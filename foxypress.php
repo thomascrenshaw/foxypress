@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.webmovementllc.com/foxypress/forum
 Description: FoxyPress is a WP + FoxyCart E-commerce plugin to easily integrated FoxyCart into your site and add items to your WordPress pages/posts
 Author: WebMovement, LLC
-Version: 0.1
+Version: 0.1.0
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -103,14 +103,22 @@ function foxypress_wp_head() {
 	if(get_option('foxycart_storeurl')!=''){
 		if($version=="0.7.1"){
 			echo'<!-- BEGIN FOXYCART FILES -->
-			<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+			<script type="text/javascript">
+			if(jQuery !== undefined){
+			  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+			}
+			</script>
 			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
 			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1_fc/colorbox.css" type="text/css" media="screen" charset="utf-8" />
 			<!-- END FOXYCART FILES -->
 			';
 		}else{
 			echo'<!-- BEGIN FOXYCART FILES -->
-			<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+			<script type="text/javascript">
+				if(jQuery !== undefined){
+				  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+				}
+			</script>
 			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
 			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1/colorbox.css" type="text/css" media="screen" charset="utf-8" />
 			<!-- END FOXYCART FILES -->
