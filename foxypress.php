@@ -182,7 +182,7 @@ function foxypress_options()
 		<td align="left">
 			<?php
 				if(get_option('foxycart_apikey')==''){
-					echo'<input type="text" name="foxycart_apikey" value="<?php echo $apikey; ?>" size="50" readonly />';
+					echo'<input type="text" name="foxycart_apikey" value="' . $apikey . '" size="50" readonly />';
 				}else{
 					echo'<input type="text" name="foxycart_apikey" value="' . get_option("foxycart_apikey") . '" size="50" readonly />';
 				}
