@@ -11,6 +11,10 @@ This is an E-commerce plugin for FoxyCart to easily add items to your WordPress 
 
 == Changelog ==
 
+= 0.1.1 =
+
+* Fixed: Graphic changes
+
 = 0.1.0 =
 
 * Fixed: JQuery confliction.  A check is now made if JQuery is already included in your pages.
@@ -20,13 +24,14 @@ This is an E-commerce plugin for FoxyCart to easily add items to your WordPress 
 1. Extract the zip file and drop the contents in the wp-content/plugins/ directory of your WordPress installation.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Enter your FoxyCart Store URL found in FoxyCart's Admin section, then click save.
+
 == Frequently Asked Questions ==
 
-Do I need a FoxyCart account to use this plugin?
+**Do I need a FoxyCart account to use this plugin?**
 
 Yes, you do. Please signup for a FoxyCart account <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182" target="_blank">here</a>.
 
-Do I need to know HTML to use this plugin?
+**Do I need to know HTML to use this plugin?**
 
 No. That is the reason this plugin was made. You can learn the WP shortcode or use the WYSIWIG menu item to add your product through a short form.
 
