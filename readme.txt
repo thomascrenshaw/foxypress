@@ -4,12 +4,17 @@ Tags: products, foxycart, cart, e-commerce, shopping cart
 Requires at least: 3.0
 Tested up to: 3.1
 Stable tag: trunk
+Version: 0.1.2
 
 This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.
 == Description ==
 This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.
 
 == Changelog ==
+
+= 0.1.2 =
+
+* Fixed: JQuery include check updated.
 
 = 0.1.1 =
 

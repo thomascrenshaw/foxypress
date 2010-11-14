@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.webmovementllc.com/foxypress/forum
 Description: FoxyPress is a WP + FoxyCart E-commerce plugin to easily integrated FoxyCart into your site and add items to your WordPress pages/posts
 Author: WebMovement, LLC
-Version: 0.1.1
+Version: 0.1.2
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -101,24 +101,26 @@ add_action('wp_head', 'foxypress_wp_head');
 function foxypress_wp_head() {
 	$version = get_option('foxycart_storeversion');
 	if(get_option('foxycart_storeurl')!=''){
+		echo"
+		<script type='text/javascript'>
+			if (typeof jQuery == 'undefined') {
+				var head = document.getElementsByTagName('head')[0];
+				script = document.createElement('script');
+				script.id = 'jQuery';
+				script.type = 'text/javascript';
+				script.src = 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js';
+				head.appendChild(script);
+			}
+		</script>
+		";
 		if($version=="0.7.1"){
 			echo'<!-- BEGIN FOXYCART FILES -->
-			<script type="text/javascript">
-			if(jQuery !== undefined){
-			  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-			}
-			</script>
 			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
 			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1_fc/colorbox.css" type="text/css" media="screen" charset="utf-8" />
 			<!-- END FOXYCART FILES -->
 			';
 		}else{
 			echo'<!-- BEGIN FOXYCART FILES -->
-			<script type="text/javascript">
-				if(jQuery !== undefined){
-				  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-				}
-			</script>
 			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
 			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1/colorbox.css" type="text/css" media="screen" charset="utf-8" />
 			<!-- END FOXYCART FILES -->
