@@ -33,4 +33,18 @@ h2 {
 }
 
 
-hr {color: #fff; background-color: #fff; border:2px dotted #ccc; border-style: none none dotted; }
+hr {
+  color: #fff; 
+  background-color: #fff; 
+  border:2px dotted #ccc; 
+  border-style: none none dotted; 
+}
+
+.inventory-heading{
+  font-size: 11pt;
+  border-bottom: solid;
+}
+
+.inventory-label{
+  text-align: center;
+}

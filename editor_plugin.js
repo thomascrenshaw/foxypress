@@ -4,8 +4,8 @@
 		init : function(ed, url) {
 			ed.addCommand('mceFoxyPress', function() {
 				ed.windowManager.open({
-					file : url + '/dialog.htm',
-					width : 445 + parseInt(ed.getLang('foxypress.delta_width', 0)),
+					file : url + '/dialog.php',
+					width : 850 + parseInt(ed.getLang('foxypress.delta_width', 0)),
 					height : 635 + parseInt(ed.getLang('foxypress.delta_height', 0)),
 					inline : 1
 				}, {

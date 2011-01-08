@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.webmovementllc.com/foxypress/forum
 Description: FoxyPress is a WP + FoxyCart E-commerce plugin to easily integrated FoxyCart into your site and add items to your WordPress pages/posts
 Author: WebMovement, LLC
-Version: 0.1.2
+Version: 0.1.3
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -40,14 +40,18 @@ Thanks and enjoy this plugin!
 
 **************************************************************************/
 
-include_once("cart_validation.php");
+include_once( 'settings.php' );
+global $foxypress_url; 
+$foxypress_url = get_option('foxycart_storeurl');
 
-$foxyClass = new FoxyCart_Helper;
-
-$foxycart_options = get_option('foxycart');
-
-// init process for button control
-add_action('init', 'myplugin_addbuttons');
+if ( !empty ( $foxypress_url ) ){
+  // init process for button control
+  add_action('init', 'myplugin_addbuttons');
+  add_action('get_header', 'foxypress_wp_head' );
+  
+  // Include inventory settings and functionality \\
+  include_once( 'inventory.php');
+}  
 
 function myplugin_addbuttons() {
    // Don't bother doing this stuff if the current user lacks permissions
@@ -96,23 +100,21 @@ function foxypress_shortcode( $atts, $content = null) {
 }
 add_shortcode('foxypress', 'foxypress_shortcode');
 
-add_action('wp_head', 'foxypress_wp_head');
 
 function foxypress_wp_head() {
 	$version = get_option('foxycart_storeversion');
-	if(get_option('foxycart_storeurl')!=''){
 		echo"
 		<script type='text/javascript'>
 			if (typeof jQuery == 'undefined') {
 				var head = document.getElementsByTagName('head')[0];
-				script = document.createElement('script');
-				script.id = 'jQuery';
-				script.type = 'text/javascript';
-				script.src = 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js';
+				var script = document.createElement('script');
+				script.setAttribute('id', 'jQuery' );
+				script.setAttribute('type','text/javascript')
+				script.setAttribute('src', 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
 				head.appendChild(script);
-			}
-		</script>
-		";
+			}  
+    </script>";  
+
 		if($version=="0.7.1"){
 			echo'<!-- BEGIN FOXYCART FILES -->
 			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
@@ -126,7 +128,6 @@ function foxypress_wp_head() {
 			<!-- END FOXYCART FILES -->
 			';
 		}
-	}
 }
 
 function foxypress_request($name, $default=null) {
@@ -136,105 +137,16 @@ function foxypress_request($name, $default=null) {
 
 
 add_action( 'admin_menu', 'foxypress_add_menu' );
-function foxypress_add_menu()
-{
-    add_options_page('Setup FoxyPress', 'FoxyPress', 8, 'foxypress.php', 'foxypress_options');
-}
-
-function foxypress_options()
-{
-	$len = 16;
-	$base='ABCDEFGHKLMNOPQRSTWXYZabcdefghjkmnpqrstwxyz123456789';
-	$max=strlen($base)-1;
-	$activatecode='';
-	mt_srand((double)microtime()*1000000);
-	while (strlen($activatecode)<$len+1){
-	  $activatecode.=$base{mt_rand(0,$max)};
-	}
-	$today = getdate();
-	$apikey .= "wmm" . $today['mon'] . $today['mday'] . $today['year'] . $today['seconds'] . $activatecode;
-
-    ?>
-    <div class="wrap" style="text-align:center;">
-    <img src="../wp-content/plugins/foxypress/img/foxycart_logo.png" />
-
-    <form method="post" action="options.php">
-    <?php wp_nonce_field('update-options'); ?>
-
-    <table class="form-table">
-    <tr>
-    	<td colspan="2">
-    		<p>The FoxyPress Plugin was created to provide users a way to harness the easy to use e-commerce functionality of FoxyCart.</p>
-			<p>The plugin can be implemented two different ways:
-				<ul>
-					<li>Typed WordPress ShortCode</li>
-					<li>WordPress Generated ShortCode from the WYSIWYG Editor</li>
-				</ul>
-			</p>
-    	</td>
-    </tr>
-    <tr valign="top">
-		<td align="right" width="300">FoxyCart Store URL</td>
-		<td align="left">
-			<input type="text" name="foxycart_storeurl" value="<?php echo get_option('foxycart_storeurl'); ?>" size="50" />
-		</td>
-    </tr>
-    <tr valign="top">
-		<td align="right" width="300">FoxyCart API Key</td>
-		<td align="left">
-			<?php
-				if(get_option('foxycart_apikey')==''){
-					echo'<input type="text" name="foxycart_apikey" value="' . $apikey . '" size="50" readonly />';
-				}else{
-					echo'<input type="text" name="foxycart_apikey" value="' . get_option("foxycart_apikey") . '" size="50" readonly />';
-				}
-			?>
-			<br />
-			*Please copy this into your FoxyCart settings for your Datafeed/API Key
-		</td>
-    </tr>
-    <tr valign="top">
-		<td align="right" width="300">FoxyCart Store Version</td>
-		<td align="left">
-			<select name="foxycart_storeversion" width="300" style="width: 300px">
-			<?php
-				$version = get_option('foxycart_storeversion');
-				if($version=="0.7.1"){
-					echo("<option value='0.7.1' selected>0.7.1</option>");
-					echo("<option value='0.7.0'>0.7.0</option>");
-				}else{
-					echo("<option value='0.7.1'>0.7.1</option>");
-					echo("<option value='0.7.0' selected>0.7.0</option>");
-				}
-
-			?>
-
-			</select>
-		</td>
-    </tr>
-    <tr>
-    	<td colspan="2" align="center">
-    		<input type="hidden" name="action" value="update" />
-			<input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion" />
-			<p class="submit">
-			<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
-			</p>
-    	</td>
-    </tr>
-    </table>
-	<?
-		echo($here);
-	?>
-
-	</form>
-	<img src="../wp-content/plugins/foxypress/img/footer.png" />
-	<p style="text-align:center;">Please visit our forum for info and help for all your needs.
-		<br />
-		<a href="http://www.webmovementllc.com/foxypress/forum" target="_blank">http://www.webmovementllc.com/foxypress/forum</a>
-		<br /><br />
-		Need a FoxyCart account?  Go to <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182" target="_blank">FoxyCart</a> today and sign up!
-	</p>
-	</div>
-    <?php
+function foxypress_add_menu() {
+    // Set admin as the only one who can use Inventory for security
+    $allowed_group = 'manage_options';
+  
+      // Add the admin panel pages for Inventory. Use permissions pulled from above
+    if ( function_exists( 'add_menu_page' ) ) {
+       add_menu_page( __( 'Foxypress','foxypress' ), __( 'Foxypress','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options' );
+     }
+    if ( function_exists( 'add_submenu_page' ) ) {
+       add_submenu_page( 'foxypress', __( 'Settings','foxypress' ), __( 'Manage Settings','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options');     
+     }
 }
 ?>
