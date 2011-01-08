@@ -12,8 +12,6 @@ define('INVENTORY_IMAGE_LOCAL_DIR', "/wp-content/inventory_images");
 define('INVENTORY_SAVE_TO', "../wp-content/inventory_images");
 define('INVENTORY_LOAD_FROM', "wp-content/inventory_images");
 
-
-
 // Create a master category for Inventory and its sub-pages
 add_action('admin_menu', 'inventory_menu');
 
@@ -29,9 +27,9 @@ function inventory_menu()  {
   // Add the admin panel pages for Inventory. Use permissions pulled from above
    if (function_exists('add_submenu_page')) 
      {
-       add_submenu_page('foxypress', __('Manage Inventory','foxypress'), __('Manage Inventory','inventory'), $allowed_group, 'inventory', 'edit_inventory');
+       add_submenu_page('foxypress', __('Inventory','foxypress'), __('Manage Inventory','foxypress'), $allowed_group, 'inventory', 'edit_inventory');
        // Note only admin can change inventory options
-       add_submenu_page('foxypress', __('Manage Categories','foxypress'), __('Manage Categories','inventory'), $allowed_group, 'inventory-categories', 'manage_inventory_categories');
+       add_submenu_page('foxypress', __('Inventory Categories','foxypress'), __('Manage Categories','foxypress'), $allowed_group, 'inventory-categories', 'manage_inventory_categories');
      }
 }
 
@@ -107,13 +105,13 @@ function check_inventory() {
     $defaultImage = '../wp-content/plugins/foxypress/img/default-product-image.jpg';
     $defaultImgMove = INVENTORY_SAVE_TO . '/default-product-image.jpg';
     echo $defaultImage;
-    if (file_exists( $defaultImage )) {      
-      if (copy ( $defaultImage, $defaultImgMove)) {
+    if ( file_exists( $defaultImage ) ) {            
+      if ( copy ( $defaultImage, $defaultImgMove ) ) {
       } else {
-        echo 'could not copy image';
+        echo 'could not copy default product image';
       }
     }
-else{ echo 'files does not exits at plugin directory';}
+  else{ echo 'files does not exist at plugin directory';}
   }
 }
 

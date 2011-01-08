@@ -13,6 +13,7 @@ This is an E-commerce plugin for FoxyCart to easily add items to your WordPress 
 == Changelog ==
 
 = 0.1.3 =
+* Fixed: Admin menu link errors. Links to inventory from Foxypress tab menu were invalid upon upgrade.  
 * Added: Inventory features.  It is now possile to manage a simple inventory with add, edit, and delete functionality.  Inventory items may be inserted using the foxypress popup editor.
 * Added: Disabled use of foxypress without foxycart store url
 * Moved: Foxypress now uses its own tab on the admin menu.  Sub-tabs include settings, inventory management, and inventory category management 

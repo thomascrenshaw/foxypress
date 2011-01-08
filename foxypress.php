@@ -41,17 +41,16 @@ Thanks and enjoy this plugin!
 **************************************************************************/
 
 include_once( 'settings.php' );
-global $foxypress_url; 
+global $foxypress_url;
 $foxypress_url = get_option('foxycart_storeurl');
 
 if ( !empty ( $foxypress_url ) ){
   // init process for button control
   add_action('init', 'myplugin_addbuttons');
   add_action('get_header', 'foxypress_wp_head' );
-  
-  // Include inventory settings and functionality \\
-  include_once( 'inventory.php');
-}  
+
+
+}
 
 function myplugin_addbuttons() {
    // Don't bother doing this stuff if the current user lacks permissions
@@ -112,8 +111,8 @@ function foxypress_wp_head() {
 				script.setAttribute('type','text/javascript')
 				script.setAttribute('src', 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js');
 				head.appendChild(script);
-			}  
-    </script>";  
+			}
+    </script>";
 
 		if($version=="0.7.1"){
 			echo'<!-- BEGIN FOXYCART FILES -->
@@ -140,13 +139,18 @@ add_action( 'admin_menu', 'foxypress_add_menu' );
 function foxypress_add_menu() {
     // Set admin as the only one who can use Inventory for security
     $allowed_group = 'manage_options';
-  
+
       // Add the admin panel pages for Inventory. Use permissions pulled from above
     if ( function_exists( 'add_menu_page' ) ) {
        add_menu_page( __( 'Foxypress','foxypress' ), __( 'Foxypress','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options' );
      }
     if ( function_exists( 'add_submenu_page' ) ) {
-       add_submenu_page( 'foxypress', __( 'Settings','foxypress' ), __( 'Manage Settings','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options');     
+       add_submenu_page( 'foxypress', __( 'Settings','foxypress' ), __( 'Manage Settings','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options');
      }
+}
+
+if ( !empty ( $foxypress_url ) ){
+  // Include inventory settings and functionality \\
+  include_once( 'inventory.php');
 }
 ?>
