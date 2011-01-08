@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.webmovementllc.com/foxypress/forum
 Description: FoxyPress is a WP + FoxyCart E-commerce plugin to easily integrated FoxyCart into your site and add items to your WordPress pages/posts
 Author: WebMovement, LLC
-Version: 0.1.3
+Version: 0.1.4
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
