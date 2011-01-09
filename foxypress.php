@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.webmovementllc.com/foxypress/forum
 Description: FoxyPress is a WP + FoxyCart E-commerce plugin to easily integrated FoxyCart into your site and add items to your WordPress pages/posts
 Author: WebMovement, LLC
-Version: 0.1.5
+Version: 0.1.6
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -77,15 +77,14 @@ function add_myplugin_tinymce_plugin($plugin_array) {
 // determine absolute url path of editor_plugin.js
 function url($type) {
     //check if defined WordPress Plugins URL
-	if (defined('WP_PLUGINS_URL'))  {
+  if (defined('WP_PLUGINS_URL'))  {
 
-		return WP_PLUGINS_URL."/". $type ."/editor_plugin.js";
+    return WP_PLUGINS_URL."/". $type ."/editor_plugin.js";
 
-	}else{
+  }else{
     //if not assumme it is default location.
-	return "../../../wp-content/plugins/". $type ."/editor_plugin.js";
-
-	}
+  return "../../../wp-content/plugins/". $type ."/editor_plugin.js";
+  }
 }
 
 function foxypress_shortcode( $atts, $content = null) {
@@ -107,13 +106,13 @@ add_action( 'admin_menu', 'foxypress_add_menu' );
 function foxypress_add_menu() {
     // Set admin as the only one who can use Inventory for security
     $allowed_group = 'manage_options';
-
+    
       // Add the admin panel pages for Inventory. Use permissions pulled from above
     if ( function_exists( 'add_menu_page' ) ) {
        add_menu_page( __( 'Foxypress','foxypress' ), __( 'Foxypress','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options' );
      }
     if ( function_exists( 'add_submenu_page' ) ) {
-       add_submenu_page( 'foxypress', __( 'Settings','foxypress' ), __( 'Manage Settings','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options');
+       add_submenu_page( 'foxypress', __( 'Settings','foxypress' ), __( 'Manage Settings','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options' );
      }
 }
 

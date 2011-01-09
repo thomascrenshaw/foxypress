@@ -75,7 +75,6 @@ function check_inventory() {
                 inventory_code VARCHAR(30) NOT NULL,
                 inventory_name VARCHAR(100) NOT NULL,
                 inventory_description TEXT NOT NULL,
-                inventory_order INT(11) NOT NULL,
                 inventory_weight VARCHAR(30) NULL,
                 inventory_quantity INT(11) DEFAULT 0,
                 category_id INT(11) NOT NULL,
@@ -104,7 +103,6 @@ function check_inventory() {
   // COPY DEFAULT PRODUCT IMAGE TO IMAGE DIRECOTRY \\
     $defaultImage = '../wp-content/plugins/foxypress/img/default-product-image.jpg';
     $defaultImgMove = INVENTORY_SAVE_TO . '/default-product-image.jpg';
-    echo $defaultImage;
     if ( file_exists( $defaultImage ) ) {            
       if ( copy ( $defaultImage, $defaultImgMove ) ) {
       } else {
@@ -127,7 +125,7 @@ function wp_inventory_display_list() {
     FROM " . WP_INVENTORY_TABLE . ", " . WP_INVENTORY_CATEGORIES_TABLE . ", " . WP_INVENTORY_IMAGES_TABLE . " 
     WHERE " . WP_INVENTORY_TABLE .".inventory_id = " . WP_INVENTORY_IMAGES_TABLE . ".inventory_id AND " 
     . WP_INVENTORY_TABLE .".category_id = " . WP_INVENTORY_CATEGORIES_TABLE . ".category_id   
-    ORDER BY inventory_order DESC");
+    ORDER BY inventory_code DESC");
     
   if ( !empty($items) ) {
     ?>
@@ -337,7 +335,7 @@ check_inventory();
         return;
       }
       $data = $data[0];
-      inv_deleteFile($directory . $data->inventory_image);
+      // inv_deleteFile($directory . $data->inventory_image); \\
       $query = sprintf('DELETE FROM ' . WP_INVENTORY_IMAGES_TABLE . ' WHERE inventory_images_id=%d', $image_id);
       
       $wpdb->query($query);
@@ -352,7 +350,6 @@ check_inventory();
     $code = !empty($_REQUEST['inventory_code']) ? $_REQUEST['inventory_code'] : '';
     $name = !empty($_REQUEST['inventory_name']) ? $_REQUEST['inventory_name'] : '';
     $desc = !empty($_REQUEST['inventory_description']) ? $_REQUEST['inventory_description'] : '';
-    $order = !empty($_REQUEST['inventory_order']) ? $_REQUEST['inventory_order'] : '';
     $cat = !empty($_REQUEST['category_id']) ? $_REQUEST['category_id'] : '';
     $price = !empty($_REQUEST['inventory_price']) ? $_REQUEST['inventory_price'] : '';
     $weight = !empty($_REQUEST['inventory_weight']) ? $_REQUEST['inventory_weight'] : '';
@@ -361,6 +358,7 @@ check_inventory();
     $quantity = !empty($_REQUEST['inventory_quantity']) ? $_REQUEST['inventory_quantity'] : '';
    
     $image = isset($_FILES["inv_image"]["name"]) ? $_FILES["inv_image"]["name"] : "";
+    $defaultImg = isset( $_POST['default_image'] );
     if ($image) {
       $imgname = inv_doImages("inv_image");
       if (!$imgname) {
@@ -370,10 +368,11 @@ check_inventory();
       }
     }
     if (!$image){
-      $imgname = 'default-product-image.jpg';
+      if( $defaultImg == 'ON' ){      
+        $imgname = 'default-product-image.jpg';
+      }        
     }
-    $order= ($order * 1);
-    $order = (!$order) ? 0 : $order;
+
     $price = ($price * 1);
     $price = (!$price) ? 0 : $price;
     $added = strtotime($added);
@@ -383,7 +382,6 @@ check_inventory();
       $code = stripslashes($code);
       $name = stripslashes($name);
       $desc = stripslashes($desc);
-      $order = stripslashes($order);
       $cat = stripslashes($cat);
       $price = stripslashes($price);
       $added = stripslashes($added);
@@ -409,8 +407,8 @@ check_inventory();
           $sql = "INSERT INTO " . WP_INVENTORY_TABLE . " SET inventory_code='" . mysql_escape_string($code)
         . "', inventory_name='" . mysql_escape_string($name)
         . "', inventory_description='" . mysql_escape_string($desc)
+        . "', date_added='" . mysql_escape_string($added)
         . "', category_id='" . mysql_escape_string($cat) 
-        . "', inventory_order='" . mysql_escape_string($order)
         . "', inventory_weight='" . mysql_escape_string($weight)
         . "', inventory_price='" . mysql_escape_string($price)
         . "', inventory_quantity='" . ($quantity*1) . "'"
@@ -424,7 +422,6 @@ check_inventory();
         . "', inventory_name='" . mysql_escape_string($name)
         . "', inventory_description='" . mysql_escape_string($desc)
         . "', category_id='" . mysql_escape_string($cat) 
-        . "', inventory_order='" . mysql_escape_string($order)
         . "', inventory_weight='" . mysql_escape_string($weight)
         . "', inventory_price='" . mysql_escape_string($price) 
         . "', inventory_quantity='" . ($quantity*1)
@@ -455,7 +452,6 @@ check_inventory();
         $users_entries->inventory_description = $desc;
         $users_entries->date_added = $added;
         $users_entries->inventory_price = $price;
-        $users_entries->inventory_order = $order;
         $users_entries->inventory_category = $cat;      
         $users_entries->inventory_quantity = $quantity;
       }
@@ -606,9 +602,12 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
               if (!empty($data) && $data->inventory_id) {
                 $ires = $wpdb->get_results("SELECT * FROM " . WP_INVENTORY_IMAGES_TABLE . " WHERE inventory_id=" . $data->inventory_id);
                 foreach ($ires as $imagedata) {
-                    echo '<tr><tdclass="inventory-title"><legend>Existing Image</legend>';
+                    echo '<tr><table>';
+                    echo '<tr><td class="inventory-title"><legend>Existing Image</legend>';
                     echo '<br><a href="' . $_SERVER['PHP_SELF'] . '?page=inventory&action=delimage&image_id=' . $imagedata->inventory_images_id . '&inventory_id=' . $imagedata->inventory_id . '">(Remove)</a>';
-                    echo '</td><td><img style="max-width: 300px;"  src="' . INVENTORY_IMAGE_DIR . "/" . $imagedata->inventory_image . '">';
+                    echo '</td><td><img style="max-width: 300px;"  src="' . INVENTORY_IMAGE_DIR . "/" . $imagedata->inventory_image . '"></td>';
+                    echo '<td>*Remove this image before adding a new one</td>';
+                    echo '</tr></table></tr>';
                 } 
               }
             ?>
@@ -620,6 +619,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
                   <td>                  
                       <input type="file" name="inv_image"  class="input" size="60">                      
                   </td>
+                  <td><input type="checkbox" name="default_image" /> Use default image</td>
                   <td>
                      <div id="inventory-help">
                       <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
@@ -785,14 +785,14 @@ function inv_isImage($file) {
 
 function inv_uploadFile($field, $filename, $savetopath, $overwrite, $name="") { 
     global $message;
-    if (!is_array($field)) {
+    if ( !is_array( $field ) ) {
       $field = $_FILES[$field];
     }
-    if (!file_exists($savetopath)) {
+    if ( !file_exists( $savetopath ) ) {
       echo "<br>The save-to path doesn't exist.... attempting to create...<br>";
       mkdir(ABSPATH . "/" . str_replace("../", "", $savetopath));
     }
-    if (!file_exists($savetopath)) {
+    if ( !file_exists( $savetopath ) ) {
       echo "<br>The save-to directory (" . $savetopath . ") does not exist, and could not be created automatically.<br>";
       return false;
     }
@@ -803,7 +803,7 @@ function inv_uploadFile($field, $filename, $savetopath, $overwrite, $name="") {
         return false;
       }
     }
-    if ($field["error"] > 0) {
+    if ( $field["error"] > 0 ) {
             switch ($field["error"]) {
                 case 1:
                     $error = "The file is too big. (php.ini)"; // php installation max file size error

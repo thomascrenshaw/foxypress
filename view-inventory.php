@@ -10,7 +10,8 @@ function wp_display_foxypress_inventory(){
   global $wpdb;
   $items = $wpdb->get_results("SELECT " . WP_INVENTORY_TABLE . ".*, " . WP_INVENTORY_CATEGORIES_TABLE . ".category_name, " . WP_INVENTORY_IMAGES_TABLE . ".*  
     FROM " . WP_INVENTORY_TABLE . ", " . WP_INVENTORY_CATEGORIES_TABLE . ", " . WP_INVENTORY_IMAGES_TABLE . " 
-    WHERE " . WP_INVENTORY_TABLE .".inventory_id = " . WP_INVENTORY_IMAGES_TABLE . ".inventory_id  
+    WHERE " . WP_INVENTORY_TABLE .".inventory_id = " . WP_INVENTORY_IMAGES_TABLE . ".inventory_id AND " 
+    . WP_INVENTORY_TABLE .".category_id = " . WP_INVENTORY_CATEGORIES_TABLE . ".category_id   
     ORDER BY inventory_order DESC");
 
 ?>
