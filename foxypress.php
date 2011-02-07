@@ -178,11 +178,6 @@ function FixPostVar($variable, $default = '')
 }
 
 function curlPostRequest($url, $postData) {
-$mtime = microtime();
-      $mtime = explode(' ', $mtime);
-      $mtime = $mtime[1] + $mtime[0];
-      $starttime = $mtime;
-
     $ch=curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
   if(!empty($postData))
@@ -207,12 +202,6 @@ $mtime = microtime();
   }
 
   curl_close($ch);
-   $mtime = microtime();
-        $mtime = explode(" ", $mtime);
-        $mtime = $mtime[1] + $mtime[0];
-        $endtime = $mtime;
-        $totaltime = ($endtime - $starttime);
-      echo 'This page was created in ' .$totaltime. ' seconds.';
     return($response);
 }
 
