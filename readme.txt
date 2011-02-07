@@ -4,7 +4,7 @@ Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress, pres
 Requires at least: 3.0
 Tested up to: 3.4
 Stable tag: trunk
-Version: 0.1.7
+Version: 0.1.8
 
 This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.
 == Description ==
@@ -19,6 +19,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC.  Additional Fo
 - Scott Hollencamp - Order Management inspiration
 
 == Changelog ==
+
+= 0.1.8 =
+* General bug fixes and additional instructions.
 
 = 0.1.7 =
 * Added: Order Management - this management tab allows you to sync WordPress with your FoxyCart transactions/customers. This functionality allows you to add notes to orders, change their status, edit billing/shipping addresses, and add shipping/tracking information.

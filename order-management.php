@@ -553,7 +553,7 @@ function SyncTransactions()
 	//use that date to query for new transactions that have happened since then
 	$foxyStoreURL = get_option('foxycart_storeurl');
 	$foxyAPIKey =  get_option('foxycart_apikey');
-	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
+	$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  $foxyAPIKey;
 	$foxyData["api_action"] = "transaction_list";
