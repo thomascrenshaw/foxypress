@@ -70,11 +70,11 @@ Yes, you do. Please signup for a FoxyCart account <a href="http://affiliate.foxy
 
 No. That is the reason this plugin was made. You can learn the WP shortcode or use the WYSIWIG menu item to add your product through a short form.
 
-**Why doesn't my add to cart button open the modal dialog?  **
+**Why doesn't my add to cart button open the modal dialog?**
 
 Make sure you don't have .foxycart.com at the end of your store subdomain.  You only need the subdomain in the textbox. Correct: websevenpointo Incorrect: websevenpointo.foxycart.com.
 
-**Why doesn't my default image work? **
+**Why doesn't my default image work?**
 
 Make sure it is in the inventory_images folder.
 
