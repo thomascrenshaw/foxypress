@@ -11,7 +11,9 @@ This is an E-commerce plugin for FoxyCart to easily add items to your WordPress 
 This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.  FoxyPress is developed and implemented soley by WebMovement, LLC.  Additional FoxyPress changes will be completed based on forum user request. If special needs are required, please contact us directly at foxypress@webmovementllc.com.
 
 --Site credits--
+
 - WebMovement, LLC - Plugin Development and conception
+
 - Scott Hollencamp - Order Management inspiration
 
 == Changelog ==
