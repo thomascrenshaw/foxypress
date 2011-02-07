@@ -48,3 +48,7 @@ hr {
 .inventory-label{
   text-align: center;
 }
+
+#product-form{
+  min-height: 315px;
+}

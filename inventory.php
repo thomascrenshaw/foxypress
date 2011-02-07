@@ -575,7 +575,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
                   </td>
                   <td>
                     <div id="inventory-help">
-                      <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                      <a href="#"><img src="" height="15px" />
                       <span>Item Code: i.e item sku, or number</span></a>
                     </div>              
                   </td>
@@ -592,7 +592,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
                   </td>
                   <td>
                     <div id="inventory-help">
-                      <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                      <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                       <span>Name of the item or product</span></a>
                     </div>
                   </td>
@@ -622,7 +622,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
                   <td><input type="checkbox" name="default_image" /> Use default image</td>
                   <td>
                      <div id="inventory-help">
-                      <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                      <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                       <span>Upload a thumbnail image to associate to the product.  This will display in foxycart and the inventory.</span></a>
                     </div>
                   </td>
@@ -638,7 +638,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
                   </td>              
                   <td>
                     <div id="inventory-help">
-                      <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                      <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                       <span>Enter a description of your product or item.</span></a>
                     </div>
                   </td>
@@ -668,7 +668,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
               </td>
               <td>
                 <div id="inventory-help">
-                    <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                    <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                     <span>Select the item category.  The categories must first be created via foxycart.com, then added to your inventory category list.</span></a>
                 </div>  
               </td>
@@ -689,7 +689,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
               </td>
               <td>
                <div id="inventory-help">
-                <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                   <span>Enter the date you want the item submission logged by.</span></a>
                 </div>  
               </td>              
@@ -705,7 +705,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
               </td>
               <td>
                 <div id="inventory-help">
-                  <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                  <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                   <span>Enter the price of the item in US Dollars.</span></a>
                 </div>
               </td>
@@ -721,7 +721,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
               </td>
               <td>
               <div id="inventory-help">
-                <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                   <span>Enter the product weight in one the following formats: 10, 10.23, 0.34</span></a>
                 </div>
               </td>
@@ -737,7 +737,7 @@ function wp_inventory_edit_form($mode='add', $inventory_id=false) {
               </td>
                   <td>
                   <div id="inventory-help">
-                  <a href="#"><img src="http://static-p4.fotolia.com/jpg/00/12/15/15/400_F_12151553_jI74hHdTUVmUpWV8KhX3NGLdbfbuNvsw.jpg" height="15px" />
+                  <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
                   <span>Number of items to sell.</span></a>
                 </div>
                   </td>

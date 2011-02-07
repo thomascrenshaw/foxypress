@@ -1,16 +1,26 @@
 === FoxyPress ===
 Contributors: webmovementllc
-Tags: products, foxycart, cart, e-commerce, shopping cart
+Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress, press
 Requires at least: 3.0
 Tested up to: 3.4
 Stable tag: trunk
-Version: 0.1.6
+Version: 0.1.7
 
 This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.
 == Description ==
-This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.
+This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.  FoxyPress is developed and implemented soley by WebMovement, LLC.  Additional FoxyPress changes will be completed based on forum user request. If special needs are required, please contact us directly at foxypress@webmovementllc.com.
+
+--Site credits--
+- WebMovement, LLC - Plugin Development and conception
+- Scott Hollencamp - Order Management inspiration
 
 == Changelog ==
+
+= 0.1.7 =
+* Added: Order Management - this management tab allows you to sync WordPress with your FoxyCart transactions/customers. This functionality allows you to add notes to orders, change their status, edit billing/shipping addresses, and add shipping/tracking information.
+* Added: Status Management - this management tab allows you to add/edit/delete specific statuses that your transactions require.  You can choose to trigger email alerts and add tracking information.
+* Changed: Inventory usage - the inventory is where you will keep track of all your products.  When you add an item from inventory to your page, it will only put the id of the product, then the item is pulled from the database when your page loads.  This allows you to change your product's name, price, etc and have it reflect on your already published pages.
+* General bug fixes and additional instructions.
 
 = 0.1.6 =
 * Fixed: Default Image for inventory items.  Users must now select "use default image" if they want to apply the default image to their item
@@ -44,7 +54,7 @@ This is an E-commerce plugin for FoxyCart to easily add items to your WordPress 
 
 1. Extract the zip file and drop the contents in the wp-content/plugins/ directory of your WordPress installation.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Enter your FoxyCart Store URL found in FoxyCart's Admin section, then click save.
+3. Enter your FoxyCart Store Subdomain URL found in FoxyCart's Admin section, then click save.
 
 == Frequently Asked Questions ==
 
@@ -55,6 +65,14 @@ Yes, you do. Please signup for a FoxyCart account <a href="http://affiliate.foxy
 **Do I need to know HTML to use this plugin?**
 
 No. That is the reason this plugin was made. You can learn the WP shortcode or use the WYSIWIG menu item to add your product through a short form.
+
+**Why doesn't my add to cart button open the modal dialog?  **
+
+Make sure you don't have .foxycart.com at the end of your store subdomain.  You only need the subdomain in the textbox. Correct: websevenpointo Incorrect: websevenpointo.foxycart.com.
+
+**Why doesn't my default image work? **
+
+Make sure it is in the inventory_images folder.
 
 **Where do I submit requests for new features or any comments I have?**
 

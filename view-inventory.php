@@ -12,7 +12,7 @@ function wp_display_foxypress_inventory(){
     FROM " . WP_INVENTORY_TABLE . ", " . WP_INVENTORY_CATEGORIES_TABLE . ", " . WP_INVENTORY_IMAGES_TABLE . " 
     WHERE " . WP_INVENTORY_TABLE .".inventory_id = " . WP_INVENTORY_IMAGES_TABLE . ".inventory_id AND " 
     . WP_INVENTORY_TABLE .".category_id = " . WP_INVENTORY_CATEGORIES_TABLE . ".category_id   
-    ORDER BY inventory_order DESC");
+    ORDER BY inventory_code DESC");
 
 ?>
 <link href="css/style.css" rel="stylesheet" type="text/css" />

@@ -5,12 +5,12 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.webmovementllc.com/foxypress/forum
 Description: FoxyPress is a WP + FoxyCart E-commerce plugin to easily integrated FoxyCart into your site and add items to your WordPress pages/posts
 Author: WebMovement, LLC
-Version: 0.1.6
+Version: 0.1.7
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
 
-Copyright (C) 2008-2010 WebMovement, LLC
+Copyright (C) 2008-2011 WebMovement, LLC
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -88,11 +88,40 @@ function url($type) {
 }
 
 function foxypress_shortcode( $atts, $content = null) {
- 	$querystring = "";
- 	while (list($key, $value) = each($atts)) {
-	    $querystring .= "$key=$value&";
-	}
-	return '<a class="foxycart" href="https://' . get_option('foxycart_storeurl') . '.foxycart.com/cart?' . $querystring . '">' . $content . '</a>';
+  global $wpdb; global $foxypress_url;
+  $querystring = "";
+  $invItems = array();
+
+  $items = $wpdb->get_results("SELECT " . WP_INVENTORY_TABLE . ".*, " . WP_INVENTORY_CATEGORIES_TABLE . ".category_name, " . WP_INVENTORY_IMAGES_TABLE . ".*
+    FROM " . WP_INVENTORY_TABLE . ", " . WP_INVENTORY_CATEGORIES_TABLE . ", " . WP_INVENTORY_IMAGES_TABLE . "
+    WHERE " . WP_INVENTORY_TABLE .".inventory_id = " . WP_INVENTORY_IMAGES_TABLE . ".inventory_id AND "
+    . WP_INVENTORY_TABLE .".category_id = " . WP_INVENTORY_CATEGORIES_TABLE . ".category_id AND " . WP_INVENTORY_TABLE .".inventory_code = " . $atts['code'] . "
+    ORDER BY inventory_code DESC");
+
+  // Default product quantity to 1.  Can be overridden by shortcode
+  $invItems['quantity'] = 1;
+
+  foreach ( $atts as $key => $value ){
+    $invItems[$key] = $value;
+    if ( $key == 'image' ){
+      $invItems[$key] = INVENTORY_IMAGE_DIR . '/' . $value;
+    }
+  }
+  foreach ( $items as $item ) {
+      $invItems['name'] = stripslashes($item->inventory_name);
+      $invItems['code'] = stripslashes( $item->inventory_code );
+      $invItems['price'] = stripslashes( $item->inventory_price );
+      $invItems['category'] = stripslashes( $item->category_name );
+      $invItems['image'] = INVENTORY_LOAD_FROM. '/' . stripslashes($item->inventory_image);
+      $invItems['weight'] = stripslashes( $item->inventory_weight );
+  }
+
+  foreach ( $invItems as $key => $value ){
+    //echo $key . ' : ' . $value . '<br />';
+    $querystring .= "$key=$value&";
+  }
+
+  return '<a class="foxycart" href="https://' . $foxypress_url . '.foxycart.com/cart?' . $querystring . '">' . $content . '</a>';
 }
 add_shortcode('foxypress', 'foxypress_shortcode');
 
@@ -106,7 +135,7 @@ add_action( 'admin_menu', 'foxypress_add_menu' );
 function foxypress_add_menu() {
     // Set admin as the only one who can use Inventory for security
     $allowed_group = 'manage_options';
-    
+
       // Add the admin panel pages for Inventory. Use permissions pulled from above
     if ( function_exists( 'add_menu_page' ) ) {
        add_menu_page( __( 'Foxypress','foxypress' ), __( 'Foxypress','foxypress' ), $allowed_group, 'foxypress', 'foxypress_options' );
@@ -119,6 +148,84 @@ function foxypress_add_menu() {
 if ( !empty ( $foxypress_url ) ){
   // Include inventory settings and functionality \\
   include_once( 'inventory.php');
+  include_once( 'order-management.php');
+  include_once( 'status-management.php');
+}
+
+function FixGetVar($variable, $default = '')
+{
+  $value = $default;
+  if(isset($_GET[$variable]))
+  {
+    $value = trim($_GET[$variable]);
+      if(get_magic_quotes_gpc())
+      {
+      $value = stripslashes($value);
+      }
+  }
+  return $value;
+}
+
+function FixPostVar($variable, $default = '')
+{
+  $value = $default;
+  if(isset($_POST[$variable]))
+  {
+      $value = trim($_POST[$variable]);
+      $value = addslashes($value);
+  }
+  return $value;
+}
+
+function curlPostRequest($url, $postData) {
+$mtime = microtime();
+      $mtime = explode(' ', $mtime);
+      $mtime = $mtime[1] + $mtime[0];
+      $starttime = $mtime;
+
+    $ch=curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+  if(!empty($postData))
+  {
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+  }
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+  curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+  curl_setopt($ch, CURLOPT_FRESH_CONNECT, false);
+  curl_setopt($ch, CURLOPT_FORBID_REUSE, false);
+  $response = curl_exec($ch);
+  $info = curl_getinfo($ch);
+
+  if ($response === false || $info['http_code'] != 200) {
+    $output = "No cURL data returned for $url [". $info['http_code']. "]";
+      if (curl_error($ch))
+    {
+      $response .= "\n". curl_error($ch);
+    }
+  }
+
+  curl_close($ch);
+   $mtime = microtime();
+        $mtime = explode(" ", $mtime);
+        $mtime = $mtime[1] + $mtime[0];
+        $endtime = $mtime;
+        $totaltime = ($endtime - $starttime);
+      echo 'This page was created in ' .$totaltime. ' seconds.';
+    return($response);
+}
+
+function GetCurrentPageURL() {
+  $pageURL = 'http';
+  if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+  $pageURL .= "://";
+  if ($_SERVER["SERVER_PORT"] != "80") {
+    $pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"] . $_SERVER['PHP_SELF'];
+  } else {
+    $pageURL .= $_SERVER["SERVER_NAME"] . $_SERVER['PHP_SELF'];
+  }
+  return $pageURL;
 }
 
 function importFoxyScripts(){

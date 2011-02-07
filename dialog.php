@@ -13,16 +13,29 @@ var cfCounter=0;
 
 function validate(){
    var formValid = 0;
-	 var element = document.getElementById( 'foxypress-insert' ).elements;
+   var element = document.getElementById( 'foxypress-insert' ).elements;
 
-	 for( var i = 0; i < element.length; i++ ) {
-	   var elem = element[i]; // set current element to shorter variable, for simplicity sake.
-	   
-	   var goodValue = "<img src='img/check.png' />";
-	   var badValue = "<img src = 'img/x.png' />";
-	   
-	   switch ( elem.name ){   
-      case 'price' : 
+   for( var i = 0; i < element.length; i++ ) {
+     var elem = element[i]; // set current element to shorter variable, for simplicity sake.
+     
+     var goodValue = "<img src='img/check.png' />";
+     var badValue = "<img src = 'img/x.png' />";
+     
+     switch ( elem.name ){  
+     case 'code' : 
+        if ( elem.value == '' ) {
+         document.getElementById('valid-' + elem.name).innerHTML= badValue;          
+        } 
+        else{
+          document.getElementById('valid-' + elem.name).innerHTML= goodValue;
+          formValid += 1;
+        } 
+      break; 
+      }
+<?php /*     
+ * -------- Validation Check against name & price fields ---------------------
+ * -------- currently, we don't need these, they belong to release 1.6.0 ----- *   
+ *  case 'price' : 
         if ( elem.value == '' ) {
          document.getElementById('valid-' + elem.name).innerHTML= badValue;          
         } 
@@ -41,33 +54,36 @@ function validate(){
           formValid += 1;
         } 
       break;
-     }     
-	 }	 
-	 return formValid;
+     }   
+ ---------------------------------------------------------------------------------
+ * */ ?>   
+   }   
+   return formValid;
 }
-  	 
+     
 function createInput(){
-		var controls="<tr><td height='22'><input name='custom" + cfCounter + "' type='text' value='Field Name' class='text' size='25' value='' style='margin-left:24px;' /></td><td height='22'><input name='cvalue" + cfCounter + "' type='text' value='Value' class='text' size='25' value='' onblur='validateValue(this)' style='margin-left:24px;' /><div id='valid-custom" + cfCounter + "'></div></td></tr>";
+    var controls="<tr><td height='22'><input name='custom" + cfCounter + "' type='text' value='Field Name' class='text' size='25' value='' style='margin-left:24px;' /></td><td height='22'><input name='cvalue" + cfCounter + "' type='text' value='Value' class='text' size='25' value='' onblur='validateValue(this)' style='margin-left:24px;' /><div id='valid-custom" + cfCounter + "'></div></td></tr>";
 
-		document.getElementById("customfieldcontainer").innerHTML+=controls;
-		cfCounter = cfCounter + 1;
+    document.getElementById("customfieldcontainer").innerHTML+=controls;
+    cfCounter = cfCounter + 1;
 }
 
 function checkForm(){
-	  var formIsValid = validate();
-		if( formIsValid != 2 ){
-			alert("Please fill in the required fields.");
-		}
-		else{
-			FoxyPressDialog.insert();
-		}
+    var formIsValid = validate();
+    if( formIsValid != 1 ){
+      alert("Please fill in the required fields.");
+    }
+    else{
+      FoxyPressDialog.insert();
+    }
 }
 </script>
 </head>
 <body>
-	 <div style="background-image:url(img/top.jpg);height:19px;"></div>
+   <div style="background-image:url(img/top.jpg);height:19px;"></div>
     <div style="margin-left:auto;margin-right:auto;width:420px; text-align:left;">
       <img src="img/foxycart_logo.png" /><br />
+      <div id="product-form">
       <form onsubmit="FoxyPressDialog.insert();return false;" id="foxypress-insert" action="#">
     <?php
     // Item information values gathered from inventory
@@ -93,10 +109,10 @@ function checkForm(){
               <a href="view-inventory.php">Select Item from Inventory</a>          
             </td>
            </tr>           
-          <tr>
+          <tr><?php /*
             <td style="font-size: 10pt;padding-left:24px;">
               Product Name: *
-            </td>
+            </td>            
             <td width="205" height="22" align="left">
               <input id="name" name="name" type="text" class="text" size="30" value="<?php echo $inventory_name; ?>" "/>
               <div style="display:inline;" id="valid-name"></div>
@@ -107,7 +123,7 @@ function checkForm(){
             Product Price: *
             </td>
             <td height="22">
-            <input id="price" name="price" type="text" class="text" size="30" value="<?php echo $inventory_price; ?>" <?php /*onblur="validateValue(this)" onLoad="validateValue(this) */ ?>" />
+            <input id="price" name="price" type="text" class="text" size="30" value="<?php echo $inventory_price; ?>" />
             <div style="display:inline;" id="valid-price"></div>
             </td>
           </tr>
@@ -119,16 +135,17 @@ function checkForm(){
               <input id="image" name="image" type="text" class="text" size="30" value="<?php echo $inventory_image; ?>" />
               <div style="display:inline;" id="valid-name"></div>
             </td>
-          </tr>
+          </tr> */ ?>
           <tr>
             <td style="font-size: 10pt;padding-left:24px;">
-            Product Code:
+            Product Code: *
             </td>
             <td height="22">
             <input id="code" name="code" type="text" class="text" size="30" value="<?php echo $inventory_code; ?>" />
             <div style="display:inline;" id="valid-code"></div>
             </td>
-          </tr>
+          </tr> 
+          <?php /*
           <tr>
             <td style="font-size: 10pt;padding-left:24px;">
             Product Quantity:
@@ -155,7 +172,7 @@ function checkForm(){
             <input id="weight" name="weight" type="text" class="text" size="30" value="<?php echo $inventory_weight; ?>" />
             <div style="display:inline;" id="valid-weight"></div>
             </td>
-          </tr>
+          </tr> */ ?>
           <tr>
             <td style="font-size: 10pt;padding-left:24px;">
             Product ShipTo:
@@ -178,28 +195,29 @@ function checkForm(){
         </table>
         <table id="customfieldcontainer" width="420">
         </table>
-  			<table id="customfieldcontainer" width="420">
-  			</table>
-  			<table width="420">
-  			  <tr>
-  				<td colspan="2" align="right" style="padding-right:36px;" height="26">
-  					<input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();"  />
-  					<input type="button" id="insert" name="insert" value="{#insert}" onclick="checkForm();"  /><br />
-  				</td>
-  			  </tr>
-  			  <tr>
-  				<td colspan="2">
-  					<br />
-  				</td>
-  				</tr>
-  			</table>
-		</form>
-		<img src="img/footer.png" /><br />
-		<p style="text-align:center;">Please visit our forum for info and help for all your needs.
-		<br />
-		<a href="http://www.webmovementllc.com/foxypress/forum" target="_blank">http://www.webmovementllc.com/foxypress/forum</a>
-		</p>
-	</div>
-	<div style="background-image:url(img/bottom.jpg);height:19px;"></div>
+        <table id="customfieldcontainer" width="420">
+        </table>
+        <table width="420">
+          <tr>
+          <td colspan="2" align="right" style="padding-right:36px;" height="26">
+            <input type="button" id="cancel" name="cancel" value="{#cancel}" onclick="tinyMCEPopup.close();"  />
+            <input type="button" id="insert" name="insert" value="{#insert}" onclick="checkForm();"  /><br />
+          </td>
+          </tr>
+          <tr>
+          <td colspan="2">
+            <br />
+          </td>
+          </tr>
+        </table>
+    </form>
+    </div>
+    <img src="img/footer.png" /><br />
+    <p style="text-align:center;">Please visit our forum for info and help for all your needs.
+    <br />
+    <a href="http://www.webmovementllc.com/foxypress/forum" target="_blank">http://www.webmovementllc.com/foxypress/forum</a>
+    </p>
+  </div>
+  <div style="background-image:url(img/bottom.jpg);height:19px;"></div>
 </body>
 </html>
