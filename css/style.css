@@ -1,0 +1,54 @@
+body {
+	margin:0px;
+	padding:0px;
+	color: #666;
+	font-family: "Lucida Grande", Verdana, sans-serif;
+	font-size: 10pt;
+	line-height: 20px;
+	background-image:url(../img/gradient.jpg);
+}
+
+a {text-decoration: none; color:#e11f26;}
+a:visited {text-decoration: none; color:#000000;}
+a:active {text-decoration: none; color:#000000;}
+a:hover {text-decoration: none; color:#000000;}
+
+h1 {
+	color: #333;
+	font-family: "Lucida Grande", Verdana;
+	font-size: 10pt;
+	font-variant: normal;
+	font-weight: bold;
+	line-height: 16px;
+}
+
+
+h2 {
+	color: #999;
+	font-family: "Lucida Grande", Verdana;
+	font-size: 8pt;
+	font-variant: normal;
+	font-weight: normal;
+	line-height: 12px;
+}
+
+
+hr {
+  color: #fff; 
+  background-color: #fff; 
+  border:2px dotted #ccc; 
+  border-style: none none dotted; 
+}
+
+.inventory-heading{
+  font-size: 11pt;
+  border-bottom: solid;
+}
+
+.inventory-label{
+  text-align: center;
+}
+
+#product-form{
+  min-height: 315px;
+}
