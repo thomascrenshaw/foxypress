@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.webmovementllc.com/foxypress/forum
 Description: FoxyPress is a WP + FoxyCart E-commerce plugin to easily integrated FoxyCart into your site and add items to your WordPress pages/posts
 Author: WebMovement, LLC
-Version: 0.1.8
+Version: 0.1.9
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -217,6 +217,94 @@ function GetCurrentPageURL() {
   return $pageURL;
 }
 
+function GetPagination($page, $total_pages, $limit, $targetpage)
+{
+	$adjacents = 3;
+	if ($page == 0) $page = 1;
+	$prev = $page - 1;
+	$next = $page + 1;
+	$lastpage = ceil($total_pages/$limit);
+	$lpm1 = $lastpage - 1;
+
+	$pagination = "";
+	if($lastpage > 1)
+	{
+		$pagination .= "<div class=\"pagination\">";
+		//previous button
+		if ($page > 1)
+			$pagination.= "<a href=\"$targetpage&pagenum=$prev\"><< previous</a>";
+		else
+			$pagination.= "<span class=\"disabled\"><< previous</span>";
+
+		//pages
+		if ($lastpage < 7 + ($adjacents * 2))	//not enough pages to bother breaking it up
+		{
+			for ($counter = 1; $counter <= $lastpage; $counter++)
+			{
+				if ($counter == $page)
+					$pagination.= "<span class=\"current\">$counter</span>";
+				else
+					$pagination.= "<a href=\"$targetpage&pagenum=$counter\">$counter</a>";
+			}
+		}
+		elseif($lastpage > 5 + ($adjacents * 2))	//enough pages to hide some
+		{
+			//close to beginning; only hide later pages
+			if($page < 1 + ($adjacents * 2))
+			{
+				for ($counter = 1; $counter < 4 + ($adjacents * 2); $counter++)
+				{
+					if ($counter == $page)
+						$pagination.= "<span class=\"current\">$counter</span>";
+					else
+						$pagination.= "<a href=\"$targetpage&pagenum=$counter\">$counter</a>";
+				}
+				$pagination.= "...";
+				$pagination.= "<a href=\"$targetpage&pagenum=$lpm1\">$lpm1</a>";
+				$pagination.= "<a href=\"$targetpage&pagenum=$lastpage\">$lastpage</a>";
+			}
+			//in middle; hide some front and some back
+			elseif($lastpage - ($adjacents * 2) > $page && $page > ($adjacents * 2))
+			{
+				$pagination.= "<a href=\"$targetpage&pagenum=1\">1</a>";
+				$pagination.= "<a href=\"$targetpage&pagenum=2\">2</a>";
+				$pagination.= "...";
+				for ($counter = $page - $adjacents; $counter <= $page + $adjacents; $counter++)
+				{
+					if ($counter == $page)
+						$pagination.= "<span class=\"current\">$counter</span>";
+					else
+						$pagination.= "<a href=\"$targetpage&pagenum=$counter\">$counter</a>";
+				}
+				$pagination.= "...";
+				$pagination.= "<a href=\"$targetpage&pagenum=$lpm1\">$lpm1</a>";
+				$pagination.= "<a href=\"$targetpage&pagenum=$lastpage\">$lastpage</a>";
+			}
+			//close to end; only hide early pages
+			else
+			{
+				$pagination.= "<a href=\"$targetpage&pagenum=1\">1</a>";
+				$pagination.= "<a href=\"$targetpage&pagenum=2\">2</a>";
+				$pagination.= "...";
+				for ($counter = $lastpage - (2 + ($adjacents * 2)); $counter <= $lastpage; $counter++)
+				{
+					if ($counter == $page)
+						$pagination.= "<span class=\"current\">$counter</span>";
+					else
+						$pagination.= "<a href=\"$targetpage?pagenum=$counter\">$counter</a>";
+				}
+			}
+		}
+		//next button
+		if ($page < $counter - 1)
+			$pagination.= "<a href=\"$targetpage&pagenum=$next\">next >></a>";
+		else
+			$pagination.= "<span class=\"disabled\">next >></span>";
+		$pagination.= "</div>\n";
+	}
+	return $pagination;
+}
+
 function importFoxyScripts(){
   $version = get_option('foxycart_storeversion');
   if(get_option('foxycart_storeurl')!=''){
@@ -234,8 +322,8 @@ function importFoxyScripts(){
     ";
     if($version=="0.7.1"){
       echo'<!-- BEGIN FOXYCART FILES -->
-      <script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
-      <link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1_fc/colorbox.css" type="text/css" media="screen" charset="utf-8" />
+      <script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.2.js" type="text/javascript" charset="utf-8"></script>
+      <link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1_fc/colorbox.2.css" type="text/css" media="screen" charset="utf-8" />
       <!-- END FOXYCART FILES -->
       ';
     }else{

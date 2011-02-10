@@ -2,9 +2,9 @@
 Contributors: webmovementllc
 Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress, press
 Requires at least: 3.0
-Tested up to: 3.4
+Tested up to: 3.5
 Stable tag: trunk
-Version: 0.1.8
+Version: 0.1.9
 
 This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.
 == Description ==
@@ -19,6 +19,11 @@ FoxyPress is developed and implemented soley by WebMovement, LLC.  Additional Fo
 - Scott Hollencamp - Order Management inspiration
 
 == Changelog ==
+
+= 0.1.9 =
+* Added: Custom fields, email address
+* Added: Pagination
+* Added: Showing hidden transactions
 
 = 0.1.8 =
 * General bug fixes and additional instructions.

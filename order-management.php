@@ -6,6 +6,7 @@ define('WP_TRANSACTION_TABLE', $table_prefix . 'foxypress_transaction');
 define('WP_TRANSACTION_NOTE_TABLE', $table_prefix . 'foxypress_transaction_note');
 define('WP_TRANSACTION_SYNC_TABLE', $table_prefix . 'foxypress_transaction_sync');
 define('WP_TRANSACTION_STATUS_TABLE', $table_prefix . 'foxypress_transaction_status');
+define('WP_FOXYPRESS_CONFIG_TABLE', $table_prefix . 'foxypress_config');
 
 add_action('admin_menu', 'order_management_menu');
 
@@ -30,7 +31,12 @@ function order_management_page_load()
 	$Page_URL = GetCurrentPageURL();
 	if($Page_Action == "sync")
 	{
-		SyncTransactions();
+		SyncTransactions(false, "0");
+		exit;
+	}
+	else if($Page_Action == "syncall")
+	{
+		SyncTransactions(true, "0");
 		exit;
 	}
 
@@ -65,7 +71,8 @@ function order_management_page_load()
 			echo("Please click the button below to sync your latest transactions from FoxyCart.<br>
 				   <form id=\"syncForm\" name=\"syncForm\" method=\"POST\">
 					<div>
-						<input type=\"button\" id=\"foxy_om_sync_now\"  name=\"foxy_om_sync_now\" value=\"Sync Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=sync', '../wp-content/plugins/foxypress/img/ajax-loader.gif', true);\" />
+						<input type=\"button\" id=\"foxy_om_sync_now\"  name=\"foxy_om_sync_now\" value=\"Sync Latest Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=sync', '../wp-content/plugins/foxypress/img/ajax-loader.gif', true);\" /> 
+						<input type=\"button\" id=\"foxy_om_sync_all\"  name=\"foxy_om_sync_all\" value=\"Sync All Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=syncall', '../wp-content/plugins/foxypress/img/ajax-loader.gif', true);\" />
 						<span id=\"foxy_om_sync\"></span>
 						<br><i>Last Synchronized: " . $drSync->foxy_transaction_sync_timestamp . "</i>
 					</div>
@@ -73,18 +80,38 @@ function order_management_page_load()
 		}
 		else
 		{
-			$Status = $wpdb->get_results("SELECT * FROM " . WP_TRANSACTION_STATUS_TABLE . " WHERE foxy_transaction_status = '$List_Status'");
+			$Transaction_Type = FixGetVar("transactiontype", "");
+			$basePage =  $Page_URL . "?page=order-management&status=" . $List_Status . "&mode=list";
+			$TransactionFilter = ($Transaction_Type == "1") ? " and foxy_transaction_is_test='1'" : (($Transaction_Type == "0") ? " and foxy_transaction_is_test='0'" : "");
+			$Status = $wpdb->get_row("SELECT * FROM " . WP_TRANSACTION_STATUS_TABLE . " WHERE foxy_transaction_status = '$List_Status'");
 			if ( !empty($Status) ) {
-				foreach ( $Status as $s ) {
-					_e('<h3>View your ' . $s->foxy_transaction_status_description . ' orders:</h3>');
-				}
+				_e('<h3>View your ' . $Status->foxy_transaction_status_description . ' orders:</h3>');				
 			}
-
-			$Transactions = $wpdb->get_results("SELECT * FROM " . WP_TRANSACTION_TABLE . " WHERE foxy_transaction_status = '$List_Status' order by foxy_transaction_id desc");
+			
+			echo("<form id=\"foxy_om_filter_form\" name=\"foxy_om_filter_form\" method=\"POST\" \">
+				 	<select id=\"foxy_om_transaction_type_filter\" name=\"foxy_om_transaction_type_filter\" onChange=\"RedirectFilter()\">
+						<option value=\"" . $basePage  . "\"" . (($Transaction_Type == "") ? "selected='selected'" : "") . ">All Transactions</option>
+						<option value=\"". $basePage . "&transactiontype=0" . "\"" . (($Transaction_Type == "0") ? "selected='selected'" : "") . ">Live Transactions</option>
+						<option value=\"". $basePage . "&transactiontype=1" ."\"" . (($Transaction_Type == "1") ? "selected='selected'" : ""). ">Test Transactions</option>
+				 	</select>
+				 </form> <br>");
+			$targetpage = $basePage . "&transactiontype=" . $Transaction_Type;
+			$drRows = $wpdb->get_row("SELECT COUNT(*) as RowCount FROM " . WP_TRANSACTION_TABLE . " WHERE foxy_transaction_status = '$List_Status' $TransactionFilter");
+			$limit = 25;
+			$pageNumber = FixGetVar('pagenum');
+			$start = ($pageNumber != "" && $pageNumber != "0") ? $start = ($pageNumber - 1) * $limit : 0;
+			$Transactions = $wpdb->get_results("SELECT * FROM " . WP_TRANSACTION_TABLE . " WHERE foxy_transaction_status = '$List_Status' $TransactionFilter order by foxy_transaction_id desc LIMIT $start, $limit");
 			if ( !empty($Transactions) ) {
 				foreach ( $Transactions as $t ) {
-					echo("<div><a href=\"" .$_SERVER['PHP_SELF'] . "?page=order-management&transaction=" . $t->foxy_transaction_id . "&mode=detail\">" . $t->foxy_transaction_id . " - " . $t->foxy_transaction_last_name . ", " . $t->foxy_transaction_first_name . "</div>");
+					echo("<div><a href=\"" . $Page_URL . "?page=order-management&transaction=" . $t->foxy_transaction_id . "&mode=detail\">" . $t->foxy_transaction_id . " - " . $t->foxy_transaction_last_name . ", " . $t->foxy_transaction_first_name . "</a></div>");
 				}
+				
+				if($drRows->RowCount > 25)
+				{
+					$Pagination = GetPagination($pageNumber, $drRows->RowCount, $limit, $targetpage);
+					echo("<Br>" . $Pagination);
+				}
+				
 			}
 			else
 			{
@@ -216,8 +243,10 @@ function order_management_page_load()
 					</div>
 					<h3>Customer Details</h3>
                     <div>
-                    	Name: " . $foxyXMLResponse->transaction->customer_last_name  . ", " . $foxyXMLResponse->transaction->customer_first_name . "
-                    </div> <br><br>
+                    	Name: " . $foxyXMLResponse->transaction->customer_last_name  . ", " . $foxyXMLResponse->transaction->customer_first_name .
+						"<br> Email: " . $foxyXMLResponse->transaction->customer_email .
+						"<br> Phone: " . $foxyXMLResponse->transaction->customer_phone . 	
+                    "</div> <br><br>
 					<div id=\"divViewAddress\">
 						<table>
 							<tr>
@@ -226,7 +255,7 @@ function order_management_page_load()
 									<b>Billing Address</b> <a href=\"javascript:ToggleEdit();\">(edit)</a> <br />" .
 									$foxyXMLResponse->transaction->customer_last_name . " " . $foxyXMLResponse->transaction->customer_first_name . "<br />" .
 									$tRow->foxy_transaction_billing_address1 . " " .  $tRow->foxy_transaction_billing_address2 . "<br />" .
-									$tRow->foxy_transaction_billing_city . ", " . $tRow->foxy_transaction_billing_state . " " . $tRow->foxy_transaction_billing_zip .
+									$tRow->foxy_transaction_billing_city . ", " . $tRow->foxy_transaction_billing_state . " " . $tRow->foxy_transaction_billing_zip . " " . $tRow->foxy_transaction_billing_country .
 								"</div>
 								</td>
 								<td valign=\"top\">
@@ -236,10 +265,10 @@ function order_management_page_load()
 									(
 										($HasSameBillingAndShipping) ?
 										$tRow->foxy_transaction_billing_address1 . " " .  $tRow->foxy_transaction_billing_address2 . "<br />" .
-										$tRow->foxy_transaction_billing_city . ", " . $tRow->foxy_transaction_billing_state . " " . $tRow->foxy_transaction_billing_zip
+										$tRow->foxy_transaction_billing_city . ", " . $tRow->foxy_transaction_billing_state . " " . $tRow->foxy_transaction_billing_zip . " " . $tRow->foxy_transaction_billing_country
 										:
 										$tRow->foxy_transaction_shipping_address1 . " " .  $tRow->foxy_transaction_shipping_address2 . "<br />" .
-										$tRow->foxy_transaction_shipping_city . ", " . $tRow->foxy_transaction_shipping_state . " " . $tRow->foxy_transaction_shipping_zip
+										$tRow->foxy_transaction_shipping_city . ", " . $tRow->foxy_transaction_shipping_state . " " . $tRow->foxy_transaction_shipping_zip . " " . $tRow->foxy_transaction_shipping_country
 									) .
 								"</div>
 								</td>
@@ -306,12 +335,18 @@ function order_management_page_load()
 				$i=1;
 				foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
 				{
+					$options = "";
+					foreach($td->transaction_detail_options->transaction_detail_option as $opt)
+					{
+						$options .=  $opt->product_option_name . ": " . $opt->product_option_value . "<br>";
+					}
 
-					echo("<td style='padding-right:45px;'><div>" .
+					echo("<td style='padding-right:45px;' valign='top'><div>" .
 							"Product: " . $td->product_name . "<br>" .
 							"Price: " . $td->product_price . "<br>" .
 							"Quantity: " . $td->product_quantity . "<br>" .
-							"Weight: " . $td->product_weight . "<br>" .
+							"Weight: " . $td->product_weight . "<br>" . 
+							$options .
 						 "</div> <br></td>");
 						 if ($i % 2) {
 							//echo "This number is not even.";
@@ -324,6 +359,26 @@ function order_management_page_load()
 				}
 				echo("	</tr>
 					</table>");
+					
+				//show hidden fields
+				
+				foreach($foxyXMLResponse->transaction->custom_fields->custom_field as $cf)
+				{
+					$HiddenFields .= "<div>" . $cf->custom_field_name . ": " . $cf->custom_field_value . "</div>";
+				}
+				if($HiddenFields != "")
+				{
+					_e("<div><b>Hidden Fields</b></div>");
+					_e($HiddenFields);
+					_e("<br>");
+				}
+				
+				_e("<div><b>Transaction Totals</b></div>" . 
+				   "<div>Product Total: $" . $foxyXMLResponse->transaction->product_total . "</div>" .
+				   "<div>Tax Total: $" . $foxyXMLResponse->transaction->tax_total . "</div>" .
+				   "<div>Shipping Total: $" . $foxyXMLResponse->transaction->shipping_total . "</div>" .
+				   "<div>Order Total: $" . $foxyXMLResponse->transaction->order_total . "</div>");
+					
 				//show notes
 				echo("<div><h3>Notes</h3></div>");
 				$Notes = $wpdb->get_results("SELECT * FROM " . WP_TRANSACTION_NOTE_TABLE . " WHERE foxy_transaction_id = '$TransactionID'");
@@ -404,11 +459,40 @@ function Begin_Foxy_Order_Management()
 {
 	?>
     <style type="text/css">
-	  .Hide { display:none; }
+		.Hide { display:none; }
+	  	div.pagination {
+			padding: 3px;
+			margin: 3px;
+		}		
+		div.pagination a {
+			padding: 2px 5px 2px 5px;
+			margin: 2px;
+			border: 1px solid #AAAADD;	
+			text-decoration: none; /* no underline */
+			/*color: #000099;*/
+		}
+		div.pagination a:hover, div.pagination a:active {
+			border: 1px solid #000099;
+			color: #000;
+		}
+		div.pagination span.current {
+			padding: 2px 5px 2px 5px;
+			margin: 2px;
+			border: 1px solid #666666;	
+			font-weight: bold;
+/*			background-color: #000099;*/
+			color: #666666;
+		}
+		div.pagination span.disabled {
+			padding: 2px 5px 2px 5px;
+			margin: 2px;
+			border: 1px solid #EEE;
+			color: #ccc;
+		}
 	</style>
 	<div class="wrap">
     	<h2><?php _e('Order Management','order-management'); ?></h2>
-        <div style="">
+        <div>
         	<h3><?php _e('Search'); ?></h3>
         	<?php _e('Search by first name, last name, or transaction id'); ?>
         	<form name="omsearchForm" id="omsearchForm" class="wrap" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>?page=order-management">
@@ -417,7 +501,6 @@ function Begin_Foxy_Order_Management()
 
             </form>
         </div>
-
 	<?
 }
 
@@ -441,6 +524,11 @@ function End_Foxy_Order_Management($NeedsSync)
 					jQuery('#divEditAddress').addClass("Hide");
 					jQuery('#divViewAddress').removeClass("Hide");
 				}
+			}
+			
+			function RedirectFilter()
+			{
+				window.location.href = jQuery('#foxy_om_transaction_type_filter').val();
 			}
 
 			function SyncTransactionsJS(baseurl, fullurl, loadingimage, showProgress)
@@ -482,8 +570,17 @@ function ManageTables()
 	  	}
 	}
 
-	if(!$TablesExist)
+	if(!$TablesExist) //fresh install, create all tables, no mods needed
 	{
+		//create config table
+		$sql = "CREATE TABLE " . WP_FOXYPRESS_CONFIG_TABLE . " ( 
+				foxy_current_version VARCHAR(10) NOT NULL
+			)";
+		$wpdb->query($sql);
+		//insert the current version
+		$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('0.1.9')";
+		$wpdb->query($sql);
+		
 		//create main transaction table to hold data that gets synched up.
 		$sql = "CREATE TABLE " . WP_TRANSACTION_TABLE . " (
 				foxy_transaction_id INT(11) NOT NULL PRIMARY KEY,
@@ -503,7 +600,8 @@ function ManageTables()
 				foxy_transaction_shipping_city VARCHAR(50) NULL,
 				foxy_transaction_shipping_state VARCHAR(2) NULL,
 				foxy_transaction_shipping_zip VARCHAR(10) NULL,
-				foxy_transaction_shipping_country VARCHAR(50) NULL
+				foxy_transaction_shipping_country VARCHAR(50) NULL,
+				foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0'
 			)";
 		$wpdb->query($sql);
 
@@ -541,15 +639,68 @@ function ManageTables()
 		$sql = "INSERT INTO " . WP_TRANSACTION_SYNC_TABLE . " (foxy_transaction_sync_date, foxy_transaction_sync_timestamp ) values ('1900-01-01', now())";
 		$wpdb->query($sql);
 	}
+	else
+	{
+		//we have some modifications to do.		
+		//version 0.1.8 - added all transaction tables/functionality (config table didnt exist yet)
+		//version 0.1.9 - added foxypress config table, added is_test column to transaction table
+		$ConfigTableExists = false;
+		foreach ( $tables as $table ) {
+			foreach ( $table as $value ) {
+				if($value == WP_FOXYPRESS_CONFIG_TABLE)
+				{
+					$ConfigTableExists = true;
+					break;
+				}
+			}
+		}
+		if(!$ConfigTableExists)
+		{
+			//create config table
+			$sql = "CREATE TABLE " . WP_FOXYPRESS_CONFIG_TABLE . " ( 
+					foxy_current_version VARCHAR(10) NOT NULL
+				)";
+			$wpdb->query($sql);
+			//insert the current version
+			$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('0.1.9')";
+			$wpdb->query($sql);
+			//alter current tables
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country";
+			$wpdb->query($sql);
+		}
+		/*
+		else
+		{		
+			//get current version
+			$drCurrentVersion = $wpdb->get_row("SELECT foxy_current_version from " . WP_FOXYPRESS_CONFIG_TABLE);
+			if($drCurrentVersion->foxy_current_version != "0.1.9")
+			{		
+				//alter current tables
+				if($drCurrentVersion->foxy_current_version == "0.1.8")
+				{
+						$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country";
+						$wpdb->query($sql);
+				}
+				//update current version
+				$sql = "UPDATE " . WP_FOXYPRESS_CONFIG_TABLE . " SET foxy_current_version = '0.1.9'";
+				$wpdb->query($sql);		
+			}
+		}
+		*/
+	}
 }
 
-function SyncTransactions()
+function SyncTransactions($SyncAll, $PageStart)
 {
 	global $wpdb;
 	//get last date we synced, if it's a new sync we start at 1900, if it's a current running system then we take the last date and subtract a day
 	$sql = "SELECT CASE foxy_transaction_sync_date WHEN '1900-01-01' THEN '1900-01-01' ELSE DATE_SUB(foxy_transaction_sync_date, INTERVAL 1 DAY) END as LastSync, DATE_FORMAT(NOW(), '%Y-%m-%d') as CurrentDate FROM " . WP_TRANSACTION_SYNC_TABLE;
 	$dr = $wpdb->get_row($sql);
-
+	$LastSync = $dr->LastSync;
+	if($SyncAll)
+	{
+		$LastSync = "1900-01-01";
+	}
 	//use that date to query for new transactions that have happened since then
 	$foxyStoreURL = get_option('foxycart_storeurl');
 	$foxyAPIKey =  get_option('foxycart_apikey');
@@ -557,22 +708,25 @@ function SyncTransactions()
 	$foxyData = array();
 	$foxyData["api_token"] =  $foxyAPIKey;
 	$foxyData["api_action"] = "transaction_list";
-	$foxyData["transaction_date_filter_begin"] = $dr->LastSync;
+	$foxyData["transaction_date_filter_begin"] = $LastSync;
 	$foxyData["transaction_date_filter_end"] = $dr->CurrentDate;
+	$foxyData["hide_transaction_filter"] = "";
+	$foxyData["is_test_filter"] = "";	
+	$foxyData["pagination_start"] = $PageStart;
 	$SearchResults = curlPostRequest($foxyAPIURL, $foxyData);
 	$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
-	//print_r($foxyXMLResponse);
 	if($foxyXMLResponse->result == "SUCCESS")
 	{
 		foreach($foxyXMLResponse->transactions->transaction as $t)
 		{
-			//check if they exist in our db already, if not insert them with a unprocessed status
+			//insert new transactions into our db, ignore existing transactions
 			$sql = "INSERT IGNORE INTO " . WP_TRANSACTION_TABLE .
 				  " SET foxy_transaction_id = '" . $t->id . "'" .
 				  ", foxy_transaction_status = '1'" .
 				  ", foxy_transaction_first_name='" . $t->customer_first_name . "'" .
 				  ", foxy_transaction_last_name='" . $t->customer_last_name . "'" .
-				  ", foxy_transaction_email='" . $t->customer_email . "'";
+				  ", foxy_transaction_email='" . $t->customer_email . "'" .
+				  ", foxy_transaction_is_test='" . $t->is_test . "'";
 
 				  if($t->shipping_address1 == "")
 				  {
@@ -606,11 +760,30 @@ function SyncTransactions()
 							  ", foxy_transaction_shipping_country = '" . $t->shipping_country. "'";
 				  }
 			$wpdb->query($sql);
+			
+			//if we ignore it and they have an old version we may have missed the...
+			//	version 0.1.9 - foxy_transaction_is_test
+			//so update accordingly
+			$sql = "UPDATE " . WP_TRANSACTION_TABLE .  " SET foxy_transaction_is_test='" . $t->is_test . "' WHERE foxy_transaction_id = '" . $t->id . "'";
+			$wpdb->query($sql);
+		}
+		
+		$Total_Transactions = (int)$foxyXMLResponse->statistics->total_transactions;
+		$Pagination_Start = (int)$foxyXMLResponse->statistics->pagination_start;
+		$Pagination_End = (int)$foxyXMLResponse->statistics->pagination_end;		
+		if($Total_Transactions > $Pagination_End) //foxy only lets us grab 300 at a time, if we have more, recurse.
+		{
+			$NextStart = $Pagination_End;		
+			SyncTransactions($SyncAll, $NextStart);
 		}
 	}
-	//update our last sync timestamp(s)
-	$sql = "UPDATE " . WP_TRANSACTION_SYNC_TABLE . " SET foxy_transaction_sync_date = '" . $dr->CurrentDate . "', foxy_transaction_sync_timestamp = now()";
-	$wpdb->query($sql);
+	
+	if($PageStart == "0") //update after all recursion is done
+	{
+		//update our last sync timestamp(s)
+		$sql = "UPDATE " . WP_TRANSACTION_SYNC_TABLE . " SET foxy_transaction_sync_date = '" . $dr->CurrentDate . "', foxy_transaction_sync_timestamp = now()";
+		$wpdb->query($sql);
+	}
 }
 
 
