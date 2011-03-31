@@ -20,7 +20,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 == Changelog ==
 
 = 0.2.0 =
-* Added option to automatically include jQuery on user’s site
+* Added option to automatically include jQuery on user's site
 * Added Custom Inventory Item Options
 * Added Multiple Option Groups for Products
 * Added Custom Inventory Item Attributes
@@ -84,9 +84,13 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 == Installation ==
 
 1.To install FoxyPress, use either the WordPress automatic installer, or drop the FoxyPress folder into your plugins folder in your WordPress installation.
+
 2. You will want to activate FoxyPress through the Plugins menu.
+
 3. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
+
 4. The last step necessary to get FoxyPress working is to go to the Manage Settings menu item under FoxyPress and enter your FoxyCart subdomain.
+
 
 == Frequently Asked Questions ==
 
