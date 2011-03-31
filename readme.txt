@@ -83,9 +83,10 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Installation ==
 
-1. Extract the zip file and drop the contents in the wp-content/plugins/ directory of your WordPress installation.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Enter your FoxyCart Store Subdomain URL found in FoxyCart's Admin section, then click save.
+1.To install FoxyPress, use either the WordPress automatic installer, or drop the FoxyPress folder into your plugins folder in your WordPress installation.
+2. You will want to activate FoxyPress through the Plugins menu.
+3. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
+4. The last step necessary to get FoxyPress working is to go to the Manage Settings menu item under FoxyPress and enter your FoxyCart subdomain.
 
 == Frequently Asked Questions ==
 
