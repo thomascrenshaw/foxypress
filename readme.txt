@@ -114,7 +114,33 @@ Go to the <a href="http://www.foxy-press.com/forum" target="_blank">FoxyPress Fo
 This is a stable release.  Please view the changelog to see the bugs we fixed.
 
 == Screenshots ==
-1. This is a screenshot of the plugin component that you add products to your page/post through.
+1. Manage Settings Page - Add your FoxyCart subdomain here and view your API key.
 
-2. This is a screenshot of the plugin settings.
- `[vimeo http://www.vimeo.com/16263168]`
+2. Manage Inventory Page - Add and edit products to your store.
+
+3. Add Inventory Page - Add your product and the details/images associated.
+
+4. Edit Inventory Page - Edit your product's features, options and images.
+
+4a. Edit Inventory Page - Custom options have been added to products.
+
+5. Manage Option Groups Page - This page allows you to add sizes, colors, etc to your items.
+
+6. Manage Categories Page - This page allows you to add categories for your items.  Remember to match your FoxyCart categories.
+
+7. Order Management Page - This page allows you to keep track of your orders, as well as some customer information.
+
+7a. Order Management Category - This page shows an example of all orders that are labeled for Processing.
+
+8. Order Management Transaction Detail - This page shows information about the product purchased.
+
+8a. Order Management Transaction Detail - Additional transaction details.
+
+9. Status Management - This page allows you to edit different statuses for your transactions.
+
+9a. Status Management Detail Page - A return email can be configured for users.
+
+10. Product Listing Category Page - Here we are calling all items with a categoryid of 1, this is done through the popup.
+
+10a. FoxyPress Modal popup - This page allows you to add single items to the page or product listings for a specific category.
+ `[vimeo http://vimeo.com/21743308]`
