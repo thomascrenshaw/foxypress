@@ -2,23 +2,42 @@
 Contributors: webmovementllc
 Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress, press
 Requires at least: 3.0
-Tested up to: 3.5
+Tested up to: 3.1
 Stable tag: trunk
-Version: 0.1.9
+Version: 0.2.0
 
-This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.
+This free plugin allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon. 
 == Description ==
-This is an E-commerce plugin for FoxyCart to easily add items to your WordPress posts or pages.  Add items through the WYSIWYG Editor or shortcode.  
+This free plugin allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon. 
 
-FoxyPress is developed and implemented soley by WebMovement, LLC.  Additional FoxyPress changes will be completed based on forum user request. If special needs are required, please contact us directly at foxypress@webmovementllc.com.
+FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users’ requests. If you require custom functionality, please contact us directly at foxypress@webmovementllc.com.
 
 --Site credits--
-
 - WebMovement, LLC - Plugin Development and conception
-
 - Scott Hollencamp - Order Management inspiration
+- Uploadify - Multi-image support
 
 == Changelog ==
+
+= 0.2.0 =
+* Added option to automatically include jQuery on user’s site
+* Added Custom Inventory Item Options
+* Added Multiple Option Groups for Products
+* Added Custom Inventory Item Attributes
+* New shortcode attribute to list items from a specific category. Includes paging options and items per row.
+* New shortcode attribute to link items to an item detail page
+* New shortcode attribute for an item detail page
+* New shortcode attribute for an order detail module
+* Created default item detail page on install for foxy products to land on
+* Added search inventory option within the foxypress shortcode dialog window
+* Added multiple image support for inventory items
+* Added multiple category support for inventory items
+* Implemented Uploadify for image uploading
+* Added pagination on the inventory page
+* Modified order management UI
+* Added pagination in order management
+* Added pagination to category management
+* FoxyPress shortcode now uses inventory_id instead of code for single items
 
 = 0.1.9 =
 * Added: Custom fields, email address
@@ -88,7 +107,7 @@ Make sure it is in the inventory_images folder.
 
 **Where do I submit requests for new features or any comments I have?**
 
-Go to the <a href="http://www.webmovementllc.com/foxypress/forum" target="_blank">FoxyPress Forum</a> on WebMovement, LLC's website to submit your question/comment/feature request.
+Go to the <a href="http://www.foxy-press.com/forum" target="_blank">FoxyPress Forum</a> to submit your question/comment/feature request.
 
 == Upgrade Notice ==
 

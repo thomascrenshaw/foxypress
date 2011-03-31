@@ -6,6 +6,8 @@ body {
 	font-size: 10pt;
 	line-height: 20px;
 	background-image:url(../img/gradient.jpg);
+	background-repeat:repeat-x;
+	background-color:#dfdfdf;
 }
 
 a {text-decoration: none; color:#e11f26;}
@@ -41,7 +43,7 @@ hr {
 }
 
 .inventory-heading{
-  font-size: 11pt;
+  font-size: 9pt;
   border-bottom: solid;
 }
 
@@ -51,4 +53,143 @@ hr {
 
 #product-form{
   min-height: 315px;
+}
+
+.DialogHeading
+{
+	font-size: 11pt;
+	font-weight:bold;
+}
+
+.center
+{
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.centertext
+{
+	text-align:center;	
+}
+
+/* These css classes can be copied into your themes css style sheet and reworked as necessary */
+
+.foxypress_item_image
+{
+	/* item image div */
+}
+
+.foxypress_item_name
+{
+	/* item name div */
+}
+
+.foxypress_item_submit_wrapper
+{
+	/* add to cart div wrapper */
+}
+
+.foxypress_item_submit
+{
+	/* add to cart button */
+}
+
+.foxy_item_wrapper
+{
+	/* entire item div */
+}
+
+.foxypress_item_row
+{
+	/* entire row of items */	
+}
+
+.foxypress_item_readmore
+{
+	/* read more div */
+}
+
+.foxypress_item_price
+{
+	/* item price div */
+}
+
+/* product detail page */
+
+.foxypress_item_image_detail
+{
+	/* item image div */
+}
+
+.foxypress_item_name_detail
+{
+	/* item name div */
+}
+
+.foxypress_item_submit_wrapper_detail
+{
+	/* add to cart div wrapper */
+}
+
+.foxypress_item_submit_detail
+{
+	/* add to cart button */
+}
+
+.foxy_item_wrapper_detail
+{
+	/* entire item div */
+}
+
+.foxypress_item_readmore_detail
+{
+	/* read more div */
+}
+
+.foxypress_item_price_detail
+{
+	/* item price div */
+}
+
+.foxypress_item_image_thumbs_detail
+{
+	/* item image thumbs */
+}
+
+.foxypress_item_content_wrapper
+{
+	/* item content wrapper on listing pages */
+}
+
+div.foxy_item_pagination 
+{
+	padding: 3px;
+	margin: 3px;
+}		
+div.foxy_item_pagination a 
+{
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #AAAADD;	
+	text-decoration: none; /* no underline */
+}
+div.foxy_item_pagination a:hover, div.foxy_item_pagination a:active 
+{
+	border: 1px solid #000099;
+	color: #000;
+}
+div.foxy_item_pagination span.current 
+{
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #666666;	
+	font-weight: bold;
+	color: #666666;
+}
+div.foxy_item_pagination span.disabled 
+{
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #EEE;
+	color: #ccc;
 }

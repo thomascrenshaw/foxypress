@@ -8,11 +8,14 @@ add_filter('the_content','inventory_insert');
 
 function wp_display_foxypress_inventory(){
   global $wpdb;
-  $items = $wpdb->get_results("SELECT " . WP_INVENTORY_TABLE . ".*, " . WP_INVENTORY_CATEGORIES_TABLE . ".category_name, " . WP_INVENTORY_IMAGES_TABLE . ".*  
-    FROM " . WP_INVENTORY_TABLE . ", " . WP_INVENTORY_CATEGORIES_TABLE . ", " . WP_INVENTORY_IMAGES_TABLE . " 
-    WHERE " . WP_INVENTORY_TABLE .".inventory_id = " . WP_INVENTORY_IMAGES_TABLE . ".inventory_id AND " 
-    . WP_INVENTORY_TABLE .".category_id = " . WP_INVENTORY_CATEGORIES_TABLE . ".category_id   
-    ORDER BY inventory_code DESC");
+  $items = $wpdb->get_results("SELECT i.*
+										,ic.category_name
+										,im.inventory_images_id
+										,im.inventory_image
+								FROM " . WP_INVENTORY_TABLE . " as i
+								INNER JOIN " . WP_INVENTORY_CATEGORIES_TABLE . " as ic ON i.category_id = ic.category_id
+								LEFT JOIN " . WP_INVENTORY_IMAGES_TABLE . " as im ON i.inventory_id = im.inventory_id
+								ORDER BY i.inventory_code DESC");
 
 ?>
 <link href="css/style.css" rel="stylesheet" type="text/css" />
