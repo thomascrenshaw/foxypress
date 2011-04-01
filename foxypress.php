@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: This free plugin allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon.
 Author: WebMovement, LLC
-Version: 0.2.0
+Version: 0.2.1
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
