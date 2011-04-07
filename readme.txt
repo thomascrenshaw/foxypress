@@ -4,7 +4,7 @@ Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress, pres
 Requires at least: 3.0
 Tested up to: 3.1
 Stable tag: trunk
-Version: 0.2.1
+Version: 0.2.2
 
 This free plugin allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon. 
 == Description ==
@@ -13,6 +13,7 @@ This free plugin allows you to easily add products to your WordPress pages using
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users’ requests. If you require custom functionality, please contact us directly at foxypress@webmovementllc.com.
 
 --Site credits--
+
 - WebMovement, LLC - Plugin Development and conception
 
 - Scott Hollencamp - Order Management inspiration
@@ -20,6 +21,10 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Uploadify - Multi-image support
 
 == Changelog ==
+
+= 0.2.2 =
+* BugFix: FoxyCart Sync/Timeout issue
+* Changed products in single mode to have full description
 
 = 0.2.1 =
 * BugFix: Fixed Item Deletion

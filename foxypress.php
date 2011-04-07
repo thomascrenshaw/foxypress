@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: This free plugin allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon.
 Author: WebMovement, LLC
-Version: 0.2.1
+Version: 0.2.2
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -69,6 +69,7 @@ define('WP_POSTS', $table_prefix . 'posts');
 define('INVENTORY_IMAGE_DIR', get_bloginfo("url") . "/wp-content/inventory_images");
 define('INVENTORY_IMAGE_LOCAL_DIR', "wp-content/inventory_images/");
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.2");
 
 if ( !empty ( $foxypress_url ) ){
 	// Include inventory settings and functionality \\
@@ -173,7 +174,7 @@ function foxypress_managetables()
 			)";
 		$wpdb->query($sql);
 		//insert the current version
-		$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('0.2.0')";
+		$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('" . WP_FOXYPRESS_CURRENT_VERSION . "')";
 		$wpdb->query($sql);
 
 		//create main transaction table to hold data that gets synched up.
@@ -314,7 +315,7 @@ function foxypress_managetables()
 			)";
 		$wpdb->query($sql);
 		//insert the current version
-		$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('0.2.0')";
+		$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('" . WP_FOXYPRESS_CURRENT_VERSION . "')";
 		$wpdb->query($sql);
 
 		//create main transaction table to hold data that gets synched up.
@@ -471,7 +472,7 @@ function foxypress_managetables()
 					)";
 			$wpdb->query($sql);
 			//insert the current version
-			$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('0.2.0')";
+			$sql = "INSERT INTO " . WP_FOXYPRESS_CONFIG_TABLE . " (foxy_current_version) values ('" . WP_FOXYPRESS_CURRENT_VERSION . "')";
 			$wpdb->query($sql);
 
 
@@ -601,7 +602,7 @@ function foxypress_managetables()
 				$wpdb->query($sql);
 
 				//update to current version
-				$sql = "UPDATE " . WP_FOXYPRESS_CONFIG_TABLE . " SET foxy_current_version = '0.2.0'";
+				$sql = "UPDATE " . WP_FOXYPRESS_CONFIG_TABLE . " SET foxy_current_version = '" . WP_FOXYPRESS_CURRENT_VERSION . "'";
 				$wpdb->query($sql);
 
 				//delete rows with default proudct image
@@ -738,7 +739,7 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 		$foxyForm .= "<div class=\"foxypress_item_content_wrapper\">
 						<div class=\"foxypress_item_name\">" . stripslashes($item->inventory_name) . "</div>" .
 					 (($item->inventory_price != "" && $item->inventory_price != "0") ? "<div class=\"foxypress_item_price\">$" . stripslashes($item->inventory_price) . "</div>" : "") .
-					 "  <div class=\"foxypress_item_description\">" . foxypress_TruncateString(stripslashes($item->inventory_description), 35) . "</div>" .
+					 "  <div class=\"foxypress_item_description\">" . stripslashes($item->inventory_description) . "</div>" .
 					 $foxyAttributes .
 					 $foxyOptionList .
 					 $MoreDetailDiv .

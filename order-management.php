@@ -704,7 +704,7 @@ function SyncTransactions($SyncAll, $PageStart)
 			$wpdb->query($sql);
 		}
 		
-		$Total_Transactions = (int)$foxyXMLResponse->statistics->total_transactions;
+		$Total_Transactions = (int)$foxyXMLResponse->statistics->filtered_total;
 		$Pagination_Start = (int)$foxyXMLResponse->statistics->pagination_start;
 		$Pagination_End = (int)$foxyXMLResponse->statistics->pagination_end;		
 		if($Total_Transactions > $Pagination_End) //foxy only lets us grab 300 at a time, if we have more, recurse.
