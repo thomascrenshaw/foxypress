@@ -21,6 +21,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Uploadify - Multi-image support
 
 == Changelog ==
+
 = 0.2.4 =
 * Changed Single Product Template to use different CSS classes
 * Added multiple image thumbnails to the Single Product Template
