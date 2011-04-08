@@ -3,9 +3,9 @@
 **************************************************************************
 Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
-Description: This free plugin allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon.
+Description: FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon.
 Author: WebMovement, LLC
-Version: 0.2.3
+Version: 0.2.4
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -69,7 +69,7 @@ define('WP_POSTS', $table_prefix . 'posts');
 define('INVENTORY_IMAGE_DIR', get_bloginfo("url") . "/wp-content/inventory_images");
 define('INVENTORY_IMAGE_LOCAL_DIR', "wp-content/inventory_images/");
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.3");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.4");
 
 if ( !empty ( $foxypress_url ) ){
 	// Include inventory settings and functionality \\
@@ -712,12 +712,12 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 	{
 		$FullURL =  get_bloginfo("url") . $detailurl;
 		$FullURL = foxypress_AddQSValue($FullURL, "id",  $item->inventory_id);
-		$MoreDetailDiv = "<div class=\"foxypress_item_readmore\"><a href=\"" . $FullURL . "\">Read More</a></div>";
+		$MoreDetailDiv = "<div class=\"" . (($show_addtocart) ? "foxypress_item_readmore_single" : "foxypress_item_readmore") . "\"><a href=\"" . $FullURL . "\">Read More</a></div>";
 	}
 
 	if($show_addtocart)
 	{
-		$foxyForm = "<div class=\"foxy_item_wrapper\">
+		$foxyForm = "<div class=\"foxy_item_wrapper_single\">
 						<form action=\"https://" . $foxypress_url . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\">
 							<input type=\"hidden\" name=\"quantity\" value=\"1\" />
 							<input type=\"hidden\" name=\"name\" value=\"" . stripslashes($item->inventory_name) . "\" />
@@ -735,24 +735,41 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 		//check to see if we have any options & build up the dropdown if we do
 		$foxyOptionList = foxypress_buildoptionlist($item->inventory_id);
 
-		$foxyForm .= ($item->inventory_image != "") ? "<div class=\"foxypress_item_image\"><img style=\"max-width: 300px;\"  src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" /></div>" : "<div class=\"foxypress_item_image\"><img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" /></div>";
-		$foxyForm .= "<div class=\"foxypress_item_content_wrapper\">
-						<div class=\"foxypress_item_name\">" . stripslashes($item->inventory_name) . "</div>" .
-					 (($item->inventory_price != "" && $item->inventory_price != "0") ? "<div class=\"foxypress_item_price\">$" . stripslashes($item->inventory_price) . "</div>" : "") .
-					 "  <div class=\"foxypress_item_description\">" . stripslashes($item->inventory_description) . "</div>" .
+		//get images
+		$itemImages =  $wpdb->get_results("SELECT *
+								FROM " . WP_INVENTORY_IMAGES_TABLE . "
+								WHERE inventory_id = '" . $item->inventory_id . "'
+								ORDER BY inventory_images_id");
+		$foxyThumbs = "";
+		if(!empty($itemImages) && ($wpdb->num_rows > 1))
+		{
+			$foxyThumbs = "<ul class=\"foxypress_item_image_thumbs_single\">";
+			foreach($itemImages as $ii)
+			{
+				$foxyThumbs .= "<li><a href=\"" . INVENTORY_IMAGE_DIR . "/" . $ii->inventory_image . "\" rel=\"colorbox\"><img src=\"" . INVENTORY_IMAGE_DIR . "/" . $ii->inventory_image . "\" /></a></li>";
+			}
+			$foxyThumbs .= "</ul>";
+		}
+
+		$foxyImages = ($item->inventory_image != "") ? "<div class=\"foxypress_item_image_single\"><img style=\"max-width: 300px;\"  src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />" : "<div class=\"foxypress_item_image_single\"><img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
+		$foxyImages .= $foxyThumbs . "</div>";
+
+		$foxyForm .= "<div class=\"foxypress_item_name_single\">" . stripslashes($item->inventory_name) . "</div>" .
+					 (($item->inventory_price != "" && $item->inventory_price != "0") ? "<div class=\"foxypress_item_price_single\">$" . stripslashes($item->inventory_price) . "</div>" : "") .
+					 "  <div class=\"foxypress_item_description_single\">" . stripslashes($item->inventory_description) . "</div>" .
 					 $foxyAttributes .
 					 $foxyOptionList .
 					 $MoreDetailDiv .
-					 "  <div class=\"foxypress_item_submit_wrapper\">"
+					 "  <div class=\"foxypress_item_submit_wrapper_single\">"
 							.
 							( (foxypress_canaddtocart($item->inventory_id)) ?
-							"<input type=\"submit\" value=\"Add To Cart\" class=\"foxypress_item_submit\" />" :
+							"<input type=\"submit\" value=\"Add To Cart\" class=\"foxypress_item_submit_single\" />" :
 							"Sorry, we are out of stock for this item, please check back later.")
 							.
 					 "  </div>" .
-					 "</div>" .
 					 "</form>" .
 					 "</div>";
+		$foxyForm .= $foxyImages;
 	}
 	else
 	{
