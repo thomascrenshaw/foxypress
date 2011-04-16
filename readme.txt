@@ -23,7 +23,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
-= 0.2.4 =
+= 0.2.5 =
 * Changed Single Product Template to use different CSS classes
 * Added multiple image thumbnails to the Single Product Template
 * View the release notes <a href="http://www.foxy-press.com/archives/168" target="_blank">here</a>
