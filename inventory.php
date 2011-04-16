@@ -6,6 +6,8 @@ load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_d
 // Create a master category for Inventory and its sub-pages
 add_action('admin_menu', 'inventory_menu');
 add_action('admin_init', 'inventory_postback');
+wp_enqueue_script('jquery-ui-core');
+wp_enqueue_script('jquery-ui-sortable');
 
 //handle all postbacks before we have headers
 function inventory_postback()
@@ -58,6 +60,17 @@ function inventory_postback()
 		{
 			//insert new option
 			$wpdb->query("insert into " . WP_FOXYPRESS_INVENTORY_OPTIONS . " (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_active) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '1')");
+		}
+		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory&inventory_id=" . $inventory_id);
+	}
+	else if(isset($_POST['foxy_options_order_save']))
+	{	
+		$OptionsOrderArray = explode(",", foxypress_FixPostVar('hdn_foxy_options_order'));
+		$counter = 1;
+		foreach ($OptionsOrderArray as $OptionID) 
+		{
+			$wpdb->query("update " . WP_FOXYPRESS_INVENTORY_OPTIONS . " set option_order = '$counter' where option_id='" . $OptionID . "'");
+			$counter++;
 		}
 		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory&inventory_id=" . $inventory_id);
 	}
@@ -570,6 +583,7 @@ function inventory_page_load() {
     <script type="text/javascript" src="../wp-content/plugins/foxypress/uploadify/jquery.uploadify.min.js"></script>
     <script type="text/javascript">
 		jQuery(document).ready(function() {
+		  //uploadify
 		  jQuery('#inv_image').uploadify({
 			'swf'  : '../wp-content/plugins/foxypress/uploadify/uploadify.swf',
 			'cancelImage' : '../wp-content/plugins/foxypress/uploadify/uploadify-cancel.png',
@@ -586,7 +600,19 @@ function inventory_page_load() {
 				ShowPhoto(data);
 			}
 		  });
+		  //sorting
+		  jQuery( "#foxypress_inv_options tbody" ).sortable(
+				{
+					update: function(event, ui) { jQuery('#hdn_foxy_options_order').val(jQuery( "#foxypress_inv_options tbody" ).sortable("toArray")); }	
+				}
+			);
+		  
 		});
+
+		function doSomething()
+		{
+			alert(jQuery('#hdn_foxy_options_order').val());
+		}
 
 		function ShowPhoto(data)
 		{
@@ -973,9 +999,10 @@ function foxypress_edit_item($inventory_id = "") {
 				</div>
 			</form>
             <Br />
-			<table class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">
+			<table id="foxypress_inv_options" class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">
 				<thead>
 					<tr>
+                    	<th class="manage-column" scope="col" style="width:50px;">Sort</th>
 						<th class="manage-column" scope="col">Option Name</th>
 						<th class="manage-column" scope="col">Option Value</th>
 						<th class="manage-column" scope="col">Option Group Name</th>
@@ -984,18 +1011,22 @@ function foxypress_edit_item($inventory_id = "") {
 						<th class="manage-column" scope="col">&nbsp;</th>
 					</tr>
 				</thead>
+                <tbody>
 			<?
 				//get options
 				$foxy_inv_options = $wpdb->get_results("select o.*, og.option_group_name
 														from " . WP_FOXYPRESS_INVENTORY_OPTIONS . " as o
 														inner join " . WP_FOXYPRESS_INVENTORY_OPTION_GROUP . " as og on o.option_group_id = og.option_group_id
 														where o.inventory_id = '" . $inventory_id .  "'
-														order by o.option_group_id, o.option_text");
+														order by option_order");
+				$current_option_order = "";
 				if(!empty($foxy_inv_options))
 				{
 					foreach($foxy_inv_options as $foxyopt)
 					{
-						echo("<tr>
+						$current_option_order .= ($current_option_order == "") ? $foxyopt->option_id : "," . $foxyopt->option_id;
+						echo("<tr id=\"" . $foxyopt->option_id . "\">
+								<td style=\"cursor:pointer;\"><img src=\"" .get_bloginfo("url") . "/wp-content/plugins/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
 								<td>" . stripslashes($foxyopt->option_text) . "</td>
 								<td>" . stripslashes($foxyopt->option_value) . "</td>
 								<td>" . stripslashes($foxyopt->option_group_name) . "</td>
@@ -1012,10 +1043,15 @@ function foxypress_edit_item($inventory_id = "") {
 				}
 				else
 				{
-					echo("<tr><td colspan=\"6\">There are currently no options for this inventory item</td></tr>");
+					echo("<tr><td colspan=\"7\">There are currently no options for this inventory item</td></tr>");
 				}
 			?>
+            	</tbody>
 			</table>
+            <form id="foxy_order_options" name="foxy_order_options" method="POST">
+                <input type="submit" id="foxy_options_order_save" name="foxy_options_order_save" value="<?php _e('Update Order'); ?> &raquo;"  class="button bold" />
+                <input type="hidden" id="hdn_foxy_options_order" name="hdn_foxy_options_order" value="<?=$current_option_order?>" />
+            </form>
 		<?
 		}
 		else

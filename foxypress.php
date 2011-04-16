@@ -3,9 +3,9 @@
 **************************************************************************
 Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
-Description: FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon.
+Description: FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...all within your WordPress Dashboard.
 Author: WebMovement, LLC
-Version: 0.2.4
+Version: 0.2.5
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -69,7 +69,7 @@ define('WP_POSTS', $table_prefix . 'posts');
 define('INVENTORY_IMAGE_DIR', get_bloginfo("url") . "/wp-content/inventory_images");
 define('INVENTORY_IMAGE_LOCAL_DIR', "wp-content/inventory_images/");
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.4");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.5");
 
 if ( !empty ( $foxypress_url ) ){
 	// Include inventory settings and functionality \\
@@ -78,6 +78,7 @@ if ( !empty ( $foxypress_url ) ){
 	include_once('inventory-option-groups.php');
 	include_once('order-management.php');
 	include_once('status-management.php');
+	include_once('reports.php');
 }
 
 function foxypress_RunUpdates()
@@ -149,6 +150,7 @@ function foxypress_managetables()
 				 inventory_images_id INT(11) NOT NULL AUTO_INCREMENT ,
 				 inventory_id INT(11) NOT NULL ,
 				 inventory_image TEXT NULL,
+				 image_order int DEFAULT '99'
 				 PRIMARY KEY (inventory_images_id)
 			 )";
 		$wpdb->query($sql);
@@ -197,7 +199,13 @@ function foxypress_managetables()
 				foxy_transaction_shipping_state VARCHAR(2) NULL,
 				foxy_transaction_shipping_zip VARCHAR(10) NULL,
 				foxy_transaction_shipping_country VARCHAR(50) NULL,
-				foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0'
+				foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0',
+				foxy_transaction_date DATETIME,
+				foxy_transaction_product_total FLOAT(10, 2),
+				foxy_transaction_tax_total FLOAT(10, 2),
+				foxy_transaction_shipping_total FLOAT(10, 2),
+				foxy_transaction_order_total FLOAT(10, 2),
+				foxy_transaction_cc_type varchar(50)
 			)";
 		$wpdb->query($sql);
 
@@ -244,7 +252,8 @@ function foxypress_managetables()
 					option_text VARCHAR(50) NOT NULL ,
 					option_value VARCHAR(50) NOT NULL ,
 					option_extra_price FLOAT(10, 2) NOT NULL DEFAULT '0',
-					option_active TINYINT NOT NULL DEFAULT '1'
+					option_active TINYINT NOT NULL DEFAULT '1',
+					option_order INT DEFAULT '99'
 			   ) ";
 		$wpdb->query($sql);
 
@@ -338,7 +347,13 @@ function foxypress_managetables()
 				foxy_transaction_shipping_state VARCHAR(2) NULL,
 				foxy_transaction_shipping_zip VARCHAR(10) NULL,
 				foxy_transaction_shipping_country VARCHAR(50) NULL,
-				foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0'
+				foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0',
+				foxy_transaction_date DATETIME,
+				foxy_transaction_product_total FLOAT(10, 2),
+				foxy_transaction_tax_total FLOAT(10, 2),
+				foxy_transaction_shipping_total FLOAT(10, 2),
+				foxy_transaction_order_total FLOAT(10, 2),
+				foxy_transaction_cc_type varchar(50)
 			)";
 		$wpdb->query($sql);
 
@@ -385,7 +400,8 @@ function foxypress_managetables()
 					option_text VARCHAR(50) NOT NULL ,
 					option_value VARCHAR(50) NOT NULL ,
 					option_extra_price FLOAT(10, 2) NOT NULL DEFAULT '0',
-					option_active TINYINT NOT NULL DEFAULT '1'
+					option_active TINYINT NOT NULL DEFAULT '1',
+					option_order INT DEFAULT '99'
 			   ) ";
 		$wpdb->query($sql);
 
@@ -427,6 +443,10 @@ function foxypress_managetables()
 		$sql = "delete from  " . WP_INVENTORY_IMAGES_TABLE . " where inventory_image='default-product-image.jpg'";
 		$wpdb->query($sql);
 
+		//add image_order to images table
+		$sql = "ALTER TABLE " . WP_INVENTORY_IMAGES_TABLE . " ADD image_order int DEFAULT '99' AFTER inventory_image";
+		$wpdb->query($sql);
+
 		//check to see if the detail page exists already
 		$sql = "select ID from " . WP_POSTS . " where post_name='foxy-product-detail'";
 		$foxydetail = $wpdb->get_row($sql);
@@ -452,6 +472,7 @@ function foxypress_managetables()
 		//version 0.1.8 - added all transaction tables/functionality (config table didnt exist yet)
 		//version 0.1.9 - added foxypress config table, added is_test column to transaction table
 		//version 0.2.0 - added options tables for inventory
+		//version 0.2.5 - added date and total to transaction table
 		$ConfigTableExists = false;
 		$tables = $wpdb->get_results("show tables;");
 		foreach ( $tables as $table ) {
@@ -477,8 +498,21 @@ function foxypress_managetables()
 
 
 			//alter current tables
-			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country";
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country;";
 			$wpdb->query($sql);
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_date DATETIME AFTER foxy_transaction_is_test;";
+			$wpdb->query($sql);
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_product_total FLOAT(10, 2) AFTER foxy_transaction_date;";
+			$wpdb->query($sql);
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_tax_total FLOAT(10, 2) AFTER foxy_transaction_product_total;";
+			$wpdb->query($sql);
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_shipping_total FLOAT(10, 2) AFTER foxy_transaction_tax_total;";
+			$wpdb->query($sql);
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_order_total FLOAT(10, 2) AFTER foxy_transaction_shipping_total;";
+			$wpdb->query($sql);
+			$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_cc_type varchar(50) AFTER foxy_transaction_order_total;";
+			$wpdb->query($sql);
+
 
 			//create options table
 			$sql = "CREATE TABLE " . WP_FOXYPRESS_INVENTORY_OPTIONS . " (
@@ -488,7 +522,8 @@ function foxypress_managetables()
 						option_text VARCHAR(50) NOT NULL ,
 						option_value VARCHAR(50) NOT NULL ,
 						option_extra_price FLOAT(10, 2) NOT NULL DEFAULT '0',
-						option_active TINYINT NOT NULL DEFAULT '1'
+						option_active TINYINT NOT NULL DEFAULT '1',
+						option_order INT DEFAULT '99'
 				   ) ";
 			$wpdb->query($sql);
 
@@ -529,6 +564,10 @@ function foxypress_managetables()
 			$sql = "delete from  " . WP_INVENTORY_IMAGES_TABLE . " where inventory_image='default-product-image.jpg'";
 			$wpdb->query($sql);
 
+			//add image_order to images table
+			$sql = "ALTER TABLE " . WP_INVENTORY_IMAGES_TABLE . " ADD image_order int DEFAULT '99' AFTER inventory_image";
+			$wpdb->query($sql);
+
 			//check to see if the detail page exists already
 			$sql = "select ID from " . WP_POSTS . " where post_name='foxy-product-detail'";
 			$foxydetail = $wpdb->get_row($sql);
@@ -563,7 +602,8 @@ function foxypress_managetables()
 							option_text VARCHAR(50) NOT NULL ,
 							option_value VARCHAR(50) NOT NULL ,
 							option_extra_price FLOAT(10, 2) NOT NULL DEFAULT '0',
-							option_active TINYINT NOT NULL DEFAULT '1'
+							option_active TINYINT NOT NULL DEFAULT '1',
+							option_order INT DEFAULT '99'
 					   ) ";
 				$wpdb->query($sql);
 
@@ -608,7 +648,23 @@ function foxypress_managetables()
 				//delete rows with default proudct image
 				$sql = "delete from  " . WP_INVENTORY_IMAGES_TABLE . " where inventory_image='default-product-image.jpg'";
 				$wpdb->query($sql);
+				//add image_order to images table
+				$sql = "ALTER TABLE " . WP_INVENTORY_IMAGES_TABLE . " ADD image_order int DEFAULT '99' AFTER inventory_image";
+				$wpdb->query($sql);
 
+				//add date & totals to transaction table
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_date DATETIME AFTER foxy_transaction_is_test;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_product_total FLOAT(10, 2) AFTER foxy_transaction_date;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_tax_total FLOAT(10, 2) AFTER foxy_transaction_product_total;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_shipping_total FLOAT(10, 2) AFTER foxy_transaction_tax_total;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_order_total FLOAT(10, 2) AFTER foxy_transaction_shipping_total;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_cc_type varchar(50) AFTER foxy_transaction_order_total;";
+				$wpdb->query($sql);
 
 				//check to see if the detail page exists already
 				$sql = "select ID from " . WP_POSTS . " where post_name='foxy-product-detail'";
@@ -628,6 +684,31 @@ function foxypress_managetables()
 					);
 					wp_insert_post( $ProductDetailPost );
 				}
+			}
+			else if($drCurrentVersion->foxy_current_version == "0.2.0" || $drCurrentVersion->foxy_current_version == "0.2.1" || $drCurrentVersion->foxy_current_version == "0.2.2" || $drCurrentVersion->foxy_current_version == "0.2.3" || $drCurrentVersion->foxy_current_version == "0.2.4")
+			{
+				//add date & totals to transaction table
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_date DATETIME AFTER foxy_transaction_is_test;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_product_total FLOAT(10, 2) AFTER foxy_transaction_date;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_tax_total FLOAT(10, 2) AFTER foxy_transaction_product_total;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_shipping_total FLOAT(10, 2) AFTER foxy_transaction_tax_total;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_order_total FLOAT(10, 2) AFTER foxy_transaction_shipping_total;";
+				$wpdb->query($sql);
+				$sql = "ALTER TABLE " . WP_TRANSACTION_TABLE . " ADD foxy_transaction_cc_type varchar(50) AFTER foxy_transaction_order_total;";
+				$wpdb->query($sql);
+				//add sort order to options table
+				$sql = "ALTER TABLE " . WP_FOXYPRESS_INVENTORY_OPTIONS . " ADD option_order INT DEFAULT '99' AFTER option_active;";
+				$wpdb->query($sql);
+				//add sort order to images table
+				$sql = "ALTER TABLE " . WP_INVENTORY_IMAGES_TABLE . " ADD image_order int DEFAULT '99' AFTER inventory_image";
+				$wpdb->query($sql);
+				//update to current version
+				$sql = "UPDATE " . WP_FOXYPRESS_CONFIG_TABLE . " SET foxy_current_version = '" . WP_FOXYPRESS_CURRENT_VERSION . "'";
+				$wpdb->query($sql);
 			}
 		}
 	}
@@ -751,7 +832,7 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 			$foxyThumbs .= "</ul>";
 		}
 
-		$foxyImages = ($item->inventory_image != "") ? "<div class=\"foxypress_item_image_single\"><img style=\"max-width: 300px;\"  src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />" : "<div class=\"foxypress_item_image_single\"><img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
+		$foxyImages = ($item->inventory_image != "") ? "<div class=\"foxypress_item_image_single\"><img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />" : "<div class=\"foxypress_item_image_single\"><img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
 		$foxyImages .= $foxyThumbs . "</div>";
 
 		$foxyForm .= "<div class=\"foxypress_item_name_single\">" . stripslashes($item->inventory_name) . "</div>" .
@@ -777,7 +858,7 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 		$foxyForm =  "<div class=\"foxy_item_wrapper\">"
 		 			  .
 					 (($item->inventory_image != "") ?
-					 	"<div class=\"foxypress_item_image\"><img style=\"max-width: 300px;\"  src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" /></div>" :
+					 	"<div class=\"foxypress_item_image\"><a href=\"" . $FullURL . "\"><img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" /></a></div>" :
 					 	"<div class=\"foxypress_item_image\"><img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" /></div>")
 					  .
    				      	"<div class=\"foxypress_item_content_wrapper\">" .
@@ -880,7 +961,7 @@ function foxypress_handle_shortcode_detail()
 							WHERE i.inventory_id = '$inventory_id'
 							ORDER BY i.inventory_code DESC");
 
-	$foxyForm = "<div class=\"foxy_item_wrapper\">
+	$foxyForm = "<div class=\"foxy_item_wrapper_detail\">
 					<form action=\"https://" . $foxypress_url . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\">
 						<input type=\"hidden\" name=\"quantity\" value=\"1\" />
 						<input type=\"hidden\" name=\"name\" value=\"" . stripslashes($item->inventory_name) . "\" />
@@ -912,7 +993,7 @@ function foxypress_handle_shortcode_detail()
 		$foxyThumbs .= "</ul>";
 	}
 
-	$foxyImages = ($item->inventory_image != "") ? "<div class=\"foxypress_item_image_detail\"><img style=\"max-width: 300px;\"  src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />" : "<div class=\"foxypress_item_image_detail\"><img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
+	$foxyImages = ($item->inventory_image != "") ? "<div class=\"foxypress_item_image_detail\"><img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />" : "<div class=\"foxypress_item_image_detail\"><img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
 	$foxyImages .= $foxyThumbs . "</div>";
 	$foxyForm .= "<div class=\"foxypress_item_name_detail\">" . stripslashes($item->inventory_name) . "</div>" .
 				 (($item->inventory_price != "" && $item->inventory_price != "0") ? "<div class=\"foxypress_item_price_detail\">$" . stripslashes($item->inventory_price) . "</div>" : "") .
@@ -1019,7 +1100,7 @@ function foxypress_buildattributelist($inventory_id)
 function foxypress_buildoptionlist($inventory_id)
 {
 	global $wpdb;
-	//check if we have any options
+	//check if we have any options, order by group name first so that we group items together correctly
 	$itemOptions = $wpdb->get_results("SELECT o.option_text
 											,o.option_value
 											,og.option_group_name
@@ -1029,7 +1110,7 @@ function foxypress_buildoptionlist($inventory_id)
 									   inner join " . WP_FOXYPRESS_INVENTORY_OPTION_GROUP . " as og on o.option_group_id = og.option_group_id
 									   inner join " . WP_INVENTORY_TABLE . " i on o.inventory_id = i.inventory_id
 									   WHERE i.inventory_id = '$inventory_id'
-									   order by og.option_group_name");
+									   order by og.option_group_name, option_order");
 	//check to see if we have any options & build up the dropdown if we do
 	$foxyOptionList = "";
 	if(!empty($itemOptions))

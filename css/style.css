@@ -74,92 +74,69 @@ hr {
 
 /* These css classes can be copied into your themes css style sheet and reworked as necessary */
 
-.foxypress_item_image
-{
-	/* item image div */
-}
+/** SINGLE ITEM **/
+.foxy_item_wrapper_single{}
 
-.foxypress_item_name
-{
-	/* item name div */
-}
+form.foxycart{}
 
-.foxypress_item_submit_wrapper
-{
-	/* add to cart div wrapper */
-}
+.foxypress_item_name_single{ /* item name div */ }
+.foxypress_item_price_single{ /* item price div */ }
+.foxypress_item_description_single{ /* item description div */ }
+.foxypress_item_options_detail{ /* item options div */}
 
-.foxypress_item_submit
-{
-	/* add to cart button */
-}
+.foxypress_item_options{}
+	.foxypress_item_options select{ /* item options select input */}
 
-.foxy_item_wrapper
-{
-	/* entire item div */
-}
+.foxypress_item_submit_wrapper_single{ /* item submit wrapper div */ }
+	.foxypress_item_submit_wrapper_single .foxypress_item_submit{ /* item submit button */}
 
-.foxypress_item_row
-{
-	/* entire row of items */	
-}
+.foxypress_item_image_single{ /* item image div */}
+	.foxypress_item_image_single img{ /* item image element */ }
 
-.foxypress_item_readmore
-{
-	/* read more div */
-}
+	ul.foxypress_item_image_thumbs_single{ /* item thumbnail unordered list element */ }
+		ul.foxypress_item_image_thumbs_single li{ /* item thumbnail unordered list item */ }
+		ul.foxypress_item_image_thumbs_single img{ /* item thumbnail image element */ }
 
-.foxypress_item_price
-{
-	/* item price div */
-}
+/** CATEGORY TEMPLATE **/
+.foxypress_item_row{}
 
-/* product detail page */
+.foxy_item_wrapper{}
 
-.foxypress_item_image_detail
-{
-	/* item image div */
-}
+.foxypress_item_image{}
+	.foxypress_item_image img{}
 
-.foxypress_item_name_detail
-{
-	/* item name div */
-}
+.foxypress_item_content_wrapper{}
+	.foxypress_item_name{}
+	.foxypress_item_price{}
+	.foxypress_item_description{}
+	.foxypress_item_readmore {}
+		.foxypress_item_readmore a{}
 
-.foxypress_item_submit_wrapper_detail
-{
-	/* add to cart div wrapper */
-}
+.foxypress_item_row_clear{}
 
-.foxypress_item_submit_detail
-{
-	/* add to cart button */
-}
+/** PRODUCT DETAIL **/
+.foxy_item_wrapper_detail{}
 
-.foxy_item_wrapper_detail
-{
-	/* entire item div */
-}
+form.foxycart{}
 
-.foxypress_item_readmore_detail
-{
-	/* read more div */
-}
+.foxypress_item_name_detail{}
+.foxypress_item_price_detail{}
+.foxypress_item_description_detail{}
+.foxypress_item_options_detail{}
+.foxypress_item_options{}
+	.foxypress_item_options select{}
 
-.foxypress_item_price_detail
-{
-	/* item price div */
-}
+.foxypress_item_submit_wrapper_detail{}
+	.foxypress_item_submit_wrapper_detail .foxypress_item_submit{}
+	.foxypress_item_submit_wrapper_detail .foxypress_item_submit:hover{}
 
-.foxypress_item_image_thumbs_detail
-{
-	/* item image thumbs */
-}
+.foxypress_item_image_detail{}
+	.foxypress_item_image_detail img{}
+	
+	ul.foxypress_item_image_thumbs_detail{}
+		ul.foxypress_item_image_thumbs_detail li{}
+		ul.foxypress_item_image_thumbs_detail img{}
 
-.foxypress_item_content_wrapper
-{
-	/* item content wrapper on listing pages */
-}
 
 div.foxy_item_pagination 
 {

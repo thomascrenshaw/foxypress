@@ -4,9 +4,10 @@ Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress, pres
 Requires at least: 3.0
 Tested up to: 3.1.1
 Stable tag: trunk
-Version: 0.2.4
+Version: 0.2.5
 
-FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon. 
+FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...all within your WordPress Dashboard.
+`[vimeo http://vimeo.com/22461143]`
 == Description ==
 FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon. 
 
@@ -21,6 +22,11 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Uploadify - Multi-image support
 
 == Changelog ==
+
+= 0.2.4 =
+* Changed Single Product Template to use different CSS classes
+* Added multiple image thumbnails to the Single Product Template
+* View the release notes <a href="http://www.foxy-press.com/archives/168" target="_blank">here</a>
 
 = 0.2.4 =
 * Changed Single Product Template to use different CSS classes
@@ -164,4 +170,4 @@ This is a stable release.  Please view the changelog to see the bugs we fixed.
 10. Product Listing Category Page - Here we are calling all items with a categoryid of 1, this is done through the popup.
 
 10a. FoxyPress Modal popup - This page allows you to add single items to the page or product listings for a specific category.
- `[vimeo http://vimeo.com/21743308]`
+ `[vimeo http://vimeo.com/22461104]`

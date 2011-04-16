@@ -191,6 +191,7 @@ function order_management_page_load()
 					<thead>
 						<tr>
 							<th class=\"manage-column\" scope=\"col\">Transaction ID</th>
+							<th class=\"manage-column\" scope=\"col\">Date of Order</th>
 							<th class=\"manage-column\" scope=\"col\">Name</th>
 							<th class=\"manage-column\" scope=\"col\">Email</th>
 							<th class=\"manage-column\" scope=\"col\">Tracking</th>
@@ -201,6 +202,8 @@ function order_management_page_load()
 					echo("<tr>
 							<td>
 								<a href=\"" . $Page_URL . "?page=order-management&transaction=" . $t->foxy_transaction_id . "&mode=detail\">" . $t->foxy_transaction_id . "</a>
+							</td>
+							<td>" . $t->foxy_transaction_date . "</td>
 							<td>" . $t->foxy_transaction_last_name . ", " . $t->foxy_transaction_first_name . "</td>
 							<td>" . $t->foxy_transaction_email . "</td>
 							<td>" . $t->foxy_transaction_trackingnumber . "</td>
@@ -490,6 +493,7 @@ function ProcessSearch($SearchValue)
 					<thead>
 						<tr>
 							<th class=\"manage-column\" scope=\"col\">Transaction ID</th>
+							<th class=\"manage-column\" scope=\"col\">Date of Order</th>
 							<th class=\"manage-column\" scope=\"col\">Name</th>
 							<th class=\"manage-column\" scope=\"col\">Email</th>
 							<th class=\"manage-column\" scope=\"col\">Tracking</th>
@@ -502,6 +506,8 @@ function ProcessSearch($SearchValue)
 				echo("<tr>
 							<td>
 								<a href=\"" . $Page_URL . "?page=order-management&transaction=" . $t->foxy_transaction_id . "&mode=detail\">" . $t->foxy_transaction_id . "</a>
+							</td>
+							<td>" . $t->foxy_transaction_date . "</td>
 							<td>" . $t->foxy_transaction_last_name . ", " . $t->foxy_transaction_first_name . "</td>
 							<td>" . $t->foxy_transaction_email . "</td>
 							<td>" . $t->foxy_transaction_trackingnumber . "</td>
@@ -661,7 +667,13 @@ function SyncTransactions($SyncAll, $PageStart)
 				  ", foxy_transaction_first_name='" . $t->customer_first_name . "'" .
 				  ", foxy_transaction_last_name='" . $t->customer_last_name . "'" .
 				  ", foxy_transaction_email='" . $t->customer_email . "'" .
-				  ", foxy_transaction_is_test='" . $t->is_test . "'";
+				  ", foxy_transaction_is_test='" . $t->is_test . "'" . 
+				  ", foxy_transaction_date = '" . $t->transaction_date . "'" .
+				  ", foxy_transaction_product_total = '" . $t->product_total . "'" .
+				  ", foxy_transaction_tax_total = '" . $t->tax_total . "'" .
+				  ", foxy_transaction_shipping_total = '" . $t->shipping_total . "'" .
+				  ", foxy_transaction_order_total = '" . $t->order_total . "'" .
+				  ", foxy_transaction_cc_type = '" . $t->cc_type . "'";
 
 				  if($t->shipping_address1 == "")
 				  {
@@ -698,9 +710,17 @@ function SyncTransactions($SyncAll, $PageStart)
 			
 			//if our insert ignores it and they have an old version we may have missed the ...
 			//	- version 0.1.9 - foxy_transaction_is_test
-			//  - ?
+			//  - version 0.2.5 - _date, _product_total, tax_total, shipping_total, order_total, cc_type
 			//so update accordingly
-			$sql = "UPDATE " . WP_TRANSACTION_TABLE .  " SET foxy_transaction_is_test='" . $t->is_test . "' WHERE foxy_transaction_id = '" . $t->id . "'";
+			$sql = "UPDATE " . WP_TRANSACTION_TABLE .  " 
+					SET  foxy_transaction_is_test='" . $t->is_test . "'" . 
+					  ", foxy_transaction_date = '" . $t->transaction_date . "'" .
+					  ", foxy_transaction_product_total = '" . $t->product_total . "'" .
+					  ", foxy_transaction_tax_total = '" . $t->tax_total . "'" .
+					  ", foxy_transaction_shipping_total = '" . $t->shipping_total . "'" .
+					  ", foxy_transaction_order_total = '" . $t->order_total . "'" .
+					  ", foxy_transaction_cc_type = '" . $t->cc_type . "'
+					WHERE foxy_transaction_id = '" . $t->id . "'";
 			$wpdb->query($sql);
 		}
 		
