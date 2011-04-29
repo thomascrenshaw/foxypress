@@ -82,7 +82,7 @@ function inventory_option_groups_page_load() {
                         echo("<tr>
                                 <td>
 									<form name=\"foxy_edit_option_group_form\" id=\"foxy_edit_option_group_form\" method=\"POST\">
-										<input type=\"text\" id=\"foxypress_edit_option_name\" name=\"foxypress_edit_option_name\" value=\"" . $group->option_group_name  . "\" />
+										<input type=\"text\" id=\"foxypress_edit_option_name\" name=\"foxypress_edit_option_name\" value=\"" . stripslashes($group->option_group_name)  . "\" />
 										<input type=\"hidden\" id=\"foxypress_edit_option_id\" name=\"foxypress_edit_option_id\" value=\"" . $group->option_group_id . "\" />
 										<input type=\"submit\" id=\"foxypress_edit_option_save\" name=\"foxypress_edit_option_save\" value=\"Save\" />
 									</form>

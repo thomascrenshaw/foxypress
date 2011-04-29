@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...all within your WordPress Dashboard.
 Author: WebMovement, LLC
-Version: 0.2.5
+Version: 0.2.6
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -69,7 +69,7 @@ define('WP_POSTS', $table_prefix . 'posts');
 define('INVENTORY_IMAGE_DIR', get_bloginfo("url") . "/wp-content/inventory_images");
 define('INVENTORY_IMAGE_LOCAL_DIR', "wp-content/inventory_images/");
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.5");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.6");
 
 if ( !empty ( $foxypress_url ) ){
 	// Include inventory settings and functionality \\
@@ -150,7 +150,7 @@ function foxypress_managetables()
 				 inventory_images_id INT(11) NOT NULL AUTO_INCREMENT ,
 				 inventory_id INT(11) NOT NULL ,
 				 inventory_image TEXT NULL,
-				 image_order int DEFAULT '99'
+				 image_order int DEFAULT '99',
 				 PRIMARY KEY (inventory_images_id)
 			 )";
 		$wpdb->query($sql);
@@ -759,12 +759,13 @@ function foxypress_handle_tracking_module()
 {
 	$url = get_bloginfo("url") . "/wp-content/plugins/foxypress/ajax.php";
 	$trackingform = "<div> Enter your order number </div>
-					 <div>
-					 	<input type=\"text\" id=\"foxypress_order_number\" name=\"foxypress_order_number\" value=\"\" />
-						<input type=\"button\" id=\"foxypress_tracking_button\"	name=\"foxypress_tracking_button\"	value=\"Find Tracking Number\" onclick=\"foxypress_find_tracking('" . $url . "');\" />
-					 </div>
-					 <div id=\"foxypress_find_tracking_return\"></div>
-					 ";
+		 <div><input type=\"text\" id=\"foxypress_order_number\" name=\"foxypress_order_number\" value=\"\" /></div>
+		 <div> Enter your last name </div>
+		 <div><input type=\"text\" id=\"foxypress_order_name\" name=\"foxypress_order_name\" value=\"\" /></div>
+		 <div><input type=\"button\" id=\"foxypress_tracking_button\"	name=\"foxypress_tracking_button\"	value=\"Find Tracking Number\" onclick=\"foxypress_find_tracking('" . $url . "');\" />
+		 </div>
+		 <div id=\"foxypress_find_tracking_return\"></div>
+	 ";
 	return $trackingform;
 }
 
@@ -1155,7 +1156,7 @@ function foxypress_buildoptionlist($inventory_id)
 					$extraattributefriendly = " + $" . number_format($foxyoption->option_extra_price, 2)
 					;
 				}
-				$templist  .= "<option value=\"" . stripslashes($foxyoption->option_value) . $extraattribute . "\">" . stripslashes($foxyoption->option_text) . $extraattributefriendly . "</option>";
+				$templist  .= '<option value="' . htmlspecialchars(stripslashes($foxyoption->option_value)) . $extraattribute . '">' . htmlspecialchars(stripslashes($foxyoption->option_text)) . $extraattributefriendly . '</option>';
 			}
 			else
 			{
@@ -1508,6 +1509,7 @@ function foxypress_importFoxyScripts(){
 				if(ordernumber != '' && lastname != '')
 				{
 					var url = baseurl + '?m=tracking&id=' + ordernumber + '&ln=' + lastname;
+					//alert(url);
 					jQuery.ajax(
 						{
 							url : url,

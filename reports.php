@@ -91,6 +91,16 @@ function reports_page_load()
                         </td>
                     </tr>
                     <tr>
+                    	<td>Transaction Type</td>
+                        <td>
+                        	<select id="foxy_transaction_type" name="foxy_transaction_type">
+								<option value="" <?= ($_POST['foxy_transaction_type'] == "") ? "selected=\"selected\"" : "" ?>>All Transactions</option>
+								<option value="0" <?= ($_POST['foxy_transaction_type'] == "0" || !(isset($_POST['btnSubmit']))) ? "selected=\"selected\"" : "" ?>>Live Transactions</option>
+								<option value="1" <?= ($_POST['foxy_transaction_type'] == "1") ? "selected=\"selected\"" : "" ?>>Test Transactions</option>
+				 			</select>
+                        </td>
+                    </tr>
+                    <tr>
                     	<td colspan="2">
                         	<input type="submit" id="btnSubmit" name="btnSubmit" value="Run Report" /> 
                             <small><i>(Start and End Dates need to be in yyyy-mm-dd format. ex: <?=date("Y-m-d")?>)</i></small>
@@ -121,6 +131,7 @@ function reports_page_load()
 			$EndHour = $EndHour + 12;
 		}		
 		$EndDate = $EndDate . " " . $EndHour . ":" . $EndMinute . ":00";
+		$TransactionType = foxypress_FixPostVar('foxy_transaction_type');
 		
 		$sql = "SELECT count(foxy_transaction_id) as TransactionCount 
 						,coalesce(sum(foxy_transaction_product_total), 0) as ProductTotal
@@ -128,7 +139,12 @@ function reports_page_load()
 						,coalesce(sum(foxy_transaction_shipping_total), 0) as ShippingTotal
 						,coalesce(sum(foxy_transaction_order_total), 0) as OrderTotal
 				FROM " . WP_TRANSACTION_TABLE . " 
-				WHERE foxy_transaction_date >= '$StartDate' and foxy_transaction_date <= '$EndDate'";            
+				WHERE foxy_transaction_date >= '$StartDate' and foxy_transaction_date <= '$EndDate' "
+				. 
+				(  
+					($TransactionType == "1") ? "and foxy_transaction_is_test = '1'" :
+						(($TransactionType == "0") ? "and foxy_transaction_is_test = '0'" : "")
+				);            
 		$OrderTotals = $wpdb->get_row($sql);
 		if(!empty($OrderTotals))
 		{
@@ -150,10 +166,18 @@ function reports_page_load()
 						<td>$" . $OrderTotals->OrderTotal . "</td>
 					</tr>
 				  </table>");
-			$sql = "SELECT foxy_transaction_cc_type as TypeOfCard, count(foxy_transaction_ID) as TypeCount
+			$sql = "SELECT foxy_transaction_cc_type as TypeOfCard
+							,count(foxy_transaction_ID) as TypeCount
+							,sum(foxy_transaction_order_total) as TypeTotal
 				FROM " . WP_TRANSACTION_TABLE . " 
-				WHERE foxy_transaction_date >= '$StartDate' and foxy_transaction_date <= '$EndDate'
-				group by TRIM(LOWER(foxy_transaction_cc_type))";
+				WHERE foxy_transaction_date >= '$StartDate' and foxy_transaction_date <= '$EndDate' " 
+				. 
+				(  
+					($TransactionType == "1") ? "and foxy_transaction_is_test = '1'" :
+						(($TransactionType == "0") ? "and foxy_transaction_is_test = '0'" : "")
+				) 
+				.
+				" group by TRIM(LOWER(foxy_transaction_cc_type))";
 			$CreditCards = $wpdb->get_results($sql);         
 			if(!empty($CreditCards))
 			{
@@ -162,7 +186,8 @@ function reports_page_load()
 						<thead>
 							<tr>
 								<th class=\"manage-column\" scope=\"col\">Credit Card Type</td>
-								<th class=\"manage-column\" scope=\"col\">Credit Card Total</td>
+								<th class=\"manage-column\" scope=\"col\">Total Transactions</td>
+								<th class=\"manage-column\" scope=\"col\">Total Order Amount</td>
 							</tr>
 						</thead>");
 				foreach($CreditCards as $Card)
@@ -170,6 +195,7 @@ function reports_page_load()
 					echo("<tr>
 							<td>" . $Card->TypeOfCard . "</td>
 							<td>" . $Card->TypeCount . "</td>
+							<td>$" . $Card->TypeTotal . "</td>
 						  </tr>");
 				}
 				echo("</table>");

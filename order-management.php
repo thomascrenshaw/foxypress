@@ -369,13 +369,32 @@ function order_management_page_load()
 					{
 						$options .=  $opt->product_option_name . ": " . $opt->product_option_value . "<br>";
 					}
-					echo("<td style='padding-right:45px;' valign='top'><div>" .
-							"Product: " . $td->product_name . "<br>" .
-							"Price: " . $td->product_price . "<br>" .
-							"Quantity: " . $td->product_quantity . "<br>" .
-							"Weight: " . $td->product_weight . "<br>" . 
-							$options .
-						 "</div> <br></td>");
+					$ProductCode = $td->product_code;
+					$ProductImage = "";
+					if($ProductCode != "")
+					{
+						//get product image based on code
+						$pi = $wpdb->get_row("SELECT ii.inventory_image
+												FROM " . WP_INVENTORY_TABLE . " as i
+												inner join " . WP_INVENTORY_IMAGES_TABLE . " as ii on i.inventory_id = ii.inventory_id
+												where i.inventory_code = '" . $ProductCode . "'
+												order by ii.image_order, ii.inventory_images_id
+												LIMIT 0, 1");
+						if(!empty($pi))
+						{
+							$ProductImage = "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . $pi->inventory_image . "\" style=\"width: 100px; \"/><br />";
+						}
+					}
+					echo("<td style='padding-right:45px;' valign='top'>"
+								. $ProductImage . 
+								"Product: " . $td->product_name . "<br>" .
+								"Price: " . $td->product_price . "<br>" .
+								"Quantity: " . $td->product_quantity . "<br>" .
+								"Weight: " . $td->product_weight . "<br>" . 
+								(($ProductCode != "") ? "Code: " . $ProductCode . "<br>" : "") .
+								$options .
+						 	"</div><br />
+						  </td>");
 					if ($i % 2){ } 
 					else 
 					{

@@ -1,17 +1,18 @@
 === FoxyPress ===
 Contributors: webmovementllc
-Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress, press
+Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress
 Requires at least: 3.0
-Tested up to: 3.1.1
+Tested up to: 3.1.2
 Stable tag: trunk
-Version: 0.2.5
+Version: 0.2.6
 
-FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...all within your WordPress Dashboard.
-`[vimeo http://vimeo.com/22461143]`
+FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...
 == Description ==
 FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon. 
 
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users’ requests. If you require custom functionality, please contact us directly at foxypress@webmovementllc.com.
+
+`[vimeo http://vimeo.com/22461143]`
 
 --Site credits--
 
@@ -22,6 +23,13 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Uploadify - Multi-image support
 
 == Changelog ==
+
+= 0.2.6 =
+* Modified reporting functionality to include dropdown for live/test/all transactions
+* Modified reporting functionality to include price per total card transactions
+* Added image thumbnails in the order management single item screen
+* BugFix: New installs had some inventory problems. 
+* View the release notes <a href="http://www.foxy-press.com/archives/204" target="_blank">here</a>
 
 = 0.2.5 =
 * Changed Single Product Template to use different CSS classes
