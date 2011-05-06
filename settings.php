@@ -78,6 +78,13 @@ function foxypress_options()
                             	<input type="checkbox" name="foxycart_include_jquery" value="1" <?=(($includejq == "1") ? "checked=\"checked\"" : "") ?> /> *We will automatically include a reference to jQuery
                             </td>
                         </tr>
+                        <tr valign="top">
+                          <td align="right" nowrap>Product Feed</td>
+                          <td alig="left">
+                          	<input type="text" name="foxycart_product_feed" id="foxycart_product_feed" value="<?=get_bloginfo("url") . "/wp-content/plugins/foxypress/productfeed.php"?>" size="50" readonly /> <br />
+                            *RSS Feed of your Products compatible with Google Products
+                          </td>
+                        </tr>
                     </table>
             	</td>
             </tr>

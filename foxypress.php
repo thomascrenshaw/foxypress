@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...all within your WordPress Dashboard.
 Author: WebMovement, LLC
-Version: 0.2.6
+Version: 0.2.7
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -51,6 +51,7 @@ if ( !empty ( $foxypress_url ) ){
 add_shortcode('foxypress', 'foxypress_shortcode');
 add_action( 'admin_menu', 'foxypress_add_menu' );
 add_action('admin_init', 'foxypress_managetables');
+add_action( 'widgets_init', 'foxypress_load_minicart' );
 
 // foxypress constants
 define('WP_TRANSACTION_TABLE', $table_prefix . 'foxypress_transaction');
@@ -69,7 +70,7 @@ define('WP_POSTS', $table_prefix . 'posts');
 define('INVENTORY_IMAGE_DIR', get_bloginfo("url") . "/wp-content/inventory_images");
 define('INVENTORY_IMAGE_LOCAL_DIR', "wp-content/inventory_images/");
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.6");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.7");
 
 if ( !empty ( $foxypress_url ) ){
 	// Include inventory settings and functionality \\
@@ -79,7 +80,14 @@ if ( !empty ( $foxypress_url ) ){
 	include_once('order-management.php');
 	include_once('status-management.php');
 	include_once('reports.php');
+	include_once('import-export.php');
 }
+
+function foxypress_load_minicart()
+{
+	register_widget( 'FoxyPress_MiniCart' );
+}
+
 
 function foxypress_RunUpdates()
 {
@@ -129,7 +137,7 @@ function foxypress_managetables()
 					inventory_description TEXT NOT NULL,
 					inventory_weight VARCHAR(30) NULL,
 					inventory_quantity INT(11) DEFAULT 0,
-					category_id INT(11) NOT NULL,
+					category_id INT(11) NULL,
 					inventory_price FLOAT(10, 2) NOT NULL,
 					inventory_image TEXT NULL,
 					PRIMARY KEY (inventory_id)
@@ -1497,9 +1505,23 @@ function foxypress_importFoxyScripts(){
 	if(get_option('foxycart_storeurl')!=''){
 		if($includejq)
 		{
-			echo("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js\"></script>");
+			echo("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js\"></script>");
+		}
+		if($version=="0.7.1"){
+			echo'<!-- BEGIN FOXYCART FILES -->
+			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.3.js" type="text/javascript" charset="utf-8"></script>
+			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.16/style1_fc/colorbox.css" type="text/css" media="screen" charset="utf-8" />
+			<!-- END FOXYCART FILES -->
+			';
+		}else{
+			echo'<!-- BEGIN FOXYCART FILES -->
+			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
+			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1/colorbox.css" type="text/css" media="screen" charset="utf-8" />
+			<!-- END FOXYCART FILES -->
+			';
 		}
 		echo"
+		<link rel=\"stylesheet\" href=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/style.css\">
 		<script type=\"text/javascript\" src=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/js/jquery.qtip.js\"></script>
 		<script type='text/javascript'>
 			function foxypress_find_tracking(baseurl)
@@ -1545,21 +1567,196 @@ function foxypress_importFoxyScripts(){
 				jQuery(\"a[rel='colorbox']\").colorbox();
 			});
 		</script>
-		";
-		if($version=="0.7.1"){
-			echo'<!-- BEGIN FOXYCART FILES -->
-			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.3.js" type="text/javascript" charset="utf-8"></script>
-			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.16/style1_fc/colorbox.css" type="text/css" media="screen" charset="utf-8" />
-			<!-- END FOXYCART FILES -->
-			';
-		}else{
-			echo'<!-- BEGIN FOXYCART FILES -->
-			<script src="http://cdn.foxycart.com/' . get_option('foxycart_storeurl') . '/foxycart.complete.js" type="text/javascript" charset="utf-8"></script>
-			<link rel="stylesheet" href="http://static.foxycart.com/scripts/colorbox/1.3.9/style1/colorbox.css" type="text/css" media="screen" charset="utf-8" />
-			<!-- END FOXYCART FILES -->
-			';
-		}
+		";		
 	}
 }
 
+class FoxyPress_MiniCart extends WP_Widget {
+
+	function FoxyPress_MiniCart() {
+		/* Widget settings. */
+		$widget_ops = array( 'classname' => 'min', 'description' => __('A widget that will display the FoxyCart cart as a dropdown or in your website\'s sidebar.', 'example') );
+
+		/* Widget control settings. */
+		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'mini-cart-widget' );
+
+		/* Create the widget. */
+		$this->WP_Widget( 'mini-cart-widget', __('FoxyPress Mini-Cart', 'example'), $widget_ops, $control_ops );
+	}
+
+	//Display widget on frontend
+	function widget( $args, $instance ) {
+		extract( $args );
+		$title = apply_filters('widget_title', $instance['title'] );
+		$hideonzero = apply_filters('widget_title', $instance['hideonzero'] );
+		$dropdowndisplay = apply_filters('widget_title', $instance['dropdowndisplay'] );
+		echo $before_widget;
+		if ( $title )
+		{
+			echo $before_title . $title . $after_title;
+		}
+		if ( $dropdowndisplay == "" )
+		{
+			if ( $hideonzero == "1" )
+			{
+				?> <div id="fc_minicart"> <?
+			}
+			?>
+				<span id="fc_quantity">0</span> items.<br />
+				$<span id="fc_total_price">0.00</span>
+				<a href="https://<?=get_option('foxycart_storeurl')?>.foxycart.com/cart?cart=view" class="foxycart">View Cart</a>
+			<?
+			if ( $hideonzero == "1" )
+			{
+				?> </div> <?
+			}
+		}
+		else
+		{
+			?>
+			<a href="#" class="fc_link"><strong>Your Cart</strong></a>
+			<div id="fc_cart">
+				<img src="<?=get_bloginfo("url")?>/wp-content/plugins/foxypress/img/cart.png" alt="your cart"/>
+				<h2>Your Cart</h2>
+				<div class="fc_clear"></div>
+				<table>
+					<thead>
+					<th>item</th>
+					<th>qty</th>
+					<th>price</th>
+					</thead>
+					<tbody id="cart_content">
+					</tbody>
+				</table>
+				<a href="https://<?=get_option('foxycart_storeurl')?>.foxycart.com/cart?checkout" id="fc_checkout_link">Check Out</a>
+				<div class="fc_clear"></div>
+			</div>
+			<script type="text/javascript" charset="utf-8">
+				var StoreURL = '<?=get_option('foxycart_storeurl')?>';
+				var FoxyDomain = StoreURL + ".foxycart.com/";
+				var timer = 0;
+				// this function hides the cart in a very nice way
+				function json_cart_fade_out(){
+				     if (timer != 0){
+				          clearTimeout(timer);
+				          timer = 0;
+				     }
+				     $("#fc_cart").animate({
+						  top: 0 - $("#fc_cart").height(),
+						  opacity: 0
+				      }, 1000);
+				}
+				$(document).ready(function(){
+					fcc.events.cart.postprocess.add(function(){
+						fcc.cart_update.call(fcc);
+						jQuery.getJSON('https://'+storedomain+'/cart?'+fcc.session_get()+'&output=json&callback=?', function(cart) {
+							console.info(cart.product_count);
+							console.info(cart.total_price);
+							console.info(cart.total_discount);
+							var total_price = cart.total_price - cart.total_discount;
+							fc_FoxyCart = "";
+					        for (i=0;i<cart.products.length;i++) {
+					                fc_BuildFoxyCartRow(cart.products[i].name,cart.products[i].code,cart.products[i].options,cart.products[i].quantity,cart.products[i].price_each,cart.products[i].price);
+					        }
+					        // fc_FoxyCart is a javascript variable that now holds your shopping cart data
+					        // if you have some products in your cart, why not display it?
+					        if (cart.products.length > 0) {
+					                $("#fc_cart #cart_content").html(fc_FoxyCart);
+					        } else {
+					                $("#fc_cart #cart_content").html("");
+					        }
+						});
+					});
+					jQuery.getJSON('https://'+storedomain+'/cart?'+fcc.session_get()+'&output=json&callback=?', function(cart) {
+						console.info(cart.product_count);
+						console.info(cart.total_price);
+						console.info(cart.total_discount);
+						var total_price = cart.total_price - cart.total_discount;
+						fc_FoxyCart = "";
+				        for (i=0;i<cart.products.length;i++) {
+				                fc_BuildFoxyCartRow(cart.products[i].name,cart.products[i].code,cart.products[i].options,cart.products[i].quantity,cart.products[i].price_each,cart.products[i].price);
+				        }
+				        // fc_FoxyCart is a javascript variable that now holds your shopping cart data
+				        // if you have some products in your cart, why not display it?
+				        if (cart.products.length > 0) {
+				                $("#fc_cart #cart_content").html(fc_FoxyCart);
+				        } else {
+				                $("#fc_cart #cart_content").html("");
+				        }
+					});
+				   // shows the cart when the mouse is positioned on an specific link
+				   $(".fc_link").mouseover(function(){
+
+					   if (timer!= 0){
+					        clearTimeout(timer);
+					        timer = 0;
+					   }
+
+					   $("#fc_cart").animate({
+					             opacity: '.99',
+					             top: '0px'
+					       }, 1000);
+					   timer = setTimeout(function(){
+					      json_cart_fade_out();
+					   }, 2500);
+					   // if the user is looking/using the cart don't hide it
+					   $("#fc_cart").hover(function(){
+					      clearTimeout(timer);
+					      timer = 0;
+					   }, function(){
+					      timer = setTimeout(function(){
+					        json_cart_fade_out();
+					      }, 1000);
+					   });
+
+				   });
+
+				});
+
+				function fc_BuildFoxyCartRow(fc_name,fc_code,fc_options,fc_quantity,fc_price_each,fc_price) {
+				        fc_FoxyCart += "<tr>";
+				        fc_FoxyCart += "<td>" + fc_name + "</td>";
+				//      fc_FoxyCart += "<td>" + fc_options + "</td>";
+				//      fc_FoxyCart += "<td>" + fc_code + "</td>";
+				        fc_FoxyCart += "<td class=\"right-align\">" + fc_quantity + "</td>";
+				//      fc_FoxyCart += "<td>" + fc_price_each + "</td>";
+				        fc_FoxyCart += "<td class=\"right-align\">" + fc_price.toFixed(2) + "</td>";
+				        fc_FoxyCart += "</tr>";
+				}
+			</script>
+			<?
+		}
+		echo $after_widget;
+	}
+
+	//update widget settings
+	function update( $new_instance, $old_instance ) {
+		$instance = $old_instance;
+		/* Strip tags for title and name to remove HTML (important for text inputs). */
+		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['hideonzero'] = strip_tags( $new_instance['hideonzero'] );
+		$instance['dropdowndisplay'] = strip_tags( $new_instance['dropdowndisplay'] );
+		return $instance;
+	}
+
+	//displays the widget settings
+	function form( $instance ) {
+		//default settings
+		$defaults = array( 'title' => __('Your Cart', 'example'), 'hideonzero' => __('0', 'example'), 'dropdowndisplay' => __('0', 'example'));
+		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', 'hybrid'); ?></label><br />
+			<input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" style="width:100%;" type="text" />
+		</p>
+		<p>
+        	<input id="<?php echo $this->get_field_id( 'hideonzero' ); ?>" name="<?php echo $this->get_field_name( 'hideonzero' ); ?>" value="1" <?= ($instance['hideonzero'] == "1") ? "checked=\"checked\"" : "" ?>  type="checkbox" />
+			<label for="<?php echo $this->get_field_id( 'hideonzero' ); ?>"><?php _e('Hide Cart with 0 Items', 'hybrid'); ?></label>
+		</p>
+		<p>
+        	<input id="<?php echo $this->get_field_id( 'dropdowndisplay' ); ?>" name="<?php echo $this->get_field_name( 'dropdowndisplay' ); ?>" value="1" <?= ($instance['dropdowndisplay'] == "1") ? "checked=\"checked\"" : "" ?> type="checkbox" />
+			<label for="<?php echo $this->get_field_id( 'dropdowndisplay' ); ?>"><?php _e('Drop Down Display', 'hybrid'); ?></label>
+		</p>
+	<?
+	}
+}
 ?>

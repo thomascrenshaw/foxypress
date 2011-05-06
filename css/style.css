@@ -170,3 +170,20 @@ div.foxy_item_pagination span.disabled
 	border: 1px solid #EEE;
 	color: #ccc;
 }
+
+/** WIDGET STYLING **/
+#fc_cart{ 
+}
+#fc_cart h2{
+}
+.fc_clear{
+    clear: both;
+}
+#fc_cart img{
+}
+#fc_cart table{
+}
+#fc_edit_link{
+}
+#fc_checkout_link{
+}

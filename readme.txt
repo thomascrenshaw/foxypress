@@ -4,15 +4,15 @@ Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress
 Requires at least: 3.0
 Tested up to: 3.1.2
 Stable tag: trunk
-Version: 0.2.6
+Version: 0.2.7
 
 FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...
 == Description ==
-FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon. 
+FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon and administration panels. 
 
-FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users’ requests. If you require custom functionality, please contact us directly at foxypress@webmovementllc.com.
+FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users' requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
-[vimeo http://vimeo.com/21743308]
+`[vimeo http://vimeo.com/22461143]`
 
 --Site credits--
 
@@ -23,6 +23,13 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Uploadify - Multi-image support
 
 == Changelog ==
+
+= 0.2.7 =
+* Added Product Import/Export functionality <a href="http://www.foxy-press.com/webcasts-videos" target="_blank">Tutorial here</a>
+* Added Product Feed - compatible with Google Products
+* Widget Support - MiniCart in Sidebar and JSON Cart Dropdown
+* Tested with WP 3.1.2
+* View the release notes <a href="http://www.foxy-press.com/archives/211" target="_blank">here</a>
 
 = 0.2.6 =
 * Modified reporting functionality to include dropdown for live/test/all transactions
@@ -114,13 +121,13 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Installation ==
 
-1.To install FoxyPress, use either the WordPress automatic installer, or drop the FoxyPress folder into your plugins folder in your WordPress installation.
+Copy the folder to your WordPress 
+'*/wp-content/plugins/*' folder.
 
-2. You will want to activate FoxyPress through the Plugins menu.
-
-3. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
-
-4. The last step necessary to get FoxyPress working is to go to the Manage Settings menu item under FoxyPress and enter your FoxyCart subdomain.
+1. Activate the '*FoxyPress*' plugin in your WordPress admin '*Plugins*'
+1. Go to '*FoxyPress / Manage Settings*' in your WordPress admin.
+1. Enter your FoxyCart domain.
+1. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
 
 == Frequently Asked Questions ==
 
