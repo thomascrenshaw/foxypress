@@ -12,7 +12,7 @@ FoxyPress allows you to easily add products to your WordPress pages using FoxyCa
 
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users' requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
-`[vimeo http://vimeo.com/22461143]`
+[vimeo http://vimeo.com/22461143]
 
 --Site credits--
 
