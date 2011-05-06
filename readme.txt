@@ -129,6 +129,8 @@ Copy the folder to your WordPress
 1. Enter your FoxyCart domain.
 1. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
 
+[vimeo http://vimeo.com/21743308]
+
 == Frequently Asked Questions ==
 
 **Do I need a FoxyCart account to use this plugin?**
