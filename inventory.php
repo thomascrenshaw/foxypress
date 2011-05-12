@@ -266,7 +266,8 @@ function inventory_postback()
 				. "', date_added='" . mysql_escape_string($added)
 				. "', inventory_weight='" . mysql_escape_string($weight)
 				. "', inventory_price='" . mysql_escape_string($price)
-				. "', inventory_quantity='" . ($quantity*1) . "'"
+				. "', inventory_quantity='" . ($quantity*1) . ""
+				. "', category_id='0'"
 				;
 				$wpdb->query($sql);
 				$inventory_id = $wpdb->insert_id;
@@ -559,7 +560,7 @@ function foxypress_show_inventory() {
   	else {
 		?>
 		<p><?php _e("There are no inventory items in the database!",'inventory')  ?></p>
-		<p><a href="<?php echo $_SERVER['PHP_SELF'] ?>?page=inventory&amp;action=add&amp;inventory_id=<?php echo $item->inventory_id;?>" class='edit'>Add New Item</a></p>
+		<p><a href="<?php echo $_SERVER['PHP_SELF'] ?>?page=inventory&amp;action=add" class='edit'>Add New Item</a></p>
 		<?php
   	}
 }

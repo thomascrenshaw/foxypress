@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...all within your WordPress Dashboard.
 Author: WebMovement, LLC
-Version: 0.2.7
+Version: 0.2.8
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -70,7 +70,7 @@ define('WP_POSTS', $table_prefix . 'posts');
 define('INVENTORY_IMAGE_DIR', get_bloginfo("url") . "/wp-content/inventory_images");
 define('INVENTORY_IMAGE_LOCAL_DIR', "wp-content/inventory_images/");
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.7");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.8");
 
 if ( !empty ( $foxypress_url ) ){
 	// Include inventory settings and functionality \\
@@ -800,7 +800,13 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 	//check to see if we need to link to a detail page
 	if($detailurl != "")
 	{
-		$FullURL =  get_bloginfo("url") . $detailurl;
+		$BaseURL = get_option("foxypress_base_url");
+		$FullURL =  get_bloginfo("url");
+		if($BaseURL != "")
+		{
+			$FullURL .= "/" . $BaseURL;
+		}
+		$FullURL .= $detailurl;
 		$FullURL = foxypress_AddQSValue($FullURL, "id",  $item->inventory_id);
 		$MoreDetailDiv = "<div class=\"" . (($show_addtocart) ? "foxypress_item_readmore_single" : "foxypress_item_readmore") . "\"><a href=\"" . $FullURL . "\">Read More</a></div>";
 	}
@@ -1567,7 +1573,7 @@ function foxypress_importFoxyScripts(){
 				jQuery(\"a[rel='colorbox']\").colorbox();
 			});
 		</script>
-		";		
+		";
 	}
 }
 

@@ -4,7 +4,7 @@ Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress
 Requires at least: 3.0
 Tested up to: 3.1.2
 Stable tag: trunk
-Version: 0.2.7
+Version: 0.2.8
 
 FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...
 == Description ==
@@ -24,8 +24,12 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.2.8 =
+* Added Non-Permalink site support
+* View the release notes <a href="http://www.foxy-press.com/archives/248" target="_blank">here</a>
+
 = 0.2.7 =
-* Added Product Import/Export functionality <a href="http://www.foxy-press.com/webcasts-videos" target="_blank">Tutorial here</a>
+* Added Product Import/Export functionality
 * Added Product Feed - compatible with Google Products
 * Widget Support - MiniCart in Sidebar and JSON Cart Dropdown
 * Tested with WP 3.1.2

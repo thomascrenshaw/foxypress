@@ -30,7 +30,7 @@ function foxypress_options()
             	<td align="center">
                 	<table>
                         <tr valign="top">
-                            <td align="right" nowrap>FoxyCart Store Subdomain URL</td>
+                            <td align="right" valign="top" nowrap>FoxyCart Store Subdomain URL</td>
                             <td align="left">
                                 <input type="text" name="foxycart_storeurl" value="<?php echo get_option('foxycart_storeurl'); ?>" size="50" />
                                 <br />
@@ -39,7 +39,7 @@ function foxypress_options()
                             </td>
                         </tr>
                         <tr valign="top">
-                            <td align="right" nowrap>FoxyCart API Key</td>
+                            <td align="right" valign="top" nowrap>FoxyCart API Key</td>
                             <td align="left">
                               <?php
                                 if(get_option('foxycart_apikey')==''){
@@ -53,7 +53,7 @@ function foxypress_options()
                             </td>
                         </tr>
                         <tr valign="top">
-                            <td align="right" nowrap>FoxyCart Store Version</td>
+                            <td align="right" valign="top" nowrap>FoxyCart Store Version</td>
                             <td align="left">
                                 <select name="foxycart_storeversion" width="300" style="width: 300px">
                               <?php
@@ -70,7 +70,7 @@ function foxypress_options()
                             </td>
                         </tr>
                         <tr valign="top">
-                        	<td align="right" nowrap>Include jQuery</td>
+                        	<td align="right" valign="top" nowrap>Include jQuery</td>
                             <td alig="left">
                             <?
 								$includejq = get_option('foxycart_include_jquery');
@@ -79,11 +79,20 @@ function foxypress_options()
                             </td>
                         </tr>
                         <tr valign="top">
-                          <td align="right" nowrap>Product Feed</td>
+                          <td align="right" valign="top" nowrap>Product Feed</td>
                           <td alig="left">
                           	<input type="text" name="foxycart_product_feed" id="foxycart_product_feed" value="<?=get_bloginfo("url") . "/wp-content/plugins/foxypress/productfeed.php"?>" size="50" readonly /> <br />
                             *RSS Feed of your Products compatible with Google Products
                           </td>
+                        </tr>
+                        <tr>
+                        	<td align="right" valign="top" nowrap>Product Detail Base URL</td>
+                            <td alig="left">
+                            	<input type="text" name="foxypress_base_url" value="<?=get_option("foxypress_base_url")?>" /><br />
+								*You can leave this field blank if you have permalinks turned on. ex: <?=get_bloginfo("url")?>/my-page <br />
+                                If permalinks do not work on your version of wordpress, please enter the base url. <br />
+                                If your pages look like <b><?=get_bloginfo("url")?>/index.php/my-page</b> you should enter index.php as the base url.
+                            <td>
                         </tr>
                     </table>
             	</td>
@@ -91,7 +100,7 @@ function foxypress_options()
             <tr>
             	<td align="center">
                     <input type="hidden" name="action" value="update" />
-                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery" />
+                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery, foxypress_base_url" />
               		<p class="submit">
               			<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
               		</p>
