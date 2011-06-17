@@ -1,4 +1,4 @@
-<?
+<?php
 	session_start();
 	require_once('../../../wp-includes/wp-db.php');	
 	require_once('../../../wp-config.php');	
@@ -43,7 +43,6 @@
 	}
 	else if($mode == "deletephoto")
 	{
-		//delete photo vars
 		$session_id = foxypress_FixGetVar('sid');
 		$image_id = foxypress_FixGetVar('imageid');
 		$inventory_id = foxypress_FixGetVar('inventoryid');		
@@ -58,13 +57,73 @@
 					//only delete the file if it's not our default image
 					if($data->inventory_image != INVENTORY_DEFAULT_IMAGE)
 					{
-						foxypress_DeleteImage($directory . $data->inventory_image);
+						foxypress_DeleteItem($directory . $data->inventory_image);
 					}
 					$query = sprintf('DELETE FROM ' . WP_INVENTORY_IMAGES_TABLE . ' WHERE inventory_images_id=%d', $image_id);		
 					$wpdb->query($query);
 				}						
 			}
 			echo("{\"ajax_status\":\"ok\"}");
+		}
+		else
+		{
+			echo(GetErrorJSON());	
+		}
+	}
+	else if($mode == "deletedownloadable")
+	{
+		//we don't want to delete any downloads in case people still are downloading them.
+		$session_id = foxypress_FixGetVar('sid');
+		$downloadable_id = foxypress_FixGetVar('downloadableid');
+		$inventory_id = foxypress_FixGetVar('inventoryid');		
+		if($session_id == session_id())
+		{
+			if ($downloadable_id != "" && $inventory_id != "") 
+			{
+				$query = "UPDATE ". WP_INVENTORY_DOWNLOADABLES . " SET status = '0' WHERE downloadable_id='" . mysql_escape_string($downloadable_id) . "'";		
+				$wpdb->query($query);			
+			}
+			echo("{\"ajax_status\":\"ok\"}");
+		}
+		else
+		{
+			echo(GetErrorJSON());	
+		}
+	}
+	else if($mode == "savemaxdownloads")
+	{
+		$session_id = foxypress_FixGetVar('sid');
+		$downloadable_id = foxypress_FixGetVar('downloadableid');
+		$inventory_id = foxypress_FixGetVar('inventoryid');		
+		$maxdownloads = foxypress_FixGetVar('maxdownloads');
+		if($session_id == session_id())
+		{
+			if ($downloadable_id != "" && $inventory_id != "") 
+			{			
+				$query = "UPDATE " . WP_INVENTORY_DOWNLOADABLES . " SET maxdownloads='" . $maxdownloads. "' WHERE downloadable_id='" . mysql_escape_string($downloadable_id) . "'";		
+				$wpdb->query($query);		
+				
+			}
+			echo("{\"ajax_status\":\"ok\"}");	
+		}
+		else
+		{
+			echo(GetErrorJSON());	
+		}
+	}
+	else if($mode == "resetdownloadcount")
+	{
+		$session_id = foxypress_FixGetVar('sid');
+		$downloadable_id = foxypress_FixGetVar('downloadableid');
+		$download_transaction_id = foxypress_FixGetVar('downloadtransactionid');		
+		if($session_id == session_id())
+		{
+			if ($downloadable_id != "" && $download_transaction_id != "") 
+			{			
+				$query = "UPDATE " . WP_DOWNLOADABLE_TRANSACTION . " SET download_count='0' WHERE downloadable_id='" . mysql_escape_string($downloadable_id) . "' AND download_transaction_id='" . mysql_escape_string($download_transaction_id) . "'";		
+				$wpdb->query($query);						
+			}
+			echo("{\"ajax_status\":\"ok\"}");	
 		}
 		else
 		{

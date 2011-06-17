@@ -2,9 +2,9 @@
 Contributors: webmovementllc
 Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress
 Requires at least: 3.0
-Tested up to: 3.1.2
+Tested up to: 3.1.3
 Stable tag: trunk
-Version: 0.2.8
+Version: 0.2.9
 
 FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...
 == Description ==
@@ -20,9 +20,24 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 - Scott Hollencamp - Order Management inspiration
 
+- Quesinberry - Gift Certificate inspiration and donation
+
 - Uploadify - Multi-image support
 
 == Changelog ==
+
+= 0.2.9 =
+* Added downloadable product support
+* Added inventory ordering by category
+* Added multi-ship support
+* Added product detail base URL for sites with no URL-Rewriting
+* Added Lightbox capability for single item template
+* Added new shortcode detail (see notes)
+* Added uninstall hook (cleans up tables, downloadable items and inventory images)
+* Fixed product description line break issue
+* Fixed product pricing format issue
+* Fixed alot of random bugs brought to our attention by our users
+* View the release notes <a href="http://www.foxy-press.com/archives/311" target="_blank">here</a>
 
 = 0.2.8 =
 * Added Non-Permalink site support

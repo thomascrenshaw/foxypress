@@ -1,16 +1,18 @@
-<?
+<?php
 $plugin_dir = basename(dirname(__FILE__));
 load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_dir);
-add_action('admin_menu', 'inventory_category_menu');
-add_action('admin_init', 'inventory_category_postback');
+add_action('admin_menu', 'foxypress_inventory_category_menu');
+add_action('admin_init', 'foxypress_inventory_category_postback');
+wp_enqueue_script('jquery-ui-core');
+wp_enqueue_script('jquery-ui-sortable');
 
-function inventory_category_menu()
+function foxypress_inventory_category_menu()
 {
 	$allowed_group = 'manage_options';
- 	add_submenu_page('foxypress', __('Inventory Categories','foxypress'), __('Manage Categories','foxypress'), $allowed_group, 'inventory-category', 'inventory_category_page_load');
+ 	add_submenu_page('foxypress', __('Inventory Categories','foxypress'), __('Manage Categories','foxypress'), $allowed_group, 'inventory-category', 'foxypress_inventory_category_page_load');
 }
 
-function inventory_category_postback()
+function foxypress_inventory_category_postback()
 {
 	global $wpdb;
 	$mode = foxypress_FixGetVar('mode');
@@ -50,10 +52,102 @@ function inventory_category_postback()
 		$wpdb->query($sql);
 		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory-category");
 	}
+	else if(isset($_POST['foxy_order_items_save']))
+	{	
+		$categoryID = foxypress_FixGetVar('categoryid');
+		$OrderArray = explode(",", foxypress_FixPostVar('hdn_foxy_items_order'));
+		$counter = 1;
+		foreach ($OrderArray as $itc_id) 
+		{
+			$wpdb->query("UPDATE " . WP_INVENTORY_TO_CATEGORY_TABLE . " SET sort_order = '$counter' WHERE itc_id='" . $itc_id . "'");
+			$counter++;
+		}
+		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory-category&view=sort&categoryid=" . $categoryID);
+	}
+}
+
+//page load
+function foxypress_inventory_category_page_load() {
+	$page_view = foxypress_FixGetVar('view');
+	if($page_view == "sort")
+	{
+		foxypress_inventory_category_sort();
+	}
+	else
+	{
+		foxypress_inventory_category_view_categories();
+	}
+}
+
+//sort items in specific categories
+function foxypress_inventory_category_sort()
+{
+	global $wpdb;
+	$category_id =  foxypress_FixGetVar('categoryid');	
+?>
+	 <script type="text/javascript">
+		jQuery(document).ready(function() {
+			//sorting
+		  jQuery( "#foxypress_inventory_category_order tbody" ).sortable(
+				{
+					update: function(event, ui) { jQuery('#hdn_foxy_items_order').val(jQuery( "#foxypress_inventory_category_order tbody" ).sortable("toArray")); }	
+				}
+			);
+		});
+	</script>
+	<div class="wrap">
+        <h2><?php _e('Sort Category Items','inventory'); ?></h2>
+        <div>
+        	<?php
+				//get all inventory items for thie specific category
+				$items = $wpdb->get_results("SELECT i.*, itc.itc_id
+											FROM " . WP_INVENTORY_TABLE . " as i
+											INNER JOIN " . WP_INVENTORY_TO_CATEGORY_TABLE. " AS itc on i.inventory_id = itc.inventory_id
+											WHERE itc.category_id = '" . $category_id . "'
+											ORDER BY itc.sort_order");	
+				if(!empty($items))
+				{
+					echo("<table id=\"foxypress_inventory_category_order\" class=\"widefat page fixed\" width=\"50%\" cellpadding=\"3\" cellspacing=\"3\">
+							<thead>
+								<tr>
+									<th class=\"manage-column\" scope=\"col\">Sort</th>
+									<th class=\"manage-column\" scope=\"col\">Item Code</th>
+									<th class=\"manage-column\" scope=\"col\">Item Name</th>
+								</tr>
+							</thead>
+							<tbody>");
+					foreach($items as $i)
+					{
+						$current_item_order .= ($current_item_order == "") ? $i->itc_id : "," . $i->itc_id;
+						echo("<tr id=\"" . $i->itc_id . "\">
+								<td style=\"cursor:pointer;\"><img src=\"" .get_bloginfo("url") . "/wp-content/plugins/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
+								<td>" . $i->inventory_code . "&nbsp;&nbsp;</td>
+								<td>" . $i->inventory_name . "</td>
+							  </tr>");
+					}
+					echo("	</tbody>
+						</table>");
+					?>	
+                    <br />
+					<form id="foxy_order_items" name="foxy_order_items" method="POST">
+						<input type="submit" id="foxy_order_items_save" name="foxy_order_items_save" value="<?php _e('Update Order'); ?> &raquo;"  class="button bold" />
+						<input type="hidden" id="hdn_foxy_items_order" name="hdn_foxy_items_order" value="<?php echo($current_item_order) ?>" />
+					</form>
+                    <?php
+				}
+				else
+				{
+					echo("There are currently no inventory items in this category.");
+				}
+			?>
+        </div>
+    </div>    
+<?php
 }
 
 //manage categories
-function inventory_category_page_load() {
+function foxypress_inventory_category_view_categories() 
+{
 	global $wpdb;
  ?>
     <div class="wrap">
@@ -73,7 +167,7 @@ function inventory_category_page_load() {
             </div>
         </form>
         
-    <?   
+    <?php   
 	
 	//set up paging
 	$limit = 10;
@@ -123,10 +217,11 @@ function inventory_category_page_load() {
              <tr>
                <th class="manage-column" scope="col"><?php _e('ID','inventory') ?></th>
                <th class="manage-column" scope="col"><?php _e('Category Name','inventory') ?></th>
+               <th class="manage-column" scope="col"><?php _e('Sort','inventory') ?></th>
                <th class="manage-column" scope="col"><?php _e('Delete','inventory') ?></th>
              </tr>
            </thead>
-           <?
+           <?php
            		$class = '';
                	foreach ( $categories as $category ) {
                 	$class = ($class == 'alternate') ? '' : 'alternate';
@@ -145,6 +240,7 @@ function inventory_category_page_load() {
 									</form>
 								</td>";
 					  }
+					  echo("<td><a href=\"" . $_SERVER['PHP_SELF'] . "?page=inventory-category&amp;view=sort&amp;categoryid=" . $category->category_id . "\">Sort Inventory Items</a></td>");
 					  if ($category->category_id == 1)  
 					  {
 							echo "<td>" . __("N/A","inventory") . "</td>";
@@ -160,7 +256,7 @@ function inventory_category_page_load() {
                }
             ?>
          </table>
-        <?
+        <?php
 		if($drRows->RowCount > $limit)
 		{
 			$Pagination = foxypress_GetPagination($pageNumber, $drRows->RowCount, $limit, $targetpage, 'fp_pn');

@@ -1,4 +1,4 @@
-<?
+<?php
 function inventory_option_groups_page_load() { 
 	global $wpdb;
 ?>
@@ -60,7 +60,7 @@ function inventory_option_groups_page_load() {
                     <th class="manage-column" scope="col">&nbsp;</th>
                 </tr>
             </thead>
-            <?				
+            <?php				
 				//set up paging				
 				$limit = 10;
 				$targetpage = foxypress_GetFullURL();
@@ -97,7 +97,7 @@ function inventory_option_groups_page_load() {
                 }		
             ?>
         </table>
-        <? 
+        <?php 
 			if($drRows->RowCount > $limit)
 			{
 				$Pagination = foxypress_GetPagination($pageNumber, $drRows->RowCount, $limit, $targetpage, 'fp_pn');
@@ -105,4 +105,4 @@ function inventory_option_groups_page_load() {
 			}	
 		?>
 	</div>
-<? } ?>
+<?php } ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 $plugin_dir = basename(dirname(__FILE__));
 load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_dir);
 add_action('admin_menu', 'status_management_menu');
@@ -79,34 +79,34 @@ function status_management_page_load()
             	<table>
                 	<tr>
                     	<td>Status ID &nbsp;</td>
-                        <td><?=$drStatus->foxy_transaction_status?>
+                        <td><?php echo($drStatus->foxy_transaction_status) ?>
                     </tr>
                     <tr>
                     	<td>Status Description &nbsp;</td>
-                        <td><input type="text" name="foxy_sm_status_description" id="foxy_sm_status_description" value="<?=stripslashes($drStatus->foxy_transaction_status_description)?>" /></td>
+                        <td><input type="text" name="foxy_sm_status_description" id="foxy_sm_status_description" value="<?php echo(stripslashes($drStatus->foxy_transaction_status_description)) ?>" /></td>
                     </tr>
                     <tr>
                     	<td>Email Customer</td>
-                        <td><input type="checkbox" value="1" <?= ($drStatus->foxy_transaction_status_email_flag == "1") ? "checked='checked'"  : "" ?> id="foxy_sm_status_email_flag" name="foxy_sm_status_email_flag" /> <small>If this is checked, the customer will be emailed when the status on their transaction is changed to this status</small>
+                        <td><input type="checkbox" value="1" <?php echo (($drStatus->foxy_transaction_status_email_flag == "1") ? "checked='checked'"  : "") ?> id="foxy_sm_status_email_flag" name="foxy_sm_status_email_flag" /> <small>If this is checked, the customer will be emailed when the status on their transaction is changed to this status</small>
                     </tr>
                     <tr>	
                     	<td>Email Subject</td>
-                        <td><input type="text" value="<?=stripslashes($drStatus->foxy_transaction_status_email_subject)?>" id="foxy_sm_status_email_subject" name="foxy_sm_status_email_subject" /></td>
+                        <td><input type="text" value="<?php echo(stripslashes($drStatus->foxy_transaction_status_email_subject)) ?>" id="foxy_sm_status_email_subject" name="foxy_sm_status_email_subject" /></td>
                     </tr>
                     <tr>	
                     	<td>Email Body</td>
-                        <td><textarea  id="foxy_sm_status_email_body" name="foxy_sm_status_email_body" cols="50" rows="5"><?=stripslashes($drStatus->foxy_transaction_status_email_body)?></textarea></td>
+                        <td><textarea  id="foxy_sm_status_email_body" name="foxy_sm_status_email_body" cols="50" rows="5"><?php echo(stripslashes($drStatus->foxy_transaction_status_email_body)) ?></textarea></td>
                     </tr>
                     <tr>
                     	<td>Include Tracking</td>
-                        <td><input type="checkbox" value="1" <?= ($drStatus->foxy_transaction_status_email_tracking == "1") ? "checked='checked'"  : "" ?> id="foxy_sm_status_email_tracking" name="foxy_sm_status_email_tracking" />
+                        <td><input type="checkbox" value="1" <?php echo(($drStatus->foxy_transaction_status_email_tracking == "1") ? "checked='checked'"  : "") ?> id="foxy_sm_status_email_tracking" name="foxy_sm_status_email_tracking" />
                     </tr>
                     <tr>
-                    	<td colspan="2"><input type="submit" id="foxy_sm_status_submit" name="foxy_sm_status_submit" value="Save" /> <?=$sm_error?></td>
+                    	<td colspan="2"><input type="submit" id="foxy_sm_status_submit" name="foxy_sm_status_submit" value="Save" /> <?php echo($sm_error) ?></td>
                     </tr>
             	</table>
             </form>
-            <?
+            <?php
 		}
 		else
 		{
@@ -171,16 +171,16 @@ function GetStatuses()
                     <th class="manage-column" scope="col">&nbsp;</th>
                 </tr>
             </thead>
-    	<?=$Statuses?>
+    	<?php echo($Statuses) ?>
     </table>
-    <?
+    <?php
 }
 
 function End_Status_Management()
 {
 	?>
     </div>    
-    <?
+    <?php
 }
 
 function Begin_Status_Management()
@@ -188,6 +188,6 @@ function Begin_Status_Management()
 	?>
 	<div class="wrap">
     	<h2><?php _e('Status Management','status-management'); ?></h2>		
-    <?
+    <?php
 }
 ?>

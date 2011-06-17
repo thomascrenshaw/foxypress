@@ -1,4 +1,4 @@
-<?
+<?php
 $plugin_dir = basename(dirname(__FILE__));
 load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_dir);
 add_action('admin_menu', 'order_management_menu');
@@ -365,10 +365,37 @@ function order_management_page_load()
 				foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
 				{
 					$options = "";
+					$Downloadable = "";
+					$Inventory_ID = "";
 					foreach($td->transaction_detail_options->transaction_detail_option as $opt)
 					{
-						$options .=  $opt->product_option_name . ": " . $opt->product_option_value . "<br>";
-					}
+						if(strtolower($opt->product_option_name) == "downloadable")
+						{
+							$Downloadable = $opt->product_option_value;
+						}
+						else if(strtolower($opt->product_option_name) == "inventory_id")
+						{
+							$Inventory_ID = $opt->product_option_value;
+						}
+						else
+						{
+							$options .=  $opt->product_option_name . ": " . $opt->product_option_value . "<br>";
+						}
+					}					
+					//check to see if we need to show downloadable information
+					if($Downloadable == "true" && $Inventory_ID != "")
+					{
+						$dt = $wpdb->get_row("SELECT dt.* 
+											  FROM " . WP_INVENTORY_DOWNLOADABLES . " as d 
+											  INNER JOIN " . WP_DOWNLOADABLE_TRANSACTION . " as dt on dt.downloadable_id = d.downloadable_id
+																				and dt.foxy_transaction_id = '" . $foxyXMLResponse->transaction->id . "'
+											  WHERE d.inventory_id = '" . mysql_escape_string($Inventory_ID) . "'");
+						//generate url
+						$DownloadURL = get_bloginfo("url") . "/wp-content/plugins/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($dt->download_transaction_id));
+						$options .= "<a href=\"" . $DownloadURL . "\">Downloadable Link</a><br />";	
+						$options .= "Download Count: <span id=\"foxypress_downloadable_count\">" . $dt->download_count . "</span> <a href=\"javascript:ResetDownloadCount('" . get_bloginfo("url") . "/wp-content/plugins/foxypress/ajax.php" . "', '" . session_id() . "', '" . $dt->downloadable_id . "', '" . $dt->download_transaction_id . "');\">Reset</a> <img src=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/img/ajax-loader.gif\" id=\"foxypress_downloadable_loading\" name=\"foxypress_downloadable_loading\" style=\"display:none;\" /><br />";
+					}			
+					
 					$ProductCode = $td->product_code;
 					$ProductImage = "";
 					if($ProductCode != "")
@@ -441,7 +468,7 @@ function order_management_page_load()
 						echo("<tr>
 								<td>" . 
 										( (strlen(stripslashes($n->foxy_transaction_note)) > 50) 
-										  ? "<span id=\"foxy_note_" . $n->foxy_transaction_note_id . "\">" . foxypress_TruncateString(stripslashes($n->foxy_transaction_note), 50) . "</span> <script type=\"text/javascript\"> jQuery('#foxy_note_" . $n->foxy_transaction_note_id . "').qtip({ content: '" . $n->foxy_transaction_note . "', show: 'mouseover', hide: 'mouseout', style : { name: 'dark', tip: 'bottomLeft' }, position : { corner: { target: 'topRight', tooltip: 'bottomLeft'} } }); </script>"
+										  ? "<span id=\"foxy_note_" . $n->foxy_transaction_note_id . "\">" . foxypress_TruncateString(stripslashes($n->foxy_transaction_note), 50) . "</span> <script type=\"text/javascript\"> jQuery('#foxy_note_" . $n->foxy_transaction_note_id . "').qtip({ content: '" . str_replace(array("\r", "\r\n", "\n"), '<br />', $n->foxy_transaction_note) . "', show: 'mouseover', hide: 'mouseout', style : { name: 'dark', tip: 'bottomLeft' }, position : { corner: { target: 'topRight', tooltip: 'bottomLeft'} } }); </script>"
 										  : stripslashes($n->foxy_transaction_note)
 										 )										
 									  . 
@@ -544,7 +571,7 @@ function ProcessSearch($SearchValue)
 function Begin_Foxy_Order_Management()
 {
 	?>
-    <script type="text/javascript" src="<?=get_bloginfo("url")?>/wp-content/plugins/foxypress/js/jquery.qtip.js"></script>
+    <script type="text/javascript" src="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/js/jquery.qtip.js"></script>
     <style type="text/css">
 		.Hide { display:none; }
 	  	div.foxy_item_pagination {
@@ -587,7 +614,7 @@ function Begin_Foxy_Order_Management()
                     <div style="float: left; width: 98%; clear: both;" class="inside">
                         <table cellspacing="5" cellpadding="5">
                             <tr>
-                                <td><input type="text" name="foxy_om_search" id="foxy_om_search" value="<?=foxypress_FixPostVar("foxy_om_search", "")?>" /> </td>
+                                <td><input type="text" name="foxy_om_search" id="foxy_om_search" value="<?php echo(foxypress_FixPostVar("foxy_om_search", ""))?>" /> </td>
                                 <td><input type="submit" id="foxy_om_search_submit" class="button bold" name="foxy_om_search_submit" value="Search &raquo;" /></td>
                             </tr>
                         </table>
@@ -596,7 +623,7 @@ function Begin_Foxy_Order_Management()
                 </div>
             </form>
         </div>
-	<?
+	<?php
 }
 
 function End_Foxy_Order_Management($NeedsSync)
@@ -624,6 +651,24 @@ function End_Foxy_Order_Management($NeedsSync)
 			{
 				window.location.href = jQuery('#foxy_om_transaction_type_filter').val();
 			}
+			
+			function ResetDownloadCount(baseurl, sid, downloadable_id, downloadable_transaction_id)
+			{
+				jQuery('#foxypress_downloadable_loading').show();
+				var url = baseurl + "?m=resetdownloadcount&sid=" + sid + "&downloadableid=" + downloadable_id + "&downloadtransactionid=" + downloadable_transaction_id;
+				jQuery.ajax(
+							{
+								url : url,
+								type : "GET",
+								datatype : "json",
+								cache : "false",
+								success : function(){
+									jQuery('#foxypress_downloadable_loading').hide();
+									jQuery('#foxypress_downloadable_count').html("0");
+								}
+							}
+						);
+			}
 
 			function SyncTransactionsJS(baseurl, fullurl, loadingimage, showProgress)
 			{
@@ -639,14 +684,14 @@ function End_Foxy_Order_Management($NeedsSync)
 					jQuery.get(fullurl);
 				}
 			}
-			<?
+			<?php
 				if($NeedsSync)
 				{
 					echo("SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=sync', '../wp-content/plugins/foxypress/img/ajax-loader.gif', false)");
 				}
 			?>
 	  	</script>
-	<?
+	<?php
 }
 
 function SyncTransactions($SyncAll, $PageStart)
@@ -681,49 +726,49 @@ function SyncTransactions($SyncAll, $PageStart)
 		{
 			//insert new transactions into our db, ignore existing transactions
 			$sql = "INSERT IGNORE INTO " . WP_TRANSACTION_TABLE .
-				  " SET foxy_transaction_id = '" . $t->id . "'" .
+				  " SET foxy_transaction_id = '" . mysql_escape_string($t->id) . "'" .
 				  ", foxy_transaction_status = '1'" .
-				  ", foxy_transaction_first_name='" . $t->customer_first_name . "'" .
-				  ", foxy_transaction_last_name='" . $t->customer_last_name . "'" .
-				  ", foxy_transaction_email='" . $t->customer_email . "'" .
-				  ", foxy_transaction_is_test='" . $t->is_test . "'" . 
-				  ", foxy_transaction_date = '" . $t->transaction_date . "'" .
-				  ", foxy_transaction_product_total = '" . $t->product_total . "'" .
-				  ", foxy_transaction_tax_total = '" . $t->tax_total . "'" .
-				  ", foxy_transaction_shipping_total = '" . $t->shipping_total . "'" .
-				  ", foxy_transaction_order_total = '" . $t->order_total . "'" .
-				  ", foxy_transaction_cc_type = '" . $t->cc_type . "'";
+				  ", foxy_transaction_first_name='" . mysql_escape_string($t->customer_first_name) . "'" .
+				  ", foxy_transaction_last_name='" . mysql_escape_string($t->customer_last_name) . "'" .
+				  ", foxy_transaction_email='" . mysql_escape_string($t->customer_email) . "'" .
+				  ", foxy_transaction_is_test='" . mysql_escape_string($t->is_test) . "'" . 
+				  ", foxy_transaction_date = '" .mysql_escape_string( $t->transaction_date) . "'" .
+				  ", foxy_transaction_product_total = '" . mysql_escape_string($t->product_total) . "'" .
+				  ", foxy_transaction_tax_total = '" . mysql_escape_string($t->tax_total) . "'" .
+				  ", foxy_transaction_shipping_total = '" . mysql_escape_string($t->shipping_total) . "'" .
+				  ", foxy_transaction_order_total = '" . mysql_escape_string($t->order_total) . "'" .
+				  ", foxy_transaction_cc_type = '" . mysql_escape_string($t->cc_type) . "'";
 
 				  if($t->shipping_address1 == "")
 				  {
 					  //use billing for both
-					  $sql .= ", foxy_transaction_billing_address1 = '" . $t->customer_address1 . "'" .
-					  		  ", foxy_transaction_billing_address2 = '" . $t->customer_address2 . "'" .
-							  ", foxy_transaction_billing_city = '" . $t->customer_city . "'" .
-							  ", foxy_transaction_billing_state = '" . $t->customer_state . "'" .
-							  ", foxy_transaction_billing_zip = '" . $t->customer_postal_code . "'" .
-							  ", foxy_transaction_billing_country = '" . $t->customer_country . "'" .
-							  ", foxy_transaction_shipping_address1 = '" . $t->customer_address1. "'" .
-							  ", foxy_transaction_shipping_address2 = '" . $t->customer_address2. "'" .
-							  ", foxy_transaction_shipping_city = '" . $t->customer_city. "'" .
-							  ", foxy_transaction_shipping_state = '" . $t->customer_state. "'" .
-							  ", foxy_transaction_shipping_zip = '" . $t->customer_postal_code. "'" .
-							  ", foxy_transaction_shipping_country = '" . $t->customer_country. "'";
+					  $sql .= ", foxy_transaction_billing_address1 = '" . mysql_escape_string($t->customer_address1) . "'" .
+					  		  ", foxy_transaction_billing_address2 = '" . mysql_escape_string($t->customer_address2) . "'" .
+							  ", foxy_transaction_billing_city = '" . mysql_escape_string($t->customer_city) . "'" .
+							  ", foxy_transaction_billing_state = '" . mysql_escape_string($t->customer_state) . "'" .
+							  ", foxy_transaction_billing_zip = '" . mysql_escape_string($t->customer_postal_code) . "'" .
+							  ", foxy_transaction_billing_country = '" . mysql_escape_string($t->customer_country) . "'" .
+							  ", foxy_transaction_shipping_address1 = '" . mysql_escape_string($t->customer_address1) . "'" .
+							  ", foxy_transaction_shipping_address2 = '" . mysql_escape_string($t->customer_address2) . "'" .
+							  ", foxy_transaction_shipping_city = '" . mysql_escape_string($t->customer_city) . "'" .
+							  ", foxy_transaction_shipping_state = '" . mysql_escape_string($t->customer_state) . "'" .
+							  ", foxy_transaction_shipping_zip = '" . mysql_escape_string($t->customer_postal_code) . "'" .
+							  ", foxy_transaction_shipping_country = '" . mysql_escape_string($t->customer_country) . "'";
 				  }
 				  else
 				  {
-					  $sql .= ", foxy_transaction_billing_address1 = '" . $t->customer_address1 . "'" .
-					  		  ", foxy_transaction_billing_address2 = '" . $t->customer_address2 . "'" .
-							  ", foxy_transaction_billing_city = '" . $t->customer_city . "'" .
-							  ", foxy_transaction_billing_state = '" . $t->customer_state . "'" .
-							  ", foxy_transaction_billing_zip = '" . $t->customer_postal_code . "'" .
-							  ", foxy_transaction_billing_country = '" . $t->customer_country . "'" .
-							  ", foxy_transaction_shipping_address1 = '" . $t->shipping_address1. "'" .
-							  ", foxy_transaction_shipping_address2 = '" . $t->shipping_address2. "'" .
-							  ", foxy_transaction_shipping_city = '" . $t->shipping_city. "'" .
-							  ", foxy_transaction_shipping_state = '" . $t->shipping_state. "'" .
-							  ", foxy_transaction_shipping_zip = '" . $t->shipping_postal_code. "'" .
-							  ", foxy_transaction_shipping_country = '" . $t->shipping_country. "'";
+					  $sql .= ", foxy_transaction_billing_address1 = '" . mysql_escape_string($t->customer_address1) . "'" .
+					  		  ", foxy_transaction_billing_address2 = '" . mysql_escape_string($t->customer_address2) . "'" .
+							  ", foxy_transaction_billing_city = '" . mysql_escape_string($t->customer_city) . "'" .
+							  ", foxy_transaction_billing_state = '" . mysql_escape_string($t->customer_state) . "'" .
+							  ", foxy_transaction_billing_zip = '" . mysql_escape_string($t->customer_postal_code) . "'" .
+							  ", foxy_transaction_billing_country = '" . mysql_escape_string($t->customer_country) . "'" .
+							  ", foxy_transaction_shipping_address1 = '" . mysql_escape_string($t->shipping_address1) . "'" .
+							  ", foxy_transaction_shipping_address2 = '" . mysql_escape_string($t->shipping_address2) . "'" .
+							  ", foxy_transaction_shipping_city = '" . mysql_escape_string($t->shipping_city) . "'" .
+							  ", foxy_transaction_shipping_state = '" . mysql_escape_string($t->shipping_state) . "'" .
+							  ", foxy_transaction_shipping_zip = '" . mysql_escape_string($t->shipping_postal_code) . "'" .
+							  ", foxy_transaction_shipping_country = '" . mysql_escape_string($t->shipping_country) . "'";
 				  }
 			$wpdb->query($sql);
 			
@@ -732,14 +777,14 @@ function SyncTransactions($SyncAll, $PageStart)
 			//  - version 0.2.5 - _date, _product_total, tax_total, shipping_total, order_total, cc_type
 			//so update accordingly
 			$sql = "UPDATE " . WP_TRANSACTION_TABLE .  " 
-					SET  foxy_transaction_is_test='" . $t->is_test . "'" . 
-					  ", foxy_transaction_date = '" . $t->transaction_date . "'" .
-					  ", foxy_transaction_product_total = '" . $t->product_total . "'" .
-					  ", foxy_transaction_tax_total = '" . $t->tax_total . "'" .
-					  ", foxy_transaction_shipping_total = '" . $t->shipping_total . "'" .
-					  ", foxy_transaction_order_total = '" . $t->order_total . "'" .
-					  ", foxy_transaction_cc_type = '" . $t->cc_type . "'
-					WHERE foxy_transaction_id = '" . $t->id . "'";
+					SET  foxy_transaction_is_test='" . mysql_escape_string($t->is_test) . "'" . 
+					  ", foxy_transaction_date = '" . mysql_escape_string($t->transaction_date) . "'" .
+					  ", foxy_transaction_product_total = '" . mysql_escape_string($t->product_total) . "'" .
+					  ", foxy_transaction_tax_total = '" . mysql_escape_string($t->tax_total) . "'" .
+					  ", foxy_transaction_shipping_total = '" . mysql_escape_string($t->shipping_total) . "'" .
+					  ", foxy_transaction_order_total = '" . mysql_escape_string($t->order_total) . "'" .
+					  ", foxy_transaction_cc_type = '" . mysql_escape_string($t->cc_type) . "'
+					WHERE foxy_transaction_id = '" . mysql_escape_string($t->id) . "'";
 			$wpdb->query($sql);
 		}
 		

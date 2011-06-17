@@ -90,7 +90,7 @@
     <div style="margin-left:auto;margin-right:auto;background-image:url(img/top.jpg);height:19px;"></div>
     <div style="margin-left:auto;margin-right:auto;text-align:left;width:100%;min-height:597px;">
         <div style="text-align:center;"><img src="img/foxycart_logo.png" /></div>
-        <?
+        <?php
 			ShowCategoryListing();
             ShowSearch();
             if($ShowSearchResults)
@@ -112,7 +112,7 @@
 </body>
 </html>
 
-<?
+<?php
 
 function ShowCategoryListing()
 {
@@ -127,7 +127,7 @@ function ShowCategoryListing()
                 </td>
                 <td>
                 	<select id="foxy_category_listing" name="foxy_category_listing">
-						<?
+						<?php
                         $cats = $wpdb->get_results( "SELECT * FROM " . WP_INVENTORY_CATEGORIES_TABLE );
                         foreach( $cats as $cat ) {
                             echo("<option value=\"" . $cat->category_id . "\">" . $cat->category_name . "</option>");
@@ -159,7 +159,7 @@ function ShowCategoryListing()
     </form>
     </div>
     <br /><hr /><br />
-    <?
+    <?php
 }
 
 
@@ -193,7 +193,7 @@ function SearchResults($searchitems)
                         <td><label for="inventory_name"><?php echo stripslashes($item->inventory_name); ?></label></td>
                         <td><label for="inventory_price"><?php echo "$" . number_format($item->inventory_price, 2); ?></label></td>                        <td><label for="category_name"><?php echo stripslashes($item->category_name); ?></label></td>
                    </tr>
-                <? }  ?>
+                <?php }  ?>
         </table>
 	</form>
     <?php
@@ -201,7 +201,7 @@ function SearchResults($searchitems)
  	else
   	{
 		?>
-		<div class="centertext"><? _e("There are no items matching your search",'inventory')  ?></div>
+		<div class="centertext"><?php _e("There are no items matching your search",'inventory')  ?></div>
         <div class="centertext"><a href="<?=foxypress_GetCurrentPageURL()?>">Full Inventory List</a></div>
     <?
   }
@@ -290,7 +290,7 @@ function ShowInventory(){
                         <td><label for="inventory_name"><?php echo stripslashes($item->inventory_name); ?></label></td>
                         <td><label for="inventory_price"><?php echo "$" . number_format($item->inventory_price, 2); ?></label></td>                        <td><label for="category_name"><?php echo stripslashes($item->category_name); ?></label></td>
                    </tr>
-                <? }  ?>
+                <?php }  ?>
         </table>
         <?
 		//pagination
@@ -306,7 +306,7 @@ function ShowInventory(){
  	else
   	{
 		?>
-		<div class="centertext"><? _e("There are no inventory items in the database!",'inventory')  ?></div>
+		<div class="centertext"><?php _e("There are no inventory items in the database!",'inventory')  ?></div>
 		<div class="centertext"><a href="<?php echo $_SERVER['PHP_SELF'] ?>?page=inventory&amp;action=add&amp;inventory_id=<?php echo $item->inventory_id;?>" class='edit'>Add New Item</a></div>
     <?
   }

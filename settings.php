@@ -1,7 +1,4 @@
 <?php
-/*include_once("cart_validation.php");
-$foxyClass = new FoxyCart_Helper;*/
-
 $foxycart_options = get_option('foxycart');
 function foxypress_options()
 {
@@ -71,36 +68,60 @@ function foxypress_options()
                         </tr>
                         <tr valign="top">
                         	<td align="right" valign="top" nowrap>Include jQuery</td>
-                            <td alig="left">
-                            <?
+                            <td align="left">
+                            <?php
 								$includejq = get_option('foxycart_include_jquery');
 							?>
-                            	<input type="checkbox" name="foxycart_include_jquery" value="1" <?=(($includejq == "1") ? "checked=\"checked\"" : "") ?> /> *We will automatically include a reference to jQuery
+                            	<input type="checkbox" name="foxycart_include_jquery" value="1" <?php echo((($includejq == "1") ? "checked=\"checked\"" : "")) ?> /> *We will automatically include a reference to jQuery
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                        	<td align="right" valign="top" nowrap>Enable Multi-Ship</td>
+                            <td align="left">
+                            <?php
+								$enablems = get_option('foxycart_enable_multiship');
+							?>
+                            	<input type="checkbox" name="foxycart_enable_multiship" value="1" <?php echo((($enablems == "1") ? "checked=\"checked\"" : "")) ?> /> *Allows customers to ship to multiple addresses
                             </td>
                         </tr>
                         <tr valign="top">
                           <td align="right" valign="top" nowrap>Product Feed</td>
-                          <td alig="left">
-                          	<input type="text" name="foxycart_product_feed" id="foxycart_product_feed" value="<?=get_bloginfo("url") . "/wp-content/plugins/foxypress/productfeed.php"?>" size="50" readonly /> <br />
+                          <td align="left">
+                          	<input type="text" name="foxycart_product_feed" id="foxycart_product_feed" value="<?php echo(get_bloginfo("url") . "/wp-content/plugins/foxypress/productfeed.php") ?>" size="50" readonly /> <br />
                             *RSS Feed of your Products compatible with Google Products
+                          </td>
+                        </tr>
+                        <tr valign="top">
+                          <td align="right" valign="top" nowrap>DataFeed</td>
+                          <td align="left">
+                          	<input type="text" name="foxycart_data_feed" id="foxycart_data_feed" value="<?php echo(get_bloginfo("url") . "/wp-content/plugins/foxypress/foxydatafeed.php") ?>" size="50" readonly /> <br />
+                            *If you are using digital downloads, use this URL as your data feed url in FoxyCart.
                           </td>
                         </tr>
                         <tr>
                         	<td align="right" valign="top" nowrap>Product Detail Base URL</td>
-                            <td alig="left">
-                            	<input type="text" name="foxypress_base_url" value="<?=get_option("foxypress_base_url")?>" /><br />
-								*You can leave this field blank if you have permalinks turned on. ex: <?=get_bloginfo("url")?>/my-page <br />
+                            <td align="left">
+                            	<input type="text" name="foxypress_base_url" value="<?php echo(get_option("foxypress_base_url")) ?>" /><br />
+								*You can leave this field blank if you have permalinks turned on. ex: <?php echo(get_bloginfo("url")) ?>/my-page <br />
                                 If permalinks do not work on your version of wordpress, please enter the base url. <br />
-                                If your pages look like <b><?=get_bloginfo("url")?>/index.php/my-page</b> you should enter index.php as the base url.
+                                If your pages look like <b><?php echo(get_bloginfo("url")) ?>/index.php/my-page</b> you should enter index.php as the base url.
                             <td>
-                        </tr>
+                        </tr>      
+                        <tr>
+                        	<td align="right" valign="top" nowrap>Max Downloads</td>
+                            <td align="left">
+                            	<input type="text" name="foxypress_max_downloads" value="<?php echo(get_option("foxypress_max_downloads")) ?>" /><br />
+                                *Sets the maximum number of downloads allowed for a downloadable product. <br />
+                                You can specify this at a global level here and also at a product level.
+                            </td>
+                        </tr>                  
                     </table>
             	</td>
             </tr>
             <tr>
             	<td align="center">
                     <input type="hidden" name="action" value="update" />
-                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery, foxypress_base_url" />
+                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery, foxypress_base_url, foxycart_enable_multiship,foxypress_max_downloads" />
               		<p class="submit">
               			<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
               		</p>
@@ -115,6 +136,6 @@ function foxypress_options()
     Need a FoxyCart account?  Go to <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182" target="_blank">FoxyCart</a> today and sign up!
   </p>
   </div>
-<?
+<?php
 }
 ?>

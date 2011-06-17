@@ -1,4 +1,4 @@
-<?
+<?php
 $plugin_dir = basename(dirname(__FILE__));
 //actions
 load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_dir);
@@ -299,7 +299,7 @@ function import_export_page_load()
             <form method="POST" enctype="multipart/form-data" id="frmImport" name="frmImport">
                 <input type="file" name="file_import" id="file_import" /> 
                 <input type="submit" name="file_submit" id="file_submit" value="Import" /> 
-                <?
+                <?php
 					if( $error != "" && isset($_POST['file_submit']) )
 					{
 						echo($error);
@@ -312,7 +312,7 @@ function import_export_page_load()
         <div>
         	<form method="POST" id="frmExport" name="frmExport">
             	<input type="submit" name="export_submit" id="export_submit" value="Export" /> 
-                <?
+                <?php
 					if( $error != "" && isset($_POST['export_submit']) )
 					{
 						echo($error);
@@ -362,7 +362,7 @@ function import_export_page_load()
 			</li>
 		</ul>
     </div>	
-	<?
+	<?php
 }
 
 //Helper Functions

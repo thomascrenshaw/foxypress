@@ -1,4 +1,4 @@
-<?
+<?php
 	session_start();
 	require_once('../../../wp-includes/wp-db.php');	
 	require_once('../../../wp-config.php');	

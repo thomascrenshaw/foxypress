@@ -9,7 +9,7 @@ if (!empty($_FILES)) {
 	$inventory_id = $_POST['inventory_id'];
 	$imagetable = $_POST['prefix'];
 	// Validate the file type
-	$fileTypes = array('jpg','jpeg','gif','png'); // File extensions
+	$fileTypes = array('jpg','jpeg','gif','png', 'bmp', 'JPG', 'JPEG', 'GIF', 'PNG', 'BMP'); // File extensions
 	$fileParts = pathinfo($_FILES['Filedata']['name']);	
 	if (in_array($fileParts['extension'],$fileTypes)) 
 	{
