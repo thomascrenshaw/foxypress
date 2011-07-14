@@ -32,14 +32,14 @@ function import_export_postback()
 	{
 		$uploaded = false;
 		//delete current copy of Inventory.csv (if one exists)
-		if (file_exists(ABSPATH . 'wp-content/plugins/foxypress/Inventory.csv')) 
+		if (file_exists(WP_PLUGIN_DIR . '/foxypress/Inventory.csv')) 
 		{
-			unlink(ABSPATH . 'wp-content/plugins/foxypress/Inventory.csv');		
+			unlink(WP_PLUGIN_DIR . '/foxypress/Inventory.csv');		
 		}
 		//upload && rename file to Inventory.csv		
 		if ($_FILES['file_import']['name'] != "")
 		{
-			if (move_uploaded_file($_FILES['file_import']['tmp_name'], ABSPATH . 'wp-content/plugins/foxypress/Inventory.csv'))
+			if (move_uploaded_file($_FILES['file_import']['tmp_name'], WP_PLUGIN_DIR . '/foxypress/Inventory.csv'))
 			{
 				$uploaded = true;
 			}
@@ -49,7 +49,7 @@ function import_export_postback()
 		{
 			foxypress_GetCategories();
 			foxypress_GetOptionGroups();					
-			$file = fopen(ABSPATH . 'wp-content/plugins/foxypress/Inventory.csv', 'r');
+			$file = fopen(WP_PLUGIN_DIR . '/foxypress/Inventory.csv', 'r');
 			while(! feof($file))
 			{
 				$inventory_id = "";
@@ -237,11 +237,11 @@ function import_export_postback()
 			}
 		}
 
-		if (file_exists(ABSPATH . "wp-content/plugins/foxypress/Export.csv")) 
+		if (file_exists(WP_PLUGIN_DIR . "/foxypress/Export.csv")) 
 		{
-			unlink(ABSPATH . "wp-content/plugins/foxypress/Export.csv");
+			unlink(WP_PLUGIN_DIR . "/foxypress/Export.csv");
 		}
-		$f = fopen(ABSPATH . "wp-content/plugins/foxypress/Export.csv", "x+");
+		$f = fopen(WP_PLUGIN_DIR . "/foxypress/Export.csv", "x+");
 		//fwrite($f,$data);		
 		foreach ($list as $line)
 		{
@@ -250,7 +250,7 @@ function import_export_postback()
             fwrite($f, "\r\n"); 
 		}
 		fclose($f);
-		$error = "<a href=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/Export.csv\" target=\"_blank\">Download Export</a> <small><i>(Right Click, Save As)</i></small>";
+		$error = "<a href=\"" . plugins_url() . "/foxypress/Export.csv\" target=\"_blank\">Download Export</a> <small><i>(Right Click, Save As)</i></small>";
 	}//end if export
 }
 

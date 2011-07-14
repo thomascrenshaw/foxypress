@@ -1,13 +1,15 @@
 === FoxyPress ===
 Contributors: webmovementllc
-Tags: products, foxycart, cart, e-commerce, shopping cart, foxy, foxypress
+Donate link: http://www.foxy-press.com/contact
+Tags: foxycart, shopping, cart, inventory, management
 Requires at least: 3.0
-Tested up to: 3.1.3
-Stable tag: trunk
-Version: 0.2.9
+Tested up to: 3.2.1
+Stable tag: 2.7.1
 
-FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...
+FoxyPress allows you to easily manage an inventory, view and track your orders, generate reports and much more...
+
 == Description ==
+
 FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon and administration panels. 
 
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users' requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
@@ -24,7 +26,18 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 - Uploadify - Multi-image support
 
+- Green Egg Media - Multi Datafeed inspiration
+
 == Changelog ==
+
+= 0.3.0 =
+* Added support for the <a href="http://codex.wordpress.org/Installing_WordPress_With_Clean_Subversion_Repositories" target="_blank">clean svn repository method</a> by using plugins_url() instead of hardcoding the plugins folder
+* Added inventory levels and alert settings
+* Added multiple datafeed support
+* Added ability to re-order photos per product
+* Added minimum and maximum product amount available per product
+* Fixed a few random bugs brought to our attention by our users
+* View the release notes <a href="http://www.foxy-press.com/archives/317" target="_blank">here</a>
 
 = 0.2.9 =
 * Added downloadable product support

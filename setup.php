@@ -82,6 +82,7 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 		foxypress_Installation_AlterInventoryCategoryInformation();
 		foxypress_Installation_DeleteDefaultImages();
 		foxypress_Installation_AlterInventoryImagesTable();
+		foxypress_Installation_AlterInventoryTableMinMaxQuantity();
 	}
 	else // we are at least version 1.8
 	{
@@ -119,7 +120,8 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 			foxypress_Installation_AlterInventoryCategoryInformation();
 			foxypress_Installation_DeleteDefaultImages();
 			foxypress_Installation_AlterInventoryImagesTable();
-			foxypress_Installation_CreateProductDetailPage();				
+			foxypress_Installation_CreateProductDetailPage();	
+			foxypress_Installation_AlterInventoryTableMinMaxQuantity();			
 		}
 		else
 		{
@@ -142,6 +144,7 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 				foxypress_Installation_AlterInventoryImagesTable();
 				foxypress_Installation_AlterTransactionTable();
 				foxypress_Installation_CreateProductDetailPage();	
+				foxypress_Installation_AlterInventoryTableMinMaxQuantity();
 			}
 			else if(
 						$drCurrentVersion->foxy_current_version == "0.2.0" ||
@@ -161,6 +164,7 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 				foxypress_Installation_AlterInventoryImagesTable();
 				foxypress_Installation_AlterInventoryCategoryOrderInformation();
 				foxypress_Installation_UpdateCurrentVersion();
+				foxypress_Installation_AlterInventoryTableMinMaxQuantity();
 			}
 			else if(
 						$drCurrentVersion->foxy_current_version == "0.2.5" ||
@@ -175,6 +179,7 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 				foxypress_Installation_CreateInventoryDownloadablesDirectory();
 				foxypress_Installation_CreateEncryptionSetting();
 				foxypress_Installation_AlterInventoryCategoryOrderInformation();
+				foxypress_Installation_AlterInventoryTableMinMaxQuantity();
 			}
 		}
 	}
@@ -214,7 +219,7 @@ function foxypress_Installation_VerifyTableCount($new_install, $installation_att
 
 function foxypress_Installation_CanRunUpdates()
 {
-	$foxyUpdateFile = ABSPATH . "wp-content/plugins/foxypress/foxy.txt";
+	$foxyUpdateFile =  WP_PLUGIN_DIR . "/foxypress/foxy.txt";
 	$fh = fopen($foxyUpdateFile, 'r');
 	$Run = fread($fh, filesize($foxyUpdateFile));
 	if($Run == "1")
@@ -237,6 +242,8 @@ function foxypress_Installation_CreateInventoryTable()
 				inventory_description TEXT NOT NULL,
 				inventory_weight VARCHAR(30) NULL,
 				inventory_quantity INT(11) DEFAULT 0,
+				inventory_quantity_max INT(11) DEFAULT 0,
+				inventory_quantity_min INT(11) DEFAULT 0,
 				category_id INT(11) NULL,
 				inventory_price FLOAT(10, 2) NOT NULL,
 				inventory_image TEXT NULL,
@@ -276,7 +283,7 @@ function foxypress_Installation_CreateInventoryImagesDirectory()
 {
 	//create images folder and copy default image
 	$inventoryfolder = ABSPATH . INVENTORY_IMAGE_LOCAL_DIR;
-	$defaultImage = ABSPATH . 'wp-content/plugins/foxypress/img/' . INVENTORY_DEFAULT_IMAGE;
+	$defaultImage = WP_PLUGIN_DIR . '/foxypress/img/' . INVENTORY_DEFAULT_IMAGE;
 	if(!is_dir($inventoryfolder))
 	{
 		mkdir($inventoryfolder, 0777);
@@ -531,7 +538,7 @@ function foxypress_Installation_CreateProductDetailPage()
 function foxypress_Installation_UpdateFoxyFile()
 {
 	//update foxy.txt
-	$foxyUpdateFile = ABSPATH . "wp-content/plugins/foxypress/foxy.txt";
+	$foxyUpdateFile = WP_PLUGIN_DIR . "/foxypress/foxy.txt";
 	$fh = fopen($foxyUpdateFile, 'w');
 	fwrite($fh, "0");
 	fclose($fh);	
@@ -597,6 +604,16 @@ function foxypress_Installation_AlterInventoryOptionsTable()
 	global $wpdb;
 	//add sort order to options table
 	$sql = "ALTER TABLE " . WP_FOXYPRESS_INVENTORY_OPTIONS . " ADD option_order INT DEFAULT '99' AFTER option_active;";
+	$wpdb->query($sql);	
+}
+
+function foxypress_Installation_AlterInventoryTableMinMaxQuantity()
+{
+	global $wpdb;
+	//add min and max qty to inventory table
+	$sql = "ALTER TABLE " . WP_INVENTORY_TABLE . " ADD inventory_quantity_max INT DEFAULT '0' AFTER inventory_quantity;";
+	$wpdb->query($sql);	
+	$sql = "ALTER TABLE " . WP_INVENTORY_TABLE . " ADD inventory_quantity_min INT DEFAULT '0' AFTER inventory_quantity_max;";
 	$wpdb->query($sql);	
 }
 

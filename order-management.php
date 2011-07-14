@@ -157,8 +157,8 @@ function order_management_page_load()
 			echo("Please click the button below to sync your latest transactions from FoxyCart.<br>
 				   <form id=\"syncForm\" name=\"syncForm\" method=\"POST\">
 					<div>
-						<input type=\"button\" id=\"foxy_om_sync_now\"  name=\"foxy_om_sync_now\" value=\"Sync Latest Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=sync', '../wp-content/plugins/foxypress/img/ajax-loader.gif', true);\" /> 
-						<input type=\"button\" id=\"foxy_om_sync_all\"  name=\"foxy_om_sync_all\" value=\"Sync All Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=syncall', '../wp-content/plugins/foxypress/img/ajax-loader.gif', true);\" />
+						<input type=\"button\" id=\"foxy_om_sync_now\"  name=\"foxy_om_sync_now\" value=\"Sync Latest Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=sync', '" . plugins_url() . "/foxypress/img/ajax-loader.gif', true);\" /> 
+						<input type=\"button\" id=\"foxy_om_sync_all\"  name=\"foxy_om_sync_all\" value=\"Sync All Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=syncall', '" . plugins_url() . "/foxypress/img/ajax-loader.gif', true);\" />
 						<span id=\"foxy_om_sync\"></span>
 						<br><i>Last Synchronized: " . $drSync->foxy_transaction_sync_timestamp . "</i>
 					</div>
@@ -391,9 +391,9 @@ function order_management_page_load()
 																				and dt.foxy_transaction_id = '" . $foxyXMLResponse->transaction->id . "'
 											  WHERE d.inventory_id = '" . mysql_escape_string($Inventory_ID) . "'");
 						//generate url
-						$DownloadURL = get_bloginfo("url") . "/wp-content/plugins/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($dt->download_transaction_id));
+						$DownloadURL = plugins_url() . "/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($dt->download_transaction_id));
 						$options .= "<a href=\"" . $DownloadURL . "\">Downloadable Link</a><br />";	
-						$options .= "Download Count: <span id=\"foxypress_downloadable_count\">" . $dt->download_count . "</span> <a href=\"javascript:ResetDownloadCount('" . get_bloginfo("url") . "/wp-content/plugins/foxypress/ajax.php" . "', '" . session_id() . "', '" . $dt->downloadable_id . "', '" . $dt->download_transaction_id . "');\">Reset</a> <img src=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/img/ajax-loader.gif\" id=\"foxypress_downloadable_loading\" name=\"foxypress_downloadable_loading\" style=\"display:none;\" /><br />";
+						$options .= "Download Count: <span id=\"foxypress_downloadable_count\">" . $dt->download_count . "</span> <a href=\"javascript:ResetDownloadCount('" . plugins_url() . "/foxypress/ajax.php" . "', '" . session_id() . "', '" . $dt->downloadable_id . "', '" . $dt->download_transaction_id . "');\">Reset</a> <img src=\"" . plugins_url() . "/foxypress/img/ajax-loader.gif\" id=\"foxypress_downloadable_loading\" name=\"foxypress_downloadable_loading\" style=\"display:none;\" /><br />";
 					}			
 					
 					$ProductCode = $td->product_code;
@@ -571,7 +571,7 @@ function ProcessSearch($SearchValue)
 function Begin_Foxy_Order_Management()
 {
 	?>
-    <script type="text/javascript" src="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/js/jquery.qtip.js"></script>
+    <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/jquery.qtip.js"></script>
     <style type="text/css">
 		.Hide { display:none; }
 	  	div.foxy_item_pagination {
@@ -687,7 +687,7 @@ function End_Foxy_Order_Management($NeedsSync)
 			<?php
 				if($NeedsSync)
 				{
-					echo("SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=sync', '../wp-content/plugins/foxypress/img/ajax-loader.gif', false)");
+					echo("SyncTransactionsJS('" . $Page_URL . "?page=order-management', '" . $Page_URL . "?page=order-management&action=sync', '" . plugins_url() . "/foxypress/img/ajax-loader.gif', false)");
 				}
 			?>
 	  	</script>

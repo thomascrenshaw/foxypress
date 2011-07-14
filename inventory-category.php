@@ -120,7 +120,7 @@ function foxypress_inventory_category_sort()
 					{
 						$current_item_order .= ($current_item_order == "") ? $i->itc_id : "," . $i->itc_id;
 						echo("<tr id=\"" . $i->itc_id . "\">
-								<td style=\"cursor:pointer;\"><img src=\"" .get_bloginfo("url") . "/wp-content/plugins/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
+								<td style=\"cursor:pointer;\"><img src=\"" . plugins_url() . "/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
 								<td>" . $i->inventory_code . "&nbsp;&nbsp;</td>
 								<td>" . $i->inventory_name . "</td>
 							  </tr>");

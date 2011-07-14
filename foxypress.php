@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress allows you to easily create an inventory, view and track your orders, generate reports and much more...all within your WordPress Dashboard.
 Author: WebMovement, LLC
-Version: 0.2.9
+Version: 0.3.0
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -76,7 +76,7 @@ define('INVENTORY_IMAGE_LOCAL_DIR', "wp-content/inventory_images/");
 define('INVENTORY_DOWNLOADABLE_DIR', get_bloginfo("url") . "/wp-content/inventory_downloadables");
 define('INVENTORY_DOWNLOADABLE_LOCAL_DIR', "wp-content/inventory_downloadables/");
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.2.9");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.0");
 
 if ( !empty ( $foxypress_url ) ){
 	// Include inventory settings and functionality \\
@@ -88,6 +88,16 @@ if ( !empty ( $foxypress_url ) ){
 	include_once('reports.php');
 	include_once('import-export.php');
 }
+
+/** DASHBOARD STUFF **/
+function my_wp_dashboard_test() {
+	echo 'Test Add Dashboard-Widget';
+}
+function my_wp_dashboard_setup() {
+	wp_add_dashboard_widget( 'my_wp_dashboard_test', __( 'Test My Dashboard' ), 'my_wp_dashboard_test' );
+}
+add_action('wp_dashboard_setup', 'my_wp_dashboard_setup');
+/** DASHBOARD STUFF **/
 
 function foxypress_load_minicart()
 {
@@ -131,7 +141,7 @@ function url($type) {
 
 function foxypress_handle_tracking_module()
 {
-	$url = get_bloginfo("url") . "/wp-content/plugins/foxypress/ajax.php";
+	$url = plugins_url() . "/foxypress/ajax.php";
 	$trackingform = "<div> Enter your order number </div>
 		 <div><input type=\"text\" id=\"foxypress_order_number\" name=\"foxypress_order_number\" value=\"\" /></div>
 		 <div> Enter your last name </div>
@@ -143,15 +153,48 @@ function foxypress_handle_tracking_module()
 	return $trackingform;
 }
 
-function foxypress_GetDownloadableFormFields($DownloadableID)
+function foxypress_GetDownloadableAndMinMaxFormFields($DownloadableID, $min, $max, $qty)
 {
 	$IsDownloadable =  foxypress_IsDownloadable($DownloadableID);
+	$MaxField = "";
+	$MinField = "";
+	//min
+	if($min > 0)
+	{
+		if($qty != null && $qty < $min)
+		{
+			$MinField  = "<input type=\"hidden\" name=\"quantity_min\" value=\"" . stripslashes($qty) . "\" />";
+		}
+		else
+		{
+			$MinField  = "<input type=\"hidden\" name=\"quantity_min\" value=\"" . stripslashes($min) . "\" />";
+		}
+	}
+	//max
+	if($max > 0)
+	{
+		if($qty != null && $qty < $max)
+		{
+			$MaxField  = "<input type=\"hidden\" name=\"quantity_max\" value=\"" . stripslashes($qty) . "\" />";
+		}
+		else
+		{
+			$MaxField  = "<input type=\"hidden\" name=\"quantity_max\" value=\"" . stripslashes($max) . "\" />";
+		}
+	}
+	else
+	{
+		$MaxField  = "<input type=\"hidden\" name=\"quantity_max\" value=\"" . stripslashes($qty) . "\" />";
+	}
+
 	if($IsDownloadable)
 	{
 		return "<input type=\"hidden\" name=\"Downloadable\" value=\"true\" />
 				<input type=\"hidden\" name=\"quantity_max\" value=\"1\" />";
-	}	
-	return "<input type=\"hidden\" name=\"Downloadable\" value=\"false\" />";
+	}
+	return "<input type=\"hidden\" name=\"Downloadable\" value=\"false\" />" .
+			$MinField .
+			$MaxField;
 }
 
 function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $detailurl='', $show_addtocart, $showMainImage = true)
@@ -162,17 +205,20 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 	$idcolumn = ($legacy_shortcode) ? "inventory_code" : "inventory_id";
 	$item = $wpdb->get_row("SELECT i.*
 									,c.category_name
-									,im.inventory_images_id
-									,im.inventory_image
+									,(select inventory_images_id
+										from wp_foxypress_inventory_images
+										where inventory_id = i.inventory_id
+										order by image_order limit 0,1) as inventory_images_id
+								   ,(select inventory_image
+								   		from wp_foxypress_inventory_images
+										where inventory_id = i.inventory_id
+										order by image_order limit 0,1) as inventory_image
 									,d.downloadable_id
 							FROM " . WP_INVENTORY_TABLE . " as i
 							INNER JOIN (SELECT min( itc_id ) AS itc_id, inventory_id, category_id
 											FROM " . WP_INVENTORY_TO_CATEGORY_TABLE . "
 											GROUP BY inventory_id) as ic on i.inventory_id = ic.inventory_id
 							INNER JOIN " . WP_INVENTORY_CATEGORIES_TABLE . " as c ON ic.category_id = c.category_id
-							LEFT JOIN
-									(select min(inventory_images_id) as inventory_images_id, inventory_id, inventory_image
-									from " . WP_INVENTORY_IMAGES_TABLE . " group by inventory_id) as im ON i.inventory_id = im.inventory_id
 							LEFT JOIN " . WP_INVENTORY_DOWNLOADABLES . " as d on i.inventory_id = d.inventory_id and d.status = 1
 							WHERE i." . $idcolumn. " = '" . $item_id . "'
 							ORDER BY i.inventory_code DESC");
@@ -191,7 +237,7 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 	}
 
 	if($show_addtocart)
-	{		
+	{
 		$foxyForm = "<div class=\"foxy_item_wrapper_single\">
 						<form action=\"https://" . $foxypress_url . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\">
 							<input type=\"hidden\" name=\"quantity\" value=\"1\" />
@@ -201,11 +247,9 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 							<input type=\"hidden\" name=\"category\" value=\"" . stripslashes($item->category_name) . "\" />
 							<input type=\"hidden\" name=\"image\" value=\"" . INVENTORY_IMAGE_DIR . '/' . (($item->inventory_image != "") ? stripslashes($item->inventory_image) : INVENTORY_DEFAULT_IMAGE) . "\" />
 							<input type=\"hidden\" name=\"weight\" value=\"" . stripslashes($item->inventory_weight) . "\" />
-							<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />" . 
-							foxypress_GetDownloadableFormFields($item->downloadable_id) . 
+							<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />" .
+							foxypress_GetDownloadableAndMinMaxFormFields($item->downloadable_id, $item->inventory_quantity_min, $item->inventory_quantity_max, $item->inventory_quantity) .
 							"<input type=\"hidden\" name=\"Inventory_ID\" value=\"" . $item->inventory_id . "\" />";
-							
-							
 
 		//check to see if we have any attributes & build up the list
 		$foxyForm .= foxypress_buildattributeform($item->inventory_id);
@@ -217,7 +261,7 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 		$itemImages =  $wpdb->get_results("SELECT *
 								FROM " . WP_INVENTORY_IMAGES_TABLE . "
 								WHERE inventory_id = '" . $item->inventory_id . "'
-								ORDER BY inventory_images_id");
+								ORDER BY image_order");
 		$foxyThumbs = "";
 		if(!empty($itemImages) && ($wpdb->num_rows > 1))
 		{
@@ -232,14 +276,14 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 		$foxyImages = "<div class=\"foxypress_item_image_single\">";
 		if($showMainImage)
 		{
-			$foxyImages .= ($item->inventory_image != "") 
+			$foxyImages .= ($item->inventory_image != "")
 						? ($foxyThumbs == "")
 							? "<a href=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" rel=\"colorbox\"><img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" /></a>"
-							: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />" 
+							: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />"
 						: "<img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
 		}
 		$foxyImages .= $foxyThumbs . "</div>";
-		$Multiship = (get_option('foxycart_enable_multiship') == "1") ? 
+		$Multiship = (get_option('foxycart_enable_multiship') == "1") ?
 				  "<div class=\"shipto_container\">
 						<div class=\"shipto_select\" style=\"display:none\">
 							<label>Ship this item to:</label><br />
@@ -260,8 +304,8 @@ function foxypress_handle_shortcode_item ($item_id, $legacy_shortcode=false, $de
 					 $MoreDetailDiv .
 					 "  <div class=\"foxypress_item_submit_wrapper_single\">"
 							.
-							( (foxypress_canaddtocart($item->inventory_id)) ?
-							$Multiship . 
+							( (foxypress_canaddtocart($item->inventory_id, $item->inventory_quantity)) ?
+							$Multiship .
 							"<input type=\"submit\" value=\"Add To Cart\" class=\"foxypress_item_submit_single\" />" :
 							"Sorry, we are out of stock for this item, please check back later.")
 							.
@@ -306,9 +350,6 @@ function foxypress_handle_shortcode_listing($categoryid, $limit = 5, $itemsperro
 								INNER JOIN " . WP_INVENTORY_TO_CATEGORY_TABLE . " as ic ON i.inventory_id=ic.inventory_id and
 																							ic.category_id = '" .  $categoryid . "'
 								INNER JOIN " . WP_INVENTORY_CATEGORIES_TABLE . " as c ON ic.category_id = c.category_id
-								LEFT JOIN
-									(select min(inventory_images_id) as inventory_images_id, inventory_id, inventory_image
-									from " . WP_INVENTORY_IMAGES_TABLE . " group by inventory_id) as im ON i.inventory_id = im.inventory_id
 								");
 	$pageNumber = foxypress_FixGetVar('fp_pn');
 	$start = ($pageNumber != "" && $pageNumber != "0") ? $start = ($pageNumber - 1) * $limit : 0;
@@ -316,17 +357,22 @@ function foxypress_handle_shortcode_listing($categoryid, $limit = 5, $itemsperro
 	//get all items within this category. format the result set somehow
 	$items = $wpdb->get_results("SELECT i.*
 									,c.category_name
-									,im.inventory_images_id
-									,im.inventory_image
+									,(select inventory_images_id
+										from wp_foxypress_inventory_images
+										where inventory_id = i.inventory_id
+										order by image_order limit 0,1) as inventory_images_id
+								   ,(select inventory_image
+								   		from wp_foxypress_inventory_images
+										where inventory_id = i.inventory_id
+										order by image_order limit 0,1) as inventory_image
 							FROM " . WP_INVENTORY_TABLE . " as i
 							INNER JOIN " . WP_INVENTORY_TO_CATEGORY_TABLE . " as ic ON i.inventory_id=ic.inventory_id and
 																							ic.category_id = '" .  $categoryid . "'
 							INNER JOIN " . WP_INVENTORY_CATEGORIES_TABLE . " as c ON ic.category_id = c.category_id
-							LEFT JOIN
-									(select min(inventory_images_id) as inventory_images_id, inventory_id, inventory_image
-									from " . WP_INVENTORY_IMAGES_TABLE . " group by inventory_id) as im ON i.inventory_id = im.inventory_id
-							ORDER BY ic.sort_order, i.inventory_code DESC 
+							ORDER BY ic.sort_order, i.inventory_code DESC
 							LIMIT $start, $limit");
+
+
 	$foxyResults = "";
 	if(!empty($items))
 	{
@@ -384,13 +430,13 @@ function foxypress_handle_shortcode_detail($showMainImage)
 											GROUP BY inventory_id) as ic on i.inventory_id = ic.inventory_id
 							INNER JOIN " . WP_INVENTORY_CATEGORIES_TABLE . " as c ON ic.category_id = c.category_id
 							LEFT JOIN
-									(select min(inventory_images_id) as inventory_images_id, inventory_id, inventory_image
-									from " . WP_INVENTORY_IMAGES_TABLE . " group by inventory_id) as im ON i.inventory_id = im.inventory_id
+									(select inventory_images_id, inventory_id, inventory_image
+									 from " . WP_INVENTORY_IMAGES_TABLE . "
+									 where inventory_id='$inventory_id'
+									 order by image_order limit 0,1) as im ON i.inventory_id = im.inventory_id
 							LEFT JOIN " . WP_INVENTORY_DOWNLOADABLES . " as d on i.inventory_id = d.inventory_id and d.status = 1
 							WHERE i.inventory_id = '$inventory_id'
 							ORDER BY i.inventory_code DESC");
-							
-
 	$foxyForm = "<div class=\"foxy_item_wrapper_detail\">
 					<form action=\"https://" . $foxypress_url . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\">
 						<input type=\"hidden\" name=\"quantity\" value=\"1\" />
@@ -400,8 +446,8 @@ function foxypress_handle_shortcode_detail($showMainImage)
 						<input type=\"hidden\" name=\"category\" value=\"" . stripslashes($item->category_name) . "\" />
 						<input type=\"hidden\" name=\"image\" value=\"" . INVENTORY_IMAGE_DIR . '/' . (($item->inventory_image != "") ? stripslashes($item->inventory_image) : INVENTORY_DEFAULT_IMAGE) . "\" />
 						<input type=\"hidden\" name=\"weight\" value=\"" . stripslashes($item->inventory_weight) . "\" />
-						<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />" . 
-						foxypress_GetDownloadableFormFields($item->downloadable_id) . 
+						<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />" .
+						foxypress_GetDownloadableAndMinMaxFormFields($item->downloadable_id, $item->inventory_quantity_min, $item->inventory_quantity_max, $item->inventory_quantity) .
 						"<input type=\"hidden\" name=\"Inventory_ID\" value=\"" . $item->inventory_id . "\" />";
 
 	//check to see if we have any attributes & build up the list
@@ -413,7 +459,7 @@ function foxypress_handle_shortcode_detail($showMainImage)
 	$itemImages =  $wpdb->get_results("SELECT *
 							FROM " . WP_INVENTORY_IMAGES_TABLE . "
 							WHERE inventory_id = '$inventory_id'
-							ORDER BY inventory_images_id");
+							ORDER BY image_order");
 	$foxyThumbs = "";
 	if(!empty($itemImages) && ($wpdb->num_rows > 1))
 	{
@@ -428,14 +474,14 @@ function foxypress_handle_shortcode_detail($showMainImage)
 	$foxyImages = "<div class=\"foxypress_item_image_detail\">";
 	if($showMainImage)
 	{
-		$foxyImages .= ($item->inventory_image != "") 
+		$foxyImages .= ($item->inventory_image != "")
 						? ($foxyThumbs == "")
 							? "<a href=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" rel=\"colorbox\"><img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" /></a>"
-							: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />" 
+							: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "\" />"
 						: "<img  src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
 	}
 	$foxyImages .= $foxyThumbs . "</div>";
-	$Multiship = (get_option('foxycart_enable_multiship') == "1") ? 
+	$Multiship = (get_option('foxycart_enable_multiship') == "1") ?
 				  "<div class=\"shipto_container\">
 						<div class=\"shipto_select\" style=\"display:none\">
 							<label>Ship this item to:</label><br />
@@ -456,8 +502,8 @@ function foxypress_handle_shortcode_detail($showMainImage)
 				 $MoreDetailDiv .
 				  "<div class=\"foxypress_item_submit_wrapper_detail\">"
 				 	.
-					( (foxypress_canaddtocart($item->inventory_id)) ?
-					$Multiship . 
+					( (foxypress_canaddtocart($item->inventory_id, $item->inventory_quantity)) ?
+					$Multiship .
 					"<input type=\"submit\" value=\"Add To Cart\" class=\"foxypress_item_submit\" />" :
 					"Sorry, we are out of stock for this item, please check back later.")
 					.
@@ -467,10 +513,14 @@ function foxypress_handle_shortcode_detail($showMainImage)
 	return $foxyForm . $foxyImages;
 }
 
-function foxypress_canaddtocart($inventory_id)
+function foxypress_canaddtocart($inventory_id, $quantity)
 {
 	//check the options available, if any of the option lists have 0 items, then we cannot add to cart
 	global $wpdb;
+	if($quantity == "0")
+	{
+		return false;
+	}
 	//get option groups
 	$itemOptionGroups = $wpdb->get_results("SELECT distinct option_group_id
 										FROM " . WP_FOXYPRESS_INVENTORY_OPTIONS . "
@@ -755,24 +805,23 @@ function foxypress_DeleteItem($fileloc)
 	}
 }
 
-function foxypress_ParseFileExtension($filename) 
-{ 
+function foxypress_ParseFileExtension($filename)
+{
 	$filename = strtolower($filename);
-	$exts = split("[/\\.]", $filename); 
+	$exts = split("[/\\.]", $filename);
 	$n = count($exts)-1;
-	$exts = $exts[$n]; 
-	return $exts; 
+	$exts = $exts[$n];
+	return $exts;
 }
 
 function foxypress_GenerateNewFileName($fileExtension, $inventory_id, $targetpath, $prefix)
 {
-	//$newName = "fp_" . foxypress_GenerateRandomString(10) . "_" . $inventory_id . "." . $fileext;
 	$newName = $prefix . foxypress_GenerateRandomString(10) . "_" . $inventory_id . "." . $fileExtension;
 	$directory = $targetpath;
 	$directory .= ($directory!="") ? "/" : "";
 	if(file_exists($directory . $newName))
 	{
-		return foxypress_GenerateNewFileName($currentname, $inventory_id, $targetpath);
+		return foxypress_GenerateNewFileName($fileExtension, $inventory_id, $targetpath, $prefix);
 	}
 	return $newName;
 }
@@ -818,7 +867,7 @@ function foxypress_curlPostRequest($url, $postData) {
 //gets the exact url as presented in the url bar
 function foxypress_GetFullURL()
 {
-	$pageURL = 'http';	
+	$pageURL = 'http';
 	if (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != "off") {$pageURL .= "s";}
 	$pageURL .= "://";
 	if ($_SERVER["SERVER_PORT"] != "80") {
@@ -1003,11 +1052,11 @@ function foxypress_importFoxyScripts(){
 		}
 		if($enablemuliship == "1")
 		{
-			echo('<script src="' . get_bloginfo("url") . '/wp-content/plugins/foxypress/js/multiship.jquery.js" type="text/javascript" charset="utf-8"></script>	');
+			echo('<script src="' . plugins_url() . '/foxypress/js/multiship.jquery.js" type="text/javascript" charset="utf-8"></script>	');
 		}
 		echo"
-		<link rel=\"stylesheet\" href=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/style.css\">
-		<script type=\"text/javascript\" src=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/js/jquery.qtip.js\"></script>
+		<link rel=\"stylesheet\" href=\"" . plugins_url() ."/foxypress/style.css\">
+		<script type=\"text/javascript\" src=\"" . plugins_url() ."/foxypress/js/jquery.qtip.js\"></script>
 		<script type='text/javascript'>
 			function foxypress_find_tracking(baseurl)
 			{
@@ -1101,7 +1150,7 @@ class FoxyPress_MiniCart extends WP_Widget {
 			?>
 			<a href="#" class="fc_link"><strong>Your Cart</strong></a>
 			<div id="fc_cart">
-				<img src="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/img/cart.png" alt="your cart"/>
+				<img src="<?php echo(plugins_url()) ?>/foxypress/img/cart.png" alt="your cart"/>
 				<h2>Your Cart</h2>
 				<div class="fc_clear"></div>
 				<table>

@@ -17,8 +17,8 @@ function reports_page_load()
 {
 	global $wpdb;		
 	?>
-    <link rel="stylesheet" href="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/css/smoothness/jquery-ui-1.8.11.custom.css"> 
-    <script type="text/javascript" src="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/js/jquery-ui-1.8.11.custom.min.js"></script>
+    <link rel="stylesheet" href="<?php echo(plugins_url())?>/foxypress/css/smoothness/jquery-ui-1.8.11.custom.css"> 
+    <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/jquery-ui-1.8.11.custom.min.js"></script>
     <script> 
 		jQuery(function() {
 			jQuery("#txtStartDate").datepicker({ dateFormat: 'yy-mm-dd' });

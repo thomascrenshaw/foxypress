@@ -130,6 +130,29 @@
 			echo(GetErrorJSON());	
 		}
 	}
+	else if($mode == "saveimageorder")
+	{
+		$session_id = foxypress_FixGetVar('sid');
+		if($session_id == session_id())
+		{
+			$imageorder = foxypress_FixGetVar('order');
+			$images = explode(",", $imageorder);
+			$x = 1;
+			foreach($images as $image)
+			{
+				$imageExploded = explode("-", $image);
+				$imageid = $imageExploded[1];
+				$query = "UPDATE " . WP_INVENTORY_IMAGES_TABLE . " SET image_order='" . $x . "' WHERE inventory_images_id='" . mysql_escape_string($imageid) . "'";		
+				$wpdb->query($query);
+				$x++;
+			}
+			echo("{\"ajax_status\":\"ok\"}");	
+		}
+		else
+		{
+			echo(GetErrorJSON());	
+		}
+	}
 	else
 	{
 		echo(GetErrorJSON());	

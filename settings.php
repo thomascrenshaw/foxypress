@@ -14,7 +14,7 @@ function foxypress_options()
   	$apikey = "wmm" . $today['mon'] . $today['mday'] . $today['year'] . $today['seconds'] . $activatecode;
     ?>
     <div class="wrap" style="text-align:center;">
-    <img src="../wp-content/plugins/foxypress/img/foxycart_logo.png" />
+    <img src="<?php echo(plugins_url())?>/foxypress/img/foxycart_logo.png" />
     <form method="post" action="options.php">
     <?php wp_nonce_field('update-options'); ?>
         <table class="form-table">
@@ -87,17 +87,26 @@ function foxypress_options()
                         <tr valign="top">
                           <td align="right" valign="top" nowrap>Product Feed</td>
                           <td align="left">
-                          	<input type="text" name="foxycart_product_feed" id="foxycart_product_feed" value="<?php echo(get_bloginfo("url") . "/wp-content/plugins/foxypress/productfeed.php") ?>" size="50" readonly /> <br />
+                          	<input type="text" name="foxycart_product_feed" id="foxycart_product_feed" value="<?php echo(plugins_url() . "/foxypress/productfeed.php") ?>" size="125" readonly /> <br />
                             *RSS Feed of your Products compatible with Google Products
                           </td>
                         </tr>
                         <tr valign="top">
                           <td align="right" valign="top" nowrap>DataFeed</td>
                           <td align="left">
-                          	<input type="text" name="foxycart_data_feed" id="foxycart_data_feed" value="<?php echo(get_bloginfo("url") . "/wp-content/plugins/foxypress/foxydatafeed.php") ?>" size="50" readonly /> <br />
+                          	<input type="text" name="foxycart_data_feed" id="foxycart_data_feed" value="<?php echo(plugins_url() . "/foxypress/foxydatafeed.php") ?>" size="125" readonly /> <br />
                             *If you are using digital downloads, use this URL as your data feed url in FoxyCart.
                           </td>
                         </tr>
+                        <tr valign="top">
+                        	<td align="right" valign="top" nowrap>Additional DataFeed(s)</td>
+                            <td align="left">
+                          		<input type="text" name="foxycart_datafeeds" id="foxycart_datafeeds" value="<?php echo(get_option('foxycart_datafeeds')) ?>" size="125" /> <br />
+                            	*If you have additional datafeeds that need to be hit, enter the full url for your datafeed. Separate multiple datafeeds with a comma.
+                          </td>
+                        </tr>
+                        
+                        
                         <tr>
                         	<td align="right" valign="top" nowrap>Product Detail Base URL</td>
                             <td align="left">
@@ -114,14 +123,22 @@ function foxypress_options()
                                 *Sets the maximum number of downloads allowed for a downloadable product. <br />
                                 You can specify this at a global level here and also at a product level.
                             </td>
-                        </tr>                  
+                        </tr>    
+                        <tr>
+                        	<td align="right" valign="top" nowrap>Quantity Alert Level</td>
+                            <td align="left">
+                            	<input type="text" name="foxypress_qty_alert" value="<?php echo(get_option("foxypress_qty_alert")) ?>" /><br />
+                                *You will be notified via email when the quantity of an item goes below this threshold. <br />
+                                You can set this to 0 or blank if you do not want any notifications.
+                            </td>
+                        </tr>                   
                     </table>
             	</td>
             </tr>
             <tr>
             	<td align="center">
                     <input type="hidden" name="action" value="update" />
-                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery, foxypress_base_url, foxycart_enable_multiship,foxypress_max_downloads" />
+                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery, foxypress_base_url, foxycart_enable_multiship,foxypress_max_downloads,foxypress_qty_alert,foxycart_datafeeds" />
               		<p class="submit">
               			<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
               		</p>
@@ -129,7 +146,7 @@ function foxypress_options()
             </tr>
         </table>
   </form>
-  <img src="../wp-content/plugins/foxypress/img/footer.png" />
+  <img src="<?php echo(plugins_url())?>/foxypress/img/footer.png" />
   <p style="text-align:center;">
   	Please visit our forum for info and help for all your needs.<br />
   	<a href="http://www.foxy-press.com/forum" target="_blank">http://www.foxy-press.com/forum</a><br /><br />

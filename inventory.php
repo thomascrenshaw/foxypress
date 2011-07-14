@@ -191,6 +191,8 @@ function inventory_postback()
 		$weight = foxypress_FixPostVar('inventory_weight', '');
 		$added =  foxypress_FixPostVar('date_added', '');
 		$quantity = foxypress_FixPostVar('inventory_quantity', '');
+		$quantity_min = foxypress_FixPostVar('inventory_quantity_min', '');
+		$quantity_max = foxypress_FixPostVar('inventory_quantity_max', '');
 		$price = ($price * 1);
 		$price = (!$price) ? 0 : $price;
 		$added = strtotime($added);
@@ -203,6 +205,8 @@ function inventory_postback()
 			$added = stripslashes($added);
 			$weight = stripslashes($weight);
 			$quantity = stripslashes($quantity);
+			$quantity_min = stripslashes($quantity_min);
+			$quantity_max = stripslashes($quantity_max);
 		}
 		// The name must be at least one character in length and no more than 100 - no non-standard characters allowed
 		if ($save) {
@@ -242,27 +246,31 @@ function inventory_postback()
 			if ($inventory_id != "" && $inventory_id != "0")
 			{
 				// update item
-				$sql = "UPDATE " . WP_INVENTORY_TABLE . " SET inventory_code='" . mysql_escape_string($code)
-				. "', inventory_name='" . mysql_escape_string($name)
-				. "', inventory_description='" . mysql_escape_string($desc)
-				. "', inventory_weight='" . mysql_escape_string($weight)
-				. "', inventory_price='" . mysql_escape_string($price)
-				. "', inventory_quantity='" . ($quantity*1)
-				. "' WHERE inventory_id='" . mysql_escape_string($inventory_id) . "'";
+				$sql = "UPDATE " . WP_INVENTORY_TABLE . " SET inventory_code='" . mysql_escape_string($code) . "'"
+				. ", inventory_name='" . mysql_escape_string($name) . "'"
+				. ", inventory_description='" . mysql_escape_string($desc) . "'"
+				. ", inventory_weight='" . mysql_escape_string($weight) . "'"
+				. ", inventory_price='" . mysql_escape_string($price) . "'"
+				. ", inventory_quantity=" . (($quantity == "") ? "NULL" : "'" . $quantity . "'")
+				. ", inventory_quantity_min='" . $quantity_min . "'"
+				. ", inventory_quantity_max='" . $quantity_max . "'"
+				. " WHERE inventory_id='" . mysql_escape_string($inventory_id) . "'";
 				$wpdb->query($sql);
 			}
 			else
 			{
 				//new item
 				$single_upload = true;
-				$sql = "INSERT INTO " . WP_INVENTORY_TABLE . " SET inventory_code='" . mysql_escape_string($code)
-				. "', inventory_name='" . mysql_escape_string($name)
-				. "', inventory_description='" . mysql_escape_string($desc)
-				. "', date_added='" . mysql_escape_string($added)
-				. "', inventory_weight='" . mysql_escape_string($weight)
-				. "', inventory_price='" . mysql_escape_string($price)
-				. "', inventory_quantity='" . ($quantity*1) . ""
-				. "', category_id='0'"
+				$sql = "INSERT INTO " . WP_INVENTORY_TABLE . " SET inventory_code='" . mysql_escape_string($code) . "'"
+				. ", inventory_name='" . mysql_escape_string($name) . "'"
+				. ", inventory_description='" . mysql_escape_string($desc) . "'"
+				. ", date_added='" . mysql_escape_string($added) . "'"
+				. ", inventory_weight='" . mysql_escape_string($weight) . "'"
+				. ", inventory_price='" . mysql_escape_string($price) . "'"
+				. ", inventory_quantity=" . (($quantity == "") ? "NULL" : "'" . $quantity . "'")
+				. ", inventory_quantity_min='" . $quantity_min . "'"
+				. ", inventory_quantity_max='" . $quantity_max . "'"
+				. ", category_id='0'"
 				;
 				$wpdb->query($sql);
 				$inventory_id = $wpdb->insert_id;
@@ -516,7 +524,6 @@ function foxypress_show_inventory() {
 
 	$pageNumber = foxypress_FixGetVar('fp_pn');
 	$start = ($pageNumber != "" && $pageNumber != "0") ? $start = ($pageNumber - 1) * $limit : 0;
-
 	$items = $wpdb->get_results("SELECT i.*
 										,c.category_name
 										,im.inventory_images_id
@@ -531,7 +538,7 @@ function foxypress_show_inventory() {
 									from " . WP_INVENTORY_IMAGES_TABLE . " group by inventory_id) as im ON i.inventory_id = im.inventory_id
 								ORDER BY i.inventory_code DESC
 								LIMIT $start, $limit");
-
+	$QuantityAlertLevel = get_option('foxypress_qty_alert');
 
 	if ( !empty($items) ) {
 		?>
@@ -560,8 +567,8 @@ function foxypress_show_inventory() {
 			$class = ($class == 'alternate') ? '' : 'alternate';
 			?>
 			<tr class="<?php echo $class; ?>">
-				<td><?php echo stripslashes( $item->inventory_code ); ?></td>
-				<td><?php echo stripslashes($item->inventory_name); ?></td>
+				<td><span <?php if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0"){ if($QuantityAlertLevel > $item->inventory_quantity) { echo("class=\"quantityLow\""); } } ?>><?php echo stripslashes( $item->inventory_code ); ?></span></td>
+				<td><span <?php if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0"){ if($QuantityAlertLevel > $item->inventory_quantity) { echo("class=\"quantityLow\""); } } ?>><?php echo stripslashes($item->inventory_name); ?></span></td>
 				<td><?php echo foxypress_TruncateString(stripslashes($item->inventory_description), 25); ?></td>
 				<td><?php echo date("m/d/Y", $item->date_added); ?></td>
 				<td><?php echo "$" . number_format($item->inventory_price, 2); ?></td>
@@ -610,15 +617,15 @@ function inventory_page_load() {
 	}
 	*/
 	?>
-	<link href="../wp-content/plugins/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
-    <script type="text/javascript" src="../wp-content/plugins/foxypress/uploadify/jquery.uploadify.min.js"></script>
+	<link href="<?php echo(plugins_url())?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
     <script type="text/javascript">
 		jQuery(document).ready(function() {
 		  //uploadify
 		  jQuery('#inv_image').uploadify({
-			'swf'  : '../wp-content/plugins/foxypress/uploadify/uploadify.swf',
-			'cancelImage' : '../wp-content/plugins/foxypress/uploadify/uploadify-cancel.png',
-			'uploader'    : '../wp-content/plugins/foxypress/imagehandler.php',
+			'swf'  : '<?php echo(plugins_url())?>/foxypress/uploadify/uploadify.swf',
+			'cancelImage' : '<?php echo(plugins_url())?>/foxypress/uploadify/uploadify-cancel.png',
+			'uploader'    : '<?php echo(plugins_url())?>/foxypress/imagehandler.php',
 			'buttonText': 'Browse Files',
 			'auto'      : true,
 			'queueSizeLimit': 1,
@@ -633,9 +640,9 @@ function inventory_page_load() {
 		  });
 		  
 		  jQuery('#inv_downloadable').uploadify({
-			'swf'  : '../wp-content/plugins/foxypress/uploadify/uploadify.swf',
-			'cancelImage' : '../wp-content/plugins/foxypress/uploadify/uploadify-cancel.png',
-			'uploader'    : '../wp-content/plugins/foxypress/documenthandler.php',
+			'swf'  : '<?php echo(plugins_url())?>/foxypress/uploadify/uploadify.swf',
+			'cancelImage' : '<?php echo(plugins_url())?>/foxypress/uploadify/uploadify-cancel.png',
+			'uploader'    : '<?php echo(plugins_url())?>/foxypress/documenthandler.php',
 			'buttonText': 'Browse Files',
 			'auto'      : true,
 			'queueSizeLimit': 1,
@@ -658,8 +665,30 @@ function inventory_page_load() {
 					update: function(event, ui) { jQuery('#hdn_foxy_options_order').val(jQuery( "#foxypress_inv_options tbody" ).sortable("toArray")); }	
 				}
 			);
-		  
+		
+		  jQuery( "#inventory_images > *" ).sortable(
+				{
+					revert: true,
+					update: function(event, ui) { SaveImageOrder(); }
+				}
+			);
+			
 		});
+		
+		function SaveImageOrder()
+		{
+			var ImageOrder = jQuery( "#inventory_images > *" ).sortable("toArray");
+			var url = "<?php echo(plugins_url()) . "/foxypress/ajax.php?m=saveimageorder&sid=" . session_id() . "&inventoryid=" . $inventory_id . "&order=" ?>" + ImageOrder;
+			
+			jQuery.ajax(
+						{
+							url : url,
+							type : "GET",
+							datatype : "json",
+							cache : "false"
+						}
+					);
+		}
 				
 		function ShowDownloadable(data)
 		{
@@ -676,7 +705,7 @@ function inventory_page_load() {
 			 	var DownloadableID = data.split("|")[1];
 				var MaxDownloads = data.split("|")[2];
 				jQuery('#downloadable_wizard').hide();
-				jQuery('#inventory_downloadables').html("<a href=\"<?php echo(get_bloginfo("url")) ?>/wp-content/inventory_downloadables/" + FileName + "\" target=\"_blank\">" + FileName + "</a> &nbsp; <img src=\"<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/img/delimg.png\" alt=\"\" onclick=\"DeleteDownloadable('<?php echo(get_bloginfo("url")) . "/wp-content/plugins/foxypress/ajax.php" ?>', '<?php echo(session_id()) ?>', '<?php echo($inventory_id) ?>', '" + DownloadableID + "');\" class=\"RemoveItem\" align=\"bottom\" /> Max Downloads: <input type=\"text\" name=\"inv_downloadable_update_max_downloads\" id=\"inv_downloadable_update_max_downloads\" value=\"" + MaxDownloads + "\" style=\"width:40px;\" /> <input type=\"button\" name=\"inv_downloadable_update_max_downloads_button\" id=\"inv_downloadable_update_max_downloads_button\" value=\"Update\" onclick=\"SaveMaxDownloads('<?php echo(get_bloginfo("url")) . "/wp-content/plugins/foxypress/ajax.php" ?>', '<?php echo(session_id()) ?>', '<?php echo($inventory_id) ?>', '" + DownloadableID + "');\" /><img src=\"<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/img/ajax-loader.gif\" id=\"inv_downloadable_loading\" name=\"inv_downloadable_loading\" style=\"display:none;\" />");				
+				jQuery('#inventory_downloadables').html("<a href=\"<?php echo(get_bloginfo("url")) ?>/wp-content/inventory_downloadables/" + FileName + "\" target=\"_blank\">" + FileName + "</a> &nbsp; <img src=\"<?php echo(plugins_url())?>/foxypress/img/delimg.png\" alt=\"\" onclick=\"DeleteDownloadable('<?php echo(plugins_url()) . "/foxypress/ajax.php" ?>', '<?php echo(session_id()) ?>', '<?php echo($inventory_id) ?>', '" + DownloadableID + "');\" class=\"RemoveItem\" align=\"bottom\" /> Max Downloads: <input type=\"text\" name=\"inv_downloadable_update_max_downloads\" id=\"inv_downloadable_update_max_downloads\" value=\"" + MaxDownloads + "\" style=\"width:40px;\" /> <input type=\"button\" name=\"inv_downloadable_update_max_downloads_button\" id=\"inv_downloadable_update_max_downloads_button\" value=\"Update\" onclick=\"SaveMaxDownloads('<?php echo(plugins_url()) . "/foxypress/ajax.php" ?>', '<?php echo(session_id()) ?>', '<?php echo($inventory_id) ?>', '" + DownloadableID + "');\" /><img src=\"<?php echo(plugins_url())?>/foxypress/img/ajax-loader.gif\" id=\"inv_downloadable_loading\" name=\"inv_downloadable_loading\" style=\"display:none;\" />");				
 			}
 		}
 		
@@ -708,14 +737,20 @@ function inventory_page_load() {
 			}
   			//var pics = jQuery("#inventory_images").children("div").length + 1;
 			var pics = parseInt(LastNumberUsed) + 1;
-			var newdiv = jQuery('<div id="inventory_images-' + pics + '" class="CreatePhoto"><div class="PhotoWrapper"><img src="' + FolderName + '/' + FileName + '" width="50" /></div><div style="text-align:center;"><a id="inventory_images_remove-' + pics + '" class="RemoveItem"><img src="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/img/delimg.png" alt="" /></a></div></div>');
-            jQuery("#inventory_images").append(newdiv);
+			var newlistitem = jQuery('<li id="inventory_images-' + ImageID + '" class="CreatePhoto"><div class="PhotoWrapper"><img src="' + FolderName + '/' + FileName + '" width="50" /></div><div style="text-align:center;"><a id="inventory_images_remove-' + pics + '" class="RemoveItem"><img src="<?php echo(plugins_url())?>/foxypress/img/delimg.png" alt="" /></a></div></li>');
+            jQuery("#inventory_images ul").append(newlistitem);
 			jQuery("#inventory_last_image_number").val(pics);
-			jQuery("#inventory_images_remove-" + pics).click(function () {
+			jQuery("#inventory_images_remove-" + ImageID).click(function () {
 				//ajax to delete image
 				jQuery(this).parent().parent().remove();
-				DeletePhoto('<?php echo(get_bloginfo("url")) . "/wp-content/plugins/foxypress/ajax.php" ?>', '<?php echo(session_id()) ?>', '<?php echo($inventory_id) ?>', ImageID);
+				DeletePhoto('<?php echo(plugins_url()) . "/foxypress/ajax.php" ?>', '<?php echo(session_id()) ?>', '<?php echo($inventory_id) ?>', ImageID);
 			});
+			jQuery( "#inventory_images > *" ).sortable(
+				{
+					revert: true,
+					update: function(event, ui) { SaveImageOrder(); }
+				}
+			);
 		}
 
 		function DeletePhoto(baseurl, sid, inventoryid, imageid)
@@ -729,6 +764,12 @@ function inventory_page_load() {
 							cache : "false"
 						}
 					);
+			jQuery( "#inventory_images > *" ).sortable(
+				{
+					revert: true,
+					update: function(event, ui) { SaveImageOrder(); }
+				}
+			);
 		}
 		
 		function DownloadableWizard(step)
@@ -796,6 +837,7 @@ function inventory_page_load() {
 		#inventory-help a:hover span { width:240px;margin-left: 25px;}
 		#inventory-help a:hover {text-indent: 0;}
 		.inventory-title { width: 160px; }
+		.quantityLow { color: #CC0000; }
 		div.foxy_item_pagination {
 			padding: 3px;
 			margin: 3px;
@@ -891,7 +933,7 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                         <td>
                             <div id="inventory-help">
-                              <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                              <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                               <span>Item Code: i.e item sku, or number</span></a>
                             </div>
                         </td>
@@ -903,7 +945,7 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Name of the item or product</span></a>
                             </div>
                         </td>
@@ -920,27 +962,27 @@ function foxypress_edit_item($inventory_id = "") {
 								$fp_current_images_num = 0;
 								$fp_current_images = "";
 								$fp_current_images_js = "";
-								$fp_ajax_url = get_bloginfo("url") . "/wp-content/plugins/foxypress/ajax.php";
+								$fp_ajax_url = plugins_url() . "/foxypress/ajax.php";
 								//show images if we have any
 								if (!empty($data) && $data->inventory_id) {
 									//get current image
-									$inventory_images = $wpdb->get_results("SELECT * FROM " . WP_INVENTORY_IMAGES_TABLE . " WHERE inventory_id=" . $data->inventory_id);
+									$inventory_images = $wpdb->get_results("SELECT * FROM " . WP_INVENTORY_IMAGES_TABLE . " WHERE inventory_id=" . $data->inventory_id . " ORDER BY image_order");
 									if(!empty($inventory_images))
 									{
 										foreach($inventory_images as $i)
 										{
 											$fp_current_images_num++;
-											$fp_current_images .= "<div id=\"inventory_images-" . $fp_current_images_num . "\" class=\"CreatePhoto\">
+											$fp_current_images .= "<li id=\"inventory_images-" . $i->inventory_images_id . "\" class=\"CreatePhoto\">
 													 <div class=\"PhotoWrapper\">
 														<img src=\"" . INVENTORY_IMAGE_DIR . "/" . $i->inventory_image . "\" style=\"max-width: 50px;\" />
 													</div>
 													<div style=\"text-align:center;\">
-														<a id=\"inventory_images_remove-" . $fp_current_images_num . "\" class=\"RemoveItem\">
-														<img src=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/img/delimg.png\" alt=\"\" /></a>
+														<a id=\"inventory_images_remove-" . $i->inventory_images_id . "\" class=\"RemoveItem\">
+														<img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"\" /></a>
 													</div>
-												 </div>";
+												 </li>";
 
-											$fp_current_images_js .= "jQuery(\"#inventory_images_remove-" . $fp_current_images_num . "\").click(function () {															jQuery(this).parent().parent().remove(); DeletePhoto('" . $fp_ajax_url. "', '" . session_id() . "', '" . $data->inventory_id . "', '" . $i->inventory_images_id . "');  }); ";
+											$fp_current_images_js .= "jQuery(\"#inventory_images_remove-" . $i->inventory_images_id . "\").click(function () {															jQuery(this).parent().parent().remove(); DeletePhoto('" . $fp_ajax_url. "', '" . session_id() . "', '" . $data->inventory_id . "', '" . $i->inventory_images_id . "');  }); ";
 										}
 									}
 								}
@@ -949,7 +991,7 @@ function foxypress_edit_item($inventory_id = "") {
                                 <input type="file" name="inv_image" id="inv_image">
                                 <input type="hidden" name="inventory_last_image_number" id="inventory_last_image_number" value="<?php echo($fp_current_images_num) ?>" />
                             </div>
-                            <div id="inventory_images"><?php echo($fp_current_images) ?></div>
+                            <div id="inventory_images"><ul><?php echo($fp_current_images) ?></ul></div>
                             <div style="clear:both;"></div>
                             <?php
                                 if($fp_current_images_js != "")
@@ -961,7 +1003,7 @@ function foxypress_edit_item($inventory_id = "") {
                         <?php } ?>
                         <td>
                             <div id="inventory-help">
-                            <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                            <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                             <span>Upload an image to associate to the product.  This will display in foxycart and the inventory.</span></a>
                             </div>
                         </td>
@@ -972,7 +1014,7 @@ function foxypress_edit_item($inventory_id = "") {
                         <td><input type="text" name="fp_inv_downloadable_name" id="fp_inv_downloadable_name" value="my_download" />    
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Enter a name for the digital download file.</span></a>
                             </div>
                         </td>                
@@ -982,7 +1024,7 @@ function foxypress_edit_item($inventory_id = "") {
                         <td><input type="text" name="fp_inv_downloadable_max_downloads" id="fp_inv_downloadable_max_downloads" value="" />                    
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Enter the maximum number of downloads allowed for this particular file, if it's 0 or blank the global max download number will be used.</span></a>
                             </div>
                         </td> 
@@ -994,7 +1036,7 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Upload a file to associate to the product. This will be a downloadable item.</span></a>
                             </div>
                         </td> 
@@ -1006,7 +1048,7 @@ function foxypress_edit_item($inventory_id = "") {
                         <?php
 							$fp_current_downloadables = "";
 							$fp_has_downloadable = false;
-							$fp_ajax_url = get_bloginfo("url") . "/wp-content/plugins/foxypress/ajax.php";
+							$fp_ajax_url = plugins_url() . "/foxypress/ajax.php";
 							//show downloads if we have any
 							if (!empty($data) && $data->inventory_id) {
 								//get current image
@@ -1015,7 +1057,7 @@ function foxypress_edit_item($inventory_id = "") {
 								{
 									foreach($inventory_downloadables as $d)
 									{
-										$fp_current_downloadables .= "<a href=\"" . get_bloginfo("url") . "/wp-content/inventory_downloadables/" . $d->filename . "\" target=\"_blank\">" . $d->filename . "</a> &nbsp; <img src=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/img/delimg.png\" alt=\"\" onclick=\"DeleteDownloadable('" . $fp_ajax_url. "', '" . session_id() . "', '" . $data->inventory_id . "', '" . $d->downloadable_id . "');\" class=\"RemoveItem\" align=\"bottom\"/> Max Downloads: <input type=\"text\" name=\"inv_downloadable_update_max_downloads\" id=\"inv_downloadable_update_max_downloads\" value=\"" . $d->maxdownloads . "\" style=\"width:40px;\" /> <input type=\"button\" name=\"inv_downloadable_update_max_downloads_button\" id=\"inv_downloadable_update_max_downloads_button\" value=\"Update\" onclick=\"SaveMaxDownloads('" . $fp_ajax_url . "', '" . session_id() . "', '" . $data->inventory_id . "', '" . $d->downloadable_id . "');\" /><img src=\"" . get_bloginfo("url") . "/wp-content/plugins/foxypress/img/ajax-loader.gif\" id=\"inv_downloadable_loading\" name=\"inv_downloadable_loading\" style=\"display:none;\" />";
+										$fp_current_downloadables .= "<a href=\"" . get_bloginfo("url") . "/wp-content/inventory_downloadables/" . $d->filename . "\" target=\"_blank\">" . $d->filename . "</a> &nbsp; <img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"\" onclick=\"DeleteDownloadable('" . $fp_ajax_url. "', '" . session_id() . "', '" . $data->inventory_id . "', '" . $d->downloadable_id . "');\" class=\"RemoveItem\" align=\"bottom\"/> Max Downloads: <input type=\"text\" name=\"inv_downloadable_update_max_downloads\" id=\"inv_downloadable_update_max_downloads\" value=\"" . $d->maxdownloads . "\" style=\"width:40px;\" /> <input type=\"button\" name=\"inv_downloadable_update_max_downloads_button\" id=\"inv_downloadable_update_max_downloads_button\" value=\"Update\" onclick=\"SaveMaxDownloads('" . $fp_ajax_url . "', '" . session_id() . "', '" . $data->inventory_id . "', '" . $d->downloadable_id . "');\" /><img src=\"" . plugins_url() . "/foxypress/img/ajax-loader.gif\" id=\"inv_downloadable_loading\" name=\"inv_downloadable_loading\" style=\"display:none;\" />";
 									}
 									$fp_has_downloadable = true;
 								}
@@ -1037,7 +1079,7 @@ function foxypress_edit_item($inventory_id = "") {
 						</td>    
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Step 1: Enter the name of the digital download. Step 2: Enter the maximum number of downloads allowed for this particular file, if it's 0 or blank the global max download number will be used. Step 3: Upload your file.</span></a>
                             </div>
                         </td>                    
@@ -1050,7 +1092,7 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Enter a description of your product or item.</span></a>
                             </div>
                         </td>
@@ -1090,7 +1132,7 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Select the item category.  The categories must first be created via foxycart.com, then added to your inventory category list.</span></a>
                             </div>
                         </td>
@@ -1108,7 +1150,7 @@ function foxypress_edit_item($inventory_id = "") {
 						</td>
 						<td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Enter the date you want the item submission logged by.</span></a>
                             </div>
 						</td>
@@ -1120,7 +1162,7 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Enter the price of the item in US Dollars.</span></a>
                             </div>
                         </td>
@@ -1132,7 +1174,7 @@ function foxypress_edit_item($inventory_id = "") {
                     	</td>
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Enter the product weight in one the following formats: 10, 10.23, 0.34</span></a>
                             </div>
                         </td>
@@ -1144,8 +1186,32 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                         <td>
                             <div id="inventory-help">
-                                <a href="#"><img src="../wp-content/plugins/foxypress/img/help-icon.png" height="15px" />
-                                <span>Number of items to sell.</span></a>
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Number of items available. Leave this field blank if there is an unlimited amount</span></a>
+                        	</div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td class="inventory-title"><legend><?php _e( 'Minimum Quantity','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_quantity_min" class="input" size="10" maxlength="30" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_quantity_min); ?>" />
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Minimum quantity per order. Leave this field blank or at 0 if you don't want to enfore a minimum quantity.</span></a>
+                        	</div>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td class="inventory-title"><legend><?php _e( 'Maximum Quantity','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_quantity_max" class="input" size="10" maxlength="30" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_quantity_max); ?>" />
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Maximum quantity per order. Leave this field blank or at 0 if you don't want to enfore a maximum quantity.</span></a>
                         	</div>
                         </td>
                     </tr>
@@ -1228,7 +1294,7 @@ function foxypress_edit_item($inventory_id = "") {
 					{
 						$current_option_order .= ($current_option_order == "") ? $foxyopt->option_id : "," . $foxyopt->option_id;
 						echo("<tr id=\"" . $foxyopt->option_id . "\">
-								<td style=\"cursor:pointer;\"><img src=\"" .get_bloginfo("url") . "/wp-content/plugins/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
+								<td style=\"cursor:pointer;\"><img src=\"" . plugins_url() . "/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
 								<td>" . stripslashes($foxyopt->option_text) . "</td>
 								<td>" . stripslashes($foxyopt->option_value) . "</td>
 								<td>" . stripslashes($foxyopt->option_group_name) . "</td>
