@@ -7,8 +7,8 @@ var FoxyPressDialog = {
 		tinyMCEPopup.editor.execCommand('mceInsertRawHTML', false, embedCode);
 		tinyMCEPopup.close();		
 	},
-	InsertCategoryListing : function(category_id, itemsperpage, itemsperrow, detailurl) {
-		var embedCode = "[foxypress categoryid='" + category_id + "' items='" + itemsperpage + "' cols='" + itemsperrow + "' mode='list' detailurl='" + detailurl + "']FoxyPress[/foxypress]";
+	InsertCategoryListing : function(category_id, showaddtocart, itemsperpage, itemsperrow, detailurl) {
+		var embedCode = "[foxypress categoryid='" + category_id + "' addtocart='" + showaddtocart + "' items='" + itemsperpage + "' cols='" + itemsperrow + "' mode='list' detailurl='" + detailurl + "']FoxyPress[/foxypress]";
 		tinyMCEPopup.editor.execCommand('mceInsertRawHTML', false, embedCode);
 		tinyMCEPopup.close();	
 	},

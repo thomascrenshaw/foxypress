@@ -81,7 +81,7 @@
 	}
 	function InsertCategory()
 	{
-		FoxyPressDialog.InsertCategoryListing(document.getElementById('foxy_category_listing').value, document.getElementById('foxy_paging_items').value, document.getElementById('foxy_paging_itemsperrow').value, document.getElementById('foxy_paging_itemdetailurl').value);
+		FoxyPressDialog.InsertCategoryListing(document.getElementById('foxy_category_listing').value, document.getElementById('foxy_show_addtocart').value, document.getElementById('foxy_paging_items').value, document.getElementById('foxy_paging_itemsperrow').value, document.getElementById('foxy_paging_itemdetailurl').value);
 	}
 </script>
 <link href="css/style.css" rel="stylesheet" type="text/css" />
@@ -136,6 +136,15 @@ function ShowCategoryListing()
                     </select>
                 </td>
 			</tr>
+               <tr>
+            	<td><span class="DialogHeading">Show Add To Cart:</span> </td>
+            	<td>
+                	<select id="foxy_show_addtocart" name="foxy_show_addtocart">
+                    	<option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </td>
+            </tr>
             <tr>
             	<td><span class="DialogHeading">Items Per Page:</span> </td>
             	<td><input type="text" id="foxy_paging_items" name="foxy_paging_items" value="10" maxlength="3" /></td>

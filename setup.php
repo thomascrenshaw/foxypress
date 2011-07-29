@@ -138,13 +138,13 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 				foxypress_Installation_CreateDownloadableDownloadTable();
 				foxypress_Installation_CreateInventoryDownloadablesDirectory();
 				foxypress_Installation_CreateEncryptionSetting();
-				foxypress_Installation_AlterInventoryCategoryInformation();				
-				foxypress_Installation_UpdateCurrentVersion();				
+				foxypress_Installation_AlterInventoryCategoryInformation();							
 				foxypress_Installation_DeleteDefaultImages();
 				foxypress_Installation_AlterInventoryImagesTable();
 				foxypress_Installation_AlterTransactionTable();
 				foxypress_Installation_CreateProductDetailPage();	
 				foxypress_Installation_AlterInventoryTableMinMaxQuantity();
+				foxypress_Installation_UpdateCurrentVersion();	
 			}
 			else if(
 						$drCurrentVersion->foxy_current_version == "0.2.0" ||
@@ -161,10 +161,11 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 				foxypress_Installation_CreateEncryptionSetting();
 				foxypress_Installation_AlterTransactionTable();
 				foxypress_Installation_AlterInventoryOptionsTable();
+				foxypress_Installation_AlterInventoryOptionsTableAddWeight();
 				foxypress_Installation_AlterInventoryImagesTable();
 				foxypress_Installation_AlterInventoryCategoryOrderInformation();
+				foxypress_Installation_AlterInventoryTableMinMaxQuantity();				
 				foxypress_Installation_UpdateCurrentVersion();
-				foxypress_Installation_AlterInventoryTableMinMaxQuantity();
 			}
 			else if(
 						$drCurrentVersion->foxy_current_version == "0.2.5" ||
@@ -180,6 +181,16 @@ function foxypress_Install($new_install = false, $installation_attempts = 0)
 				foxypress_Installation_CreateEncryptionSetting();
 				foxypress_Installation_AlterInventoryCategoryOrderInformation();
 				foxypress_Installation_AlterInventoryTableMinMaxQuantity();
+				foxypress_Installation_AlterInventoryOptionsTableAddWeight();
+				foxypress_Installation_UpdateCurrentVersion();
+			}
+			else if (
+					$drCurrentVersion->foxy_current_version == "0.2.9" ||
+					$drCurrentVersion->foxy_current_version == "0.3.0" 
+				)
+			{
+				foxypress_Installation_AlterInventoryOptionsTableAddWeight();
+				foxypress_Installation_UpdateCurrentVersion();
 			}
 		}
 	}
@@ -413,7 +424,8 @@ function foxypress_Installation_CreateInventoryOptionsTable()
 				option_group_id INT(11) NOT NULL ,
 				option_text VARCHAR(50) NOT NULL ,
 				option_value VARCHAR(50) NOT NULL ,
-				option_extra_price FLOAT(10, 2) NOT NULL DEFAULT '0',
+				option_extra_price FLOAT(10,2) NOT NULL DEFAULT '0',
+				option_extra_weight FLOAT(10,2) NOT NULL DEFAULT '0',
 				option_active TINYINT NOT NULL DEFAULT '1',
 				option_order INT DEFAULT '99'
 		   ) ";
@@ -605,6 +617,14 @@ function foxypress_Installation_AlterInventoryOptionsTable()
 	//add sort order to options table
 	$sql = "ALTER TABLE " . WP_FOXYPRESS_INVENTORY_OPTIONS . " ADD option_order INT DEFAULT '99' AFTER option_active;";
 	$wpdb->query($sql);	
+}
+
+function foxypress_Installation_AlterInventoryOptionsTableAddWeight()
+{
+	global $wpdb;
+	//add extra weight
+	$sql = "ALTER TABLE " . WP_FOXYPRESS_INVENTORY_OPTIONS . " ADD option_extra_weight FLOAT(10,2) NOT NULL DEFAULT '0' AFTER option_extra_price";
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_AlterInventoryTableMinMaxQuantity()

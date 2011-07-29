@@ -1,21 +1,9 @@
 <?php
 	session_start();
-	require_once('../../../wp-includes/wp-db.php');	
-	require_once('../../../wp-config.php');	
+	$root = dirname(dirname(dirname(dirname(__FILE__))));
+	require_once($root.'/wp-config.php');
+	require_once($root.'/wp-includes/wp-db.php');	
 	global $wpdb;	
-	
-	/*
-	//We must urlencode the encrypted string, but when we pull it down from the url it gets decoded automagically
-	//testing
-	$encrypted_t_id = urlencode(foxypress_Encrypt($t_id));
-	$encrypted_d_id = urlencode(foxypress_Encrypt($d_id));	
-	$decrypted_t_id = foxypress_Decrypt(urldecode($encrypted_t_id));
-	$decrypted_d_id = foxypress_Decrypt(urldecode($encrypted_d_id));	
-	echo($encrypted_t_id . " ::: " . $decrypted_t_id);
-	echo("<br><Br>");
-	echo($encrypted_d_id . " ::: " . $decrypted_d_id);
-	echo("<br><Br>");
-	*/
 	
 	//get downloadlable id
 	$jibberish_downloadable_id = foxypress_FixGetVar('d');	

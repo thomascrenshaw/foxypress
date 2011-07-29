@@ -56,10 +56,11 @@ function inventory_postback()
 		$optionvalue = foxypress_FixPostVar('foxy_option_value');
 		$optiongroupid = foxypress_FixPostVar('foxy_option_group');
 		$optionextraprice = foxypress_FixPostVar('foxy_option_extra_price', '0');
+		$optionextraweight = foxypress_FixPostVar('foxy_option_extra_weight', '0'); 
 		if($optionname != "" && $optionvalue != "" && $optiongroupid != "")
 		{
 			//insert new option
-			$wpdb->query("insert into " . WP_FOXYPRESS_INVENTORY_OPTIONS . " (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_active) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '1')");
+			$wpdb->query("insert into " . WP_FOXYPRESS_INVENTORY_OPTIONS . " (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_active) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '" . $optionextraweight . "', '1')");
 		}
 		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory&inventory_id=" . $inventory_id);
 	}
@@ -185,7 +186,7 @@ function inventory_postback()
 		$save = (isset($_REQUEST["inventory_name"])) ? 1 : 0;
 		$code = foxypress_FixPostVar('inventory_code', '');
 		$name = foxypress_FixPostVar('inventory_name', '');
-		$desc = nl2br($_POST['inventory_description']);
+		$desc = $_POST['inventory_description'];
 		$cats = $_POST['foxy_categories'];
 		$price = str_replace("$", "", str_replace(",", "", foxypress_FixPostVar('inventory_price', '')));
 		$weight = foxypress_FixPostVar('inventory_weight', '');
@@ -571,7 +572,7 @@ function foxypress_show_inventory() {
 				<td><span <?php if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0"){ if($QuantityAlertLevel > $item->inventory_quantity) { echo("class=\"quantityLow\""); } } ?>><?php echo stripslashes($item->inventory_name); ?></span></td>
 				<td><?php echo foxypress_TruncateString(stripslashes($item->inventory_description), 25); ?></td>
 				<td><?php echo date("m/d/Y", $item->date_added); ?></td>
-				<td><?php echo "$" . number_format($item->inventory_price, 2); ?></td>
+				<td><?php echo foxypress_FormatCurrency($item->inventory_price); ?></td>
 				<td><?php echo stripslashes($item->category_name); ?></td>
 				<td><img src="<?php echo (($item->inventory_image != "") ? INVENTORY_IMAGE_DIR . '/' . stripslashes($item->inventory_image) : INVENTORY_IMAGE_DIR . '/' . INVENTORY_DEFAULT_IMAGE) ?>" width="25px" /></td>
 				<?php if ($cur_user_admin || !$limit_edit) { ?>
@@ -604,7 +605,7 @@ function foxypress_show_inventory() {
 
 //our page load for inventory
 function inventory_page_load() {
-    global $current_user, $wpdb, $users_entries;	
+    global $current_user, $wpdb, $users_entries;
 	$inventory_id = foxypress_FixGetVar('inventory_id');
 	$action = foxypress_FixGetVar('action');
 	// Check if it's the current user's item
@@ -618,6 +619,7 @@ function inventory_page_load() {
 	*/
 	?>
 	<link href="<?php echo(plugins_url())?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
     <script type="text/javascript">
 		jQuery(document).ready(function() {
@@ -893,6 +895,12 @@ function inventory_page_load() {
 	<?php
 }
 
+/*
+function foxypress_load_tinymce() {
+	wp_enqueue_script('tiny_mce');
+}
+*/
+
 function foxypress_edit_item($inventory_id = "") {
 	global $wpdb, $users_entries;
 	$data = false;
@@ -1088,7 +1096,40 @@ function foxypress_edit_item($inventory_id = "") {
 					<tr>
 						<td class="inventory-title" style="vertical-align:top;" nowrap><legend><?php _e('Item Description','inventory'); ?></legend></td>
                         <td>
-                            <textarea name="inventory_description" class="input" rows="5" cols="50"><?php if ( !empty($data) ) echo stripslashes($data->inventory_description); ?></textarea>
+                           	<?php
+							/*
+							add_action("admin_print_scripts", "foxypress_load_tinymce");
+							wp_tiny_mce( true , 
+								array(
+									"editor_selector" => "inventory_description",
+									"remove_linebreaks" => true,
+									"force_br_newlines" => true,
+									"force_p_newlines" => false,
+									"convert_newlines_to_brs" => true,
+									"remove_redundant_brs" => false,
+									"forced_root_block " => false,
+									"height" => "300",
+									"width" => "500"
+								)
+							);*/
+							?>
+                            <script type="text/javascript">								
+								/*jQuery(document).ready(function($) {
+									$('a.toggleVisual').click(function() {
+										console.log(tinyMCE.execCommand('mceAddControl', false, 'inventory_description'));
+									});
+									$('a.toggleHTML').click(function() {
+										console.log(tinyMCE.execCommand('mceRemoveControl', false, 'inventory_description'));
+									});
+								});*/								
+							</script>
+                            <!--<p id="toggle" align="right"><a class="button toggleVisual">Visual</a><a class="button toggleHTML">HTML</a></p>-->
+                            
+                            
+                            <textarea style="width:500px;height:300px;" class="inventory_description" id="inventory_description" name="inventory_description"><?php if ( !empty($data) ) echo stripslashes($data->inventory_description); ?></textarea>
+                            <script type="text/javascript">
+								CKEDITOR.replace( 'inventory_description' );
+							</script>
                         </td>
                         <td>
                             <div id="inventory-help">
@@ -1158,19 +1199,19 @@ function foxypress_edit_item($inventory_id = "") {
                     <tr>
                         <td class="inventory-title"><legend><?php _e('Item Price','inventory'); ?></legend></td>
                         <td>
-                            $<input type="text" name="inventory_price" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_price); ?>" />
+                            <input type="text" name="inventory_price" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_price); ?>" />
                         </td>
                         <td>
                             <div id="inventory-help">
                                 <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                                <span>Enter the price of the item in US Dollars.</span></a>
+                                <span>Enter the price of the item without the currency symbol.</span></a>
                             </div>
                         </td>
                     </tr>
                     <tr>
                         <td class="inventory-title"><legend><?php _e( 'Item Weight','inventory' ); ?></legend></td>
                         <td>
-                            <input type="text" name="inventory_weight" class="input" size="10" maxlength="30" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_weight); ?>" />lbs
+                            <input type="text" name="inventory_weight" class="input" size="10" maxlength="30" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_weight); ?>" />lb(s)
                     	</td>
                         <td>
                             <div id="inventory-help">
@@ -1252,7 +1293,11 @@ function foxypress_edit_item($inventory_id = "") {
                             </tr>
                             <tr>
                                 <td>Option Extra Price</td>
-                                <td>$<input type="text" id="foxy_option_extra_price" name="foxy_option_extra_price" /></td>
+                                <td><?php echo(foxypress_GetCurrenySymbol()); ?><input type="text" id="foxy_option_extra_price" name="foxy_option_extra_price" /> <span style="font-style:italic;">(Enter negative numbers if you need to subtract from the default price)</span></td>
+                            </tr>
+                            <tr>
+                                <td>Option Extra Weight</td>
+                                <td><input type="text" id="foxy_option_extra_weight" name="foxy_option_extra_weight" />lb(s) <span style="font-style:italic;">(Enter negative numbers if you need to subtract from the default weight)</span></td>
                             </tr>
                             <tr>
                                 <td>Option Group Name</td>
@@ -1275,6 +1320,7 @@ function foxypress_edit_item($inventory_id = "") {
 						<th class="manage-column" scope="col">Option Value</th>
 						<th class="manage-column" scope="col">Option Group Name</th>
                         <th class="manage-column" scope="col">Option Extra Price</th>
+                        <th class="manage-column" scope="col">Option Extra Weight</th>
                         <th class="manage-column" scope="col">Sold Out</th>
 						<th class="manage-column" scope="col">&nbsp;</th>
 					</tr>
@@ -1298,7 +1344,8 @@ function foxypress_edit_item($inventory_id = "") {
 								<td>" . stripslashes($foxyopt->option_text) . "</td>
 								<td>" . stripslashes($foxyopt->option_value) . "</td>
 								<td>" . stripslashes($foxyopt->option_group_name) . "</td>
-								<td>" . "$" . number_format($foxyopt->option_extra_price, 2) . "</td>
+								<td>" . foxypress_FormatCurrency($foxyopt->option_extra_price, 2) . "</td>
+								<td>" . number_format($foxyopt->option_extra_weight, 2) . " lb(s)</td>
 								<td>" .
 										( ($foxyopt->option_active == "1")
 										? "No <a href=\"" . $_SERVER['PHP_SELF'] . "?page=inventory&amp;action=inactivateoption&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to mark this option as sold out?');\">[Sold Out]</a>"

@@ -1,7 +1,8 @@
 <?php
 	session_start();
-	require_once('../../../wp-includes/wp-db.php');	
-	require_once('../../../wp-config.php');	
+	$root = dirname(dirname(dirname(dirname(__FILE__))));
+	require_once($root.'/wp-config.php');
+	require_once($root.'/wp-includes/wp-db.php');	
 	global $wpdb;	
 	//global vars
 	$mode = foxypress_FixGetVar('m');	

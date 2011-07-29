@@ -1,8 +1,9 @@
 <?php	
 
 session_start();
-require_once('../../../wp-includes/wp-db.php');	
-require_once('../../../wp-config.php');	
+$root = dirname(dirname(dirname(dirname(__FILE__))));
+require_once($root.'/wp-config.php');
+require_once($root.'/wp-includes/wp-db.php');	
 include_once('classes/class.rc4crypt.php');
 include_once('classes/class.xmlparser_php5.php');	
 global $wpdb;	

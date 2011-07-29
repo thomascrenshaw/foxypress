@@ -1,7 +1,8 @@
 <?php
 	session_start();
-	require_once('../../../wp-includes/wp-db.php');	
-	require_once('../../../wp-config.php');	
+	$root = dirname(dirname(dirname(dirname(__FILE__))));
+	require_once($root.'/wp-config.php');
+	require_once($root.'/wp-includes/wp-db.php');	
 	global $wpdb;	
 	
 	$XMLData = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>
@@ -22,8 +23,8 @@
 		foreach($Items as $item)
 		{
 			$XMLData .= "<item>
-					     	<title>" . $item->inventory_name . "</title>
-							<description>" . $item->inventory_description . "</description>
+					     	<title>" . htmlspecialchars($item->inventory_name) . "</title>
+							<description>" . htmlspecialchars($item->inventory_description) . "</description>
 							<g:id>" . $item->inventory_id . "</g:id>
 							<g:image_link>" . INVENTORY_IMAGE_DIR . "/" . $item->inventory_image . "</g:image_link>
 							<link>" . get_bloginfo("url") . "/foxy-product-detail?id=" . $item->inventory_id .  "</link>

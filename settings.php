@@ -1,17 +1,7 @@
 <?php
-$foxycart_options = get_option('foxycart');
+//$foxycart_options = get_option('foxycart');
 function foxypress_options()
 {
-	$len = 16;
-	$base='ABCDEFGHKLMNOPQRSTWXYZabcdefghjkmnpqrstwxyz123456789';
-  	$max=strlen($base)-1;
-  	$activatecode='';
-  	mt_srand((double)microtime()*1000000);
-  	while (strlen($activatecode)<$len+1){
-   		$activatecode.=$base{mt_rand(0,$max)};
-  	}
-  	$today = getdate();
-  	$apikey = "wmm" . $today['mon'] . $today['mday'] . $today['year'] . $today['seconds'] . $activatecode;
     ?>
     <div class="wrap" style="text-align:center;">
     <img src="<?php echo(plugins_url())?>/foxypress/img/foxycart_logo.png" />
@@ -39,9 +29,22 @@ function foxypress_options()
                             <td align="right" valign="top" nowrap>FoxyCart API Key</td>
                             <td align="left">
                               <?php
-                                if(get_option('foxycart_apikey')==''){
+                                if(get_option('foxycart_apikey')=='')
+								{
+									$len = 16;
+									$base='ABCDEFGHKLMNOPQRSTWXYZabcdefghjkmnpqrstwxyz123456789';
+									$max=strlen($base)-1;
+									$activatecode='';
+									mt_srand((double)microtime()*1000000);
+									while (strlen($activatecode)<$len+1){
+										$activatecode.=$base{mt_rand(0,$max)};
+									}
+									$today = getdate();
+									$apikey = "wmm" . $today['mon'] . $today['mday'] . $today['year'] . $today['seconds'] . $activatecode;
                                     echo'<input type="text" name="foxycart_apikey" value="'  . $apikey .  '" size="50" readonly />';
-                                }else{
+                                }
+								else
+								{
                                     echo'<input type="text" name="foxycart_apikey" value="' . get_option("foxycart_apikey")  . '" size="50" readonly />';
                                 }
                               ?>
@@ -64,6 +67,25 @@ function foxypress_options()
                                 }
                               ?>
                                 </select>
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <td align="right" valign="top" nowrap>Currency Locale Code</td>
+                            <td align="left">
+                                <input type="text" name="foxycart_currency_locale" value="<?php echo get_option('foxycart_currency_locale'); ?>" size="50" /><br />                              
+                                <?php 
+								if (!function_exists('money_format'))
+								{
+									echo("Attention, you are using Windows which does not support internationalization. You will be limited to $ or £.");
+								}
+								else
+								{								
+                                	echo("If you would like to use something other than $ for your currency, enter your locale code. <br />
+		                                 <a href=\"http://www.roseindia.net/tutorials/I18N/locales-list.shtml\" target=\"_blank\">View the full list of 
+										 locale codes.</a><br />
+										 You must also change your locale setting in FoxyCart by going to Templates -> Language and updating \"store locale\"");                              
+								}
+								?>
                             </td>
                         </tr>
                         <tr valign="top">
@@ -138,7 +160,7 @@ function foxypress_options()
             <tr>
             	<td align="center">
                     <input type="hidden" name="action" value="update" />
-                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery, foxypress_base_url, foxycart_enable_multiship,foxypress_max_downloads,foxypress_qty_alert,foxycart_datafeeds" />
+                    <input type="hidden" name="page_options" value="foxycart_storeurl,foxycart_apikey,foxycart_storeversion,foxycart_include_jquery, foxypress_base_url, foxycart_enable_multiship,foxypress_max_downloads,foxypress_qty_alert,foxycart_datafeeds,foxycart_currency_locale" />
               		<p class="submit">
               			<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
               		</p>

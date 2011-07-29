@@ -30,6 +30,16 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.3.1 =
+* Added support for multiple currencies
+* Made the item description for inventory items a WYSIWYG editor (line break issue resolved)
+* Added extra weight to the product options panel
+* Allowed for price and weight reductions in the options panel, instead of additions only
+* We had a table prefix issue, but changed code so you can have custom table prefixes
+* Added shortcode modifications for a quantity box
+* Added shortcode modifications for ability to show add to cart on list category mode
+* View the release notes <a href="http://www.foxy-press.com/2011/07/foxypress-0-3-1-released/" target="_blank">here</a>
+
 = 0.3.0 =
 * Added support for the <a href="http://codex.wordpress.org/Installing_WordPress_With_Clean_Subversion_Repositories" target="_blank">clean svn repository method</a> by using plugins_url() instead of hardcoding the plugins folder
 * Added inventory levels and alert settings
@@ -37,7 +47,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 * Added ability to re-order photos per product
 * Added minimum and maximum product amount available per product
 * Fixed a few random bugs brought to our attention by our users
-* View the release notes <a href="http://www.foxy-press.com/archives/317" target="_blank">here</a>
+* View the release notes <a href="http://www.foxy-press.com/2011/07/foxypress-0-3-0-released/" target="_blank">here</a>
 
 = 0.2.9 =
 * Added downloadable product support
@@ -50,30 +60,30 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 * Fixed product description line break issue
 * Fixed product pricing format issue
 * Fixed alot of random bugs brought to our attention by our users
-* View the release notes <a href="http://www.foxy-press.com/archives/311" target="_blank">here</a>
+* View the release notes <a href="http://www.foxy-press.com/2011/06/foxypress-0-2-9-released/" target="_blank">here</a>
 
 = 0.2.8 =
 * Added Non-Permalink site support
-* View the release notes <a href="http://www.foxy-press.com/archives/248" target="_blank">here</a>
+* View the release notes <a href="http://www.foxy-press.com/2011/05/foxypress-0-2-8-released/" target="_blank">here</a>
 
 = 0.2.7 =
 * Added Product Import/Export functionality
 * Added Product Feed - compatible with Google Products
 * Widget Support - MiniCart in Sidebar and JSON Cart Dropdown
 * Tested with WP 3.1.2
-* View the release notes <a href="http://www.foxy-press.com/archives/211" target="_blank">here</a>
+* View the release notes <a href="http://www.foxy-press.com/2011/05/foxypress-0-2-7-released/" target="_blank">here</a>
 
 = 0.2.6 =
 * Modified reporting functionality to include dropdown for live/test/all transactions
 * Modified reporting functionality to include price per total card transactions
 * Added image thumbnails in the order management single item screen
 * BugFix: New installs had some inventory problems. 
-* View the release notes <a href="http://www.foxy-press.com/archives/204" target="_blank">here</a>
+* View the release notes <a href="http://www.foxy-press.com/2011/04/foxypress-0-2-6-released/" target="_blank">here</a>
 
 = 0.2.5 =
 * Changed Single Product Template to use different CSS classes
 * Added multiple image thumbnails to the Single Product Template
-* View the release notes <a href="http://www.foxy-press.com/archives/168" target="_blank">here</a>
+* View the release notes <a href="http://www.foxy-press.com/2011/04/foxypress-0-2-5-released/" target="_blank">here</a>
 
 = 0.2.4 =
 * Changed Single Product Template to use different CSS classes
