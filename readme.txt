@@ -9,7 +9,6 @@ Stable tag: 2.7.1
 FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart’s e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 
 == Description ==
-
 FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart’s e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 
 FoxyPress was built to make the integration of FoxyCart and WordPress effortless. Flexible features make it easy for developers to quickly build their storefront. 
