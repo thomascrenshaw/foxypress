@@ -6,15 +6,27 @@ Requires at least: 3.0
 Tested up to: 3.2.1
 Stable tag: 2.7.1
 
-FoxyPress allows you to easily manage an inventory, view and track your orders, generate reports and much more...
+FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart’s e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 
 == Description ==
 
-FoxyPress allows you to easily add products to your WordPress pages using FoxyCart as your shopping cart solution. Manage inventories, set product options and organize transactions all within WordPress using a convenient WYSIWYG toolbar icon and administration panels. 
+FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart’s e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 
-FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users' requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
+FoxyPress was built to make the integration of FoxyCart and WordPress effortless. Flexible features make it easy for developers to quickly build their storefront. 
+
+Visit <a href="http://www.foxy-press.com" target="_blank">www.foxy-press.com</a> for full documentation and instructions
 
 [vimeo http://vimeo.com/22047284]
+
+**A few of the FoxyPress Features:**
+* Sale pricing with optional date controls
+* Product variations and pricing flexibility
+* Product categories
+* Product attribute options
+* Inventory management
+* Digital Products
+
+FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users' requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
 --Site credits--
 
@@ -29,6 +41,17 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Green Egg Media - Multi Datafeed inspiration
 
 == Changelog ==
+
+= 0.3.2 =
+* Added the ability to edit product options, instead of deleting for every change
+* Added ability to optionally monitor inventory on a product option level. Some limitations exist here, so please read the change log in full.
+* Added an informational dashboard widget per forum request to display some quick stats about your cart.  Ability to enable/disable is found in the Manage Settings page.
+* Added Lightbox as an option for photo gallery display.  This fixes a few conflicts that were occurring.
+* Ability to have sale pricing on items and schedule the sale availability (start/end date).
+* Start and end date availability for a product is now available, along with the ability to mark an item as inactive in general.
+* Out of stock items and unavailable/inactive items now have customized messages that are available for editing on the settings page.
+* Restructured the html for a few shortcodes.  You can see the updated documentation for CSS styling <a href="http://www.foxy-press.com/documentation/product-template-styling/" target="_blank">here</a>.
+* View the release notes <a href="http://www.foxy-press.com/2011/08/foxypress-0-3-2-released/" target="_blank">here</a>
 
 = 0.3.1 =
 * Added support for multiple currencies
@@ -167,9 +190,10 @@ Copy the folder to your WordPress
 '*/wp-content/plugins/*' folder.
 
 1. Activate the '*FoxyPress*' plugin in your WordPress admin '*Plugins*'
-1. Go to '*FoxyPress / Manage Settings*' in your WordPress admin.
-1. Enter your FoxyCart domain.
-1. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
+2. Go to '*FoxyPress / Manage Settings*' in your WordPress admin.
+3. Enter your FoxyCart domain.
+4. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
+5. See installation documentation <a href="http://www.foxy-press.com/documentation/installation-instructions/" target="_blank">here</a>.
 
 [vimeo http://vimeo.com/21743308]
 
@@ -179,21 +203,11 @@ Copy the folder to your WordPress
 
 Yes, you do. Please signup for a FoxyCart account <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182" target="_blank">here</a>.
 
-**Do I need to know HTML to use this plugin?**
-
-No. That is the reason this plugin was made. You can learn the WP shortcode or use the WYSIWIG menu item to add your product through a short form.
-
-**Why doesn't my add to cart button open the modal dialog?**
-
-Make sure you don't have .foxycart.com at the end of your store subdomain.  You only need the subdomain in the textbox. Correct: websevenpointo Incorrect: websevenpointo.foxycart.com.
-
-**Why doesn't my default image work?**
-
-Make sure it is in the inventory_images folder.
-
 **Where do I submit requests for new features or any comments I have?**
 
 Go to the <a href="http://www.foxy-press.com/forum" target="_blank">FoxyPress Forum</a> to submit your question/comment/feature request.
+
+View a full list of questions on our <a href="http://www.foxy-press.com/frequently-asked-questions/" target="_blank">site</a>.
 
 == Upgrade Notice ==
 

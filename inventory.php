@@ -57,15 +57,69 @@ function inventory_postback()
 		$optiongroupid = foxypress_FixPostVar('foxy_option_group');
 		$optionextraprice = foxypress_FixPostVar('foxy_option_extra_price', '0');
 		$optionextraweight = foxypress_FixPostVar('foxy_option_extra_weight', '0'); 
+		$optioncode = foxypress_FixPostVar('foxy_option_code', ''); 
+		$optionquantity = foxypress_FixPostVar('foxy_option_quantity', '');
+		
 		if($optionname != "" && $optionvalue != "" && $optiongroupid != "")
 		{
 			//insert new option
-			$wpdb->query("insert into " . WP_FOXYPRESS_INVENTORY_OPTIONS . " (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_active) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '" . $optionextraweight . "', '1')");
+			$wpdb->query("insert into " . WP_FOXYPRESS_INVENTORY_OPTIONS . " (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '" . $optionextraweight . "', '" . $optioncode . "', " . (($optionquantity == "") ? "NULL" : "'" . $optionquantity . "'") . ", '1')");
+		}
+		//NOTE: currently unique product option codes only work per 1 group per item, so if they try entering in unique codes for mulitple
+		//option groups we need ot wipe them out.
+		$BadData = $wpdb->get_row("select count(distinct option_group_id) as GroupCount from " . WP_FOXYPRESS_INVENTORY_OPTIONS. " where inventory_id='" . $inventory_id . "'");
+		if(!empty($BadData) && $BadData->GroupCount > 1)
+		{
+			//wipe out the codes and quantities
+			$wpdb->query("update " . WP_FOXYPRESS_INVENTORY_OPTIONS . " 
+						  set option_quantity = NULL
+							,option_code = NULL
+						  where inventory_id = '" . $inventory_id . "'");
 		}
 		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory&inventory_id=" . $inventory_id);
 	}
-	else if(isset($_POST['foxy_options_order_save']))
-	{	
+	else if(isset($_POST['foxy_options_update']))
+	{
+		//save option data
+		$rowsToProcess = foxypress_FixPostVar('hdn_foxy_options_count');
+		if($rowsToProcess > 0)
+		{
+			for($i=1; $i<=$rowsToProcess; $i++)
+			{
+				$optionID = foxypress_FixPostVar('hdn_foxy_option_id_' . $i);
+				$optiongroupid = foxypress_FixPostVar('foxy_option_group_' . $i);
+				$optionname = foxypress_FixPostVar('foxy_option_text_' . $i);
+				$optionvalue = foxypress_FixPostVar('foxy_option_value_' . $i);				
+				$optionextraprice = foxypress_FixPostVar('foxy_option_extra_price_' . $i);
+				$optionextraweight = foxypress_FixPostVar('foxy_option_extra_weight_' . $i);
+				$optionCode = foxypress_FixPostVar('foxy_option_code_' . $i, '');
+				$optionActive = foxypress_FixPostVar('foxy_option_active_' . $i);
+				$optionQuantity = foxypress_FixPostVar('foxy_option_quantity_' . $i, '');				
+				$wpdb->query("update " . WP_FOXYPRESS_INVENTORY_OPTIONS . " 
+							  set option_group_id = '" . $optiongroupid . "'
+								  ,option_text = '" . $optionname . "'
+								  ,option_value = '" . $optionvalue . "'
+								  ,option_extra_price = '" . $optionextraprice . "'
+								  ,option_extra_weight = '" . $optionextraweight . "'
+								  ,option_code = '" . $optionCode. "'
+								  ,option_quantity = " . (($optionQuantity == "") ? "NULL" : "'" . $optionQuantity . "'") . " 	
+								  ,option_active = '" . $optionActive. "'								  						  
+							  where option_id='" . $optionID . "'");
+			}
+			
+			//NOTE: currently unique product option codes only work per 1 group per item, so if they try entering in unique codes for mulitple
+			//option groups we need ot wipe them out.
+			$BadData = $wpdb->get_row("select count(distinct option_group_id) as GroupCount from " . WP_FOXYPRESS_INVENTORY_OPTIONS. " where inventory_id='" . $inventory_id . "'");
+			if(!empty($BadData) && $BadData->GroupCount > 1)
+			{
+				//wipe out the codes and quantities
+				$wpdb->query("update " . WP_FOXYPRESS_INVENTORY_OPTIONS . " 
+							  set option_quantity = NULL
+							  	,option_code = NULL
+							  where inventory_id = '" . $inventory_id . "'");
+			}			
+		}
+		//update sort order		
 		$OptionsOrderArray = explode(",", foxypress_FixPostVar('hdn_foxy_options_order'));
 		$counter = 1;
 		foreach ($OptionsOrderArray as $OptionID) 
@@ -92,24 +146,6 @@ function inventory_postback()
 		if($optionid != "")
 		{
 			$wpdb->query("delete from " . WP_FOXYPRESS_INVENTORY_OPTIONS . " where option_id = '" . $optionid . "'");
-		}
-		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory&inventory_id=" . $inventory_id);
-	}
-	else if($action == "inactivateoption")
-	{
-		$optionid = foxypress_FixGetVar("optionid", "");
-		if($optionid != "")
-		{
-			$wpdb->query("update " . WP_FOXYPRESS_INVENTORY_OPTIONS . " set option_active = '0' where option_id = '" . $optionid . "'");
-		}
-		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory&inventory_id=" . $inventory_id);
-	}
-	else if($action == "activateoption")
-	{
-		$optionid = foxypress_FixGetVar("optionid", "");
-		if($optionid != "")
-		{
-			$wpdb->query("update " . WP_FOXYPRESS_INVENTORY_OPTIONS . " set option_active = '1' where option_id = '" . $optionid . "'");
 		}
 		header("location: " . $_SERVER['PHP_SELF'] . "?page=inventory&inventory_id=" . $inventory_id);
 	}
@@ -189,26 +225,23 @@ function inventory_postback()
 		$desc = $_POST['inventory_description'];
 		$cats = $_POST['foxy_categories'];
 		$price = str_replace("$", "", str_replace(",", "", foxypress_FixPostVar('inventory_price', '')));
-		$weight = foxypress_FixPostVar('inventory_weight', '');
-		$added =  foxypress_FixPostVar('date_added', '');
-		$quantity = foxypress_FixPostVar('inventory_quantity', '');
-		$quantity_min = foxypress_FixPostVar('inventory_quantity_min', '');
-		$quantity_max = foxypress_FixPostVar('inventory_quantity_max', '');
 		$price = ($price * 1);
 		$price = (!$price) ? 0 : $price;
-		$added = strtotime($added);
-		if (!$added) { $added = time(); }
-		if ( ini_get('magic_quotes_gpc')) {
-			$code = stripslashes($code);
-			$name = stripslashes($name);
-			$desc = stripslashes($desc);
-			$price = stripslashes($price);
-			$added = stripslashes($added);
-			$weight = stripslashes($weight);
-			$quantity = stripslashes($quantity);
-			$quantity_min = stripslashes($quantity_min);
-			$quantity_max = stripslashes($quantity_max);
-		}
+		$sale_price = str_replace("$", "", str_replace(",", "", foxypress_FixPostVar('inventory_sale_price', '')));
+		$sale_start_date = foxypress_FixPostVar('inventory_sale_start');
+		$sale_end_date = foxypress_FixPostVar('inventory_sale_end');
+		$weight = foxypress_FixPostVar('inventory_weight', '');
+		$quantity = foxypress_FixPostVar('inventory_quantity', '');
+		$quantity_min = foxypress_FixPostVar('inventory_quantity_min', '');
+		$quantity_max = foxypress_FixPostVar('inventory_quantity_max', '');				
+		$discount_quantity_amount = foxypress_FixPostVar('inventory_discount_quantity_amount', '');
+		$discount_quantity_percentage = foxypress_FixPostVar('inventory_discount_quantity_percentage', '');
+		$discount_price_amount = foxypress_FixPostVar('inventory_discount_price_amount', '');
+		$discount_price_percentage = foxypress_FixPostVar('inventory_discount_price_percentage', '');			
+		$item_active = foxypress_FixPostVar('inventory_active');
+		$item_start_date = foxypress_FixPostVar('inventory_start_date');
+		$item_end_date = foxypress_FixPostVar('inventory_end_date');			
+		$added = time(); 
 		// The name must be at least one character in length and no more than 100 - no non-standard characters allowed
 		if ($save) {
 			//check title
@@ -252,9 +285,19 @@ function inventory_postback()
 				. ", inventory_description='" . mysql_escape_string($desc) . "'"
 				. ", inventory_weight='" . mysql_escape_string($weight) . "'"
 				. ", inventory_price='" . mysql_escape_string($price) . "'"
+				. ", inventory_sale_price=" . (($sale_price == "") ? "NULL" : "'" . $sale_price . "'")
+				. ", inventory_sale_start=" . (($sale_start_date == "") ? "NULL" : "'" . $sale_start_date . "'")
+				. ", inventory_sale_end=" . (($sale_end_date == "") ? "NULL" : "'" . $sale_end_date . "'")
 				. ", inventory_quantity=" . (($quantity == "") ? "NULL" : "'" . $quantity . "'")
 				. ", inventory_quantity_min='" . $quantity_min . "'"
-				. ", inventory_quantity_max='" . $quantity_max . "'"
+				. ", inventory_quantity_max='" . $quantity_max . "'"				
+				. ", inventory_discount_quantity_amount='" . $discount_quantity_amount . "'"
+				. ", inventory_discount_quantity_percentage='" . $discount_quantity_percentage . "'"
+				. ", inventory_discount_price_amount='" . $discount_price_amount . "'"
+				. ", inventory_discount_price_percentage='" . $discount_price_percentage . "'"		
+				. ", inventory_active='" . $item_active . "'"			
+				. ", inventory_start_date=" . (($item_start_date == "") ? "NULL" : "'" . $item_start_date . "'")
+				. ", inventory_end_date=" . (($item_end_date == "") ? "NULL" : "'" . $item_end_date . "'")	
 				. " WHERE inventory_id='" . mysql_escape_string($inventory_id) . "'";
 				$wpdb->query($sql);
 			}
@@ -268,9 +311,19 @@ function inventory_postback()
 				. ", date_added='" . mysql_escape_string($added) . "'"
 				. ", inventory_weight='" . mysql_escape_string($weight) . "'"
 				. ", inventory_price='" . mysql_escape_string($price) . "'"
+				. ", inventory_sale_price=" . (($sale_price == "") ? "NULL" : "'" . $sale_price . "'")
+				. ", inventory_sale_start=" . (($sale_start_date == "") ? "NULL" : "'" . $sale_start_date . "'")
+				. ", inventory_sale_end=" . (($sale_end_date == "") ? "NULL" : "'" . $sale_end_date . "'")
 				. ", inventory_quantity=" . (($quantity == "") ? "NULL" : "'" . $quantity . "'")
 				. ", inventory_quantity_min='" . $quantity_min . "'"
 				. ", inventory_quantity_max='" . $quantity_max . "'"
+				. ", inventory_discount_quantity_amount='" . $discount_quantity_amount . "'"
+				. ", inventory_discount_quantity_percentage='" . $discount_quantity_percentage . "'"
+				. ", inventory_discount_price_amount='" . $discount_price_amount . "'"
+				. ", inventory_discount_price_percentage='" . $discount_price_percentage . "'"		
+				. ", inventory_active='" . $item_active . "'"			
+				. ", inventory_start_date=" . (($item_start_date == "") ? "NULL" : "'" . $item_start_date . "'")
+				. ", inventory_end_date=" . (($item_end_date == "") ? "NULL" : "'" . $item_end_date . "'")		
 				. ", category_id='0'"
 				;
 				$wpdb->query($sql);
@@ -568,9 +621,9 @@ function foxypress_show_inventory() {
 			$class = ($class == 'alternate') ? '' : 'alternate';
 			?>
 			<tr class="<?php echo $class; ?>">
-				<td><span <?php if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0"){ if($QuantityAlertLevel > $item->inventory_quantity) { echo("class=\"quantityLow\""); } } ?>><?php echo stripslashes( $item->inventory_code ); ?></span></td>
-				<td><span <?php if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0"){ if($QuantityAlertLevel > $item->inventory_quantity) { echo("class=\"quantityLow\""); } } ?>><?php echo stripslashes($item->inventory_name); ?></span></td>
-				<td><?php echo foxypress_TruncateString(stripslashes($item->inventory_description), 25); ?></td>
+				<td><span <?php if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0"){ if($item->inventory_quantity != null && $QuantityAlertLevel > $item->inventory_quantity) { echo("class=\"quantityLow\""); } } ?>><?php echo stripslashes( $item->inventory_code ); ?></span></td>
+				<td><span <?php if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0"){ if($item->inventory_quantity != null && $QuantityAlertLevel > $item->inventory_quantity) { echo("class=\"quantityLow\""); } } ?>><?php echo stripslashes($item->inventory_name); ?></span></td>
+				<td><?php echo foxypress_TruncateString(stripslashes(strip_tags($item->inventory_description)), 25); ?></td>
 				<td><?php echo date("m/d/Y", $item->date_added); ?></td>
 				<td><?php echo foxypress_FormatCurrency($item->inventory_price); ?></td>
 				<td><?php echo stripslashes($item->category_name); ?></td>
@@ -621,8 +674,16 @@ function inventory_page_load() {
 	<link href="<?php echo(plugins_url())?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
     <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
+    <link rel="stylesheet" href="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/css/smoothness/jquery-ui-1.8.11.custom.css"> 
+    <script type="text/javascript" src="<?php echo(get_bloginfo("url")) ?>/wp-content/plugins/foxypress/js/jquery-ui-1.8.11.custom.min.js"></script>
     <script type="text/javascript">
 		jQuery(document).ready(function() {
+		  //calendars		  
+			jQuery("#inventory_sale_start").datepicker({ dateFormat: 'yy-mm-dd' });
+			jQuery("#inventory_sale_end").datepicker({ dateFormat: 'yy-mm-dd' });
+			jQuery("#inventory_start_date").datepicker({ dateFormat: 'yy-mm-dd' });
+			jQuery("#inventory_end_date").datepicker({ dateFormat: 'yy-mm-dd' });
+		
 		  //uploadify
 		  jQuery('#inv_image').uploadify({
 			'swf'  : '<?php echo(plugins_url())?>/foxypress/uploadify/uploadify.swf',
@@ -869,6 +930,7 @@ function inventory_page_load() {
 			border: 1px solid #EEE;
 			color: #ccc;
 		}
+		.required{color:red;}
     </style>
 	<div class="wrap">
 	<?php
@@ -947,17 +1009,72 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>
                     </tr>
                     <tr>
-                        <td class="inventory-title"><legend><?php _e( 'Item Name','inventory' ); ?></legend></td>
+                        <td class="inventory-title"><legend><?php _e( 'Item Name','inventory' ); ?><span class="required">*</span></legend></td>
                         <td>
                             <input type="text" name="inventory_name" class="input" size="60" maxlength="100" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_name); ?>" />
                         </td>
                         <td>
                             <div id="inventory-help">
                                 <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                                <span>Name of the item or product</span></a>
+                                <span><b>[Required]</b> Name of the item or product</span></a>
                             </div>
                         </td>
                     </tr>
+                    <tr>
+                        <td class="inventory-title" <?php if (!empty($data) && $data->inventory_id) { echo("valign=\"top\""); } ?>>Item Category<span class="required">*</span></td>
+                        <td>
+                        	<?php
+							$CurrentCategoriesArray = array();
+							//check for current categories
+							if (!empty($data) && $data->inventory_id)
+							{
+								$inventory_categories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id
+																			FROM " . WP_INVENTORY_TO_CATEGORY_TABLE . " as itc inner join " .
+																			WP_INVENTORY_CATEGORIES_TABLE . " as c on itc.category_id = c.category_id
+																			WHERE inventory_id='" . $data->inventory_id . "'");
+								if(!empty($inventory_categories))
+								{
+									foreach($inventory_categories as $inventory_cat)
+									{
+										$CurrentCategoriesArray[] = $inventory_cat->category_id;
+									}
+								}
+							}
+                            // Grab all the categories and list them
+                            $cats = $wpdb->get_results( "SELECT * FROM " . WP_INVENTORY_CATEGORIES_TABLE );
+                            foreach( $cats as $cat )
+							{
+								$checked="";
+								if(in_array($cat->category_id, $CurrentCategoriesArray))
+								{
+									$checked = "checked=\"checked\"";
+								}
+								echo("<input type=\"checkbox\" name=\"foxy_categories[]\" value=\"" . $cat->category_id . "\" " . $checked. " /> " . stripslashes($cat->category_name) . "<br/>");
+                            }
+							?>
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span><b>[Required]</b> Select the item category.  The categories must first be created via foxycart.com, then added to your inventory category list.</span></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+						<td class="inventory-title" style="vertical-align:top;" nowrap><legend><?php _e('Item Description','inventory'); ?><span class="required">*</span></legend></td>
+                        <td>
+                        	<textarea style="width:500px;height:300px;" class="inventory_description" id="inventory_description" name="inventory_description"><?php if ( !empty($data) ) echo stripslashes($data->inventory_description); ?></textarea>
+                            <script type="text/javascript">
+								CKEDITOR.replace( 'inventory_description' );
+							</script>
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span><b>[Required]</b> Enter a description of your product or item.</span></a>
+                            </div>
+                        </td>
+                    </tr>                    
                     <tr>
                         <td class="inventory-title"><legend><?php _e('Image(s)','inventory'); ?></legend></td>
                         <?php if ($inventory_id == "0" || $inventory_id == "")  { ?>
@@ -1093,118 +1210,51 @@ function foxypress_edit_item($inventory_id = "") {
                         </td>                    
                     </tr>
                      <?php } ?>
-					<tr>
-						<td class="inventory-title" style="vertical-align:top;" nowrap><legend><?php _e('Item Description','inventory'); ?></legend></td>
-                        <td>
-                           	<?php
-							/*
-							add_action("admin_print_scripts", "foxypress_load_tinymce");
-							wp_tiny_mce( true , 
-								array(
-									"editor_selector" => "inventory_description",
-									"remove_linebreaks" => true,
-									"force_br_newlines" => true,
-									"force_p_newlines" => false,
-									"convert_newlines_to_brs" => true,
-									"remove_redundant_brs" => false,
-									"forced_root_block " => false,
-									"height" => "300",
-									"width" => "500"
-								)
-							);*/
-							?>
-                            <script type="text/javascript">								
-								/*jQuery(document).ready(function($) {
-									$('a.toggleVisual').click(function() {
-										console.log(tinyMCE.execCommand('mceAddControl', false, 'inventory_description'));
-									});
-									$('a.toggleHTML').click(function() {
-										console.log(tinyMCE.execCommand('mceRemoveControl', false, 'inventory_description'));
-									});
-								});*/								
-							</script>
-                            <!--<p id="toggle" align="right"><a class="button toggleVisual">Visual</a><a class="button toggleHTML">HTML</a></p>-->
-                            
-                            
-                            <textarea style="width:500px;height:300px;" class="inventory_description" id="inventory_description" name="inventory_description"><?php if ( !empty($data) ) echo stripslashes($data->inventory_description); ?></textarea>
-                            <script type="text/javascript">
-								CKEDITOR.replace( 'inventory_description' );
-							</script>
-                        </td>
-                        <td>
-                            <div id="inventory-help">
-                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                                <span>Enter a description of your product or item.</span></a>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="inventory-title" <?php if (!empty($data) && $data->inventory_id) { echo("valign=\"top\""); } ?>>Item Category</td>
-                        <td>
-                        	<?php
-							$CurrentCategoriesArray = array();
-							//check for current categories
-							if (!empty($data) && $data->inventory_id)
-							{
-								$inventory_categories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id
-																			FROM " . WP_INVENTORY_TO_CATEGORY_TABLE . " as itc inner join " .
-																			WP_INVENTORY_CATEGORIES_TABLE . " as c on itc.category_id = c.category_id
-																			WHERE inventory_id='" . $data->inventory_id . "'");
-								if(!empty($inventory_categories))
-								{
-									foreach($inventory_categories as $inventory_cat)
-									{
-										$CurrentCategoriesArray[] = $inventory_cat->category_id;
-									}
-								}
-							}
-                            // Grab all the categories and list them
-                            $cats = $wpdb->get_results( "SELECT * FROM " . WP_INVENTORY_CATEGORIES_TABLE );
-                            foreach( $cats as $cat )
-							{
-								$checked="";
-								if(in_array($cat->category_id, $CurrentCategoriesArray))
-								{
-									$checked = "checked=\"checked\"";
-								}
-								echo("<input type=\"checkbox\" name=\"foxy_categories[]\" value=\"" . $cat->category_id . "\" " . $checked. " /> " . stripslashes($cat->category_name) . "<br/>");
-                            }
-							?>
-                        </td>
-                        <td>
-                            <div id="inventory-help">
-                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                                <span>Select the item category.  The categories must first be created via foxycart.com, then added to your inventory category list.</span></a>
-                            </div>
-                        </td>
-                    </tr>
-					<tr>
-						<td class="inventory-title"><legend><?php _e('Added Date','inventory'); ?></legend></td>
-						<td>
-                            <input type="text" name="date_added" class="input" size="12" value="<?php
-                            if ( !empty($data))  {
-                            	echo htmlspecialchars(date("m/d/Y", $data->date_added));
-                            }
-                            else {
-                            	echo date("m/d/Y");
-							} ?>" />
-						</td>
-						<td>
-                            <div id="inventory-help">
-                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                                <span>Enter the date you want the item submission logged by.</span></a>
-                            </div>
-						</td>
-					</tr>
                     <tr>
                         <td class="inventory-title"><legend><?php _e('Item Price','inventory'); ?></legend></td>
                         <td>
-                            <input type="text" name="inventory_price" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_price); ?>" />
+                            <?php echo(foxypress_GetCurrenySymbol()); ?><input type="text" name="inventory_price" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_price); ?>" />
                         </td>
                         <td>
                             <div id="inventory-help">
                                 <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                                 <span>Enter the price of the item without the currency symbol.</span></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e('Sale Price','inventory'); ?></legend></td>
+                        <td>
+                            <?php echo(foxypress_GetCurrenySymbol()); ?><input type="text" name="inventory_sale_price" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_sale_price); ?>" />
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Enter the sale price of the item without the currency symbol.</span></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e('Sale Start Date','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_sale_start" id="inventory_sale_start" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_sale_start); ?>" /> <small><i>(yyyy-mm-dd format. ex: <?php echo(date("Y-m-d"))?>)</i></small>
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Enter the date when the sale starts.</span></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e('Sale End Date','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_sale_end" id="inventory_sale_end" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_sale_end); ?>" /> <small><i>(yyyy-mm-dd format. ex: <?php echo(date("Y-m-d"))?>)</i></small>
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Enter the date when the sale ends.</span></a>
                             </div>
                         </td>
                     </tr>
@@ -1240,11 +1290,11 @@ function foxypress_edit_item($inventory_id = "") {
                         <td>
                             <div id="inventory-help">
                                 <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                                <span>Minimum quantity per order. Leave this field blank or at 0 if you don't want to enfore a minimum quantity.</span></a>
+                                <span>Minimum quantity per order. Leave this field blank or at 0 if you don't want to enforce a minimum quantity.</span></a>
                         	</div>
                         </td>
                     </tr>
-                     <tr>
+                    <tr>
                         <td class="inventory-title"><legend><?php _e( 'Maximum Quantity','inventory'); ?></legend></td>
                         <td>
                             <input type="text" name="inventory_quantity_max" class="input" size="10" maxlength="30" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_quantity_max); ?>" />
@@ -1252,7 +1302,85 @@ function foxypress_edit_item($inventory_id = "") {
                         <td>
                             <div id="inventory-help">
                                 <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                                <span>Maximum quantity per order. Leave this field blank or at 0 if you don't want to enfore a maximum quantity.</span></a>
+                                <span>Maximum quantity per order. Leave this field blank or at 0 if you don't want to enforce a maximum quantity.</span></a>
+                        	</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e('Item Availability','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_start_date" id="inventory_start_date" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_start_date); ?>" /> to <input type="text" name="inventory_end_date" id="inventory_end_date" class="input" size="10" maxlength="20" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_end_date); ?>" /> <small><i>(yyyy-mm-dd format. ex: <?php echo(date("Y-m-d"))?>)</i></small>
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Enter the start and end dates for when this item is available. Leave the dates blank if the item is always available.</span></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e('Active','inventory'); ?></legend></td>
+                        <td>
+                            <select name="inventory_active">
+                            	<option value="1" <?php echo(($data->inventory_active == "1") ? "selected=\"selected\"" : ""); ?>>Yes</option>
+                                <option value="0" <?php echo(($data->inventory_active == "0") ? "selected=\"selected\"" : ""); ?>>No</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Whether or not the item is currently active.</span></a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td colspan="3"><b>Item Discounts</b> <i>(For help with discounts visit FoxyCart's <a href="http://wiki.foxycart.com/v/0.7.0/coupons_and_discounts" target="_blank">documentation</a> or <a href="http://wiki.foxycart.com/v/0.7.0/cheat_sheet#discount_methods" target="_blank">cheat sheet</a>)</i></td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e( 'Quantity Amount','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_discount_quantity_amount" class="input" size="30" maxlength="100" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_discount_quantity_amount); ?>" />
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Discounts by an amount, based on the quantity of to-be-discounted products.</span></a>
+                        	</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e( 'Quantity Percentage','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_discount_quantity_percentage" class="input" size="30" maxlength="100" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_discount_quantity_percentage); ?>" />
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Discounts by a percentage, based on the quantity of to-be-discounted products.</span></a>
+                        	</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e( 'Price Amount','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_discount_price_amount" class="input" size="30" maxlength="100" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_discount_price_amount); ?>" />
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Discounts by an amount, based on the price of to-be-discounted products.</span></a>
+                        	</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="inventory-title"><legend><?php _e( 'Price Percentage','inventory'); ?></legend></td>
+                        <td>
+                            <input type="text" name="inventory_discount_price_percentage" class="input" size="30" maxlength="100" value="<?php if ( !empty($data) ) echo stripslashes($data->inventory_discount_price_percentage); ?>" />
+                        </td>
+                        <td>
+                            <div id="inventory-help">
+                                <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                <span>Discounts by a percentage, based on the price of to-be-discounted products.</span></a>
                         	</div>
                         </td>
                     </tr>
@@ -1286,86 +1414,131 @@ function foxypress_edit_item($inventory_id = "") {
                             <tr>
                                 <td>Option Name</td>
                                 <td><input type="text" id="foxy_option_name" name="foxy_option_name" /></td>
+                                <td></td>
                             </tr>
                             <tr>
                                 <td>Option Value</td>
                                 <td><input type="text" id="foxy_option_value" name="foxy_option_value" /></td>
+                                <td></td>
                             </tr>
                             <tr>
-                                <td>Option Extra Price</td>
-                                <td><?php echo(foxypress_GetCurrenySymbol()); ?><input type="text" id="foxy_option_extra_price" name="foxy_option_extra_price" /> <span style="font-style:italic;">(Enter negative numbers if you need to subtract from the default price)</span></td>
-                            </tr>
-                            <tr>
-                                <td>Option Extra Weight</td>
-                                <td><input type="text" id="foxy_option_extra_weight" name="foxy_option_extra_weight" />lb(s) <span style="font-style:italic;">(Enter negative numbers if you need to subtract from the default weight)</span></td>
-                            </tr>
-                            <tr>
-                                <td>Option Group Name</td>
+                                <td>Option Group</td>
                                 <td><select name="foxy_option_group" id="foxy_option_group"><?php echo($groups_selection_list) ?></select></td>
+                                <td></td>
                             </tr>
                             <tr>
-                                <td colspan="2"><input type="submit" id="foxy_option_save" name="foxy_option_save" value="<?php _e('Save'); ?> &raquo;"  class="button bold"  /></td>
+                                <td>Extra Price</td>
+                                <td><?php echo(foxypress_GetCurrenySymbol()); ?><input type="text" id="foxy_option_extra_price" name="foxy_option_extra_price" /></td>
+                                <td>
+                                    <div id="inventory-help">
+                                        <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                        <span>Enter negative numbers if you need to subtract from the default price.</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Extra Weight</td>
+                                <td><input type="text" id="foxy_option_extra_weight" name="foxy_option_extra_weight" />lb(s)</td>
+                                <td>
+                                    <div id="inventory-help">
+                                        <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                        <span>Enter negative numbers if you need to subtract from the default weight.</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Unique Code</td>
+                                <td><input type="text" id="foxy_option_code" name="foxy_option_code" /></td>
+                                <td>
+                                    <div id="inventory-help">
+                                        <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                        <span>If your product code differs for different options, enter the correct code here. Currently option level quantities only work correctly for 1 option group per item.</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Option Quantity</td>
+                                <td><input type="text" id="foxy_option_quantity" name="foxy_option_quantity" /></td>
+                                <td>
+                                    <div id="inventory-help">
+                                        <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                                        <span>Use this field if have a unique product code and would like to keep track of inventory at the option specific level.</span></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3"><input type="submit" id="foxy_option_save" name="foxy_option_save" value="<?php _e('Save'); ?> &raquo;"  class="button bold"  /></td>
                             </tr>
                         </table>
 					</div>
-                    <div style="clear:both;">&nbsp;</div>
+                    <div style="clear:both;"></div>
 				</div>
 			</form>
             <Br />
-			<table id="foxypress_inv_options" class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">
-				<thead>
-					<tr>
-                    	<th class="manage-column" scope="col" style="width:50px;">Sort</th>
-						<th class="manage-column" scope="col">Option Name</th>
-						<th class="manage-column" scope="col">Option Value</th>
-						<th class="manage-column" scope="col">Option Group Name</th>
-                        <th class="manage-column" scope="col">Option Extra Price</th>
-                        <th class="manage-column" scope="col">Option Extra Weight</th>
-                        <th class="manage-column" scope="col">Sold Out</th>
-						<th class="manage-column" scope="col">&nbsp;</th>
-					</tr>
-				</thead>
-                <tbody>
-			<?php
-				//get options
-				$foxy_inv_options = $wpdb->get_results("select o.*, og.option_group_name
-														from " . WP_FOXYPRESS_INVENTORY_OPTIONS . " as o
-														inner join " . WP_FOXYPRESS_INVENTORY_OPTION_GROUP . " as og on o.option_group_id = og.option_group_id
-														where o.inventory_id = '" . $inventory_id .  "'
-														order by option_order");
-				$current_option_order = "";
-				if(!empty($foxy_inv_options))
-				{
-					foreach($foxy_inv_options as $foxyopt)
-					{
-						$current_option_order .= ($current_option_order == "") ? $foxyopt->option_id : "," . $foxyopt->option_id;
-						echo("<tr id=\"" . $foxyopt->option_id . "\">
-								<td style=\"cursor:pointer;\"><img src=\"" . plugins_url() . "/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
-								<td>" . stripslashes($foxyopt->option_text) . "</td>
-								<td>" . stripslashes($foxyopt->option_value) . "</td>
-								<td>" . stripslashes($foxyopt->option_group_name) . "</td>
-								<td>" . foxypress_FormatCurrency($foxyopt->option_extra_price, 2) . "</td>
-								<td>" . number_format($foxyopt->option_extra_weight, 2) . " lb(s)</td>
-								<td>" .
-										( ($foxyopt->option_active == "1")
-										? "No <a href=\"" . $_SERVER['PHP_SELF'] . "?page=inventory&amp;action=inactivateoption&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to mark this option as sold out?');\">[Sold Out]</a>"
-										: "Yes <a href=\"" . $_SERVER['PHP_SELF'] . "?page=inventory&amp;action=activateoption&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to mark this option as available?');\">[Available]</a>" )
-									  .
-								"</td>
-								<td><a href=\"" . $_SERVER['PHP_SELF'] . "?page=inventory&amp;action=deleteoption&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to delete this option?');\">Delete</td>
-							 </tr>");
-					}
-				}
-				else
-				{
-					echo("<tr><td colspan=\"7\">There are currently no options for this inventory item</td></tr>");
-				}
-			?>
-            	</tbody>
-			</table>
             <form id="foxy_order_options" name="foxy_order_options" method="POST">
-                <input type="submit" id="foxy_options_order_save" name="foxy_options_order_save" value="<?php _e('Update Order'); ?> &raquo;"  class="button bold" />
+                <table id="foxypress_inv_options" class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">
+                    <thead>
+                        <tr>
+                            <th class="manage-column" scope="col" style="width:50px;">Sort</th>
+                            <th class="manage-column" scope="col">Option Name</th>
+                            <th class="manage-column" scope="col">Option Value</th>
+                            <th class="manage-column" scope="col">Option Group</th>
+                            <th class="manage-column" scope="col">Extra Price</th>
+                            <th class="manage-column" scope="col">Extra Weight</th>
+                            <th class="manage-column" scope="col">Unique Code</th>
+                            <th class="manage-column" scope="col">Active</th>
+                            <th class="manage-column" scope="col">Qty</th>
+                            <th class="manage-column" scope="col">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                <?php
+                    //get options
+                    $foxy_inv_options = $wpdb->get_results("select o.*, og.option_group_name
+                                                            from " . WP_FOXYPRESS_INVENTORY_OPTIONS . " as o
+                                                            inner join " . WP_FOXYPRESS_INVENTORY_OPTION_GROUP . " as og on o.option_group_id = og.option_group_id
+                                                            where o.inventory_id = '" . $inventory_id .  "'
+                                                            order by option_order");
+                    $current_option_order = "";
+					$row = 1;
+                    if(!empty($foxy_inv_options))
+                    {
+                        foreach($foxy_inv_options as $foxyopt)
+                        {
+                            $current_option_order .= ($current_option_order == "") ? $foxyopt->option_id : "," . $foxyopt->option_id;
+                            echo("<tr id=\"" . $foxyopt->option_id . "\">
+                                    <td style=\"cursor:pointer;\"><img src=\"" . plugins_url() . "/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
+                                    <td><input type=\"text\" name=\"foxy_option_text_" . $row . "\" id=\"foxy_option_text_" . $row . "\" value=\"" . $foxyopt->option_text . "\" size=\"15\"></td>
+                                    <td><input type=\"text\" name=\"foxy_option_value_" . $row . "\" id=\"foxy_option_value_" . $row . "\" value=\"" . $foxyopt->option_value . "\" size=\"15\"></td>
+                                    <td><select id=\"foxy_option_group_" . $row . "\" name=\"foxy_option_group_" . $row . "\">" . foxypress_BuildInventoryOptionGroupList($groups, $foxyopt->option_group_id) . "</select></td>
+                                    <td nowrap>" . foxypress_GetCurrenySymbol() . "<input type=\"text\" name=\"foxy_option_extra_price_" . $row . "\" id=\"foxy_option_extra_price_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_price, 2) . "\" size=\"10\"></td>
+                                    <td nowrap><input type=\"text\" name=\"foxy_option_extra_weight_" . $row . "\" id=\"foxy_option_extra_weight_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_weight, 2) . "\" size=\"5\">lb(s)</td>
+                                    <td><input type=\"text\" name=\"foxy_option_code_" . $row . "\" id=\"foxy_option_code_" . $row . "\" value=\"" . $foxyopt->option_code . "\" size=\"10\"></td>
+                                    <td>
+										<select id=\"foxy_option_active_" . $row . "\" name=\"foxy_option_active_" . $row . "\">
+											<option value=\"1\" " . (($foxyopt->option_active == "1") ? "selected=\"selected\"" : "") . ">Yes</option>
+											<option value=\"0\" " . (($foxyopt->option_active == "0") ? "selected=\"selected\"" : "") . ">No</option>											
+										</select>
+                                    </td>
+									<td>
+										<input type=\"text\" id=\"foxy_option_quantity_" . $row . "\" name=\"foxy_option_quantity_" . $row . "\" value=\"" . $foxyopt->option_quantity . "\" size=\"5\" />
+									</td>
+                                    <td><input type=\"hidden\" name=\"hdn_foxy_option_id_" . $row . "\" id=\"hdn_foxy_option_id_" . $row . "\" value=\"" . $foxyopt->option_id . "\" /><a href=\"" . $_SERVER['PHP_SELF'] . "?page=inventory&amp;action=deleteoption&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to delete this option?');\"><img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"Delete\" class=\"noBorder\" /></td>
+                                 </tr>");
+                            $row++;
+                        }
+                    }
+                    else
+                    {
+                        echo("<tr><td colspan=\"7\">There are currently no options for this inventory item</td></tr>");
+                    }
+                ?>
+                    </tbody>
+                </table>
+                <br />
+           		<input type="submit" id="foxy_options_update" name="foxy_options_update" value="<?php _e('Save Options'); ?> &raquo;"  class="button bold" />
                 <input type="hidden" id="hdn_foxy_options_order" name="hdn_foxy_options_order" value="<?php echo($current_option_order) ?>" />
+                <input type="hidden" id="hdn_foxy_options_count" name="hdn_foxy_options_count" value="<?php echo($row-1); ?>" />
             </form>
 		<?php
 		}
@@ -1397,7 +1570,7 @@ function foxypress_edit_item($inventory_id = "") {
                         </tr>
                     </table>
                 </div>
-                <div style="clear:both;">&nbsp;</div>
+                <div style="clear:both;"></div>
 			</div>
         </form>
         <Br />
@@ -1435,5 +1608,15 @@ function foxypress_edit_item($inventory_id = "") {
   	?>
   	<div style="clear:both; height:50px;">&nbsp;</div>
   <?php
+}
+
+function foxypress_BuildInventoryOptionGroupList($groups, $selectedid)
+{
+	$groups_selection_list = "";
+	foreach($groups as $group)
+	{
+		$groups_selection_list .= "<option value=\"" . $group->option_group_id . "\" " . (($group->option_group_id == $selectedid) ? "selected=\"selected\"" : "") . ">" . $group->option_group_name . "</option>";
+	}	
+	return $groups_selection_list;
 }
 ?>

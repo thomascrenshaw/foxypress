@@ -103,23 +103,47 @@ else
 					$Downloads[] = plugins_url() . "/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt_downloadable->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($download_transaction_id));					
 				}			
 				//get quantity and adjust table as needed
-				$QuantityPurchased = $detail->product_quantity[0]->tagData;
-				//update table 
-				$wpdb->query("UPDATE " . WP_INVENTORY_TABLE . " SET inventory_quantity = (inventory_quantity - " . $QuantityPurchased . ") WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND inventory_quantity != 'null'");
+				$QuantityPurchased = $detail->product_quantity[0]->tagData;				
 				
-				if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0")
+				//check to see if we have a option level product code
+				$dt_OptionLevelCount = $wpdb->get_row("SELECT count(*) as ProductCount FROM " . WP_FOXYPRESS_INVENTORY_OPTIONS . " where inventory_id='" . mysql_escape_string($InventoryID) . "' and option_code='" . mysql_escape_string($ProductCode) . "'");		
+				if(!empty($dt_OptionLevelCount) && $dt_OptionLevelCount->ProductCount == 1)
 				{
-					//check new quantity to see if we need to send an email
-					$dt_item = $wpdb->get_row("SELECT * FROM " . WP_INVENTORY_TABLE . " WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "'");
-					if($dt_item->inventory_quantity != null && $dt_item->inventory_quantity >= 0 && $dt_item->inventory_quantity < $QuantityAlertLevel)
+					//update quantity 
+					$wpdb->query("UPDATE " . WP_FOXYPRESS_INVENTORY_OPTIONS . " SET option_quantity = (option_quantity - " . $QuantityPurchased . ") WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND option_code='" . mysql_escape_string($ProductCode) . "' AND option_quantity != 'null'");					
+					if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0")
 					{
-						//uh oh!
-						$headers = "From: " . get_settings("admin_email") . "\r\n";
-						$headers .= "Content-type: text/html\r\n"; 
-						$body = $dt_item->inventory_name . " is running low, " . $dt_item->inventory_quantity . " remain.  Please check your inventory by logging into your WordPress dashboard.";
-						mail(get_settings("admin_email"), get_bloginfo("name") . " - Quantity Alert", $body, $headers);	
-					}
-				}					
+						//check new quantity to see if we need to send an email
+						$dt_item = $wpdb->get_row("SELECT * FROM " . WP_FOXYPRESS_INVENTORY_OPTIONS . " WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND option_code='" . mysql_escape_string($ProductCode) . "'");						
+						if($dt_item->option_quantity != null && $dt_item->option_quantity >= 0 && $dt_item->option_quantity < $QuantityAlertLevel)
+						{
+							//uh oh!
+							$headers = "From: " . get_settings("admin_email") . "\r\n";
+							$headers .= "Content-type: text/html\r\n"; 
+							$body = $dt_item->option_code . " is running low, " . $dt_item->option_quantity . " remain.  Please check your inventory by logging into your WordPress dashboard.";
+							mail(get_settings("admin_email"), get_bloginfo("name") . " - Quantity Alert", $body, $headers);	
+						}						
+					}	
+				}
+				else //standard product
+				{	
+					//update quantity 
+					$wpdb->query("UPDATE " . WP_INVENTORY_TABLE . " SET inventory_quantity = (inventory_quantity - " . $QuantityPurchased . ") WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND inventory_quantity != 'null'");
+					
+					if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0")
+					{
+						//check new quantity to see if we need to send an email
+						$dt_item = $wpdb->get_row("SELECT * FROM " . WP_INVENTORY_TABLE . " WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "'");
+						if($dt_item->inventory_quantity != null && $dt_item->inventory_quantity >= 0 && $dt_item->inventory_quantity < $QuantityAlertLevel)
+						{
+							//uh oh!
+							$headers = "From: " . get_settings("admin_email") . "\r\n";
+							$headers .= "Content-type: text/html\r\n"; 
+							$body = $dt_item->inventory_name . " is running low, " . $dt_item->inventory_quantity . " remain.  Please check your inventory by logging into your WordPress dashboard.";
+							mail(get_settings("admin_email"), get_bloginfo("name") . " - Quantity Alert", $body, $headers);	
+						}
+					}		
+				}				
 			}
 			else
 			{
