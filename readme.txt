@@ -6,7 +6,7 @@ Requires at least: 3.0
 Tested up to: 3.2.1
 Stable tag: 2.7.1
 
-FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart’s e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
+FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 
 == Description ==
 
@@ -18,15 +18,7 @@ Visit <a href="http://www.foxy-press.com" target="_blank">www.foxy-press.com</a>
 
 [vimeo http://vimeo.com/22047284]
 
-**A few of the FoxyPress Features:**
-* Sale pricing with optional date controls
-* Product variations and pricing flexibility
-* Product categories
-* Product attribute options
-* Inventory management
-* Digital Products
-
-FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum users' requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
+FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum user requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
 --Site credits--
 
