@@ -9,9 +9,9 @@ FoxyPress is a one stop shopping cart and management tool for use with FoxyCart'
 
 == Description ==
 
-FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
+FoxyPress is a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 
-FoxyPress was built to make the integration of FoxyCart and WordPress effortless. Flexible features make it easy for developers to quickly build their storefront. 
+FoxyPress was built to make the integration of FoxyCart and WordPress effortless and easy to understand. Our ever growing features and fantastic support make it easy to get your store up and running quickly!
 
 Visit <a href="http://www.foxy-press.com" target="_blank">www.foxy-press.com</a> for full documentation and instructions
 
