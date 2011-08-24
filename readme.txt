@@ -1,7 +1,7 @@
 === FoxyPress ===
 Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/contact
-Tags: foxycart, shopping, cart, inventory, management
+Tags: foxycart, shopping cart, inventory, products, e-commerce
 Requires at least: 3.0
 Tested up to: 3.2.1
 Stable tag: 2.7.1
