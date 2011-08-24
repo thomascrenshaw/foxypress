@@ -1,11 +1,10 @@
 === FoxyPress ===
 Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/contact
-Tags: foxycart, shopping cart, cart, inventory, products, e-commerce
+Tags: foxycart, shopping, cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 2.7.1
-
+Stable tag: 3.0.1
 FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 
 == Description ==
