@@ -5,7 +5,7 @@ Tags: foxycart, shopping, cart, inventory, management, ecommerce, selling, subsc
 Requires at least: 3.0
 Tested up to: 3.2.1
 Stable tag: 3.0.1
-FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
+FoxyPress is a one stop shopping cart and management tool for use with FoxyCart's hosted e-commerce solution.
 
 == Description ==
 
