@@ -189,7 +189,7 @@ function foxyprses_view_ordersByCode_report()
 						if($ProductCode == "" || $ProductCode == $td->product_code)
 						{
 							$Results .= "<tr>
-											<td>" . $fo->id . "</td>
+											<td><a href=\"" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $fo->id . "&b=" . $fo->foxy_blog_id . "&mode=detail\" target=\"_blank\">" . $fo->id . "</a></td>
 											<td>" . $td->product_code . "</td>
 											<td>" . $td->product_quantity . "</td>
 											<td>" . $fo->transaction_date . "</td>

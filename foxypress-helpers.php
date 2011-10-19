@@ -25,8 +25,8 @@ function foxypress_GetProduct($inventory_id)
 		$product['weight'] = get_post_meta($item->ID,'_weight',TRUE);
 		$product['weight2'] = get_post_meta($item->ID,'_weight2',TRUE);
 		$product['quantity'] = get_post_meta($item->ID,'_quantity',TRUE);
-		$product['quantity_max'] = get_post_meta($item->ID,'_quantity_min',TRUE);
-		$product['quantity_min'] = get_post_meta($item->ID,'_quantity_max',TRUE);	
+		$product['quantity_max'] = get_post_meta($item->ID,'_quantity_max',TRUE);
+		$product['quantity_min'] = get_post_meta($item->ID,'quantity_min',TRUE);	
 		$product['price'] = get_post_meta($item->ID,'_price',TRUE);
 		$featuredImageID = (has_post_thumbnail($item->ID)) ? get_post_thumbnail_id($item->ID) : 0;
 		if($featuredImageID != 0)
@@ -287,18 +287,12 @@ function foxypress_SearchProducts($search_term)
 	return null;   
 }
 
-function foxypress_GetProductFormStart($form_id = "foxypress_form")
-{
-	global $wpdb;
-	return "<form action=\"https://" . get_option('foxycart_storeurl') . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\" id=\"" . $form_id . "\">";
-}
-
 function foxypress_GetProductFormEnd()
 {
 	return "</form>";	
 }
 
-function foxypress_GetProductForm($inventory_id, $include_quantity_field = true)
+function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form", $include_quantity_field = true)
 {
 	global $wpdb, $post;
 	$form = "";
@@ -351,7 +345,9 @@ function foxypress_GetProductForm($inventory_id, $include_quantity_field = true)
 	$main_inventory_image = foxypress_GetMainInventoryImage($item->ID);
 
 	
-	$form  = ( 
+	$form  = "<form action=\"https://" . get_option('foxycart_storeurl') . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\" id=\"" . $form_id . "\">"
+			.
+			( 
 				($include_quantity_field)
 					? "<input type=\"hidden\" name=\"quantity\" value=\"1\" />"
 					: ""
@@ -408,7 +404,7 @@ function foxypress_GetProductForm($inventory_id, $include_quantity_field = true)
 					: "" 
 				)
 			  . foxypress_BuildAttributeForm($inventory_id);
-	
+
 	return $form;
 }	
 

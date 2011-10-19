@@ -4,6 +4,8 @@ add_action('init', 'foxypress_create_custom_post_type', 1);
 add_action('after_setup_theme','foxypress_setup_post_thumbnails', 999);
 add_action('manage_posts_custom_column', 'manage_custom_columns', 10, 2);
 add_filter('manage_edit-foxypress_product_columns', 'add_new_foxypress_product_columns');
+add_filter( 'manage_edit-foxypress_product_sortable_columns', 'foxypress_product_sortable_columns' );
+add_filter( 'request', 'foxypress_product_sortable_columns_orderby' );
 add_filter('post_updated_messages', 'foxypress_updated_messages');
 add_action('admin_init', 'foxypress_product_meta_init');
 add_action('before_delete_post', 'foxypress_delete_product');
@@ -80,6 +82,24 @@ function foxypress_delete_product($postid)
 	}
 }
 
+function foxypress_product_sortable_columns( $columns ) {
+
+	$columns['productcode'] = 'productcode';
+	$columns['id'] = 'id';
+	return $columns;
+}
+
+function foxypress_product_sortable_columns_orderby( $vars ) {
+	if ( isset( $vars['orderby'] ) && 'productcode' == $vars['orderby'] ) {
+		$vars = array_merge( $vars, array(
+			'meta_key' => '_code',
+			'orderby' => 'meta_value'
+		) );
+	}
+ 
+	return $vars;
+}
+
 function add_new_foxypress_product_columns($cols) 
 {
 	$new_columns['cb'] = '<input type="checkbox" />';
@@ -88,6 +108,7 @@ function add_new_foxypress_product_columns($cols)
 	$new_columns['description'] = __('Description');
 	$new_columns['productcode'] = __('Code');	
 	$new_columns['price'] = __('Price');
+	$new_columns['qty'] = __('Qty');
 	$new_columns['productimage'] = __('Image');	
 	$new_columns['date'] = __('Date');		
 	return $new_columns;
@@ -109,21 +130,27 @@ function manage_custom_columns($column_name, $id)
 			$productcode = get_post_meta($id, "_code", true);
 			echo ($productcode ? $productcode : 'n/a');			
 			break;
+		case 'qty':
+			$qty = get_post_meta($id, "_quantity", true);
+			if($qty!=""){
+				echo ($qty ? $qty : 'sold out');			
+			}else{
+				echo ($qty ? $qty : 'not set');
+			}
+			break;
 		case 'price':
 			$salestartdate = get_post_meta($id,'_salestartdate',TRUE);
 			$saleenddate = get_post_meta($id,'_saleenddate',TRUE);
 			$originalprice = get_post_meta($id,'_price', true);
 			$saleprice = get_post_meta($id,'_saleprice', true);	
-			if ($saleprice > 0) {
-				$beginningOK = (strtotime("now") > $salestartdate);
-				$endingOK = (strtotime("now") < ($saleenddate + 86400) || $saleenddate == 0);
-				if ($beginningOK && $endingOK || ($salestartdate == 0 && $saleenddate == 0)) {
-					echo '<span style="text-decoration: line-through; margin-right: 10px;">' . foxypress_FormatCurrency($originalprice) . '</span><span style="color: red;">' . foxypress_FormatCurrency($saleprice) . '</span>';
-				} else {
-					echo foxypress_FormatCurrency($originalprice);
-				}
-			} else {
+			$actualprice = foxypress_GetActualPrice($originalprice, $saleprice, $salestartdate, $saleenddate);
+			if($actualprice == $originalprice)
+			{
 				echo foxypress_FormatCurrency($originalprice);
+			}
+			else
+			{
+				echo "<span class=\"price_strike\">" . foxypress_FormatCurrency($originalprice) . "</span> <span class=\"price_sale\">" . foxypress_FormatCurrency($saleprice) . "</span>";
 			}
 			break;
 		case 'productimage':			
@@ -221,6 +248,7 @@ function foxypress_product_categories_setup()
 	
 	// Grab all the categories and list them
 	$cats = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories" );
+	$i=0;
 	foreach( $cats as $cat )
 	{
 		$checked="";
@@ -228,7 +256,9 @@ function foxypress_product_categories_setup()
 		{
 			$checked = "checked=\"checked\"";
 		}
+		if($i==0){$checked = "checked=\"checked\"";}
 		echo("<input type=\"checkbox\" name=\"foxy_categories[]\" value=\"" . $cat->category_id . "\" " . $checked. " /> " . stripslashes($cat->category_name) . "<br/>");
+		$i+=1;
 	}			
 ?>
 	<script type="text/javascript" language="javascript">

@@ -143,10 +143,8 @@ else
 							if($dt_item->option_quantity != null && $dt_item->option_quantity >= 0 && $dt_item->option_quantity < $QuantityAlertLevel)
 							{
 								//uh oh!
-								$headers = "From: " . get_settings("admin_email") . "\r\n";
-								$headers .= "Content-type: text/html\r\n"; 
 								$body = $dt_item->option_code . " is running low, " . $dt_item->option_quantity . " remain.  Please check your inventory by logging into your WordPress dashboard.";
-								mail(get_settings("admin_email"), get_bloginfo("name") . " - Quantity Alert", $body, $headers);	
+								foxypress_Mail($tRow->foxy_transaction_email, get_bloginfo("name") . " - Quantity Alert", $body);								
 							}						
 						}	
 					}
@@ -163,10 +161,8 @@ else
 							if($inventory_quantity != null && $inventory_quantity >= 0 && $inventory_quantity < $QuantityAlertLevel)
 							{
 								//uh oh!
-								$headers = "From: " . get_settings("admin_email") . "\r\n";
-								$headers .= "Content-type: text/html\r\n"; 
 								$body = $inventory_name . " is running low, " . $inventory_quantity . " remain.  Please check your inventory by logging into your WordPress dashboard.";
-								mail(get_settings("admin_email"), get_bloginfo("name") . " - Quantity Alert", $body, $headers);	
+								foxypress_Mail(get_settings("admin_email"), get_bloginfo("name") . " - Quantity Alert", $body);
 							}
 						}		
 					}		
@@ -203,9 +199,7 @@ else
 					$body .= "<a href=\"" . $d . "\" target=\"_blank\">" . $d . "</a> <br /><br />";	
 				}
 				//email customer
-				$headers = "From: " . get_settings("admin_email") . "\r\n";
-				$headers .= "Content-type: text/html\r\n"; 
-				mail($Email, get_bloginfo("name") . " - Digital Downloads", $body, $headers);			
+				foxypress_Mail($Email, get_bloginfo("name") . " - Digital Downloads", $body);	
 			}		
 
 			//if we have a mult-site, we need to restore the blog

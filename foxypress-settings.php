@@ -20,8 +20,10 @@ function foxypress_settings_postback()
 		update_option("foxycart_apikey", foxypress_FixPostVar('foxycart_apikey'));
 		update_option("foxycart_storeversion", foxypress_FixPostVar('foxycart_storeversion'));
 		update_option("foxycart_include_jquery", foxypress_FixPostVar('foxycart_include_jquery'));
+		update_option("foxypress_include_default_stylesheet", foxypress_FixPostVar('foxypress_include_default_stylesheet'));		
 		update_option("foxypress_image_mode", foxypress_FixPostVar('foxypress_image_mode'));		
 		update_option("foxypress_uninstall_keep_products", foxypress_FixPostVar('foxypress_uninstall_keep_products'));
+		update_option("foxycart_hmac", foxypress_FixPostVar('foxycart_hmac'));
 		update_option("foxycart_enable_multiship", foxypress_FixPostVar('foxycart_enable_multiship'));
 		update_option("foxycart_show_dashboard_widget", foxypress_FixPostVar('foxycart_show_dashboard_widget'));
 		update_option("foxypress_max_downloads", foxypress_FixPostVar('foxypress_max_downloads'));
@@ -30,6 +32,13 @@ function foxypress_settings_postback()
 		update_option("foxycart_currency_locale", foxypress_FixPostVar('foxycart_currency_locale'));
 		update_option("foxypress_inactive_message", foxypress_FixPostVar('foxypress_inactive_message'));
 		update_option("foxypress_out_of_stock_message", foxypress_FixPostVar('foxypress_out_of_stock_message'));
+		update_option("foxypress_packing_slip_header", foxypress_FixPostVar('foxypress_packing_slip_header'));
+		update_option("foxypress_packing_slip_footer_message", foxypress_FixPostVar('foxypress_packing_slip_footer_message'));
+		update_option("foxypress_smtp_host", foxypress_FixPostVar('foxypress_smtp_host'));
+		update_option("foxypress_secure_port", foxypress_FixPostVar('foxypress_secure_port'));
+		update_option("foxypress_email_username", foxypress_FixPostVar('foxypress_email_username'));
+		update_option("foxypress_email_password", foxypress_FixPostVar('foxypress_email_password'));
+		
 
 		if(function_exists('is_multisite') && is_multisite())
 		{
@@ -174,10 +183,13 @@ function foxypress_settings_page_load()
                 <tr valign="top">
                     <td align="right" valign="top" nowrap  class="title">Include jQuery</td>
                     <td align="left">
-                    <?php
-                        $includejq = get_option('foxycart_include_jquery');
-                    ?>
-                        <input type="checkbox" name="foxycart_include_jquery" value="1" <?php echo((($includejq == "1") ? "checked=\"checked\"" : "")) ?> /> *We will automatically include a reference to jQuery
+                        <input type="checkbox" name="foxycart_include_jquery" value="1" <?php echo(((get_option('foxycart_include_jquery') == "1") ? "checked=\"checked\"" : "")) ?> /> *We will automatically include a reference to jQuery
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <td align="right" valign="top" nowrap  class="title">Include Default Style Sheet</td>
+                    <td align="left">
+                        <input type="checkbox" name="foxypress_include_default_stylesheet" value="1" <?php echo(((get_option('foxypress_include_default_stylesheet') == "1") ? "checked=\"checked\"" : "")) ?> /> *We will automatically include a reference to the default FoxyPress stylesheet
                     </td>
                 </tr>
                 <tr valign="top">
@@ -226,6 +238,12 @@ function foxypress_settings_page_load()
         </div>		
         <div class="settings_inside">
             <table>
+            	<tr valign="top">
+                    <td align="right" valign="top" nowrap class="title">Enable Cart Validation</td>
+                    <td align="left">                                
+                        <input type="checkbox" name="foxycart_hmac" value="1" <?php echo(((get_option('foxycart_hmac') == "1") ? "checked=\"checked\"" : "")) ?> /> *If you want to take advantage of cart validation, you must enable the cart validation feature in the FoxyCart admin panel under Store->Advanced.
+                    </td>
+                </tr>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title">Enable Multi-Ship</td>
                     <td align="left">                                
@@ -282,11 +300,35 @@ function foxypress_settings_page_load()
                         <input type="checkbox" name="foxypress_main_blog" value="1" <?php echo(((get_option('foxypress_main_blog') == "1") ? "checked=\"checked\"" : "")) ?> /> *If you mark this as your main site, you will be able to see orders from all of your sub-sites.
                     </td>
                 </tr>
-                <? } ?>
+                <? } ?>                
             </table>
         </div>
     </div>
      
+	<div id="" class="settings_widefat">
+        <div class="settings_head custom">
+            Packing Slip Wizard Settings
+        </div>		
+        <div class="settings_inside">
+            <table>  
+                <tr valign="top">
+                    <td align="right" valign="top" nowrap>Header Image</td>
+                    <td align="left">
+                        <input type="text" name="foxypress_packing_slip_header" size="125" value="<?php echo(get_option('foxypress_packing_slip_header')); ?>" /> <br />
+                        *If you would like a custom header image on your packing slip, use the media library to upload an image and set the url here.
+                    </td>
+                </tr>   
+				<tr valign="top">
+                    <td align="right" valign="top" nowrap>Default Footer Message</td>
+                    <td align="left">
+                        <textarea name="foxypress_packing_slip_footer_message" cols="75" rows="3"><?php echo(get_option('foxypress_packing_slip_footer_message')); ?></textarea> <br />
+                        *A custom message can be generated for the footer of packing slips.  Set a default here so you don't have to type it each time if you'd prefer.
+                    </td>
+                </tr>                
+            </table>
+        </div>
+    </div>
+
     <div id="" class="settings_widefat">
         <div class="settings_head custom">
             Custom Instructions
@@ -307,6 +349,45 @@ function foxypress_settings_page_load()
                         *Foxypress will show this message instead of the default unavailable message
                     </td>
                 </tr>                   
+            </table>
+        </div>
+    </div>
+
+	<div id="" class="settings_widefat">
+        <div class="settings_head custom">
+            SMTP Mail Settings
+        </div>		
+        <div class="settings_inside">
+			<p>Should you need to configure SMTP settings for secure mail through your webhost, we've allowed you to define these values below.  Keep in mind that these settings are only for mail going out of FoxyPress <i>(order management)</i>.  It will not change your overall WordPress mail() functionality.</p>
+            <table>  
+                <tr>
+                    <td align="right" valign="top" nowrap class="title">SMTP Host</td>
+                    <td align="left">
+                        <input type="text" name="foxypress_smtp_host" value="<?php echo(get_option("foxypress_smtp_host")) ?>"  size="50" /><br />
+                        <i>*your smtp host here</i>
+                    </td>
+                </tr>  
+                 <tr>
+                    <td align="right" valign="top" nowrap>Secure Port (optional)</td>
+                    <td align="left">
+                        <input type="text" name="foxypress_secure_port" value="<?php echo(get_option("foxypress_secure_port")) ?>" size="50" /><br />
+                        <i>*465</i>
+                    </td>
+                </tr>       
+			 	<tr>
+                    <td align="right" valign="top" nowrap>Email Username</td>
+                    <td align="left">
+                        <input type="text" name="foxypress_email_username" value="<?php echo(get_option("foxypress_email_username")) ?>" size="50" /><br />
+                        <i>*your full email here</i>
+                    </td>
+                </tr>    
+				 <tr>
+                    <td align="right" valign="top" nowrap>Email Password</td>
+                    <td align="left">
+                        <input type="text" name="foxypress_email_password" value="<?php echo(get_option("foxypress_email_password")) ?>" size="50" /><br />
+                        <i>*your email password here</i>
+                    </td>
+                </tr>                
             </table>
         </div>
     </div>
@@ -358,7 +439,8 @@ function foxypress_settings_page_load()
             <img src="<?php echo(plugins_url())?>/foxypress/img/logo.png" />
 			<div id="wizard_success">
                 <p class="submit">
-                    <input type="submit" class="button-primary" id="btnFoxyPressSettingsSaveWizard" name="btnFoxyPressSettingsSaveWizard" value="<?php _e('Save Settings') ?>" /></p>
+                    <input type="submit" class="button-primary" id="btnFoxyPressSettingsSaveWizard" name="btnFoxyPressSettingsSaveWizard" value="<?php _e('Save Settings') ?>" />
+				</p>
                  <p>That is all! We have additional settings available, but these are the core things you should have setup before doing anything else.</p>
                  <p>Now lets get Foxy!</p>
             </div>

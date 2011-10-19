@@ -232,8 +232,10 @@ table.product_options{margin-bottom:10px;}
 .settings_widefat td.title {width: 200px; text-align:right; }
 .collapse { padding-left: 15px;padding-bottom:15px; }
 #sortable { list-style-type: none; margin: 0; padding: 0; width: 90%; }
-#sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; min-height: 18px; background:none; }
-#sortable li div { position: absolute; margin-left: -1.3em; }
+#sortable li { margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1.4em; min-height: 18px; background:#F7F7F7; }
+#sortable li a{color:#000;}
+#sortable li div { position: absolute; margin-left: -1.3em; color:#000;}
+#sortable li div.ui-icon { background-image: url("smoothness/images/ui-icons_888888_256x240.png");}
 #sortable li div.collapse { position: relative; }
 .expand a {
   display:block;
@@ -242,6 +244,7 @@ table.product_options{margin-bottom:10px;}
   background-image:url(../img/arrow-down.gif);
   background-repeat:no-repeat;
   background-position:98% 50%;
+
 }
 .expand a:hover, .expand a:active, .expand a:focus {
   text-decoration:underline
@@ -249,6 +252,8 @@ table.product_options{margin-bottom:10px;}
 .expand a.open:link, .expand a.open:visited {
   background: url(../img/arrow-up.gif) no-repeat 98% 50%
 }
+
+span.expand a{color:red;}
 
 div.subhead{
     font-family: Georgia,"Times New Roman","Bitstream Charter",Times,serif;
@@ -258,4 +263,59 @@ div.subhead{
     margin: 0;
     padding: 10px 0px 10px 0px;
 	
+}
+
+/** ORDER MANAGEMENT **/
+th.small-column{
+	width:50px;	
+}
+th.medium-column{
+	width:100px;	
+}
+
+/** PACKING WIZARD **/
+#packing_wizard_container{
+	margin: 0;
+	width: 700px;
+}
+#packing_wizard_container ul{
+	list-style: none;
+	list-style-position: outside;
+}
+#packing_wizard_container ul.packing_wizard_menu li{
+	float: left;
+	margin-right: 5px;
+	margin-bottom: -1px;
+}
+#packing_wizard_container ul.packing_wizard_menu li{
+	font-weight: 700;
+	display: block;
+	padding: 5px 10px 5px 10px;
+	background: #efefef;
+	margin-bottom: -1px;
+	border: 1px solid #d0ccc9;
+	border-width: 1px 1px 1px 1px;
+	position: relative;
+	color: #898989;
+	cursor: pointer;
+}
+#packing_wizard_container ul.packing_wizard_menu li.active{
+	background: #fff;
+	top: 1px;
+	border-bottom: 0;
+	color: #DF0011;
+}
+p.label{margin-bottom:0px;font-weight:bold;}
+textarea.message_notes{
+	width:500px;
+	height:100px;
+}
+
+.price_strike
+{
+	text-decoration:line-through;
+}
+.price_sale
+{
+	color:red;
 }

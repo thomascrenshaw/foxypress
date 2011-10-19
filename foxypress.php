@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.3
+Version: 0.3.4
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -42,7 +42,7 @@ Thanks and enjoy this plugin!
 
 register_activation_hook( __FILE__ , 'foxypress_activate');
 register_deactivation_hook( __FILE__ , 'foxypress_deactivate');
-global $foxypress_url; 
+global $foxypress_url;
 $foxypress_url = get_option('foxycart_storeurl');
 
 //init
@@ -59,20 +59,20 @@ if ( !empty ( $foxypress_url ) ){
 	add_shortcode('foxypress', 'foxypress_shortcode');
 	add_action('widgets_init', 'foxypress_load_minicart' );
 }
-if(get_option('foxycart_enable_sso') == "1") 
+if(get_option('foxycart_enable_sso') == "1")
 {
 	add_action('profile_update', 'foxypress_UpdateUser');
 	add_action('password_reset', 'foxypress_PasswordReset');
 }
-if (function_exists('is_multisite') && is_multisite()) 
-{ 
-	if(get_option('foxycart_enable_sso') == "1") { add_action('wpmu_new_user', 'foxypress_RegisterUser'); }	
+if (function_exists('is_multisite') && is_multisite())
+{
+	if(get_option('foxycart_enable_sso') == "1") { add_action('wpmu_new_user', 'foxypress_RegisterUser'); }
 	add_action('wpmu_new_blog', 'foxypress_InstallBlog');
 	add_action('delete_blog', 'foxypress_UninstallBlog');
 }
 else
 {
-	if(get_option('foxycart_enable_sso') == "1") { add_action('user_register', 'foxypress_RegisterUser'); }	
+	if(get_option('foxycart_enable_sso') == "1") { add_action('user_register', 'foxypress_RegisterUser'); }
 }
 $foxypress_locale = get_option('foxycart_currency_locale');
 setlocale(LC_MONETARY, ($foxypress_locale != "") ? $foxypress_locale  : get_locale());
@@ -87,19 +87,23 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.3");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.4");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
-	
+
 	include_once('foxypress-helpers.php');
 	include_once('foxypress-redirect.php');
-	include_once('inventory-option-groups.php');	
+	include_once('inventory-option-groups.php');
 	include_once('inventory-category.php');
 	include_once('reports.php');
-	include_once('status-management.php');	
+	include_once('status-management.php');
 	include_once('subscriptions.php');
-	include_once('import-export.php');	
-	include_once('order-management.php');		
+	include_once('import-export.php');
+	include_once('order-management.php');
+	require_once "Mail.php";
+	require_once('classes/foxycart.cart_validation.php');
+	FoxyCart_Helper::$cart_url = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/cart";
+	FoxyCart_Helper::$secret = get_option('foxycart_apikey');
 }
 
 if(get_option("foxycart_show_dashboard_widget") == "1")
@@ -107,14 +111,14 @@ if(get_option("foxycart_show_dashboard_widget") == "1")
 	add_action('wp_dashboard_setup', 'foxypress_DashboardSetup');
 }
 
-function foxypress_menu() 
+function foxypress_menu()
 {
-	global $foxypress_url; 
+	global $foxypress_url;
 	if ( !empty ( $foxypress_url  ) )
 	{
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Option Groups'), __('Manage Option Groups'), 'manage_options', 'inventory-option-groups', 'foxypress_inventory_option_groups_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Categories'), __('Manage Categories'), 'manage_options', 'inventory-category', 'foxypress_inventory_category_page_load');
-		 add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Order Management'), __('Order Management'), 'manage_options', 'order-management', 'order_management_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Order Management'), __('Order Management'), 'manage_options', 'order-management', 'order_management_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Reports'), __('Reports'), 'manage_options', 'reports', 'foxypress_reports_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Status Management'), __('Status Management'), 'manage_options', 'status-management', 'status_management_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Subscriptions'), __('Subscriptions'), 'manage_options', 'subscriptions', 'foxypress_subscriptions_page_load');
@@ -123,16 +127,16 @@ function foxypress_menu()
 	add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Settings'), __('Settings'), 'manage_options', 'foxypress-settings', 'foxypress_settings_page_load');
 }
 
-function foxypress_save_meta_data($post_id, $fieldname, $input) 
+function foxypress_save_meta_data($post_id, $fieldname, $input)
 {
-	$current_data = get_post_meta($post_id, $fieldname, TRUE);	
+	$current_data = get_post_meta($post_id, $fieldname, TRUE);
  	$new_data = $input;
  	if ($new_data == "") $new_data = NULL;
-	if (!is_null($current_data)) 
+	if (!is_null($current_data))
 	{
 		if (is_null($new_data)) delete_post_meta($post_id,$fieldname);
 		else update_post_meta($post_id,$fieldname,$new_data);
-	} 
+	}
 	elseif (!is_null($new_data)) {
 		add_post_meta($post_id,$fieldname,$new_data);
 	}
@@ -157,8 +161,8 @@ function foxypress_FlushRewrites()
 
 function foxypress_admin_css()
 {
-	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css\">"); 
 	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() .  "/foxypress/css/smoothness/jquery-ui-1.8.11.custom.css\">");
+	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css\">");
 }
 
 function foxypress_admin_js()
@@ -244,6 +248,53 @@ function foxypress_GetEditorPluginURL($type) {
 	}
 }
 
+function foxypress_Mail($mail_to, $mail_subject, $mail_body)
+{
+	if(get_option("foxypress_smtp_host")!='' && get_option("foxypress_email_username")!='' && get_option("foxypress_email_password")!=''){
+		$from = get_option("foxypress_email_username");
+		$to = $mail_to;
+		$subject = $mail_subject;
+
+		$host = get_option("foxypress_smtp_host");
+		$username = get_option("foxypress_email_username");
+		$password = get_option("foxypress_email_password");
+
+		$headers = array ('From' => $from,
+			   'To' => $to,
+			   'Subject' => $subject,
+				'MIME-Version' => '1.0',
+				'Content-type' => 'text/html;charset=iso-8859-1');
+		//check if they are using a port or not for secure mail
+		if(get_option("foxypress_secure_port")!=''){
+			$port = get_option("foxypress_secure_port");
+			 $smtp = Mail::factory('smtp',
+			   array ('host' => $host,
+			     'port' => $port,
+			     'auth' => true,
+			     'username' => $username,
+			     'password' => $password));
+		}else{
+			 $smtp = Mail::factory('smtp',
+			   array ('host' => $host,
+			     'username' => $username,
+			     'password' => $password));
+		}
+		//send email to customer
+		$mail = $smtp->send($to, $headers, $mail_body);
+		if (PEAR::isError($mail)) {
+		  $emailSent=$mail->getMessage();
+		} else {
+		  $emailSent="Your status message has been sent.";
+		}
+	}else{
+		//send email to customer
+		$headers = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
+		$headers .= 'From: <' . get_settings("admin_email ") . '>' . "\r\n";
+		mail($mail_to,$subject,$mail_body,$headers);
+	}
+}
+
 function foxypress_GetCurrencySymbol()
 {
 	return substr(foxypress_FormatCurrency(0), 0, 1);
@@ -279,20 +330,20 @@ function foxypress_handle_search_module()
 								<input type=\"submit\" id=\"foxy_search_submit\" name=\"foxy_search_submit\" value=\"Search\" />
 							</div>
 					   </form>
-				   </div>";	
+				   </div>";
 	$search_results = "";
 	if($current_search_term != "")
 	{
-		//do search		
+		//do search
 		$searchSQL = "SELECT i.* FROM " . $wpdb->prefix ."posts as i
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																	and pm_active.meta_key = '_item_active'
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																				and pm_start_date.meta_key = '_item_start_date'	
+																				and pm_start_date.meta_key = '_item_start_date'
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																				and pm_end_date.meta_key = '_item_end_date'	
+																				and pm_end_date.meta_key = '_item_end_date'
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_code on i.ID = pm_code.post_ID
-																				and pm_code.meta_key = '_code'													
+																				and pm_code.meta_key = '_code'
 						WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 							AND i.post_status = 'publish'
 							AND pm_active.meta_value = '1'
@@ -307,11 +358,11 @@ function foxypress_handle_search_module()
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																	and pm_active.meta_key = '_item_active'
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																				and pm_start_date.meta_key = '_item_start_date'	
+																				and pm_start_date.meta_key = '_item_start_date'
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																				and pm_end_date.meta_key = '_item_end_date'	
+																				and pm_end_date.meta_key = '_item_end_date'
 						LEFT JOIN " . $wpdb->prefix . "postmeta as pm_code on i.ID = pm_code.post_ID
-																				and pm_code.meta_key = '_code'													
+																				and pm_code.meta_key = '_code'
 						WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 							AND i.post_status = 'publish'
 							AND pm_active.meta_value = '1'
@@ -324,9 +375,9 @@ function foxypress_handle_search_module()
 		$results = $wpdb->get_results($searchSQL);
 		if(!empty($results))
 		{
-			$search_results = "<div class=\"search_results\">";			
+			$search_results = "<div class=\"search_results\">";
 			foreach($results as $item)
-			{	
+			{
 				$search_results .= "<div class=\"search_result_item\">
 										<a href=\"" . foxypress_get_product_url($item->ID) . "\">" . $item->post_title . "</a>
 								    </div>";
@@ -345,13 +396,13 @@ function foxypress_get_product_url($ID)
 	$url = "";
 	if($hasPermalinks)
 	{
-		$url = get_bloginfo("url") . '/products/' . $myPost->post_name;	
+		$url = get_bloginfo("url") . '/products/' . $myPost->post_name;
 	}
 	else
 	{
 		$url =  get_bloginfo("url") . "?" . FOXYPRESS_CUSTOM_POST_TYPE . "=" . $myPost->post_name;
 	}
-	return $url;	
+	return $url;
 }
 
 function foxypress_handle_tracking_module()
@@ -421,15 +472,15 @@ function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=
 	}
 	$drRows = $wpdb->get_row("SELECT count(i.ID) as RowCount
 								FROM " . $wpdb->prefix . "posts as i
-								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic on i.ID=ic.inventory_id 
+								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic on i.ID=ic.inventory_id
 																						and ic.category_id = '" .  $CategoryID . "'
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																						and pm_start_date.meta_key = '_item_start_date'	
+																						and pm_start_date.meta_key = '_item_start_date'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																						and pm_end_date.meta_key = '_item_end_date'													
+																						and pm_end_date.meta_key = '_item_end_date'
 								WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 									AND i.post_status = 'publish'
 									AND pm_active.meta_value = '1'
@@ -440,15 +491,15 @@ function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=
 	//get all items within this category. format the result set somehow
 	$items = $wpdb->get_results("SELECT i.*
 								FROM " . $wpdb->prefix . "posts as i
-								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic ON i.ID=ic.inventory_id 
+								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic ON i.ID=ic.inventory_id
 																								and ic.category_id = '" .  $CategoryID . "'
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																						and pm_start_date.meta_key = '_item_start_date'	
+																						and pm_start_date.meta_key = '_item_start_date'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																						and pm_end_date.meta_key = '_item_end_date'	
+																						and pm_end_date.meta_key = '_item_end_date'
 								WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 									AND i.post_status = 'publish'
 									AND pm_active.meta_value = '1'
@@ -503,7 +554,7 @@ function foxypress_GetMainInventoryImage($inventory_id)
 		$current_images = get_posts(array('numberposts' => 1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
 		if(!empty($current_images))
 		{
-			foreach ($current_images as $img) 
+			foreach ($current_images as $img)
 			{
 				$src = wp_get_attachment_image_src($img->ID, "full");
 				return $src[0];
@@ -542,14 +593,14 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 											FROM " . $wpdb->prefix . "foxypress_inventory_to_category
 											GROUP BY inventory_id) as ic on i.ID = ic.inventory_id
 							INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id
-							LEFT JOIN " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id 
+							LEFT JOIN " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id
 																									and d.status = 1
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																					and pm_start_date.meta_key = '_item_start_date'	
+																					and pm_start_date.meta_key = '_item_start_date'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																					and pm_end_date.meta_key = '_item_end_date'													
+																					and pm_end_date.meta_key = '_item_end_date'
 							WHERE i.ID = '" . $InventoryID . "'
 								AND i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 								AND i.post_status = 'publish'
@@ -560,7 +611,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 		return $UnavailableMessage;
 	}
 	//get product information from post meta
-	$ItemImage = foxypress_GetMainInventoryImage($item->ID);	
+	$ItemImage = foxypress_GetMainInventoryImage($item->ID);
 	$_code = get_post_meta($item->ID,'_code',TRUE);
 	$_name = $item->post_title;
 	$_description = $item->post_content;
@@ -568,8 +619,8 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 	$_weight2 = get_post_meta($item->ID,'_weight2',TRUE);
 	$_quantity = get_post_meta($item->ID,'_quantity',TRUE);
 	$_quantity_min = get_post_meta($item->ID,'_quantity_min',TRUE);
-	$_quantity_max = get_post_meta($item->ID,'_quantity_max',TRUE);	
-	$_price = get_post_meta($item->ID,'_price',TRUE);	
+	$_quantity_max = get_post_meta($item->ID,'_quantity_max',TRUE);
+	$_price = get_post_meta($item->ID,'_price',TRUE);
 	$_sale_price = get_post_meta($item->ID,'_saleprice',TRUE);
 	$_sale_start = get_post_meta($item->ID,'_salestartdate',TRUE);
 	$_sale_end = get_post_meta($item->ID,'_saleenddate',TRUE);
@@ -609,10 +660,10 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 	{
 		$MoreDetail = "<div class=\"foxypress_item_readmore" . $CssSuffix . "\"><a href=\"" . foxypress_get_product_url($item->ID) . "\">Read More</a></div>";
 	}
-	
+
 	if($ShowAddToCart)
 	{
-		$FormID = "foxypress_form_" . foxypress_GenerateRandomString(8);		
+		$FormID = "foxypress_form_" . foxypress_GenerateRandomString(8);
 		$ItemImages = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
 		if(!empty($ItemImages) && count($ItemImages) > 1)
 		{
@@ -632,12 +683,12 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 				else
 				{
 					$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $FeaturedImage . "');\" ><img src=\"" . $FeaturedImage . "\" /></a></li>";
-				}		
-			}			
+				}
+			}
 			//loop through all the images
 			foreach($ItemImages as $ii)
 			{
-				$temp_src = wp_get_attachment_image_src($ii->ID, "full");	
+				$temp_src = wp_get_attachment_image_src($ii->ID, "full");
 				//make sure were not repeating the featured image
 				if($FeaturedImage != $temp_src[0])
 				{
@@ -652,7 +703,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 					else
 					{
 						$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $temp_src[0] . "');\" ><img src=\"" . $temp_src[0] . "\" /></a></li>";
-					}	
+					}
 				}
 			}
 			$ItemThumbs .= "</ul>";
@@ -670,7 +721,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 			}
 			else
 			{
-				$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />"; 
+				$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
 			}
 			$ImageOutput = ($ItemImage != "") //if we have an image show it, else show default
 							? ($ItemThumbs == "") //if we have no thumbs, make the main image clickable, else just <img>
@@ -679,7 +730,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 							: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
 		}
 		$ImageOutput = "<div class=\"foxypress_item_image" . $CssSuffix . "\">" . $ImageOutput . $ItemThumbs . "</div>";
-		
+
 		//show item
 		$Output = "<div class=\"foxy_item_wrapper" . $CssSuffix . "\">
 				   		<div class=\"foxypress_item_content_wrapper" . $CssSuffix . "\">
@@ -700,45 +751,45 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 								<input type=\"hidden\" name=\"h:blog_id\" value=\"" . $wpdb->blogid . "\" />"
 								 .
 									( (get_option('foxypress_include_memberid') == "1")
-										? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />" 
+										? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />"
 										: ""
 									)
 								 .
-									foxypress_GetMinMaxFormFields($item->downloadable_id, $_quantity_min, $_quantity_max, $_quantity) 
+									foxypress_GetMinMaxFormFields($item->downloadable_id, $_quantity_min, $_quantity_max, $_quantity)
 								 .
-								 	( ($_discount_quantity_amount != "") 
-										? "<input type=\"hidden\" name=\"discount_quantity_amount\" value=\"" . stripslashes($_discount_quantity_amount) . "\" />" 
-										: "" 
-									)									 
-								 .
-								 	( ($_discount_quantity_percentage != "") 
-										? "<input type=\"hidden\" name=\"discount_quantity_percentage\" value=\"" . stripslashes($_discount_quantity_percentage) . "\" />" 
-										: "" 
-									)	
-								 .
-								 	( ($_discount_price_amount != "") 
-										? "<input type=\"hidden\" name=\"discount_price_amount\" value=\"" . stripslashes($_discount_price_amount) . "\" />" 
-										: "" 
-									)	
-								 .
-								 	( ($_discount_price_percentage != "") 
-										? "<input type=\"hidden\" name=\"discount_price_percentage\" value=\"" . stripslashes($_discount_price_percentage) . "\" />" 
-										: "" 
-									)	
-								 .
-								 	( ($_sub_frequency != "") 
-										? "<input type=\"hidden\" name=\"sub_frequency\" value=\"" . stripslashes($_sub_frequency) . "\" />" 
-										: "" 
-									)								 
-								 .
-								 	( ($_sub_startdate != "") 
-										? "<input type=\"hidden\" name=\"sub_startdate\" value=\"" . stripslashes($_sub_startdate) . "\" />" 
-										: "" 
+								 	( ($_discount_quantity_amount != "")
+										? "<input type=\"hidden\" name=\"discount_quantity_amount\" value=\"" . stripslashes($_discount_quantity_amount) . "\" />"
+										: ""
 									)
 								 .
-								 	( ($_sub_enddate != "") 
-										? "<input type=\"hidden\" name=\"sub_enddate\" value=\"" . stripslashes($_sub_enddate) . "\" />" 
-										: "" 
+								 	( ($_discount_quantity_percentage != "")
+										? "<input type=\"hidden\" name=\"discount_quantity_percentage\" value=\"" . stripslashes($_discount_quantity_percentage) . "\" />"
+										: ""
+									)
+								 .
+								 	( ($_discount_price_amount != "")
+										? "<input type=\"hidden\" name=\"discount_price_amount\" value=\"" . stripslashes($_discount_price_amount) . "\" />"
+										: ""
+									)
+								 .
+								 	( ($_discount_price_percentage != "")
+										? "<input type=\"hidden\" name=\"discount_price_percentage\" value=\"" . stripslashes($_discount_price_percentage) . "\" />"
+										: ""
+									)
+								 .
+								 	( ($_sub_frequency != "")
+										? "<input type=\"hidden\" name=\"sub_frequency\" value=\"" . stripslashes($_sub_frequency) . "\" />"
+										: ""
+									)
+								 .
+								 	( ($_sub_startdate != "")
+										? "<input type=\"hidden\" name=\"sub_startdate\" value=\"" . stripslashes($_sub_startdate) . "\" />"
+										: ""
+									)
+								 .
+								 	( ($_sub_enddate != "")
+										? "<input type=\"hidden\" name=\"sub_enddate\" value=\"" . stripslashes($_sub_enddate) . "\" />"
+										: ""
 									)
 								 .
 									foxypress_BuildAttributeForm($InventoryID)
@@ -828,21 +879,21 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	$Output = "";
 	$ImageOutput = "";
 	$item = $wpdb->get_row("SELECT i.*
-									,c.category_name									
+									,c.category_name
 									,d.downloadable_id
 							FROM " . $wpdb->prefix . "posts as i
 							INNER JOIN (SELECT min( itc_id ) AS itc_id, inventory_id, category_id
 											FROM " . $wpdb->prefix . "foxypress_inventory_to_category
 											GROUP BY inventory_id) as ic on i.ID = ic.inventory_id
-							INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id							
-							LEFT JOIN " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id 
+							INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id
+							LEFT JOIN " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id
 																								and d.status = 1
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																					and pm_start_date.meta_key = '_item_start_date'	
+																					and pm_start_date.meta_key = '_item_start_date'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																					and pm_end_date.meta_key = '_item_end_date'													
+																					and pm_end_date.meta_key = '_item_end_date'
 							WHERE (i.ID = '" . mysql_escape_string($inventory_id) . "')
 								AND i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 								AND i.post_status = 'publish'
@@ -851,9 +902,9 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 							");
 	if(empty($item)){ return $UnavailableMessage; }
 	//else set up item
-		
-	//get product information from post meta	
-	$ItemImage = foxypress_GetMainInventoryImage($item->ID);	
+
+	//get product information from post meta
+	$ItemImage = foxypress_GetMainInventoryImage($item->ID);
 	$_code = get_post_meta($item->ID,'_code',TRUE);
 	$_name = $item->post_title;
 	$_description = $item->post_content;
@@ -861,8 +912,8 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	$_weight2 = get_post_meta($item->ID,'_weight2',TRUE);
 	$_quantity = get_post_meta($item->ID,'_quantity',TRUE);
 	$_quantity_min = get_post_meta($item->ID,'_quantity_min',TRUE);
-	$_quantity_max = get_post_meta($item->ID,'_quantity_max',TRUE);	
-	$_price = get_post_meta($item->ID,'_price',TRUE);	
+	$_quantity_max = get_post_meta($item->ID,'_quantity_max',TRUE);
+	$_price = get_post_meta($item->ID,'_price',TRUE);
 	$_sale_price = get_post_meta($item->ID,'_saleprice',TRUE);
 	$_sale_start = get_post_meta($item->ID,'_salestartdate',TRUE);
 	$_sale_end = get_post_meta($item->ID,'_saleenddate',TRUE);
@@ -875,7 +926,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	$_active = get_post_meta($item->ID,'_item_active',TRUE);
 	$_sub_frequency = get_post_meta($item->ID,'_sub_frequency',TRUE);
 	$_sub_startdate = get_post_meta($item->ID,'_sub_startdate',TRUE);
-	$_sub_enddate = get_post_meta($item->ID,'_sub_enddate',TRUE);	
+	$_sub_enddate = get_post_meta($item->ID,'_sub_enddate',TRUE);
 	$ActualPrice = foxypress_GetActualPrice($_price, $_sale_price, $_sale_start, $_sale_end);
 	$Multiship = (get_option('foxycart_enable_multiship') == "1") ?
 				  "<div class=\"shipto_container_wrapper_detail\">
@@ -897,7 +948,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 					  : "";
 	$CanAddToCart = foxypress_CanAddToCart($item->ID, $_quantity);
 	$ItemOptions = foxypress_BuildOptionList($item->ID, "foxypress_form", $_quantity_max);
-	
+
 	$ItemImages = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
 	if(!empty($ItemImages) && count($ItemImages) > 1)
 	{
@@ -917,8 +968,8 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 			else
 			{
 				$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $FeaturedImage . "');\" ><img src=\"" . $FeaturedImage . "\" /></a></li>";
-			}		
-		}			
+			}
+		}
 		//loop through all the images
 		foreach($ItemImages as $ii)
 		{
@@ -937,7 +988,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 				else
 				{
 					$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $temp_src[0] . "');\" ><img src=\"" . $temp_src[0] . "\" /></a></li>";
-				}	
+				}
 			}
 		}
 		$ItemThumbs .= "</ul>";
@@ -955,7 +1006,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 		}
 		else
 		{
-			$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />"; 
+			$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
 		}
 		$ImageOutput = ($ItemImage != "") //if we have an image show it, else show default
 						? ($ItemThumbs == "") //if we have no thumbs, make the main image clickable, else just <img>
@@ -963,7 +1014,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 							: "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\"/>"
 						: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
 	}
-	$ImageOutput = "<div class=\"foxypress_item_image_detail\">" . $ImageOutput . $ItemThumbs . "</div>";	
+	$ImageOutput = "<div class=\"foxypress_item_image_detail\">" . $ImageOutput . $ItemThumbs . "</div>";
 	//show item
 	$Output = "<div class=\"foxypress_detail\">
 				<div class=\"foxy_item_wrapper_detail\">
@@ -982,47 +1033,47 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 						<input type=\"hidden\" name=\"weight\" value=\"" . foxypress_GetActualWeight($_weight, $_weight2) . "\" />
 						<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
 						<input type=\"hidden\" name=\"h:blog_id\" value=\"" . $wpdb->blogid . "\" />"
-						 .						 
+						 .
 							( (get_option('foxypress_include_memberid') == "1")
-								? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />" 
+								? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />"
 								: ""
 							)
 						 .
-							foxypress_GetMinMaxFormFields($item->downloadable_id, $_quantity_min, $_quantity_max, $_quantity) 
+							foxypress_GetMinMaxFormFields($item->downloadable_id, $_quantity_min, $_quantity_max, $_quantity)
 						 .
-							( ($_discount_quantity_amount != "") 
-								? "<input type=\"hidden\" name=\"discount_quantity_amount\" value=\"" . stripslashes($_discount_quantity_amount) . "\" />" 
-								: "" 
-							)									 
-						 .
-							( ($_discount_quantity_percentage != "") 
-								? "<input type=\"hidden\" name=\"discount_quantity_percentage\" value=\"" . stripslashes($_discount_quantity_percentage) . "\" />" 
-								: "" 
-							)	
-						 .
-							( ($_discount_price_amount != "") 
-								? "<input type=\"hidden\" name=\"discount_price_amount\" value=\"" . stripslashes($_discount_price_amount) . "\" />" 
-								: "" 
-							)	
-						 .
-							( ($_discount_price_percentage != "") 
-								? "<input type=\"hidden\" name=\"discount_price_percentage\" value=\"" . stripslashes($_discount_price_percentage) . "\" />" 
-								: "" 
-							)	
-						 .
-							( ($_sub_frequency != "") 
-								? "<input type=\"hidden\" name=\"sub_frequency\" value=\"" . stripslashes($_sub_frequency) . "\" />" 
-								: "" 
-							)								 
-						 .
-							( ($_sub_startdate != "") 
-								? "<input type=\"hidden\" name=\"sub_startdate\" value=\"" . stripslashes($_sub_startdate) . "\" />" 
-								: "" 
+							( ($_discount_quantity_amount != "")
+								? "<input type=\"hidden\" name=\"discount_quantity_amount\" value=\"" . stripslashes($_discount_quantity_amount) . "\" />"
+								: ""
 							)
 						 .
-							( ($_sub_enddate != "") 
-								? "<input type=\"hidden\" name=\"sub_enddate\" value=\"" . stripslashes($_sub_enddate) . "\" />" 
-								: "" 
+							( ($_discount_quantity_percentage != "")
+								? "<input type=\"hidden\" name=\"discount_quantity_percentage\" value=\"" . stripslashes($_discount_quantity_percentage) . "\" />"
+								: ""
+							)
+						 .
+							( ($_discount_price_amount != "")
+								? "<input type=\"hidden\" name=\"discount_price_amount\" value=\"" . stripslashes($_discount_price_amount) . "\" />"
+								: ""
+							)
+						 .
+							( ($_discount_price_percentage != "")
+								? "<input type=\"hidden\" name=\"discount_price_percentage\" value=\"" . stripslashes($_discount_price_percentage) . "\" />"
+								: ""
+							)
+						 .
+							( ($_sub_frequency != "")
+								? "<input type=\"hidden\" name=\"sub_frequency\" value=\"" . stripslashes($_sub_frequency) . "\" />"
+								: ""
+							)
+						 .
+							( ($_sub_startdate != "")
+								? "<input type=\"hidden\" name=\"sub_startdate\" value=\"" . stripslashes($_sub_startdate) . "\" />"
+								: ""
+							)
+						 .
+							( ($_sub_enddate != "")
+								? "<input type=\"hidden\" name=\"sub_enddate\" value=\"" . stripslashes($_sub_enddate) . "\" />"
+								: ""
 							)
 						 .
 						 	foxypress_BuildAttributeForm($inventory_id)
@@ -1060,7 +1111,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 			</div>"
 			.
 			$ImageOutput
-			. 
+			.
 		   "<div style=\"clear:both;\"></div>
 		   </div>";
 	return $Output;
@@ -1079,7 +1130,7 @@ function foxypress_GetActualWeight($_weight1, $_weight2)
 {
 	$weight2 = number_format($_weight2 /  16, 3);
 	$arr_weight2 = explode('.', $weight2);
-	$weight2 = ((strpos($weight2, '.') !== false) ? end($arr_weight2) : $weight2);	
+	$weight2 = ((strpos($weight2, '.') !== false) ? end($arr_weight2) : $weight2);
 	return $_weight1 . "." . $weight2;
 }
 
@@ -1172,13 +1223,167 @@ function foxypress_BuildAttributeForm($inventory_id)
 	return $formAttributes;
 }
 
+function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
+{
+	global $wpdb;
+	$MasterList = "";
+	$HasCartValidation = foxypress_HasCartValidation();
+	//get distinct option groups so we loop through those individually to create dropdowns
+	$optionGroups = $wpdb->get_results("select distinct option_group_id from " . $wpdb->prefix . "foxypress_inventory_options where inventory_id='" . $inventory_id . "'");
+	if(!empty($optionGroups))
+	{
+		$ProductCode = get_post_meta($inventory_id,'_code',TRUE);
+		foreach($optionGroups as $optionGroup)
+		{
+			//get options
+			$soldOutList = array();
+			$listItems = "";
+			$jsData = "";
+			$groupName = "";
+			$soldOutItems = "";
+			$initialMaxValue = "";
+			$initialMaxValueHashedName = "";
+			$itemOptions = $wpdb->get_results("SELECT o.*
+												,og.option_group_name
+											   FROM " . $wpdb->prefix . "foxypress_inventory_options as o
+											   INNER JOIN " . $wpdb->prefix . "foxypress_inventory_option_group as og on o.option_group_id = og.option_group_id
+											   WHERE o.option_group_id = '" . $optionGroup->option_group_id . "'
+											   	AND o.inventory_id='" . $inventory_id . "'
+											   ORDER BY option_order");
+			if(!empty($itemOptions))
+			{
+				foreach($itemOptions as $option)
+				{
+					if($groupName == "")
+					{
+						$groupName = $option->option_group_name;
+					}
+					if($option->option_active == "1" && $option->option_quantity != "0")
+					{
+						$extraattribute = "";
+						$extraattributefriendly = "";
+						if($option->option_extra_price != "" && $option->option_extra_price != 0)
+						{
+							$isNegative = ($option->option_extra_price < 0);
+							$extraattribute = "p" . ($isNegative ? "" : "+") . number_format($option->option_extra_price, 2);
+							$extraattributefriendly = ($isNegative ? " " : " +") . foxypress_FormatCurrency($option->option_extra_price)
+							;
+						}
+						if($option->option_extra_weight != "" && $option->option_extra_weight != 0)
+						{
+							$isNegative = ($option->option_extra_weight < 0);
+							$extraattribute .= ($extraattribute == "") ? "w" . ($isNegative ? "" : "+") . number_format($option->option_extra_weight, 2) : "|w" . ($isNegative ? "" : "+") . number_format($option->option_extra_weight, 2);
+						}
+						if($option->option_code != "")
+						{
+							$extraattribute .= ($extraattribute == "") ? "c:" . $option->option_code : "|c:" . $option->option_code;
+						}
+						if($extraattribute != "")
+						{
+							$extraattribute = "{" . $extraattribute . "}";
+						}
+						$listItems  .= "<option value=\"" . htmlspecialchars(stripslashes($option->option_value)) . $extraattribute . "\">" . htmlspecialchars(stripslashes($option->option_text)) . $extraattributefriendly . "</option>";
+						if($option->option_code != "")
+						{
+							if($HasCartValidation)
+							{
+								if($option->option_quantity != null && $option->option_quantity < $defaultMaxQty)
+								{
+									$HashedName = FoxyCart_Helper::fc_hash_value($ProductCode, "quantity_max", $option->option_quantity, "name", false, false);
+								}
+								else
+								{
+									$HashedName = FoxyCart_Helper::fc_hash_value($ProductCode, "quantity_max", $defaultMaxQty, "name", false, false);
+								}
+							}
+							$tempJsData = htmlspecialchars(stripslashes($option->option_value)) . $extraattribute . "~" . $option->option_quantity . "~" . $HashedName;
+							$jsData .= ($jsData == "") ? $tempJsData : "," . $tempJsData;
+							if($initialMaxValue == "")
+							{
+								if($defaultMaxQty > 0)
+								{
+									if($option->option_quantity != null && $option->option_quantity < $defaultMaxQty)
+									{
+										$initialMaxValue = $option->option_quantity;
+										if($HasCartValidation)
+										{
+											$initialMaxValueHashedName = FoxyCart_Helper::fc_hash_value($ProductCode, "quantity_max", $option->option_quantity, "name", false, false);}
+									}
+									else
+									{
+										$initialMaxValue = $defaultMaxQty;
+										if($HasCartValidation)
+										{
+											$initialMaxValueHashedName = FoxyCart_Helper::fc_hash_value($ProductCode, "quantity_max", $defaultMaxQty, "name", false, false);
+										}
+									}
+								}
+								else
+								{
+									if($option->option_quantity != null && $option->option_quantity > 0)
+									{
+										$initialMaxValue = 	$option->option_quantity;
+										if($HasCartValidation)
+										{
+											$initialMaxValueHashedName = FoxyCart_Helper::fc_hash_value($ProductCode, "quantity_max", $option->option_quantity, "name", false, false);
+										}
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+						$soldOutList[] = $option->option_text;
+					}
+				}
+				if(count($soldOutList) > 0)
+				{
+					foreach($soldOutList as $soldOutItem)
+					{
+						$soldOutItems .= ($soldOutItems == "") ? $soldOutItem : ", " . $soldOutItem;
+					}
+					$soldOutItems = "<div class=\"foxypress_item_otions_soldout\">Sold Out Options: " . $soldOutItems . "</div>";
+				}
+				$JsToAdd = "";
+				if(count($optionGroups) == 1 && $jsData != "")
+				{
+					$JsToAdd = "onchange=\"foxypress_modify_max('" . $formid . "', '" . $jsData . "', this.value, " . $defaultMaxQty . ", '');\"";
+					$SetDefaultJS = "<script type=\"text/javascript\" language=\"javascript\">
+										jQuery(document).ready(function() {
+											var maxfield" . $formid . " = jQuery(\"#" . $formid . "\").find('input[name^=quantity_max]');
+											maxfield" . $formid . ".val(" . $initialMaxValue . ");"
+											.
+											(	($HasCartValidation)
+												? "maxfield" . $formid . ".attr('name', '" . $initialMaxValueHashedName . "');"
+												: ""
+											)
+											.
+										"});
+									 </script>";
+				}
+				$MasterList .= "<div class=\"foxypress_item_options\">" .
+									 stripslashes($groupName) . ":
+									<select name=\"" . stripslashes($groupName) . "\" " . $JsToAdd . ">"
+										. $listItems .
+									"</select>" .
+									$SetDefaultJS .
+									$soldOutItems .
+							   "</div>";
+				unset($soldOutList);
+			}
+		}
+	}
+	return $MasterList;
+}
+
 function foxypress_BuildAttributeList($inventory_id, $CssSuffix = '')
 {
 	global $wpdb;
 	//check if we have any custom attributes
 	$itemAttributes = $wpdb->get_results("SELECT a.attribute_text
 											,a.attribute_value
-										  FROM " . $wpdb->prefix . "foxypress_inventory_attributes as a									 
+										  FROM " . $wpdb->prefix . "foxypress_inventory_attributes as a
 										  WHERE a.inventory_id = '" . $inventory_id . "'
 										  order by a.attribute_text");
 
@@ -1195,6 +1400,7 @@ function foxypress_BuildAttributeList($inventory_id, $CssSuffix = '')
 	return $foxyAttributes;
 }
 
+/*
 function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 {
 	global $wpdb;
@@ -1263,18 +1469,18 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 								{
 									if($option->option_quantity != null && $option->option_quantity < $defaultMaxQty)
 									{
-										$initialMaxValue = $option->option_quantity;										
+										$initialMaxValue = $option->option_quantity;
 									}
 									else
 									{
-										$initialMaxValue = $defaultMaxQty;										
+										$initialMaxValue = $defaultMaxQty;
 									}
 								}
 								else
 								{
 									if($option->option_quantity != null && $option->option_quantity > 0)
 									{
-										$initialMaxValue = 	$option->option_quantity;										
+										$initialMaxValue = 	$option->option_quantity;
 									}
 								}
 							}
@@ -1296,7 +1502,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 				$JsToAdd = "";
 				if(count($optionGroups) == 1 && $jsData != "")
 				{
-					$JsToAdd = "onchange=\"foxypress_modify_max('" . $formid . "', '" . $jsData . "', this.value, " . $defaultMaxQty . ");\"";					
+					$JsToAdd = "onchange=\"foxypress_modify_max('" . $formid . "', '" . $jsData . "', this.value, " . $defaultMaxQty . ");\"";
 					$SetDefaultJS = "<script type=\"text/javascript\" language=\"javascript\">
 										jQuery(document).ready(function() {
 											var maxfield" . $formid . " = jQuery(\"#" . $formid . "\").find('input[name^=quantity_max]');
@@ -1318,6 +1524,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 	}
 	return $MasterList;
 }
+*/
 
 function foxypress_shortcode( $atts, $content = null) {
 	global $wpdb;
@@ -1328,18 +1535,19 @@ function foxypress_shortcode( $atts, $content = null) {
 	$showAddToCart = (trim($atts['addtocart']) == "1") ? true : false;
 	$showQuantity = (trim($atts['show_qty']) == "1") ? true : false;
 	$showMoreDetail = (trim($atts['showmoredetail']) == "1" || trim($atts['detailurl']) != "") ? true : false;
+	$returnHTML = "";
 
 	if(trim($atts['id']) != '' && $mode == 'single')
 	{
-		return foxypress_handle_shortcode_item(trim($atts['id']), $showMoreDetail, true, $showMainImage, $showQuantity, "_single", false);
+		$returnHTML =  foxypress_handle_shortcode_item(trim($atts['id']), $showMoreDetail, true, $showMainImage, $showQuantity, "_single", false);
 	}
 	else if(trim($atts['categoryid']) != '' && $mode == 'list')
 	{
-		return foxypress_handle_shortcode_listing(trim($atts['categoryid']), trim($atts['items']), trim($atts['cols']), $showMoreDetail, $showMainImage, $showAddToCart, $showQuantity);
+		$returnHTML = foxypress_handle_shortcode_listing(trim($atts['categoryid']), trim($atts['items']), trim($atts['cols']), $showMoreDetail, $showMainImage, $showAddToCart, $showQuantity);
 	}
 	else if($mode == 'detail')
 	{
-		return foxypress_handle_shortcode_detail($showMainImage, $showQuantity);
+		$returnHTML = foxypress_handle_shortcode_detail($showMainImage, $showQuantity);
 	}
 	else if($mode == 'tracking')
 	{
@@ -1347,8 +1555,14 @@ function foxypress_shortcode( $atts, $content = null) {
 	}
 	else if($mode  == 'search')
 	{
-		return foxypress_handle_search_module();	
+		return foxypress_handle_search_module();
 	}
+	//do we need to hash it?
+	if(foxypress_HasCartValidation())
+	{
+		$returnHTML = FoxyCart_Helper::fc_hash_html($returnHTML);
+	}
+	return $returnHTML;
 }
 
 function foxypress_category_item_count($category_name)
@@ -1361,9 +1575,9 @@ function foxypress_category_item_count($category_name)
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																					and pm_start_date.meta_key = '_item_start_date'	
+																					and pm_start_date.meta_key = '_item_start_date'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																					and pm_end_date.meta_key = '_item_end_date'													
+																					and pm_end_date.meta_key = '_item_end_date'
 							WHERE c.category_name='" . $category_name . "'
 								AND i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE. "'
 								AND i.post_status = 'publish'
@@ -1470,17 +1684,17 @@ function foxypress_curlPostRequest($url, $postData) {
     return($response);
 }
 
-function foxypress_GetCurrentPageURL($includeQS = true) 
+function foxypress_GetCurrentPageURL($includeQS = true)
 {
 	$pageURL = get_bloginfo('url');
 	if($includeQS)
 	{
-		$pageURL .= $_SERVER['REQUEST_URI'];	
+		$pageURL .= $_SERVER['REQUEST_URI'];
 	}
 	else
 	{
-		$pageURL .=  str_replace("?", "", str_replace($_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']));	
-	}	
+		$pageURL .=  str_replace("?", "", str_replace($_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']));
+	}
 	return $pageURL;
 }
 
@@ -1597,7 +1811,7 @@ function foxypress_GetPagination($page, $total_pages, $limit, $targetpage, $qspa
 	return $pagination;
 }
 
-function foxypress_ReplaceNewLine($string) 
+function foxypress_ReplaceNewLine($string)
 {
 	return (string)str_replace(array("\r", "\r\n", "\n"), '', $string);
 }
@@ -1612,7 +1826,7 @@ function foxypress_TruncateString($str, $length)
 	return $str;
 }
 
-function foxypress_TruncateHTML($text, $length = 100, $ending = '...', $exact = false, $considerHtml = true) 
+function foxypress_TruncateHTML($text, $length = 100, $ending = '...', $exact = false, $considerHtml = true)
 {
 	$text = foxypress_ReplaceNewLine($text);
 	if ($considerHtml) {
@@ -1825,18 +2039,18 @@ function foxypress_GetPaginationStart()
 	if($FoxyCart_Version == "0.7.0" || $FoxyCart_Version == "0.7.1")
 	{
 		$PageStart = "0";
-	}	
+	}
 	return $PageStart;
 }
 
 function foxypress_GetFoxyPressIncludes()
 {
 	global $wpdb;
-	
+
 	$version = get_option('foxycart_storeversion');
 	$includejq = get_option('foxycart_include_jquery');
 	$enablemuliship = get_option('foxycart_enable_multiship');
-	$scripts = "";		
+	$scripts = "";
 	if($version == "0.7.2")
 	{
 		$scripts = "<!-- BEGIN FOXYCART FILES -->"
@@ -1846,10 +2060,10 @@ function foxypress_GetFoxyPressIncludes()
 							? "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js\"></script>"
 							: ""
 					)
-					.	
+					.
 					"<script src=\"http://cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
-					<link rel=\"stylesheet\" href=\"http://cdn.foxycart.com/static/scripts/colorbox/1.3.17/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />					
-					<!-- END FOXYCART FILES -->";	
+					<link rel=\"stylesheet\" href=\"http://cdn.foxycart.com/static/scripts/colorbox/1.3.17/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
+					<!-- END FOXYCART FILES -->";
 	}
 	else if($version=="0.7.1")
 	{
@@ -1860,7 +2074,7 @@ function foxypress_GetFoxyPressIncludes()
 							? "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js\"></script>"
 							: ""
 					)
-					.	
+					.
 					"<script src=\"http://cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.complete.3.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
 					<link rel=\"stylesheet\" href=\"http://static.foxycart.com/scripts/colorbox/1.3.16/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
 					<!-- END FOXYCART FILES -->";
@@ -1874,7 +2088,7 @@ function foxypress_GetFoxyPressIncludes()
 							? "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js\"></script>"
 							: ""
 					)
-					.					
+					.
 					"<script src=\"http://cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.complete.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
 					<link rel=\"stylesheet\" href=\"http://static.foxycart.com/scripts/colorbox/1.3.9/style1/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
 					<!-- END FOXYCART FILES -->";
@@ -1894,12 +2108,15 @@ function foxypress_GetFoxyPressIncludes()
 }
 
 function foxypress_ImportFoxypressScripts()
-{	
+{
 	if(get_option('foxycart_storeurl')!='')
 	{
-		echo(foxypress_GetFoxyPressIncludes());		
+		echo(foxypress_GetFoxyPressIncludes());
+		if(get_option('foxypress_include_default_stylesheet'))
+		{
+			echo("<link rel=\"stylesheet\" href=\"" .  plugins_url() . "/foxypress/style.css\">");
+		}
 		?>
-        <link rel="stylesheet" href="<?php echo( plugins_url() );?>/foxypress/style.css">
 		<script type="text/javascript" src="<?php echo( plugins_url() );?>/foxypress/js/jquery.qtip.js"></script>
 		<script type="text/javascript">
 			function foxypress_find_tracking(baseurl)
@@ -1954,6 +2171,39 @@ function foxypress_ImportFoxypressScripts()
 					var optionData = options[i].split("~");
 					var OptionValue = optionData[0];
 					var OptionQuantity = optionData[1];
+					var OptionHashedName = optionData[2];
+					//if we don't have an exact match, we might have a signed form so check for the value and pipes
+					if(OptionValue == selectedvalue || selectedvalue.indexOf(OptionValue + "||") == 0)
+					{
+						if(OptionQuantity != null && OptionQuantity != '')
+						{
+							if(defaultmax != '' && defaultmax > OptionQuantity)
+							{
+								maxfield.val(OptionQuantity);
+							}
+							else if(defaultmax == '' || defaultmax == '0')
+							{
+								maxfield.val(OptionQuantity);
+							}
+						}
+						if(OptionHashedName != "") //if cart validation is on
+						{
+							maxfield.attr('name', OptionHashedName);
+						}
+					}
+				}
+			}
+
+			/*function foxypress_modify_max(formid, data, selectedvalue, defaultmax)
+			{
+				var options = data.split(",");
+				var maxfield = jQuery("#" + formid).find('input[name^=quantity_max]');
+				maxfield.val(defaultmax);
+				for(i = 0; i < options.length; i++)
+				{
+					var optionData = options[i].split("~");
+					var OptionValue = optionData[0];
+					var OptionQuantity = optionData[1];
 					//if we don't have an exact match, we might have a signed form so check for the value and pipes
 					if(OptionValue == selectedvalue || selectedvalue.indexOf(OptionValue + "||") == 0)
 					{
@@ -1970,22 +2220,28 @@ function foxypress_ImportFoxypressScripts()
 						}
 					}
 				}
-			}
-			
+			}*/
+
 			function ToggleItemImage(newImage)
 			{
 				jQuery('#foxypress_main_item_image').attr('src', newImage)
 			}
-			
+
 		</script>
 	<?php
 	}
 }
 
+function foxypress_HasCartValidation()
+{
+	global $wpdb;
+	return (get_option("foxycart_hmac") == "1");
+}
+
 function foxypress_RegisterUser($UserID)
 {
 	$userdata = get_user_by('id', $UserID);
-	//sync with foxycart	
+	//sync with foxycart
 	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
@@ -2000,21 +2256,21 @@ function foxypress_RegisterUser($UserID)
 	$foxycart_customer_id = (string)$foxyXMLResponse->customer_id;
 	if($foxycart_customer_id)
 	{
-		add_user_meta($UserID, 'foxycart_customer_id', $foxycart_customer_id, true); //get_user_by('id', '1');		
+		add_user_meta($UserID, 'foxycart_customer_id', $foxycart_customer_id, true); //get_user_by('id', '1');
 	}
 }
 
 function foxypress_UpdateUser($UserID)
 {
 	$foxycartCustomerID = get_user_meta($user_id, 'foxycart_customer_id', true);
-	//sync with foxycart	
+	//sync with foxycart
 	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
 	$foxyData["api_action"] = "customer_save";
 	$foxyData["customer_id"] = $foxycartCustomerID;
 	$foxyData["customer_email"] =  $_POST['email'];
-	if (isset($_POST['pass1'])) 
+	if (isset($_POST['pass1']))
 	{
 		$userdata = get_user_by('id', $UserID);
 		$foxyData["customer_password_hash"] = $userdata->user_pass;
@@ -2032,10 +2288,10 @@ function foxypress_UpdateUser($UserID)
 	}
 }
 
-function foxypress_CheckForFoxyCartUser($customer_email) 
+function foxypress_CheckForFoxyCartUser($customer_email)
 {
 	global $current_user;
-	get_currentuserinfo();	
+	get_currentuserinfo();
 	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
@@ -2043,29 +2299,29 @@ function foxypress_CheckForFoxyCartUser($customer_email)
 	$foxyData["customer_email"] = $customer_email;
 	$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
 	$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
-	if ($foxyXMLResponse->result == "SUCCESS") 
+	if ($foxyXMLResponse->result == "SUCCESS")
 	{
 		$foxycart_customer_id = (string)$foxyXMLResponse->customer_id;
-		if ($foxycart_customer_id) 
+		if ($foxycart_customer_id)
 		{
 			add_user_meta($current_user->ID, 'foxycart_customer_id', $foxycart_customer_id, true);
 		}
 		return $foxycart_customer_id;
-	} 
-	else 
+	}
+	else
 	{
 		return false;
 	}
 }
 
 function foxypress_CreateFoxyCartUser($customer_email, $customer_pass, $customer_first_name, $customer_last_name)
-{	
+{
 	global $current_user;
-	get_currentuserinfo();	
+	get_currentuserinfo();
 	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
-	$foxyData["api_action"] = "customer_save";	
+	$foxyData["api_action"] = "customer_save";
 	if($customer_first_name != "")
 	{
 		$foxyData["customer_first_name"] = $customer_first_name;
@@ -2075,7 +2331,7 @@ function foxypress_CreateFoxyCartUser($customer_email, $customer_pass, $customer
 		$foxyData["customer_last_name"] = $customer_last_name;
 	}
 	$foxyData["customer_email"] = $customer_email;
-	$foxyData["customer_password_hash"] = $customer_pass;	
+	$foxyData["customer_password_hash"] = $customer_pass;
 	$foxyData["customer_country"] = "US";
 	$foxyData["customer_password_hash_type"] = "phpass";
 	$foxyData["customer_password_hash_config"] = "8";
@@ -2085,7 +2341,7 @@ function foxypress_CreateFoxyCartUser($customer_email, $customer_pass, $customer
 	if($foxycart_customer_id)
 	{
 		add_user_meta($current_user->ID, 'foxycart_customer_id', $foxycart_customer_id, true);
-	}	
+	}
 	return $foxycart_customer_id;
 }
 
@@ -2128,14 +2384,14 @@ function foxypress_HasMainBlog()
 	if(foxypress_IsMultiSite())
 	{
 		$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-		foreach ($blogids as $blog_id) 
+		foreach ($blogids as $blog_id)
 		{
 			$switched_blog = true;
 			switch_to_blog($blog_id);
 			if(get_option('foxypress_main_blog') == "1")
 			{
 				switch_to_blog($OriginalBlog);
-				return true;	
+				return true;
 			}
 		}
 	}
@@ -2152,11 +2408,11 @@ function foxypress_InstallBlog($new_blog_id, $user_id, $domain, $path, $site_id,
 	$OriginalBlog = $wpdb->blogid;
 	//get api key already created
 	$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-	foreach ($blogids as $blog_id) 
+	foreach ($blogids as $blog_id)
 	{
 		if($foxycart_apikey == "" || $foxypress_encryptionkey == "")
 		{
-			if ( $blog_id != $wpdb->blogid ) 
+			if ( $blog_id != $wpdb->blogid )
 			{
 				switch_to_blog($blog_id);
 				$switched_blog = true;
@@ -2164,12 +2420,12 @@ function foxypress_InstallBlog($new_blog_id, $user_id, $domain, $path, $site_id,
 			//get api key if we don't have it yet
 			if($foxycart_apikey == "")
 			{
-				$foxycart_apikey = get_option('foxycart_apikey');			
+				$foxycart_apikey = get_option('foxycart_apikey');
 			}
 			//get encryption key if we don't have it yet
 			if($foxypress_encryptionkey == "")
 			{
-				$foxypress_encryptionkey = get_option('foxypress_encryption_key');			
+				$foxypress_encryptionkey = get_option('foxypress_encryption_key');
 			}
 		}
 	}
@@ -2178,7 +2434,7 @@ function foxypress_InstallBlog($new_blog_id, $user_id, $domain, $path, $site_id,
 	//defaultswitched  back to false
 	$switched_blog = false;
 	//switch to new blog if we aren't in it already
-	if ( $new_blog_id != $wpdb->blogid ) 
+	if ( $new_blog_id != $wpdb->blogid )
 	{
 		$switched_blog = true;
 		switch_to_blog( $new_blog_id );
@@ -2192,7 +2448,7 @@ function foxypress_UninstallBlog($blog_id, $drop = false)
 	global $wpdb;
 	$switched_blog = false;
 	$OriginalBlog = $wpdb->blogid;
-	if ( $blog_id != $wpdb->blogid ) 
+	if ( $blog_id != $wpdb->blogid )
 	{
 		$switched_blog = true;
 		switch_to_blog( $blog_id );
@@ -2206,7 +2462,7 @@ function foxypress_option_exists($option_name)
 	global $wpdb;
 	if( get_option($option_name) === false)
 	{
-		return false;	
+		return false;
 	}
 	return true;
 }
@@ -2220,22 +2476,22 @@ function foxypress_option_exists($option_name)
 function foxypress_RunUpdates()
 {
 	global $wpdb;
-	
+
 	if(foxypress_Installation_CanRunUpdates())
 	{
 		$apikey = get_option('foxycart_apikey');
 		$encryptionkey = get_option('foxypress_encryption_key');
-		if (foxypress_IsMultiSite()) 
+		if (foxypress_IsMultiSite())
 		{
 			$OriginalBlog = $wpdb->blogid;
 			$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-			foreach ($blogids as $blog_id) 
+			foreach ($blogids as $blog_id)
 			{
 				switch_to_blog($blog_id);
 				foxypress_Install($apikey, $encryptionkey);
 			}
 			switch_to_blog($OriginalBlog);
-		} 
+		}
 		else
 		{
 			foxypress_Install($apikey, $encryptionkey);
@@ -2251,7 +2507,7 @@ function foxypress_Installation_CanRunUpdates()
 		$installed_version = get_option("foxypress_version");
 		if($installed_version != WP_FOXYPRESS_CURRENT_VERSION)
 		{
-			return true;	
+			return true;
 		}
 		return false;
 	}
@@ -2260,54 +2516,54 @@ function foxypress_Installation_CanRunUpdates()
 
 function foxypress_activate()
 {
-	global $wpdb;	
+	global $wpdb;
 	$today = getdate();
 	$apikey = "wmm" . $today['mon'] . $today['mday'] . $today['year'] . $today['seconds'] . foxypress_GenerateRandomString(16);
-	$encryptionkey = foxypress_GenerateRandomString(10);	
-	if (foxypress_IsMultiSite()) 
+	$encryptionkey = foxypress_GenerateRandomString(10);
+	if (foxypress_IsMultiSite())
 	{
 		$OriginalBlog = $wpdb->blogid;
 		// check if it is a network activation - if so, run the activation function for each blog id
-		if (isset($_GET['networkwide']) && ($_GET['networkwide'] == 1)) 
+		if (isset($_GET['networkwide']) && ($_GET['networkwide'] == 1))
 		{
 			$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-			foreach ($blogids as $blog_id) 
+			foreach ($blogids as $blog_id)
 			{
 				switch_to_blog($blog_id);
 				foxypress_Install($apikey, $encryptionkey);
 			}
 			switch_to_blog($OriginalBlog);
-		}	
-	} 
+		}
+	}
 	else
 	{
 		foxypress_Install($apikey, $encryptionkey);
-	}	
+	}
 }
 
 function foxypress_deactivate()
 {
 	global $wpdb;
-	if (foxypress_IsMultiSite()) 
+	if (foxypress_IsMultiSite())
 	{
 		$OriginalBlog = $wpdb->blogid;
 		// check if it is a network activation - if so, run the activation function for each blog id
-		if (isset($_GET['networkwide']) && ($_GET['networkwide'] == 1)) 
+		if (isset($_GET['networkwide']) && ($_GET['networkwide'] == 1))
 		{
 			$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-			foreach ($blogids as $blog_id) 
+			foreach ($blogids as $blog_id)
 			{
 				switch_to_blog($blog_id);
 				foxypress_Uninstall();
 			}
 			switch_to_blog($OriginalBlog);
-		}	
-	} 
+		}
+	}
 	else
 	{
 		foxypress_Uninstall();
-	}	
-	
+	}
+
 	//delete downloadable directory
 	foxypress_recursiveDelete(ABSPATH . "wp-content/inventory_downloadables/");
 	//delete inventory images directory
@@ -2321,7 +2577,7 @@ function foxypress_Uninstall()
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_transaction");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_transaction_note");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_transaction_status");
-	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory_options"); 
+	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory_options");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory_attributes");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory_option_group");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory_categories");
@@ -2329,9 +2585,9 @@ function foxypress_Uninstall()
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory_downloadables");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_downloadable_transaction");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_downloadable_download");
-	
+
 	//check option first before we delete
-	$keep_products = get_option("foxypress_uninstall_keep_products");	
+	$keep_products = get_option("foxypress_uninstall_keep_products");
 	//delete custom settings
 	$keys = array(
         'foxycart_storeurl',
@@ -2359,9 +2615,16 @@ function foxypress_Uninstall()
 		'foxypress_version',
 		'foxypress_uninstall_keep_products',
 		'foxypress_last_permalink_structure',
-		'foxypress_skip_settings_wizard'
-		);		
-	foreach( $keys as $key ) 
+		'foxypress_skip_settings_wizard',
+		'foxypress_packing_slip_header',
+		'foxycart_hmac',
+		'foxypress_include_default_stylesheet',
+		'foxypress_smtp_host',
+		'foxypress_secure_port',
+		'foxypress_email_username',
+		'foxypress_email_password'
+		);
+	foreach( $keys as $key )
 	{
 		delete_option( $key );
 	}
@@ -2373,7 +2636,7 @@ function foxypress_Uninstall()
 	{
 		$foxypress_posts = 	get_posts(array('numberposts' => -1, 'post_type' => FOXYPRESS_CUSTOM_POST_TYPE, 'post_status' => null));
 		foreach($foxypress_posts as $fp)
-		{			
+		{
 			//delete meta
 			$wpdb->query("DELETE FROM " . $wpdb->prefix  . "postmeta WHERE post_id='" . $fp->ID . "'");
 			//delete attachments
@@ -2381,11 +2644,11 @@ function foxypress_Uninstall()
 			foreach($attachments as $att)
 			{
 				wp_delete_attachment($att->ID, true);
-			}			
+			}
 			//delete post
 			wp_delete_post($fp->ID, true);
 		}
-	}	
+	}
 }
 
 function foxypress_Install($apikey, $encryptionkey)
@@ -2399,8 +2662,8 @@ function foxypress_Install($apikey, $encryptionkey)
 		$new_install = true;
 	}
 	else
-	{	
-		foreach ( $tempTables as $table ) 
+	{
+		foreach ( $tempTables as $table )
 		{
 			foreach($table as $table_name)
 			{
@@ -2408,7 +2671,7 @@ function foxypress_Install($apikey, $encryptionkey)
 			}
 		}
 	}
-	if ($new_install) 
+	if ($new_install)
 	{
 		foxypress_Installation_CreateInventoryCategoryTable();
 		foxypress_Installation_CreateTransactionTable();
@@ -2437,26 +2700,26 @@ function foxypress_Install($apikey, $encryptionkey)
 				{
 					foxypress_ConvertVersion();
 				}
-			}		
+			}
 		}
-		
-		//create settings 
+
+		//create settings
 		foxypress_Installation_CreateSettings($encryptionkey, $apikey);
 
 		//create download and images dirs if not already created
 		foxypress_Installation_CreateInventoryDownloadablesDirectory();
 		foxypress_Installation_CreateInventoryImagesDirectory();
 
-		
+
 		///////////////////////////////////////////////////////////////////////////
 		//check to see if we are missing any tables, if so create them as needed.
 		///////////////////////////////////////////////////////////////////////////
-		
+
 		//inventory categories
 		if(!in_array($wpdb->prefix . "foxypress_inventory_categories", $tables))
 		{
 			foxypress_Installation_CreateInventoryCategoryTable();
-		}		
+		}
 		//transactions
 		if(!in_array($wpdb->prefix . "foxypress_transaction", $tables))
 		{
@@ -2486,17 +2749,17 @@ function foxypress_Install($apikey, $encryptionkey)
 		if(!in_array($wpdb->prefix . "foxypress_inventory_attributes", $tables))
 		{
 			foxypress_Installation_CreateInventoryAttributesTable();
-		}		
+		}
 		//inventory to category
 		if(!in_array($wpdb->prefix . "foxypress_inventory_to_category", $tables))
 		{
 			foxypress_Installation_CreateInventoryToCategoryTable();
-		}		
+		}
 		//inventory downloadables
 		if(!in_array($wpdb->prefix . "foxypress_inventory_downloadables", $tables))
 		{
 			foxypress_Installation_CreateInventoryDownloadablesTable();
-		}		
+		}
 		//download transaction
 		if(!in_array($wpdb->prefix . "foxypress_downloadable_transaction", $tables))
 		{
@@ -2507,13 +2770,13 @@ function foxypress_Install($apikey, $encryptionkey)
 		{
 			foxypress_Installation_CreateDownloadableDownloadTable();
 		}
-		
+
 		//handle alterations
 		foxypress_Installation_HandleTableAlterations();
-		
+
 		//update current version
 		foxypress_Installation_UpdateCurrentVersion();
-	}		
+	}
 }
 
 function foxypress_Installation_HandleTableAlterations()
@@ -2522,21 +2785,21 @@ function foxypress_Installation_HandleTableAlterations()
 	//all tables should be created up to this point if they are upgrading
 	//we can run all the alters everytime for sake of consistency, since they don't update very often it won't be too big of a performance
 	//hit. This way sql will realize its dupe columns and not create as opposed to us manually checking every table for every column needed.
-		
-	
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_to_category
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//add sort order to inventory_to_category
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_to_category ADD sort_order int DEFAULT '99' AFTER category_id";
-	$wpdb->query($sql);	
-	
-	
+	$wpdb->query($sql);
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_transaction
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//add is test
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country;";
 	$wpdb->query($sql);
@@ -2560,15 +2823,15 @@ function foxypress_Installation_HandleTableAlterations()
 	$wpdb->query($sql);
 	//add blog id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_blog_id BIGINT(20) NULL AFTER foxy_transaction_cc_type;";
-	$wpdb->query($sql);		
-	
-	
+	$wpdb->query($sql);
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_iventory_options
 	///////////////////////////////////////////////////////////////////////////
 	// add option order
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_order INT DEFAULT '99' AFTER option_active;";
-	$wpdb->query($sql);		
+	$wpdb->query($sql);
 	//add option extra weight
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_extra_weight FLOAT(10,2) NOT NULL DEFAULT '0' AFTER option_extra_price";
 	$wpdb->query($sql);
@@ -2578,23 +2841,23 @@ function foxypress_Installation_HandleTableAlterations()
 	//add option quantity
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_quantity INT(11) NULL AFTER option_code";
 	$wpdb->query($sql);
-	
-	
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_categories
 	///////////////////////////////////////////////////////////////////////////
 	//add category image
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_categories ADD category_image VARCHAR(100) NULL AFTER category_name;";
-	$wpdb->query($sql);		
-	
-	
+	$wpdb->query($sql);
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//updates
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//update blog id
 	$sql = "UPDATE " . $wpdb->prefix . "foxypress_transaction SET foxy_blog_id = (select min(blog_id) from " . $wpdb->prefix . "blogs) where foxy_blog_id = '0' or foxy_blog_id is null;";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateInventoryCategoryTable()
@@ -2606,14 +2869,14 @@ function foxypress_Installation_CreateInventoryCategoryTable()
 				category_image VARCHAR(100) NULL,
 				PRIMARY KEY (category_id)
 			)";
-	$wpdb->query($sql);			
+	$wpdb->query($sql);
 	//insert default data
 	$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_inventory_categories" . " SET category_id=1, category_name='Default'";
 	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateTransactionTable()
-{	
+{
 	global $wpdb;
 	//create main transaction table to hold data that gets synched up.
 	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_transaction" . " (
@@ -2644,7 +2907,7 @@ function foxypress_Installation_CreateTransactionTable()
 			foxy_transaction_cc_type varchar(50),
 			foxy_blog_id BIGINT(20) NULL
 		)";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateTransactionStatusTable()
@@ -2662,7 +2925,7 @@ function foxypress_Installation_CreateTransactionStatusTable()
 	$wpdb->query($sql);
 	//insert the default category
 	$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_transaction_status (foxy_transaction_status, foxy_transaction_status_description) values ('1', 'Uncategorized')";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateTransactionNoteTable()
@@ -2676,11 +2939,11 @@ function foxypress_Installation_CreateTransactionNoteTable()
 				foxy_transaction_entered_by VARCHAR(30),
 				foxy_transaction_date_entered DATE
 			)";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateInventoryOptionsTable()
-{	
+{
 	global $wpdb;
 	//create options table
 	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_options" . " (
@@ -2707,7 +2970,7 @@ function foxypress_Installation_CreateInventoryOptionGroupsTable()
 				option_group_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 				option_group_name VARCHAR(50) NOT NULL
 			)";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateInventoryAttributesTable()
@@ -2720,7 +2983,7 @@ function foxypress_Installation_CreateInventoryAttributesTable()
 				attribute_text VARCHAR(50) NOT NULL ,
 				attribute_value VARCHAR(50) NOT NULL
 		   ) ";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 
@@ -2734,7 +2997,7 @@ function foxypress_Installation_CreateInventoryToCategoryTable()
 				category_id INT(11) NOT NULL,
 				sort_order INT(11) NOT NULL DEFAULT '99'
 		   ) ";
-	$wpdb->query($sql);			
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateInventoryDownloadablesTable()
@@ -2748,7 +3011,7 @@ function foxypress_Installation_CreateInventoryDownloadablesTable()
 				maxdownloads INT(11) NOT NULL DEFAULT '0',
 				status INT(11) NOT NULL DEFAULT '1'
 		   ) ";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateDownloadTransactionTable()
@@ -2761,7 +3024,7 @@ function foxypress_Installation_CreateDownloadTransactionTable()
 				downloadable_id INT(11) NOT NULL,
 				download_count INT(11) NOT NULL DEFAULT '0'
 		   ) ";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateDownloadableDownloadTable()
@@ -2775,7 +3038,7 @@ function foxypress_Installation_CreateDownloadableDownloadTable()
 				ip_address varchar(25),
 				referrer varchar(255)
 		   ) ";
-	$wpdb->query($sql);	
+	$wpdb->query($sql);
 }
 
 function foxypress_Installation_CreateSettings($encryption_key, $api_key)
@@ -2783,35 +3046,35 @@ function foxypress_Installation_CreateSettings($encryption_key, $api_key)
 	global $wpdb;
 	if(!foxypress_option_exists("foxypress_encryption_key"))
 	{
-		add_option("foxypress_encryption_key", $encryption_key, '', 'yes');	
+		add_option("foxypress_encryption_key", $encryption_key, '', 'yes');
 	}
 	if(!foxypress_option_exists("foxypress_transaction_sync_date"))
 	{
-		add_option("foxypress_transaction_sync_date", '1900-01-01', '', 'yes');	
+		add_option("foxypress_transaction_sync_date", '1900-01-01', '', 'yes');
 	}
 	if(!foxypress_option_exists("foxypress_transaction_sync_timestamp"))
 	{
-		add_option("foxypress_transaction_sync_timestamp", date("Y-m-d H:i:s"), '', 'yes');	
+		add_option("foxypress_transaction_sync_timestamp", date("Y-m-d H:i:s"), '', 'yes');
 	}
 	if(!foxypress_option_exists("foxypress_version"))
 	{
-		add_option("foxypress_version", WP_FOXYPRESS_CURRENT_VERSION);	
+		add_option("foxypress_version", WP_FOXYPRESS_CURRENT_VERSION);
 	}
 	if(!foxypress_option_exists("foxycart_apikey"))
 	{
-		add_option("foxycart_apikey", $api_key);	
+		add_option("foxycart_apikey", $api_key);
 	}
 }
 
 function foxypress_Installation_CreateInventoryDownloadablesDirectory()
-{	
+{
 	//create downloadables folder
 	$downlodablefolder = ABSPATH . INVENTORY_DOWNLOADABLE_LOCAL_DIR;
 	if(!is_dir($downlodablefolder))
 	{
 		mkdir($downlodablefolder, 0777);
 		chmod($downlodablefolder, 0777);
-	}				
+	}
 }
 
 function foxypress_Installation_CreateInventoryImagesDirectory()
@@ -2839,9 +3102,9 @@ function foxypress_Installation_UpdateCurrentVersion()
 
 function foxypress_ConvertVersion()
 {	//converting from 0.3.2
-	global $wpdb;	
-	
-	//insert inventory items in posts		
+	global $wpdb;
+
+	//insert inventory items in posts
 	$items = $wpdb->get_results("select * from " . $wpdb->prefix  . "foxypress_inventory");
 	if(!empty($items))
 	{
@@ -2855,7 +3118,7 @@ function foxypress_ConvertVersion()
 				 'post_status' => 'publish',
 				 'post_author' => 1,
 				 'post_type' => FOXYPRESS_CUSTOM_POST_TYPE
-				 
+
 			  );
 			$new_inventory_id = wp_insert_post( $my_post );
 			//save details
@@ -2867,7 +3130,7 @@ function foxypress_ConvertVersion()
 			foxypress_save_meta_data($new_inventory_id, '_weight', $item->inventory_weight);
 			foxypress_save_meta_data($new_inventory_id, '_quantity', $item->inventory_quantity);
 			foxypress_save_meta_data($new_inventory_id, '_quantity_min', $item->inventory_quantity_min);
-			foxypress_save_meta_data($new_inventory_id, '_quantity_max', $item->inventory_quantity_max);						
+			foxypress_save_meta_data($new_inventory_id, '_quantity_max', $item->inventory_quantity_max);
 			foxypress_save_meta_data($new_inventory_id, '_discount_quantity_amount', $item->inventory_discount_quantity_amount);
 			foxypress_save_meta_data($new_inventory_id, '_discount_quantity_percentage', $item->inventory_discount_quantity_percentage);
 			foxypress_save_meta_data($new_inventory_id, '_discount_price_amount', $item->inventory_discount_price_amount);
@@ -2877,10 +3140,10 @@ function foxypress_ConvertVersion()
 			foxypress_save_meta_data($new_inventory_id, '_sub_enddate', $item->inventory_sub_enddate);
 			foxypress_save_meta_data($new_inventory_id, '_item_start_date', $item->inventory_start_date);
 			foxypress_save_meta_data($new_inventory_id, '_item_end_date', $item->inventory_end_date);
-			foxypress_save_meta_data($new_inventory_id, '_item_active', $item->	inventory_active);				
+			foxypress_save_meta_data($new_inventory_id, '_item_active', $item->	inventory_active);
 			//keep track of old inventory id
 			foxypress_save_meta_data($new_inventory_id, '_old_inventory_id', $old_inventory_id);
-			
+
 			//update attributes table with new inventoryid
 			$wpdb->query("UPDATE " . $wpdb->prefix  . "foxypress_inventory_attributes SET inventory_id = '" . $new_inventory_id . "' WHERE inventory_id = '" . $old_inventory_id . "'");
 			//update downloadables table with new inventoryid
@@ -2896,35 +3159,35 @@ function foxypress_ConvertVersion()
 				foreach($images as $img)
 				{
 					$temp_path = ABSPATH . INVENTORY_IMAGE_LOCAL_DIR . $img->inventory_image;
-					foxypress_ConvertImage($temp_path, $new_inventory_id, $img->image_order);	
+					foxypress_ConvertImage($temp_path, $new_inventory_id, $img->image_order);
 				}
 			}
 		}
-	}	
-	
+	}
+
 	//insert config value into wp_options
-	add_option("foxypress_version", WP_FOXYPRESS_CURRENT_VERSION);	
+	add_option("foxypress_version", WP_FOXYPRESS_CURRENT_VERSION);
 	add_option("foxypress_skip_settings_wizard", "1");
-	
+
 	//insert sync values into wp_options
 	$synch_values = $wpdb->get_row("select * from " . $wpdb->prefix  . "foxypress_transaction_sync");
 	if(!empty($sync_values))
 	{
-		add_option("foxypress_transaction_sync_date", $synch_values->foxy_transaction_sync_date, '', 'yes');	
-		add_option("foxypress_transaction_sync_timestamp", $synch_values->foxy_transaction_sync_timestamp, '', 'yes');	
+		add_option("foxypress_transaction_sync_date", $synch_values->foxy_transaction_sync_date, '', 'yes');
+		add_option("foxypress_transaction_sync_timestamp", $synch_values->foxy_transaction_sync_timestamp, '', 'yes');
 	}
 	else
 	{
-		add_option("foxypress_transaction_sync_date", '1900-01-01', '', 'yes');	
-		add_option("foxypress_transaction_sync_timestamp", date("Y-m-d H:i:s"), '', 'yes');	
-	}	
-	
+		add_option("foxypress_transaction_sync_date", '1900-01-01', '', 'yes');
+		add_option("foxypress_transaction_sync_timestamp", date("Y-m-d H:i:s"), '', 'yes');
+	}
+
 	//delete tables
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_config");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_transaction_sync");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_inventory_images");
-		
+
 	//delete physical files
 	foxypress_DeleteItem(FOXYPRESS_PATH . '/imagehandler.php');
 	foxypress_DeleteItem(FOXYPRESS_PATH . '/inventory.php');
@@ -2939,7 +3202,7 @@ function foxypress_ConvertVersion()
 	foxypress_DeleteItem(FOXYPRESS_PATH . '/screenshot-7b.jpg');
 	foxypress_DeleteItem(FOXYPRESS_PATH . '/screenshot-7c.jpg');
 	foxypress_DeleteItem(FOXYPRESS_PATH . '/screenshot-9a.jpg');
-	
+
 	//update default image
 	$defaultImage = WP_PLUGIN_DIR . '/foxypress/img/' . INVENTORY_DEFAULT_IMAGE;
 	if (file_exists($defaultImage))
@@ -2955,7 +3218,7 @@ function foxypress_ConvertImage($file_to_move, $post_id, $menu_order)
 	$uploads = wp_upload_dir();
 	$file_name = basename($file_to_move);
 	$new_file = $uploads[path] . '/' . $file_name;
-  	if(!file_exists($new_file) and !is_dir($new_file) and !is_dir($old_file)) 
+  	if(!file_exists($new_file) and !is_dir($new_file) and !is_dir($old_file))
 	{
     	copy($file_to_move, $new_file);
   	}
@@ -2972,12 +3235,12 @@ function foxypress_ConvertImage($file_to_move, $post_id, $menu_order)
 	  'menu_order' => $menu_order
 	);
 	$attachment_id = wp_insert_attachment($attachment, $new_file_path, $post_id);
-	if($attachment_id != 0) 
+	if($attachment_id != 0)
 	{
 		require_once(ABSPATH . 'wp-admin/includes/image.php');
   		$attachment_data = wp_generate_attachment_metadata($attachment_id, $new_file_path);
   		wp_update_attachment_metadata($attachment_id, $attachment_data);
-	}	
+	}
 	//delete original image
 	foxypress_DeleteItem($file_to_move);
 }

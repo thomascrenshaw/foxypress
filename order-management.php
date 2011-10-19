@@ -119,11 +119,8 @@ function order_management_postback()
 						{
 							$EmailBody .= "<br /> Tracking Number: " . $TrackingNumber;
 						}
-						//send email to customer
-						$headers = "MIME-Version: 1.0" . "\r\n";
-						$headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
-						$headers .= 'From: <' . get_settings("admin_email ") . '>' . "\r\n";
-						mail($tRow->foxy_transaction_email,$statusEmail->foxy_transaction_status_email_subject,$EmailBody,$headers);
+						//check if user decided to fill out SMTP form
+						foxypress_Mail($tRow->foxy_transaction_email, $statusEmail->foxy_transaction_status_email_subject, $EmailBody);	
 					}
 				}
 			}
@@ -132,6 +129,18 @@ function order_management_postback()
 			$wpdb->query($sql);
 			if($switched_blog) { restore_current_blog(); }
 			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID. "&mode=detail&b=" .$BlogID);
+		}
+		else if($Page_Action == "previewslip")
+		{
+			foxypress_PrintPackingSlip(true, false);
+		}
+		else if($Page_Action == "printpartialslip")
+		{
+			foxypress_PrintPackingSlip(true, true);
+		}
+		else if($Page_Action == "printslip")
+		{
+			foxypress_PrintPackingSlip(false, true);
 		}
 	}
 }
@@ -320,25 +329,33 @@ function order_management_page_load()
 												$TransactionFilter 
 												order by foxy_transaction_id desc 
 												LIMIT $start, $limit");
+			echo("<select onchange=\"HandleBulkAction(this.value, '" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&b=" . $wpdb->blogid . "&action=printslip')\" id=\"foxypress_bulk_select\">
+					<option value=\"\">Bulk Actions</option>
+					<option value=\"bulk_print\">Print Packing Slip(s)</option>
+				</select><br /><br />");
 			echo("<table class=\"widefat page fixed\">
 					<thead>
 						<tr>
+							<th class=\"small-column\" scope=\"col\"><input type=\"checkbox\" name=\"foxypress_bulk_all\" onclick=\"BulkSelectAll(this.checked);\" /></th>
 							<th class=\"manage-column\" scope=\"col\">Transaction ID</th>
 							<th class=\"manage-column\" scope=\"col\">Date of Order</th>
 							<th class=\"manage-column\" scope=\"col\">Name</th>
 							<th class=\"manage-column\" scope=\"col\">Email</th>
+							<th class=\"medium-column\" scope=\"col\">Packing Slip</th>
 							<th class=\"manage-column\" scope=\"col\">Tracking</th>
 						</tr>
 					</thead>");
 			if ( !empty($Transactions) ) {
 				foreach ( $Transactions as $t ) {
 					echo("<tr>
+							<td><input type=\"checkbox\" name=\"foxypress_bulk_check[]\" id=\"foxypress_bulk_check\" value=\"" . $t->foxy_transaction_id . "\" /></td>
 							<td>
 								<a href=\"" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $t->foxy_transaction_id . "&b=" . $t->foxy_blog_id . "&mode=detail\">" . $t->foxy_transaction_id . "</a>
 							</td>
 							<td>" . $t->foxy_transaction_date . "</td>
 							<td>" . $t->foxy_transaction_last_name . ", " . $t->foxy_transaction_first_name . "</td>
 							<td>" . $t->foxy_transaction_email . "</td>
+							<td><a href=\"" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $t->foxy_transaction_id . "&b=" . $t->foxy_blog_id . "&mode=createslip\">Create Slip</a></td>
 							<td>" . $t->foxy_transaction_trackingnumber . "</td>
 						  </tr>");
 				}				
@@ -647,6 +664,165 @@ function order_management_page_load()
 		$SearchValue = foxypress_FixPostVar("foxy_om_search", "");
 		ProcessSearch($SearchValue);
 	}
+	else if($Page_Mode == "createslip")
+	{
+		$TransactionID = foxypress_FixGetVar("transaction", "");
+		$foxyStoreURL = get_option('foxycart_storeurl');
+		$foxyAPIKey =  get_option('foxycart_apikey');
+		$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
+		$foxyData = array();
+		$foxyData["api_token"] =  $foxyAPIKey;
+		$foxyData["api_action"] = "transaction_get";
+		$foxyData["transaction_id"] = $TransactionID;
+		$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
+		$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
+		if($foxyXMLResponse->result == "SUCCESS")
+		{
+			$productList = "";
+			$temp_inventory_id = "";
+			foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
+			{
+				foreach($td->transaction_detail_options->transaction_detail_option as $opt)
+				{
+					if(strtolower($opt->product_option_name) == "inventory_id")
+					{
+						$temp_inventory_id = $opt->product_option_value;
+					}
+				}				
+				$productList .= "<li><input type=\"checkbox\" name=\"foxypress_packing_products[]\" value=\"" . $temp_inventory_id . "|" . $td->product_code . "\" checked=\"checked\" /> " . $td->product_name . " (" . $td->product_code . ")</li>";
+			}
+			_e('<h3>Create a Partial Packing slip</h3>');
+			_e('<p>Below is a wizard that will guide you through creating a packing slip.  You may not want to include all of your items, for a partial order perhaps, so feel free to modify your slip and preview it until it looks correct.</p>');
+	?>
+		<form method="POST">
+		     <div id="packing_wizard_container">
+		        <ul class="packing_wizard_menu">
+		            <li id="step-one" class="active">Step 1</li>
+		            <li id="step-two">Step 2</li>
+		            <li id="step-three">Step 3</li>
+		        </ul>
+		
+		        <span class="wizard_clear"></span>
+		        <div class="wizard_tab_content step-one">
+					<p>You've chosen to create a packing slip for <?php echo($TransactionID); ?>.</p>
+					<p>Please choose which products you'd like to include on this packing slip, then click the next arrow below.</p>
+		            <ul>
+						<?php echo($productList); ?>
+					</ul>
+					<img id="step-two-nav" class="wizard_nav next" src="<?php echo(plugins_url())?>/foxypress/img/next.png" />
+		        </div>
+		
+		        <div class="wizard_tab_content step-two">
+		            <p>Now that you've selected your products, please enter your custom message that will appear on the packing slip.</p>
+					<p class="label">Message/Notes</p>
+					<textarea class="message_notes" id="foxypress_packing_notes" name="foxypress_packing_notes"><?php echo(get_option('foxypress_packing_slip_footer_message')); ?></textarea>
+					<img id="step-one-nav" class="wizard_nav prev" src="<?php echo(plugins_url())?>/foxypress/img/prev.png" />
+					<img id="step-three-nav" class="wizard_nav next" src="<?php echo(plugins_url())?>/foxypress/img/next.png" />
+		        </div>
+		        <div class="wizard_tab_content step-three">
+		           <p>All of your information has been collected and now you may preview your packing slip.  If something looks wrong, feel free to go backwards through the wizard and modify it.</p>
+					<?php echo("<a href=\"javascript:PrintSlip('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID . "&b=" . $wpdb->blogid . "&action=previewslip');\">Preview Packing Slip</a>");?>
+					<p>Everything look ok?</p>
+					<p class="submit">
+                    <input type="button" class="button-primary" id="btnFoxyPressPackingSlipWizardPrint" name="btnFoxyPressPackingSlipWizardPrint" value="<?php _e('Print Packing Slip') ?>" onclick="<?php echo("javascript:PrintSlip('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID . "&b=" . $wpdb->blogid . "&action=printpartialslip');return false;");?>" />
+				</p>
+					<img id="step-two-nav" class="wizard_nav prev" src="<?php echo(plugins_url())?>/foxypress/img/prev.png" />
+		        </div>
+		    </div>
+		</form>
+		  <script type="text/javascript" language="javascript">
+			jQuery(document).ready(function(){
+				jQuery(".packing_wizard_menu > li").click(function(e){
+					switch(e.target.id){
+						case "step-one":
+							//change status & style menu
+							jQuery("#step-one").addClass("active");
+							jQuery("#step-two").removeClass("active");
+							jQuery("#step-three").removeClass("active");
+							//display selected division, hide others
+							jQuery("div.step-one").fadeIn();
+							jQuery("div.step-two").css("display", "none");
+							jQuery("div.step-three").css("display", "none");
+						break;
+						case "step-two":
+							//change status & style menu
+							jQuery("#step-one").removeClass("active");
+							jQuery("#step-two").addClass("active");
+							jQuery("#step-three").removeClass("active");
+							//display selected division, hide others
+							jQuery("div.step-two").fadeIn();
+							jQuery("div.step-one").css("display", "none");
+							jQuery("div.step-three").css("display", "none");
+						break;
+						case "step-three":
+							//change status & style menu
+							jQuery("#step-one").removeClass("active");
+							jQuery("#step-two").removeClass("active");
+							jQuery("#step-three").addClass("active");
+							//display selected division, hide others
+							jQuery("div.step-three").fadeIn();
+							jQuery("div.step-one").css("display", "none");
+							jQuery("div.step-two").css("display", "none");
+						break;
+					}
+					return false;
+				});
+				jQuery(".wizard_nav").click(function(e){
+					switch(e.target.id){
+						case "step-one-nav":
+							//change status & style menu
+							jQuery("#step-one").addClass("active");
+							jQuery("#step-two").removeClass("active");
+							jQuery("#step-three").removeClass("active");
+							//display selected division, hide others
+							jQuery("div.step-one").fadeIn();
+							jQuery("div.step-two").css("display", "none");
+							jQuery("div.step-three").css("display", "none");
+						break;
+						case "step-two-nav":
+							//change status & style menu
+							jQuery("#step-one").removeClass("active");
+							jQuery("#step-two").addClass("active");
+							jQuery("#step-three").removeClass("active");
+							//display selected division, hide others
+							jQuery("div.step-two").fadeIn();
+							jQuery("div.step-one").css("display", "none");
+							jQuery("div.step-three").css("display", "none");
+						break;
+						case "step-three-nav":
+							//change status & style menu
+							jQuery("#step-one").removeClass("active");
+							jQuery("#step-two").removeClass("active");
+							jQuery("#step-three").addClass("active");
+							//display selected division, hide others
+							jQuery("div.step-three").fadeIn();
+							jQuery("div.step-one").css("display", "none");
+							jQuery("div.step-two").css("display", "none");
+						break;
+					}
+					//alert(e.target.id);
+					return false;
+				});
+			});
+			
+			function PrintSlip(baseURL)
+			{
+				var values = new Array();
+				jQuery.each(jQuery("input[name='foxypress_packing_products[]']:checked"), function() {
+				  values.push(jQuery(this).val());
+				});
+				var customMessage = jQuery("#foxypress_packing_notes").val();
+				var fullURL = baseURL + "&products=" + values + "&message=" + customMessage;
+				window.open(fullURL);
+			}
+			</script>
+		<?php		
+		}
+		else
+		{
+			echo("Invalid Transaction ID");	
+		}
+	}
 	//check to see how much time has passed since the last time we synched. If it has been more than 10 minutes, sync it up.
 	$NeedsSync = false;
 	$sql = "select ( (unix_timestamp(now()) - unix_timestamp(option_value)) / 60 ) as Minutes FROM " . $wpdb->prefix . "options where option_name='foxypress_transaction_sync_timestamp'";
@@ -659,6 +835,188 @@ function order_management_page_load()
 		}
 	}
 	End_Foxy_Order_Management($NeedsSync);
+}
+
+function foxypress_PrintPackingSlip($partialSlip, $printPage)
+{
+	global $wpdb;
+	$TransactionID = foxypress_FixGetVar('transaction');
+	$Products = explode(",", foxypress_FixGetVar('products'));
+	$CustomMessage = foxypress_FixGetVar('message');
+	if(!$printPage)
+	{
+		_e('<h3>Preview Your Packing Slip</h3>');
+		_e('<p>This is what your packing slip will look like:</p>');
+	}
+	//get transaction
+	$foxyStoreURL = get_option('foxycart_storeurl');
+	$foxyAPIKey =  get_option('foxycart_apikey');
+	$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
+	$foxyData = array();
+	$foxyData["api_token"] =  $foxyAPIKey;
+	$foxyData["api_action"] = "transaction_get";
+	$foxyData["transaction_id"] = $TransactionID;
+	$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
+	$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
+	if($foxyXMLResponse->result != "SUCCESS")
+	{
+		echo("Invalid Transaction ID");	
+	}
+	else
+	{
+		$tRow = $wpdb->get_row("select * from " . $wpdb->prefix ."foxypress_transaction where foxy_transaction_id = '$TransactionID'");
+		$HasSameBillingAndShipping = ($tRow->foxy_transaction_shipping_address1 == "");
+		$HeaderImage = get_option('foxypress_packing_slip_header');
+		$productList = "";
+		$temp_inventory_id = "";
+		foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
+		{
+			if($partialSlip)
+			{
+				foreach($td->transaction_detail_options->transaction_detail_option as $opt)
+				{
+					if(strtolower($opt->product_option_name) == "inventory_id")
+					{
+						$temp_inventory_id = $opt->product_option_value;
+					}
+				}		
+				foreach($Products as $product)
+				{
+					$temp_exploded = explode("|", $product);
+					if($temp_exploded[0] == $temp_inventory_id || $temp_exploded[1] == $td->product_code)
+					{
+						$productList .= "<div class=\"clearall\"></div>
+								<div class=\"product\">
+									<div class=\"sku\">" . $td->product_code . "</div>
+									<div class=\"qty\">" .  $td->product_quantity . "</div>
+									<div class=\"name\">" .  $td->product_name . "</div>
+								</div>";
+						break;
+					}
+				}			
+			}
+			else
+			{
+				$productList .= "<div class=\"clearall\"></div>
+							<div class=\"product\">
+								<div class=\"sku\">" . $td->product_code . "</div>
+								<div class=\"qty\">" .  $td->product_quantity . "</div>
+								<div class=\"name\">" .  $td->product_name . "</div>
+							</div>";
+			}
+		}
+	?>
+	<style>
+		@media print{
+			body{ background-color:#FFFFFF; background-image:none; color:#000000 }
+			.wrapper{width:600px;margin:0 auto;}
+			.header{text-align:center;}
+			.order_details{margin-top:10px;}
+				.order_details span{font-weight:bold;}
+			.customer_information{margin-top:30px;}
+				.customer_information .bill_to{float:left;width:280px;margin-right:20px;}
+				.customer_information .ship_to{float:left;width:280px;}
+	
+			.product_headers{}
+				.product_headers div{font-weight:bold;float:left;margin-right:10px;}
+				.product_headers div.sku{width:100px;text-align:center;}
+				.product_headers div.qty{width:50px;text-align:center;}
+				.product_headers div.name{width:250px;}
+			.product{}
+				.product div{float:left;margin-right:10px;}
+				.product div.sku{width:100px;text-align:center;}
+				.product div.qty{width:50px;text-align:center;}
+				.product div.name{width:250px;}
+
+			.custom_message span{font-weight:bold;}
+
+			.breaker{margin-top:20px;margin-bottom:20px;}
+	
+			.clearall{clear:both;}
+		}
+		.wrapper{width:600px;margin:0 auto;}
+		.header{text-align:center;}
+		.order_details{margin-top:10px;}
+		.order_details span{font-weight:bold;}
+		.customer_information{margin-top:30px;}
+			.customer_information .bill_to{float:left;width:280px;margin-right:20px;}
+			.customer_information .ship_to{float:left;width:280px;}
+	
+		.product_headers{}
+			.product_headers div{font-weight:bold;float:left;margin-right:10px;}
+			.product_headers div.sku{width:100px;text-align:center;}
+			.product_headers div.qty{width:50px;text-align:center;}
+			.product_headers div.name{width:250px;}
+		.product{}
+			.product div{float:left;margin-right:10px;}
+			.product div.sku{width:100px;text-align:center;}
+			.product div.qty{width:50px;text-align:center;}
+			.product div.name{width:250px;}
+	
+		.custom_message span{font-weight:bold;}
+
+		.breaker{margin-top:20px;margin-bottom:20px;}
+	
+		.clearall{clear:both;}
+	</style>
+	<div class="wrapper">
+        <?php if($HeaderImage != "") { echo("<div class=\"header\"><img src=\"" . $HeaderImage . "\" /></div>"); } ?>
+		<div class="order_details">
+			<span>Order Date</span> <?php echo($foxyXMLResponse->transaction->transaction_date); ?>
+		</div>
+		<div class="order_details">
+			<span>Order Number</span> <?php echo($TransactionID); ?>
+		</div>
+		<div class="customer_information">
+			<div class="bill_to">
+            	<?php
+				echo($foxyXMLResponse->transaction->customer_first_name . " " . $foxyXMLResponse->transaction->customer_last_name . "<br />" .
+					  $tRow->foxy_transaction_billing_address1 . " " .  $tRow->foxy_transaction_billing_address2 . "<br />" .
+					  $tRow->foxy_transaction_billing_city . ", " . $tRow->foxy_transaction_billing_state . " " . $tRow->foxy_transaction_billing_zip . " " . $tRow->foxy_transaction_billing_country . "<br />" .
+					  $foxyXMLResponse->transaction->customer_phone);
+				?>
+			</div>
+			<div class="ship_to">
+				<?php
+				echo($foxyXMLResponse->transaction->customer_last_name . " " .  $foxyXMLResponse->transaction->customer_first_name . "<br />" .
+						(
+							($HasSameBillingAndShipping) ?
+							$tRow->foxy_transaction_billing_address1 . " " .  $tRow->foxy_transaction_billing_address2 . "<br />" .
+							$tRow->foxy_transaction_billing_city . ", " . $tRow->foxy_transaction_billing_state . " " . $tRow->foxy_transaction_billing_zip . " " . $tRow->foxy_transaction_billing_country
+							:
+							$tRow->foxy_transaction_shipping_address1 . " " .  $tRow->foxy_transaction_shipping_address2 . "<br />" .
+							$tRow->foxy_transaction_shipping_city . ", " . $tRow->foxy_transaction_shipping_state . " " . $tRow->foxy_transaction_shipping_zip . " " . $tRow->foxy_transaction_shipping_country
+						)
+					);
+				?>
+			</div>
+			<div class="clearall"></div>
+		</div>
+		<hr class="breaker" />
+		<div class="product_information">
+			<div class="product_headers">
+				<div class="sku">SKU</div>
+				<div class="qty">QTY</div>
+				<div class="name">PRODUCT</div>
+			</div>
+            <?php echo($productList); ?>
+			<div class="clearall"></div>
+		</div>
+		<hr class="breaker" />
+		<div class="custom_message">
+			<p>
+				<?php echo($CustomMessage); ?>
+			</p>
+		</div>
+	</div>
+    <?php if($printPage) { ?>
+		<script type="text/javascript">            
+         	window.print();           
+        </script>
+	<?php
+		}
+	}
+	exit;		
 }
 
 function ProcessSearch($SearchValue)
@@ -826,6 +1184,36 @@ function End_Foxy_Order_Management($NeedsSync)
 					jQuery.get(fullurl);
 				}
 			}
+			
+			function BulkSelectAll(isChecked)
+			{
+				 jQuery("input[name='foxypress_bulk_check[]']").attr('checked', isChecked);
+			}
+			
+			function HandleBulkAction(action, baseURL)
+			{
+				if(action == "bulk_print")
+				{
+					var TransactionsToPrint = new Array();
+					jQuery.each(jQuery("input[name='foxypress_bulk_check[]']:checked"), function() {
+					  TransactionsToPrint.push(jQuery(this).val());
+					});
+					if(TransactionsToPrint != null && TransactionsToPrint.length > 0)
+					{
+						if(confirm("You are about to print " + TransactionsToPrint.length + " packing slip(s). Are you sure you would like to continue?"))
+						{
+							for(var i=0; i < TransactionsToPrint.length; i++)
+							{
+								var fullURL = baseURL + "&transaction=" + TransactionsToPrint[i];
+								window.open(fullURL);
+							}
+						}
+						//reset dropdown
+						jQuery("#foxypress_bulk_select").val("");
+					}
+				}
+			}
+			
 			<?php
 				if($NeedsSync)
 				{

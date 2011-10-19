@@ -3,7 +3,7 @@ Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/contact
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.0
-Tested up to: 3.2.1
+Tested up to: 3.3
 Stable tag: 3.0.1
 FoxyPress is a one stop shopping cart and management tool for use with FoxyCart's hosted e-commerce solution.
 
@@ -40,6 +40,17 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Green Egg Media - Multi Datafeed inspiration
 
 == Changelog ==
+
+= 0.3.4 =
+* Per user request, we’ve added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
+* Product grid can now be sorted by additional product attributes
+* HMAC Form Code added - no more form tampering : Courtesy of Brett from FoxyCart
+* Additional setting added to Manage Settings Page  to control if our default FoxyPress stylesheet is included.  
+* Per user request, SMTP Mail settings added to Manage Settings Page - useful for overcoming server relay trouble.
+* Added Quantity available in the product grid - hide from screen options if you do not need this.
+* Bugfix : New products now have the default category applied.
+* Bugfix: Showing correct price/sale price on manage products page now.
+* View the release notes <a href="http://www.foxy-press.com/blog/2011/10/19/foxypress-0-3-4-released/" target="_blank">here</a>
 
 = 0.3.3 =
 * WordPress Multi-site support - very important to read release notes on this.
