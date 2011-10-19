@@ -42,7 +42,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 == Changelog ==
 
 = 0.3.4 =
-* Per user request, we’ve added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
+* Per user request, we've added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
 * Product grid can now be sorted by additional product attributes
 * HMAC Form Code added - no more form tampering : Courtesy of Brett from FoxyCart
 * Additional setting added to Manage Settings Page  to control if our default FoxyPress stylesheet is included.  
