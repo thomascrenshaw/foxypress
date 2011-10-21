@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.4
+Version: 0.3.4.1
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -87,7 +87,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.4");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.4.1");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -100,7 +100,9 @@ if ( !empty ( $foxypress_url ) ){
 	include_once('subscriptions.php');
 	include_once('import-export.php');
 	include_once('order-management.php');
-	require_once "Mail.php";
+	if(defined('FOXYPRESS_SMTP_MAIL_PATH') && defined('FOXYPRESS_SMTP_MAIL_PATH')!='') {
+		require_once(FOXYPRESS_SMTP_MAIL_PATH);
+	}
 	require_once('classes/foxycart.cart_validation.php');
 	FoxyCart_Helper::$cart_url = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/cart";
 	FoxyCart_Helper::$secret = get_option('foxycart_apikey');

@@ -41,6 +41,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.3.4.1 =
+* BugFix: Moved SMTP Mail Include Path to a WP-Config.php Definition for use across multiple hosts.
+
 = 0.3.4 =
 * Per user request, we've added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
 * Product grid can now be sorted by additional product attributes
