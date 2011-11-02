@@ -80,8 +80,7 @@ function foxypress_settings_postback()
 
 function foxypress_settings_page_load()
 {
-	global $wpdb;		
-	
+	global $wpdb;			
 	if(get_option("foxypress_skip_settings_wizard") == "1")
 	{	
     ?>

@@ -41,11 +41,16 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
-= 0.3.4.1 =
-* BugFix: Moved SMTP Mail Include Path to a WP-Config.php Definition for use across multiple hosts.
+= 0.3.5 =
+* Added ability to set users as affiliates, assign commission, and generate clicks/views.
+* Added ability for new users to request affiliate status
+* API Mod: foxyPress_GetProducts has been extended. View notes here.
+* Bugfix: Bulk packing slips now use the custom message entered in the Settings page.
+* Bugfix: Added a WP-Config definition for if you’re using a sub folder install.
+* View the release notes <a href="http://www.foxy-press.com/blog/2011/11/02/foxypress-0-3-5-released/" target="_blank">here</a>
 
 = 0.3.4 =
-* Per user request, we've added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
+* Per user request, we’ve added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
 * Product grid can now be sorted by additional product attributes
 * HMAC Form Code added - no more form tampering : Courtesy of Brett from FoxyCart
 * Additional setting added to Manage Settings Page  to control if our default FoxyPress stylesheet is included.  
@@ -277,3 +282,9 @@ This is a stable release.  Please view the changelog to see the bugs we fixed.
 9. Subscriptions - View and edit your existing subscriptions
 
 10. Import/Export - Easily take your inventory from site to site by importing/exporting it.
+
+11. Affiliate Management - Easily manage approved/pending affiliates that are in your store.
+
+11a. Affiliate Management - View affiliate stats for a specific user, pay orders, and view their history.
+
+12. Affiliate Signup - Allow Users that sign up for your site to apply for affiliate status.

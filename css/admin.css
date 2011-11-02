@@ -319,3 +319,31 @@ textarea.message_notes{
 {
 	color:red;
 }
+
+div.clearall{clear:both;}
+
+/** AFFILIATE STUFF **/
+div.quickstats{
+	margin:5px 3px 5px 0px;
+	float:left;
+	height:128px;
+	width:154px;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-weight: 700;
+	text-align:center;
+}
+	div.number{padding-top:40px;font-size:36px;color:#fff;margin-bottom:20px;}
+	div.attribute{font-size:14px;color:#dddddc;}
+
+div.quickstats.first{
+	background:url(../img/affiliate-stats.jpg);
+}
+div.quickstats.second{
+	background:#e01822;
+}
+div.quickstats.third{
+	background:#9e181f;
+}
+div.quickstats.last{
+	background:#5d0005;
+}

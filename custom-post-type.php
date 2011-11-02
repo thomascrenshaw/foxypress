@@ -256,7 +256,7 @@ function foxypress_product_categories_setup()
 		{
 			$checked = "checked=\"checked\"";
 		}
-		if($i==0){$checked = "checked=\"checked\"";}
+		//if($i==0){$checked = "checked=\"checked\"";} //find a way to auto check default only on new setup
 		echo("<input type=\"checkbox\" name=\"foxy_categories[]\" value=\"" . $cat->category_id . "\" " . $checked. " /> " . stripslashes($cat->category_name) . "<br/>");
 		$i+=1;
 	}			

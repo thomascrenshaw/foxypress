@@ -591,7 +591,7 @@ function order_management_page_load()
 				//show hidden fields				
 				foreach($foxyXMLResponse->transaction->custom_fields->custom_field as $cf)
 				{
-					if($cf->custom_field_name != "blog_id" && $cf->custom_field_name != "m_id")
+					if($cf->custom_field_name != "blog_id" && $cf->custom_field_name != "m_id" && $cf->custom_field_name != "affiliate_id")
 					{
 						$HiddenFields .= "<div>" . $cf->custom_field_name . ": " . $cf->custom_field_value . "</div>";
 					}
@@ -842,7 +842,12 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 	global $wpdb;
 	$TransactionID = foxypress_FixGetVar('transaction');
 	$Products = explode(",", foxypress_FixGetVar('products'));
-	$CustomMessage = foxypress_FixGetVar('message');
+	if(foxypress_FixGetVar('message')!=""){
+		$CustomMessage = foxypress_FixGetVar('message');
+	}else{
+		$CustomMessage = get_option('foxypress_packing_slip_footer_message');
+	}
+	
 	if(!$printPage)
 	{
 		_e('<h3>Preview Your Packing Slip</h3>');
@@ -1265,6 +1270,11 @@ function SyncTransactions($SyncAll, $PageStart)
 				{
 					$blog_id = $customfield->custom_field_value;
 				}
+
+				if (strtolower($customfield->custom_field_name) == "affiliate_id")
+				{
+					$affiliate_id = $customfield->custom_field_value;
+				}
 			}
 									
 			//insert new transactions into our db, ignore existing transactions
@@ -1281,7 +1291,8 @@ function SyncTransactions($SyncAll, $PageStart)
 				  ", foxy_transaction_shipping_total = '" . mysql_escape_string($t->shipping_total) . "'" .
 				  ", foxy_transaction_order_total = '" . mysql_escape_string($t->order_total) . "'" .
 				  ", foxy_transaction_cc_type = '" . mysql_escape_string($t->cc_type) . "'" . 
-				  ", foxy_blog_id = '" . mysql_escape_string($blog_id) . "'";
+				  ", foxy_blog_id = '" . mysql_escape_string($blog_id) . "'" . 
+				  ", foxy_affiliate_id = '" . mysql_escape_string($affiliate_id) . "'";
 
 				  if($t->shipping_address1 == "")
 				  {
