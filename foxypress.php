@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.5
+Version: 0.3.5.1
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -92,7 +92,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.5");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.5.1");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 	
@@ -662,6 +662,21 @@ function foxypress_GetMainInventoryImage($inventory_id)
 			}
 		}
 	}
+	return "";
+}
+
+function foxypress_GetFirstInventoryImage($inventory_id)
+{
+	global $wpdb, $post;
+	$current_images = get_posts(array('numberposts' => 1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
+		if(!empty($current_images))
+		{
+			foreach ($current_images as $img)
+			{
+				$src = wp_get_attachment_image_src($img->ID, "full");
+				return $src[0];
+			}
+		}
 	return "";
 }
 
