@@ -50,11 +50,11 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 * Added ability for new users to request affiliate status
 * API Mod: foxyPress_GetProducts has been extended. View notes here.
 * Bugfix: Bulk packing slips now use the custom message entered in the Settings page.
-* Bugfix: Added a WP-Config definition for if you’re using a sub folder install.
+* Bugfix: Added a WP-Config definition for if you're using a sub folder install.
 * View the release notes <a href="http://www.foxy-press.com/blog/2011/11/02/foxypress-0-3-5-released/" target="_blank">here</a>
 
 = 0.3.4 =
-* Per user request, we’ve added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
+* Per user request, we've added a packing slip wizard to be used for partial orders.  Handy for returns or back-ordered items.
 * Product grid can now be sorted by additional product attributes
 * HMAC Form Code added - no more form tampering : Courtesy of Brett from FoxyCart
 * Additional setting added to Manage Settings Page  to control if our default FoxyPress stylesheet is included.  
