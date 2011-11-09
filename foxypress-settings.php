@@ -1,4 +1,10 @@
 <?php
+/**************************************************************************
+FoxyPress provides a complete shopping cart and inventory management tool 
+for use with FoxyCart's e-commerce solution.
+Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+**************************************************************************/
+
 add_action('admin_init', 'foxypress_settings_postback');
 
 function foxypress_settings_postback()
@@ -147,7 +153,8 @@ function foxypress_settings_page_load()
                     <td align="left">
                          <?php $version = get_option('foxycart_storeversion'); ?>
                         <select name="foxycart_storeversion" width="300" style="width: 300px">
-                            <option value="0.7.1" <?php echo( ($version == "0.7.1") ? "selected=\"selected\"" : "" ); ?>>0.7.1</option>
+                            <option value="0.7.2" <?php echo( ($version == "0.7.2") ? "selected=\"selected\"" : "" ); ?>>0.7.2</option>
+							<option value="0.7.1" <?php echo( ($version == "0.7.1") ? "selected=\"selected\"" : "" ); ?>>0.7.1</option>
                             <option value="0.7.0" <?php echo( ($version == "0.7.0") ? "selected=\"selected\"" : "" ); ?>>0.7.0</option>                             </select>
                     </td>
                 </tr>
@@ -412,6 +419,7 @@ function foxypress_settings_page_load()
              <i>ex. if your store url is foxypress.foxycart.com, enter just 'foxypress'.</i>
             <p>What version is your FoxyCart store?</p>
             <select name="foxycart_storeversion_wizard" width="300" style="width: 300px">
+				<option value="0.7.2">0.7.2</option>
                 <option value="0.7.1">0.7.1</option>
                 <option value="0.7.0">0.7.0</option>             
             </select>

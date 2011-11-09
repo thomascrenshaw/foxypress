@@ -10,6 +10,7 @@ Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
 
+FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2011 WebMovement, LLC
 
 This program is free software: you can redistribute it and/or modify
@@ -34,7 +35,9 @@ they obviously aren't required for you to use this plugin.
 
 If you sell this code (i.e. are a web developer selling features provided
 via this plugin to clients), it would be very nice if you threw some of
-your profits my way. After all, you are profiting off my hard work. ;)
+your profits my way. Or even better, we'd love to include your new 
+functionality in the master package we distribute.  I can be contacted 
+through the plugin website at any time.
 
 Thanks and enjoy this plugin!
 
@@ -92,7 +95,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.5.1");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.5.2");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 	
@@ -107,6 +110,7 @@ if ( !empty ( $foxypress_url ) ){
 	include_once('order-management.php');	
 	include_once('affiliate-management.php');
 	include_once('affiliate-signup.php');
+	include_once('foxypress-templates.php');
 	if(defined('FOXYPRESS_SMTP_MAIL_PATH') && defined('FOXYPRESS_SMTP_MAIL_PATH')!='') { 
 		require_once(FOXYPRESS_SMTP_MAIL_PATH);
 	}	
@@ -132,6 +136,7 @@ function foxypress_menu()
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Affiliate Management'), __('Affiliate Management'), 'manage_options', 'affiliate-management', 'foxypress_create_affiliate_table');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Reports'), __('Reports'), 'manage_options', 'reports', 'foxypress_reports_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Subscriptions'), __('Subscriptions'), 'manage_options', 'subscriptions', 'foxypress_subscriptions_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Templates'), __('Templates'), 'manage_options', 'templates', 'foxypress_templates_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Import/Export'), __('Import/Export'), 'manage_options', 'import-export', 'import_export_page_load');
 		$user_id = $current_user->ID;
 		$affiliate_user = get_the_author_meta('affiliate_user', $user_id);

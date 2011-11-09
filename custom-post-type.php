@@ -1,4 +1,10 @@
 <?php
+/**************************************************************************
+FoxyPress provides a complete shopping cart and inventory management tool 
+for use with FoxyCart's e-commerce solution.
+Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+**************************************************************************/
+
 session_start();
 add_action('init', 'foxypress_create_custom_post_type', 1);
 add_action('after_setup_theme','foxypress_setup_post_thumbnails', 999);

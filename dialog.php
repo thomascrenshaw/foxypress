@@ -1,4 +1,10 @@
 <?php
+/**************************************************************************
+FoxyPress provides a complete shopping cart and inventory management tool 
+for use with FoxyCart's e-commerce solution.
+Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+**************************************************************************/
+
 	/** Load WordPress Administration Bootstrap */
 	require_once('../../../wp-admin/admin.php');
 	// Enable the ability for the inventory to be loaded from pages

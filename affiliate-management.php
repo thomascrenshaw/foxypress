@@ -1,4 +1,10 @@
 <?php
+/**************************************************************************
+FoxyPress provides a complete shopping cart and inventory management tool 
+for use with FoxyCart's e-commerce solution.
+Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+**************************************************************************/
+
 $root = dirname(dirname(dirname(dirname(__FILE__))));
 require_once($root.'/wp-config.php');
 require_once($root.'/wp-includes/wp-db.php');
@@ -644,10 +650,7 @@ function foxypress_create_affiliate_table() {
                 $mail_subject = 'Affiliate status approved!';
                 $mail_body    = 'You have been approved to be an affiliate. Your affiliate details are below.<br /><br />Affiliate Commission: ' . $percentage . '%<br />Affiliate URL: ' . $affiliate_url;
 
-                $headers = "MIME-Version: 1.0" . "\r\n";
-                $headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
-                $headers .= 'From: <' . get_settings("admin_email ") . '>' . "\r\n";
-                wp_mail($mail_to,$mail_subject,$mail_body,$headers); ?>
+                foxypress_Mail($mail_to, $mail_subject, $mail_body); ?>
 
                 <div class="updated" id="message">
                     <p><strong>Affiliate Approved!</strong></p>
@@ -836,6 +839,12 @@ function foxypress_create_affiliate_table() {
                 global $wpdb;
                 $sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_payments (foxy_affiliate_id, foxy_transaction_id, foxy_transaction_order_total, foxy_affiliate_percentage, foxy_affiliate_commission, foxy_affiliate_payment_method, foxy_affiliate_payment_date) values ('$affiliate_id', '$order_id', '$order_total', '$affiliate_percentage', '$affiliate_commission', '$payment_method', '$payment_date')";
                 $wpdb->query($sql);
+
+				$mail_to = get_the_author_meta('user_email', $affiliate_id);
+                $mail_subject = 'Affiliate Payment Notice';
+				$mail_body    = 'You have been paid for an affiliate commission on ' . $payment_date . '. <br />Amount: ' . $affiliate_commission . ' via ' . $payment_method . '';
+
+				foxypress_Mail($mail_to,$mail_subject,$mail_body);
 
                 $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&updated=true',$_REQUEST['page'],'view_details',$affiliate_id);
                 echo 'Submitting Payment...';

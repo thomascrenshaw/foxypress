@@ -1,4 +1,10 @@
 <?php	
+/**************************************************************************
+FoxyPress provides a complete shopping cart and inventory management tool 
+for use with FoxyCart's e-commerce solution.
+Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+**************************************************************************/
+
 session_start();
 $root = dirname(dirname(dirname(dirname(__FILE__))));
 require_once($root.'/wp-config.php');
