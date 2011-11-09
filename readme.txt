@@ -41,6 +41,12 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.3.5.2 =
+* Feature: Support for FoxyCart Version 0.7.2 to accommodate FoxyCart's latest public beta.
+* Feature: Template Caching (must be using store version 0.7.2)
+* Feature: Affiliate user now receives an email upon marking an order paid.
+* Feature: FoxyCart 0.7.2 Subscription DataFeed implemented
+
 = 0.3.5.1 =
 * Update: Minor styling changes to the affiliate management pages
 * Bugfix: Some installs/servers were having problems with implode() function.
