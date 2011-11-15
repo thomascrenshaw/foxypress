@@ -1,10 +1,4 @@
 <?php
-/**************************************************************************
-FoxyPress provides a complete shopping cart and inventory management tool 
-for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
-**************************************************************************/
-
 $root = dirname(dirname(dirname(dirname(__FILE__))));
 require_once($root.'/wp-config.php');
 require_once($root.'/wp-includes/wp-db.php');
@@ -13,12 +7,12 @@ if(!class_exists('WP_List_Table')){
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
-class Foxypress_affiliate_management extends WP_List_Table
+class Foxypress_affiliate_management extends WP_List_Table 
 {
-
+    
     function __construct(){
         global $status, $page;
-
+                
         //Set parent defaults
         parent::__construct( array(
             'singular'  => 'affiliate',
@@ -62,10 +56,10 @@ class Foxypress_affiliate_management extends WP_List_Table
                 return print_r($item,true);
         }
     }
-
+    
     /** ************************************************************************
      * Main page affiliate management columns
-     *
+     * 
      * @see WP_List_Table::::single_row_columns()
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td>
@@ -77,7 +71,7 @@ class Foxypress_affiliate_management extends WP_List_Table
         $actions = array(
             'view_details' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s">View Details</a>',$_REQUEST['page'],'view_details',$item->id)
         );
-
+        
         //Return the title contents
         return sprintf('%1$s <span style="color:silver">(id:%2$s)</span>%3$s',
             /*$1%s*/ $item->user_nicename,
@@ -95,11 +89,19 @@ class Foxypress_affiliate_management extends WP_List_Table
 
     function column_management_total_commission($item)
     {
-        $order_commission = $item->affiliate_percentage / 100 * $item->total_commission;
-        $order_commission = number_format($order_commission, 2, '.', ',');
-
+        if ($item->affiliate_payout_type == 0) {
+            $unpaid_commission = $item->affiliate_payout / 100 * $item->total_unpaid_amount;
+            $total_commission  = $unpaid_commission + $item->total_commission;
+            $total_commission  = number_format($total_commission, 2, '.', ',');
+        } else {
+            $unpaid_commission = $item->affiliate_payout * $item->num_unpaid_orders;
+            $total_commission  = $unpaid_commission + $item->total_commission;
+            $total_commission  = number_format($total_commission, 2, '.', ',');
+        }
+            
+                    
         return sprintf('$%1$s',
-            /*$1%s*/ $order_commission
+            /*$1%s*/ $total_commission
         );
     }
 
@@ -109,7 +111,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             /*$1%s*/ $item->num_total_orders
         );
     }
-
+    
     function column_cb($item)
     {
         return sprintf(
@@ -121,7 +123,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
     /** ************************************************************************
      * View Detail page affiliate management columns
-     *
+     * 
      * @see WP_List_Table::::single_row_columns()
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td>
@@ -165,10 +167,10 @@ class Foxypress_affiliate_management extends WP_List_Table
     {
         return sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&approve=%s&affiliate_id=%s">Approve</a>',$_REQUEST['page'],'pending_affiliates','true',$item->id);
     }
-
+    
     /** ************************************************************************
      * View Detail page affiliate management columns
-     *
+     * 
      * @see WP_List_Table::::single_row_columns()
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td>
@@ -185,7 +187,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             /*$1%s*/ $item->order_id,
                      $this->row_actions($actions)
         );
-    }
+    } 
 
     function column_view_details_order_total($item)
     {
@@ -193,11 +195,15 @@ class Foxypress_affiliate_management extends WP_List_Table
             /*$1%s*/ $item->order_total
         );
     }
-
+    
     function column_view_details_order_commission($item)
     {
-        $order_commission = $item->affiliate_percentage / 100 * $item->order_total;
-        $order_commission = number_format($order_commission, 2, '.', ',');
+        if ($item->affiliate_payout_type == 0) {
+            $order_commission = $item->affiliate_payout / 100 * $item->order_total;
+            $order_commission = number_format($order_commission, 2, '.', ',');
+        } else {
+            $order_commission  = number_format($item->affiliate_payout, 2, '.', ',');
+        }
 
         return sprintf('$%1$s',
             /*$1%s*/ $order_commission
@@ -213,7 +219,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
     /** ************************************************************************
      * View Detail page affiliate management columns
-     *
+     * 
      * @see WP_List_Table::::single_row_columns()
      * @param array $item A singular item (one full row's worth of data)
      * @return string Text to be placed inside the column <td>
@@ -224,7 +230,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             /*$1%s*/ $item->foxy_transaction_id,
             /*$2%s*/ $item->foxy_transaction_id
         );
-    }
+    } 
 
     function column_view_past_details_order_total($item)
     {
@@ -233,20 +239,23 @@ class Foxypress_affiliate_management extends WP_List_Table
         );
     }
 
-    function column_view_past_details_affiliate_percentage($item)
-    {
+    function column_view_past_details_affiliate_payout($item)
+    {   
+        if ($item->foxy_affiliate_payout_type == 0) {
+            $affiliate_payout = $item->foxy_affiliate_payout . '%';
+        } else {
+            $affiliate_payout = '$' . $item->foxy_affiliate_payout;
+        }
+
         return sprintf('%1$s',
-            /*$1%s*/ $item->foxy_affiliate_percentage . '%'
+            /*$1%s*/ $affiliate_payout
         );
     }
-
+    
     function column_view_past_details_order_commission($item)
     {
-        $order_commission = $item->foxy_affiliate_percentage / 100 * $item->foxy_transaction_order_total;
-        $order_commission = number_format($order_commission, 2, '.', ',');
-
         return sprintf('$%1$s',
-            /*$1%s*/ $order_commission
+            /*$1%s*/ $item->foxy_affiliate_commission
         );
     }
 
@@ -260,13 +269,13 @@ class Foxypress_affiliate_management extends WP_List_Table
     function column_view_past_details_payment_date($item)
     {
         return sprintf('%1$s',
-            /*$1%s*/ $item->foxy_affiliate_payment_date
+            /*$1%s*/ $item->foxy_affiliate_payment_date 
         );
     }
 
     /** ************************************************************************
-     *
-     *
+     * 
+     * 
      **************************************************************************/
     function get_columns($mode)
     {
@@ -305,7 +314,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             $columns = array(
                 'view_past_details_order_id'             => 'Order ID',
                 'view_past_details_order_total'          => 'Order Total',
-                'view_past_details_affiliate_percentage' => 'Affiliate Percentage',
+                'view_past_details_affiliate_payout'     => 'Affiliate Payout',
                 'view_past_details_order_commission'     => 'Affiliate Commission',
                 'view_past_details_payment_method'       => 'Payment Method',
                 'view_past_details_payment_date'         => 'Payment Date'
@@ -315,7 +324,7 @@ class Foxypress_affiliate_management extends WP_List_Table
         return $columns;
 
     }
-
+    
     function get_sortable_columns($mode)
     {
         if ($mode === 'management')
@@ -345,23 +354,23 @@ class Foxypress_affiliate_management extends WP_List_Table
             $sortable_columns = array(
                 'view_past_details_order_id'             => array('view_past_details_order_id', true),
                 'view_past_details_order_total'          => array('view_past_details_order_total', false),
-                'view_past_details_affiliate_percentage' => array('view_past_details_affiliate_percentage', false),
+                'view_past_details_affiliate_payout'     => array('view_past_details_affiliate_payout', false),
                 'view_past_details_order_commission'     => array('view_past_details_order_commission', false),
                 'view_past_details_payment_method'       => array('view_past_details_payment_method', false),
                 'view_past_details_payment_date'         => array('view_past_details_payment_date', false)
             );
         }
-
+        
         return $sortable_columns;
     }
-
-    function get_bulk_actions()
+    
+    function get_bulk_actions() 
     {
         $actions = array();
 
         return $actions;
     }
-
+    
     function process_bulk_action()
     {
         //Detect when a bulk action is being triggered...
@@ -369,26 +378,26 @@ class Foxypress_affiliate_management extends WP_List_Table
             //wp_die('Items deleted (or they would be if we had items to delete)!');
         //}
     }
-
+    
     function prepare_items($mode, $order_by = '', $order = '')
     {
         //How many items per page
         $per_page = 10;
-
+        
         $columns = $this->get_columns($mode);
         $hidden = array();
         $sortable = $this->get_sortable_columns($mode);
-
+        
         $this->_column_headers = array($columns, $hidden, $sortable);
-
+        
         $this->process_bulk_action();
-
+        
         global $wpdb;
-        $sql = "SELECT user_id FROM `wp_usermeta`
+        $sql = "SELECT user_id FROM " . $wpdb->prefix . "usermeta
                 WHERE meta_key = 'affiliate_user' AND meta_value = 'true'";
 
         $affiliate_ids = $wpdb->get_results($sql);
-
+        
         $ids = array();
         $i = 0;
         foreach ($affiliate_ids as $affiliate)
@@ -410,7 +419,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             if ($order_by === 'management_affiliate')
             {
                 $sort_by = 'u.user_nicename ' . $sort_order;
-            }
+            } 
             else if ($order_by === 'management_clicks')
             {
                 $sort_by = 'num_clicks ' . $sort_order;
@@ -428,22 +437,25 @@ class Foxypress_affiliate_management extends WP_List_Table
                 $sort_by = 'u.id ASC';
             }
 
-            $sql_data = "SELECT u.id, u.user_nicename, um.meta_key, um.meta_value AS affiliate_percentage,
+            $sql_data = "SELECT u.id, u.user_nicename,
+                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout_type' AND user_id = u.id) AS affiliate_payout_type,
+                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout' AND user_id = u.id) AS affiliate_payout,
                         (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_tracking WHERE affiliate_id = u.id) AS num_clicks,
                         (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id = u.id) AS num_total_orders,
-                        (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id = u.id) AS total_commission
+                        (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = u.id) AS total_commission,
+                        (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = u.id AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS num_unpaid_orders,
+                        (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = u.id AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_amount
                         FROM " . $wpdb->prefix . "users AS u
-                        LEFT JOIN " . $wpdb->prefix . "usermeta AS um ON um.meta_key = 'affiliate_percentage' AND um.user_id = u.id
                         WHERE u.id in (" . $ids . ")
                         ORDER BY " . $sort_by;
         }
         else if ($mode === 'pending_affiliates')
         {
-            $sql = "SELECT user_id FROM `wp_usermeta`
+            $sql = "SELECT user_id FROM " . $wpdb->prefix . "usermeta
                 WHERE meta_key = 'affiliate_user' AND meta_value = 'pending'";
 
             $pending_affiliate_ids = $wpdb->get_results($sql);
-
+        
             $pending_ids = array();
             $i = 0;
             foreach ($pending_affiliate_ids as $pending_affiliate)
@@ -497,10 +509,11 @@ class Foxypress_affiliate_management extends WP_List_Table
 
             $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
 
-            $sql_data = "SELECT ft.foxy_transaction_id AS order_id, ft.foxy_transaction_order_total AS order_total, ft.foxy_transaction_date AS order_date, u.id, u.user_nicename, um.meta_key, um.meta_value AS affiliate_percentage
+            $sql_data = "SELECT ft.foxy_transaction_id AS order_id, ft.foxy_transaction_order_total AS order_total, ft.foxy_transaction_date AS order_date, u.id, u.user_nicename,
+                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout_type' AND user_id = ft.foxy_affiliate_id) AS affiliate_payout_type,
+                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout' AND user_id = ft.foxy_affiliate_id) AS affiliate_payout
                         FROM " . $wpdb->prefix . "foxypress_transaction AS ft
                         LEFT JOIN " . $wpdb->prefix . "users AS u ON u.id = ft.foxy_affiliate_id
-                        LEFT JOIN " . $wpdb->prefix . "usermeta AS um ON um.meta_key = 'affiliate_percentage' AND um.user_id = ft.foxy_affiliate_id
                         WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)
                         ORDER BY " . $sort_by;
         }
@@ -515,14 +528,14 @@ class Foxypress_affiliate_management extends WP_List_Table
             if ($order_by === 'view_past_details_order_id')
             {
                 $sort_by = 'foxy_transaction_id ' . $sort_order;
-            }
+            } 
             else if ($order_by === 'view_past_details_order_total')
             {
                 $sort_by = 'foxy_transaction_order_total ' . $sort_order;
             }
-            else if ($order_by === 'view_past_details_affiliate_percentage')
+            else if ($order_by === 'view_past_details_affiliate_payout')
             {
-                $sort_by = 'foxy_affiliate_percentage ' . $sort_order;
+                $sort_by = 'foxy_affiliate_payout ' . $sort_order;
             }
             else if ($order_by === 'view_past_details_order_commission')
             {
@@ -545,20 +558,20 @@ class Foxypress_affiliate_management extends WP_List_Table
 
             $sql_data = "SELECT *
                         FROM " . $wpdb->prefix . "foxypress_affiliate_payments
-                        WHERE foxy_affiliate_id = " . $affiliate_id . "
+                        WHERE foxy_affiliate_id = " . $affiliate_id . " 
                         ORDER BY " . $sort_by;
         }
 
         $data = $wpdb->get_results($sql_data);
-
+        
         $current_page = $this->get_pagenum();
-
+        
         $total_items = count($data);
-
+        
         $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
-
+        
         $this->items = $data;
-
+        
         $this->set_pagination_args( array(
             'total_items' => $total_items,                  //WE have to calculate the total number of items
             'per_page'    => $per_page,                     //WE have to determine how many items to show on a page
@@ -570,8 +583,8 @@ class Foxypress_affiliate_management extends WP_List_Table
     {
         global $wpdb;
         $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
-
-        $data = "SELECT
+        
+        $data = "SELECT 
                 (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_tracking WHERE affiliate_id = " . $affiliate_id . ") AS num_clicks,
                 (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_total_orders,
                 (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_paid_orders,
@@ -587,9 +600,10 @@ class Foxypress_affiliate_management extends WP_List_Table
         $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
 
         $data = (object) array(
-            'firstname'  => get_user_meta($affiliate_id, 'first_name', true),
-            'lastname'   => get_user_meta($affiliate_id, 'last_name', true),
-            'percentage' => get_user_meta($affiliate_id, 'affiliate_percentage', true)
+            'firstname'   => get_user_meta($affiliate_id, 'first_name', true),
+            'lastname'    => get_user_meta($affiliate_id, 'last_name', true),
+            'payout'      => get_user_meta($affiliate_id, 'affiliate_payout', true),
+            'payout_type' => get_user_meta($affiliate_id, 'affiliate_payout_type', true)
             );
 
         return $data;
@@ -611,8 +625,8 @@ class Foxypress_affiliate_management extends WP_List_Table
     function get_affiliate_counts()
     {
         global $wpdb;
-
-        $data = "SELECT
+        
+        $data = "SELECT 
                 (SELECT count(user_id) FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_user' AND meta_value = 'pending') AS total_pending,
                 (SELECT count(user_id) FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_user' AND meta_value = 'true') AS total_approved";
 
@@ -628,27 +642,34 @@ function foxypress_create_affiliate_table() {
     $order_by     = $fp_affiliate->foxypress_FixGetVar('orderby');
     $order        = $fp_affiliate->foxypress_FixGetVar('order');
 
-    if ($mode === 'management' || $mode === 'pending_affiliates'){
+    if ($mode === 'management' || $mode === 'pending_affiliates'){ 
 
         //Fetch, prepare, sort, and filter our data...
-        $fp_affiliate->prepare_items($mode, $order_by, $order);
+        $fp_affiliate->prepare_items($mode, $order_by, $order); 
         $affiliate_counts = $fp_affiliate->get_affiliate_counts(); ?>
 
         <div class="wrap">
-
+            
             <div id="icon-users" class="icon32"><br/></div>
             <h2>FoxyPress Affiliates</h2>
 
             <?php $updated = $fp_affiliate->foxypress_FixGetVar('updated');
-            if ($updated === 'true') {
-
+            if ($updated === 'true') { 
+                
                 $user_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
-
-                $percentage = get_the_author_meta('affiliate_percentage', $user_id);
+                
+                $payout_type = get_the_author_meta('affiliate_payout_type', $user_id);
+                $payout = get_the_author_meta('affiliate_payout', $user_id);
                 $affiliate_url = get_the_author_meta('affiliate_url', $user_id);
+
+                if ($payout_type == 0) {
+                    $affiliate_commission = 'Affiliate Commission: ' . $payout . '%';
+                } else {
+                    $affiliate_commission = 'Affiliate Commission: $' . $payout;
+                }
                 $mail_to = get_the_author_meta('user_email', $user_id);
                 $mail_subject = 'Affiliate status approved!';
-                $mail_body    = 'You have been approved to be an affiliate. Your affiliate details are below.<br /><br />Affiliate Commission: ' . $percentage . '%<br />Affiliate URL: ' . $affiliate_url;
+                $mail_body    = 'You have been approved to be an affiliate. Your affiliate details are below.<br /><br />' . $affiliate_commission . '<br />Affiliate URL: ' . $affiliate_url;
 
                 foxypress_Mail($mail_to, $mail_subject, $mail_body); ?>
 
@@ -657,35 +678,47 @@ function foxypress_create_affiliate_table() {
                 </div>
 
             <?php } ?>
-
+            
             <div style="background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;">
-				<p><a class="button bold" style="float:right;" href="http://www.foxy-press.com/getting-started/affiliate-management/" target="_blank">Affiliate Documentation</a></p>
                 <?php if ($mode === 'management') { ?>
                     <p>Listed below you will find your affiliate's current stats.</p>
                 <?php } else { ?>
                     <p>Listed below you will find your pending affiliates.</p>
                 <?php } ?>
             </div>
-
+            
             <?php $approve = $fp_affiliate->foxypress_FixGetVar('approve');
                 if ($approve === 'true') {
-
+                
                     $user_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
                     if (isset($_POST['affiliate_approve_submit'])) {
-                        $percentage = $fp_affiliate->foxypress_FixPostVar('affiliate_percentage');
-                        $error      = false;
+                        $payout_type = $fp_affiliate->foxypress_FixPostVar('affiliate_payout_type');
+                        $payout      = $fp_affiliate->foxypress_FixPostVar('affiliate_payout');
+                        $error       = false;
 
-                        if (empty($percentage)) {
+                        if (empty($payout)) {
                             $error = true;
-                            $percentage_error = true;
+                            $payout_error = true;
+                        }
+
+                        if (empty($payout_type)) {
+                            $error = true;
+                            $payout_type_error = true;
                         }
 
                         if (!$error) {
-                            update_usermeta($user_id, 'affiliate_percentage', $percentage);
-                            update_usermeta($user_id, 'affiliate_user', 'true');
+                            if ($payout_type == 'percentage') {
+                                $payout_type_converted = 0;
+                            } else {
+                                $payout_type_converted = 1;
+                            }
+
+                            update_user_meta($user_id, 'affiliate_payout_type', $payout_type_converted);
+                            update_user_meta($user_id, 'affiliate_payout', $payout);
+                            update_user_meta($user_id, 'affiliate_user', 'true');
 
                             $affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $user_id;
-                            update_usermeta($user_id, 'affiliate_url', $affiliate_url);
+                            update_user_meta($user_id, 'affiliate_url', $affiliate_url);                         
 
                             $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&updated=%s&affiliate_id=%s',$_REQUEST['page'],'pending_affiliates','true',$user_id); ?>
 
@@ -694,20 +727,40 @@ function foxypress_create_affiliate_table() {
                             </div>
 
                             <script type="text/javascript">window.location.href ='<?php echo $destination_url; ?>';</script>
-
+        
                         <?php } else { ?>
                             <div class="error" id="message">
-                                <p><strong>You must enter a percentage value!</strong></p>
+                                <?php if ($payout_error) { ?>
+                                <p><strong>You must enter a payout.</strong></p>
+                                <?php } ?>
+
+                                <?php if ($payout_type_error) { ?>
+                                <p><strong>You must select a payout type.</strong></p>
+                                <?php } ?>
                             </div>
                        <?php }
                     } ?>
 
                     <form id="affiliate_approve_form" name="affiliate_approve_form" method="POST">
                     <table class="form-table">
-                        <tr class="">
+                        <tr>
+                            <th><label for="affiliate_payout_type">Affiliate Payout Type</label></th>
+                            <td>
+                                <input type="radio" <?php if ($payout_type == 'percentage') { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="percentage">
+                                <span class="description">Percentage of each order.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td>
+                                <input type="radio" <?php if ($payout_type == 'dollars') { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="dollars">
+                                <span class="description">Dollar amount of each order.</span>
+                            </td>
+                        </tr>
+                        <tr>
                             <th><label for="affiliate_first_name">Percentage <span class="description">(required)</span></label></th>
-                            <td><input type="text" name="affiliate_percentage" id="affiliate_percentage" value="">
-                            <span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30%)</b></span></td>
+                            <td><input type="text" name="affiliate_payout" id="affiliate_payout" value="<?php echo $payout; ?>"> 
+                            <span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30% or $30.00)</b></span></td>
                         </tr>
                     </table>
                     <p class="submit"><input type="submit" value="Approve" class="button-primary" id="affiliate_approve_submit" name="affiliate_approve_submit"></p>
@@ -725,24 +778,26 @@ function foxypress_create_affiliate_table() {
                 <!-- Now we can render the completed list table -->
                 <?php $fp_affiliate->display() ?>
             </form>
-
+            
         </div>
 
-    <?php } else if ($mode === 'view_details' || $mode === 'view_past_details') {
-
+    <?php } else if ($mode === 'view_details' || $mode === 'view_past_details') { 
+    
         //Fetch, prepare, sort, and filter our data...
         $fp_affiliate->prepare_items($mode, $order_by, $order); ?>
-
+        
         <?php
             $affiliate_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
-			$affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $affiliate_id;
-
             $user_detail  = $fp_affiliate->get_affiliate_user_details();
             $order_detail = $fp_affiliate->get_affiliate_order_details();
-
-            $amount_due = $user_detail->percentage / 100 * $order_detail[0]->total_unpaid_amount;
+            
+            if ($user_detail->payout_type == 0) {
+                $amount_due = $user_detail->payout / 100 * $order_detail[0]->total_unpaid_amount;
+            } else {
+                $amount_due = $user_detail->payout * $order_detail[0]->num_unpaid_orders;
+            }
             $amount_due = number_format($amount_due, 2, '.', ',');
-        ?>
+        ?>    
 
         <div class="wrap">
 
@@ -750,13 +805,13 @@ function foxypress_create_affiliate_table() {
             <h2><?php echo $user_detail->firstname . " " . $user_detail->lastname; ?> :: Affiliate Detail <a class="add-new-h2" href="<?php echo get_admin_url(); ?>user-edit.php?user_id=<?php echo $affiliate_id; ?>">Edit User</a></h2>
 
             <?php $updated = $fp_affiliate->foxypress_FixGetVar('updated');
-			if ($updated === 'true') { ?>
-			<div class="updated" id="message">
-				<p><strong>Payment Submitted Successfully</strong></p>
-			</div>
-			<?php } ?>
-
-			<div>
+            if ($updated === 'true') { ?>
+            <div class="updated" id="message">
+                <p><strong>Payment Submitted Successfully</strong></p>
+            </div>
+            <?php } ?>
+            
+            <div>
 				<div class='quickstats first'>
 
 				</div>
@@ -777,8 +832,13 @@ function foxypress_create_affiliate_table() {
 					<div class='attribute'>Amount Due</div>
 				</div>
 				<div class='quickstats last'>
-					<div class='number'><?php echo $user_detail->percentage; ?>%</div>
-					<div class='attribute'>Commission</div>
+					<?php if ($user_detail->payout_type == 0) { ?>
+                    	<div class='number'><?php echo $user_detail->payout; ?>% </div>
+						<div class='attribute'>Commission <br />(of total transaction)</div>
+                    <?php } else { ?>
+                    	<div class='number'>$<?php echo $user_detail->payout; ?></div>
+						<div class='attribute'>Commission <br />(per transaction)</div>
+                    <?php } ?>
 				</div>
 				<div class="clearall"></div>
 			</div>
@@ -789,7 +849,7 @@ function foxypress_create_affiliate_table() {
 					<b>Affiliate Link: </b><?=$affiliate_url;?>
 				</p>
 			</div>
-
+            
             <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
             <form id="affiliate-filter" method="get">
                 <!-- For plugins, we also need to ensure that the form posts back to our current page -->
@@ -813,11 +873,15 @@ function foxypress_create_affiliate_table() {
         $order_id     = $fp_affiliate->foxypress_FixGetVar('order_id');
         $affiliate_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
 
-        $affiliate_commission = $user_detail->percentage / 100 * $order_detail[0]->foxy_transaction_order_total;
+        if ($user_detail->payout_type == 0) {
+            $affiliate_commission = $user_detail->payout / 100 * $order_detail[0]->foxy_transaction_order_total;
+        } else {
+            $affiliate_commission = $user_detail->payout;
+        }
         $commission = number_format($affiliate_commission, 2, '.', ',');
         ?>
         <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/jquery-ui-1.8.11.custom.min.js"></script>
-        <script>
+        <script> 
             jQuery(function() {
                 jQuery("#pay_affiliate_date").datepicker({ dateFormat: 'yy-mm-dd' });
             });
@@ -825,27 +889,22 @@ function foxypress_create_affiliate_table() {
         <div class="settings_widefat" id="">
         <?php if(isset($_POST['pay_affiliate_submit']))
         { ?>
-            <div class="settings_head settings">Pay Order Commission</div>
+            <div class="settings_head settings">Pay Order Commission</div>      
             <div class="settings_inside">
                 <?php
-                $order_id             = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_order_id');
-                $order_total          = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_order_total');
-                $affiliate_id         = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_id');
-                $affiliate_percentage = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_percentage');
-                $affiliate_commission = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_commission');
-                $payment_method       = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_method');
-                $payment_date         = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_date');
+                $order_id              = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_order_id');
+                $order_total           = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_order_total');
+                $affiliate_id          = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_id');
+                $affiliate_payout_type = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_payout_type');
+                $affiliate_payout      = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_payout');
+                $affiliate_commission  = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_commission');
+                $payment_method        = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_method');
+                $payment_date          = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_date');
 
                 global $wpdb;
-                $sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_payments (foxy_affiliate_id, foxy_transaction_id, foxy_transaction_order_total, foxy_affiliate_percentage, foxy_affiliate_commission, foxy_affiliate_payment_method, foxy_affiliate_payment_date) values ('$affiliate_id', '$order_id', '$order_total', '$affiliate_percentage', '$affiliate_commission', '$payment_method', '$payment_date')";
+                $sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_payments (foxy_affiliate_id, foxy_transaction_id, foxy_transaction_order_total, foxy_affiliate_payout, foxy_affiliate_payout_type, foxy_affiliate_commission, foxy_affiliate_payment_method, foxy_affiliate_payment_date) values ('$affiliate_id', '$order_id', '$order_total', '$affiliate_payout', '$affiliate_payout_type', '$affiliate_commission', '$payment_method', '$payment_date')";
                 $wpdb->query($sql);
-
-				$mail_to = get_the_author_meta('user_email', $affiliate_id);
-                $mail_subject = 'Affiliate Payment Notice';
-				$mail_body    = 'You have been paid for an affiliate commission on ' . $payment_date . '. <br />Amount: ' . $affiliate_commission . ' via ' . $payment_method . '';
-
-				foxypress_Mail($mail_to,$mail_subject,$mail_body);
-
+                
                 $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&updated=true',$_REQUEST['page'],'view_details',$affiliate_id);
                 echo 'Submitting Payment...';
                 echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>'; ?>
@@ -853,15 +912,16 @@ function foxypress_create_affiliate_table() {
         <?php } else { ?>
             <div class="settings_head settings">
                 Pay Order Commission
-            </div>
+            </div>      
             <div class="settings_inside">
                 <form id="pay_affiliate_form" name="pay_affiliate_form" method="POST">
                 <input type="hidden" id="pay_affiliate_order_id" name="pay_affiliate_order_id" value="<?php echo $order_id; ?>">
                 <input type="hidden" id="pay_affiliate_order_total" name="pay_affiliate_order_total" value="<?php echo $order_detail[0]->foxy_transaction_order_total; ?>">
                 <input type="hidden" id="pay_affiliate_id" name="pay_affiliate_id" value="<?php echo $affiliate_id; ?>">
-                <input type="hidden" id="pay_affiliate_percentage" name="pay_affiliate_percentage" value="<?php echo $user_detail->percentage; ?>">
+                <input type="hidden" id="pay_affiliate_payout_type" name="pay_affiliate_payout_type" value="<?php echo $user_detail->payout_type; ?>">
+                <input type="hidden" id="pay_affiliate_payout" name="pay_affiliate_payout" value="<?php echo $user_detail->payout; ?>">
                 <input type="hidden" id="pay_affiliate_commission" name="pay_affiliate_commission" value="<?php echo $commission; ?>">
-                <table>
+                <table>  
                     <tbody><tr>
                         <td valign="top" nowrap="" align="right" class="title"><strong>Order ID</strong></td>
                         <td align="left"><?php echo $order_id; ?></td>
@@ -875,8 +935,13 @@ function foxypress_create_affiliate_table() {
                         <td align="left"><?php echo $user_detail->firstname . " " . $user_detail->lastname; ?></td>
                     </tr>
                     <tr>
-                        <td valign="top" nowrap="" align="right" class=="title"><strong>Affiliate Percentage</strong></td>
-                        <td align="left"><?php echo $user_detail->percentage; ?>%</td>
+                        <td valign="top" nowrap="" align="right" class=="title"><strong>Affiliate Payout</strong></td>
+                        <td align="left">
+                            <?php if($user_detail->payout_type == 0) {
+                                echo $user_detail->payout . '%';
+                            } else {
+                                echo '$' . $user_detail->payout;
+                            } ?></td>
                     </tr>
                     <tr>
                         <td valign="top" nowrap="" align="right" class=="title"><strong>Affiliate Commission</strong></td>
@@ -898,12 +963,12 @@ function foxypress_create_affiliate_table() {
                     </tr>
                     <tr>
                         <td colspan="2"><input type="submit" id="pay_affiliate_submit" name="pay_affiliate_submit" class="button bold" value="Submit Payment" /></td>
-                    </tr>
+                    </tr>                   
                 </tbody></table>
                 </form>
             </div>
         <?php } ?>
         </div>
     <?php }
-
+    
 }

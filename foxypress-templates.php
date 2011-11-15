@@ -146,13 +146,15 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 			$foxyData["api_token"] =  get_option('foxycart_apikey');
 			$foxyData["api_action"] = "store_template_cache";
 			$foxyData["template_type"] = $templateType;	
-			$foxyData["template_url"] = $_POST['foxypress_text_email_cached_template_url'];		
+			$foxyData["template_url"] = $_POST['foxypress_text_email_cached_template_url'];	
+			$foxyData["email_subject"] = $_POST['foxypress_text_email_cached_template_subject'];	
 
 			$cacheResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
 
 			$foxyXMLResponse = simplexml_load_string($cacheResults, NULL, LIBXML_NOCDATA);	
 			if($foxyXMLResponse->result == "SUCCESS"){
 				update_option("foxypress_text_email_cached_template_url", foxypress_FixPostVar('foxypress_text_email_cached_template_url'));
+				update_option("foxypress_text_email_cached_template_subject", foxypress_FixPostVar('foxypress_text_email_cached_template_subject'));
 				$message=$foxyXMLResponse->messages[0]->message;
 				if($message=="email Template Updated"){ ?>
 					<div class="updated" id="message">
@@ -174,12 +176,14 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 			$foxyData["api_token"] =  get_option('foxycart_apikey');
 			$foxyData["api_action"] = "store_template_cache";
 			$foxyData["template_type"] = $templateType;	
-			$foxyData["template_url"] = $_POST['foxypress_html_email_cached_template_url'];		
+			$foxyData["template_url"] = $_POST['foxypress_html_email_cached_template_url'];	
+			$foxyData["email_subject"] = $_POST['foxypress_html_email_cached_template_subject'];	
 
 			$cacheResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
 			$foxyXMLResponse = simplexml_load_string($cacheResults, NULL, LIBXML_NOCDATA);	
 			if($foxyXMLResponse->result == "SUCCESS"){
 				update_option("foxypress_html_email_cached_template_url", foxypress_FixPostVar('foxypress_html_email_cached_template_url'));
+				update_option("foxypress_html_email_cached_template_subject", foxypress_FixPostVar('foxypress_html_email_cached_template_subject'));
 				$message=$foxyXMLResponse->messages[0]->message;
 				if($message=="html_email Template Updated"){ ?>
 					<div class="updated" id="message">
@@ -303,7 +307,9 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 				<div class="template_holder">
 					<h2>Email Template</h2>
 					<p>Enter the URL of your remote text email template then click the "cache your url" button to have your template parsed, cached and saved.</p>
-					Your Text Email template url: <input type="text" id="foxypress_text_email_cached_template_url" name="foxypress_text_email_cached_template_url" size="100" value="<?php echo(get_option("foxypress_text_email_cached_template_url")) ?>" />
+					Your Text Email template url: <br /><input type="text" id="foxypress_text_email_cached_template_url" name="foxypress_text_email_cached_template_url" size="100" value="<?php echo(get_option("foxypress_text_email_cached_template_url")) ?>" />
+					<br /><br />
+					Your Text Email Subject: <i>To turn off receipt emails, leave this field blank and receipt emails will not be sent.</i><br /><input type="text" id="foxypress_text_email_cached_template_subject" name="foxypress_text_email_cached_template_subject" size="100" value="<?php echo(get_option("foxypress_text_email_cached_template_subject")) ?>" />
 					<br /><img class="template_separator" src="<?php echo(plugins_url())?>/foxypress/img/or.png" />
 					<p>Use a Default template: <i>(this will use a file located on your server that contains the default FoxyCart template contents)</i></p>
 					<p><input type="radio" name="grpTextEmailTemplate" value="standard" <? if(strpos(get_option("foxypress_text_email_cached_template_url"),"foxy_Email_Standard_Text.html")!==false){echo("checked");}?> /> FoxyCart Standard </p>					
@@ -331,9 +337,11 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 			</script>
 			<form method="post">
 				<div class="template_holder">
-					<h2>Email Template</h2>
+					<h2>HTML Email Template</h2>
 					<p>Enter the URL of your remote HTML email template then click the "cache your url" button to have your template parsed, cached and saved.</p>
-					Your HTML Email template url: <input type="text" id="foxypress_html_email_cached_template_url" name="foxypress_html_email_cached_template_url" size="100" value="<?php echo(get_option("foxypress_html_email_cached_template_url")) ?>" />
+					Your HTML Email template url: <br /><input type="text" id="foxypress_html_email_cached_template_url" name="foxypress_html_email_cached_template_url" size="100" value="<?php echo(get_option("foxypress_html_email_cached_template_url")) ?>" />
+					<br /><br />
+					Your HTML Email Subject: <i>To turn off receipt emails, leave this field blank and receipt emails will not be sent.</i><br /><input type="text" id="foxypress_html_email_cached_template_subject" name="foxypress_html_email_cached_template_subject" size="100" value="<?php echo(get_option("foxypress_html_email_cached_template_subject")) ?>" />
 					<br /><img class="template_separator" src="<?php echo(plugins_url())?>/foxypress/img/or.png" />
 					<p>Use a Default template: <i>(this will use a file located on your server that contains the default FoxyCart template contents)</i></p>
 					<p><input type="radio" name="grpHTMLEmailTemplate" value="standard" <? if(strpos(get_option("foxypress_html_email_cached_template_url"),"foxy_Email_Standard_HTML.html")!==false){echo("checked");}?> /> FoxyCart Standard </p>					

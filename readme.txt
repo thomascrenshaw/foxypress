@@ -33,13 +33,19 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 - Scott Hollencamp - Order Management inspiration
 
-- Quesinberry - Gift Certificate inspiration and donation
+- Quesinberry - donation
 
 - Uploadify - Multi-image support
 
 - Green Egg Media - Multi Datafeed inspiration
 
+- JasonHunterDesign - Affiliate Management inspiration/donation
+
 == Changelog ==
+
+= 0.3.5.3 =
+* Feature: Template caching update to include text and html email receipt subjects.
+* Feature: Affiliate commission type available.  Pay Affiliates by a dollar amount or percentage rate per transaction.
 
 = 0.3.5.2 =
 * Feature: Support for FoxyCart Version 0.7.2 to accommodate FoxyCart's latest public beta.

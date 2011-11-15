@@ -1,14 +1,44 @@
 "Item Code","Item Name","Item Description","Item Category","Item Price","Item Sale Price","Item Sale Start Date","Item Sale End Date","Item Weight","Item Quantity","Item Quantity Min","Item Quantity Max","Item Options","Item Attributes","Item Discount Quantity Amount","Item Discount Quantity Percentage","Item Discount Price Amount","Item Discount Price Percentage","Subscription Frequency","Subscription Start Date","Subscription End Date","Item Start Date","Item End Date","Item Active"
-klsofa,"Klyne Sofa","Our Klyne is a compact sofa whose bold saffron color fills the room with attitude. Narrow tapered arms cut a sleek profile and make for an even roomier experience. The perfect size for apartment and small space living…or use in conversational pairs for larger spaces.",Furniture|Default|Featured,1199.00,2.00,0,0,,,,,Color|Orange|orange|25.00|0.00|klsofa-oj||1|99~~Color|Green|green|0.00|0.00|||1|99,,,,,,,,,,,1
-175440,"Meridian Spring Dining Chair","Spring Dining Chair with Cushion 22""Wx25.5""Dx33.75""H
-rnEasy pieces for outdoor entertaining. A motion ""spring"" chair with contemporary slatted design has perfectly pitched back and spring base gently rocks for hours of relaxation. Crafted of durable yet lightweight rustproof extruded aluminum with a smooth, bronze powdercoat that stands up to the elements. Optional cushions are fade- and mildew-resistant","Outdoor Furniture|Default|Featured",109.90,0.00,0,0,,,,,,,,,,,,,,,,1
-575392,"Meridian Café Dining Table","rn Round Café Table. (2.5""dia. umbrella hole); 34"" dia. x 28""
+COFFEE1,"Bunn HG Phase Brew","The BUNN Phase Brew 8-Cup Home Brewer.",Default,40.00,10.00,,,,36,,,,,,,,,,,,,2011-11-30,1
+BED1,"Marimekko Red Bed Linens","Appearing as a disciplined linear pattern from afar, freeform yet concisely connected dots are revealed upon closer examination, creating an abstract reference to a rag rug. The pattern has been translated into a variety of color schemes, all of which succeed in creating a vibrant optical experience.",Default|Bedding|Featured,225.00,0.00,,,2,10,,,,,,,,,,,,,,1
+CHAIR1,"Alfresco Natural Dining Chair","Casual and stylish Alfresco fools the eye with the look of real wood and fools the elements with waterproof, and UV- and fade-resistant qualities. The result is an outdoor collection that will last season after season for years to come. Slats of innovative Polystyrene faux wood are treated with UV and anti-oxidant protection and finished a neutral natural.","Default|Outdoor Furniture|Featured",50.00,0.00,,,4,,,,,,,,,,,,,,,1
+SOFA1,"Klyne Sofa","Our Klyne is a compact sofa whose bold saffron color fills the room with attitude. Narrow tapered arms cut a sleek profile and make for an even roomier experience.",Default|Furniture,300.00,280.00,,,,,,,,,,,,,,,,,,1
+214942,"new york minute panels","true to life. Ordinary blur of NYC street life triptychs extraordinary life-size scale. Digitally scanned images by artist Parvez Taj montage urban hubbub—taxi cruising for a fare, subway neon, buildings in passing. Monochromatic study charged with urgent reds leans three panels against the wall, eight feet high, placing the viewer in the scene actual size.
 
-rn
-
-rn Cozy seating for two on the deck or poolside. Slat-top table is crafted of lightweight rustproof extruded aluminum with a smooth bronze powdercoat. Table has umbrella opening with removable cover.
-
-rn","Outdoor Furniture|Default",149.00,0.00,0,0,,,,,,,,,,,,,,,,1
-211722,"Marimekko Räsymatto Bed Linens","Aliquet parturient habitasse purus porta nisi urna urna tincidunt magna, natoque hac! Tincidunt montes, sed placerat arcu pellentesque? Ut habitasse in tortor? Ut amet placerat, elit porttitor tortor egestas sagittis? Nascetur magna a, ut a adipiscing! Auctor pellentesque, enim tortor, a placerat risus et hac ut facilisis habitasse, in tincidunt! Tortor vel proin pellentesque, arcu? Adipiscing cursus porttitor urna sit.",Bedding|Default,299.00,199.00,0,0,,50,,,Color|Red|red|0.00|0.00|211722-R||1|1,,,,,,,,,,,1
-DailyDeal1,"Coffee Pot","$59 for Capresso Digital 10 Cup Coffee Maker ($118 Value)",Default|Featured,118.00,59.00,0,0,,20,,,,,,,,,,,,,2011-10-15,1
-SUBSCR,"Monthly Subscription","This is a test subscription",Default,19.99,0.00,0,0,,38,,,,,,,,,30d,,,,,1
+Collectors take note: This one-time-only limited edition of prints will not be re-issued, so don't miss out.
+Set of three panels by California-based artist Parvez Taj
+<ul>
+	<li>Limited edition</li>
+	<li>Signed by the artist</li>
+	<li>Mixed media print with aluminum foil rub</li>
+	<li>Lean against wall only; do not hang</li>
+	<li>Wipe with a damp, clean cloth</li>
+	<li>Made in China</li>
+</ul>
+<div>Dimensions: Print (set of three panels). Each measures 36""Wx2""Dx96""H</div>",Default|Prints,999.99,899.99,,,,,,,,,,,,,,,,,,1
+217134,"andes walnut bed","boutique hotel. Walnut veneer platform scales to new lo-heights integrating headboard nightstands that cantilever two stepped shelves each—one wide for books, one narrow with discreet cord cutouts for clock/light/dock. Just right height for pillow propping. Ledge extends around mattress, hovers over corner block feet. Substantial wood composite construction. Dreamy price. Mattresses available, sold separately.
+<ul>
+	<li>Designed by Mark Daniel of Slate Design</li>
+	<li>Walnut veneer over wood composite</li>
+	<li>Integrated headboard nightstands with two shelves each</li>
+	<li>Ultra-low platform cantilevers over base</li>
+	<li>For use with mattress only</li>
+	<li>Made in Vietnam</li>
+	<li>See dimensions below</li>
+</ul>",Furniture|Bedding,849.00,0.00,,,,,,,,,,,,,,,,,,1
+224335,"teak bath accessories","Clean and simple. Spare solid teak stacking boxes and wastecan naturally neatens bath, bedroom, office.
+<ul>
+	<li>Solid teak</li>
+	<li>Natural and oil finish</li>
+	<li>Naturally occurring texture and knots</li>
+	<li>Made in Laos</li>
+	<li>See dimensions below</li>
+</ul>",Default|Furniture,24.95,6.95,,,,,,,,,,,,,,,,,,1
+215514,"valley bowl","come full circle. Handcrafted low-slung circle halos 24 rubberwood panels in radial blond beams. Spans a foot-and-a-half to serve ample greens.
+<ul>
+	<li>Rubberwood with clear lacquer</li>
+	<li>Hand wash</li>
+	<li>Made in Thailand</li>
+</ul>
+Get the recipe for this delicious salad prepared just for us by expert food stylist Adam Pearson on our blog.","Default|Trendy items",59.95,49.95,,,,,,,,,,,,,,,,,,1
+TIMEMAG,"TIME Magazine","This is an example of a subscription based product.  It is set to auto renew every month.  You have the option of choosing a daily renewal, monthly renewal, or yearly renewal.  The ability to set a start and end date for a subscription is possible as well.",Default,16.00,0.00,,,,,,,,,,,,,1m,,,,,1

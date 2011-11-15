@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.5.2
+Version: 0.3.5.3
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -95,7 +95,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.5.2");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.5.3");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -167,59 +167,67 @@ function foxypress_affiliate_profile_fields($user)
 	if (current_user_can('administrator'))
 	{
 		$affiliate_user 		 = get_the_author_meta('affiliate_user', $user->ID);
-		$affiliate_percentage    = get_the_author_meta('affiliate_percentage', $user->ID);
+		$affiliate_payout_type   = get_the_author_meta('affiliate_payout_type', $user->ID);
+		$affiliate_payout    	 = get_the_author_meta('affiliate_payout', $user->ID);
 		$affiliate_url  		 = get_the_author_meta('affiliate_url', $user->ID);
 		$affiliate_facebook_page = get_the_author_meta('affiliate_facebook_page', $user->ID);
 		$affiliate_age 			 = get_the_author_meta('affiliate_age', $user->ID);
-		$affiliate_gender		 = get_the_author_meta('affiliate_gender', $user->ID);
+		$affiliate_gender		 = get_the_author_meta('affiliate_gender', $user->ID); ?>
 
-		echo ("<h3>FoxyPress Affiliate Information</h3>
-				<table class=\"form-table\">
-					<tr>
-						<th><label for=\"affiliate_user\">Enable Affiliate</label></th>
-						<td>");
-						if ($affiliate_user == 'true') {
-							echo ("<input type=\"checkbox\" checked=\"yes\" name=\"affiliate_user\" id=\"affiliate_user\" value=\"true\" /> Is this an affiliate user?");
-						} else {
-							echo ("<input type=\"checkbox\" name=\"affiliate_user\" id=\"affiliate_user\" value=\"true\" /> Is this an affiliate user?");
-						}
-
-						echo ("</td>
-					</tr>
-					<tr>
-						<th><label for=\"affiliate_facebook_page\">Affiliate Facebook Page</label></th>
-						<td>
-							<input class=\"regular-text\" type=\"text\" name=\"affiliate_facebook_page\" id=a\"affiliate_facebook_page\" value=\"" . $affiliate_facebook_page . "\">
-							<span class=\"description\">Affiliate's Facebook Page.</span>
-						</td>
-					</tr>
-					<tr>
-						<th><label for=\"affiliate_age\">Affiliate Age</label></th>
-						<td>
-							<input type=\"text\" name=\"affiliate_age\" id=a\"affiliate_age\" value=\"" . $affiliate_age . "\">
-							<span class=\"description\">Affiliate's age.</span>
-						</td>
-					</tr>
-					<tr>
-						<th><label for=\"affiliate_gender\">Affiliate Gender</label></th>
-						<td>
-							<input type=\"text\" name=\"affiliate_gender\" id=a\"affiliate_gender\" value=\"" . $affiliate_gender . "\">
-							<span class=\"description\">Affiliate's gender.</span>
-						</td>
-					</tr>
-					<tr>
-						<th><label for=\"affiliate_percentage\">Affiliate Percentage</label></th>
-						<td>
-							<input type=\"text\" name=\"affiliate_percentage\" id=a\"affiliate_percentage\" value=\"" . $affiliate_percentage . "\">
-							<span class=\"description\">How much will this affiliate earn per sale? <b>(Enter 30 for 30%)</b></span>
-						</td>
-					</tr>
-					<tr>
-						<th><label>Affiliate URL</label></th>
-						<td>" . $affiliate_url . "</td>
-					</tr>
-				</table>");
-	}
+		<h3>FoxyPress Affiliate Information</h3>
+			<table class="form-table">
+				<tr>
+					<th><label for="affiliate_user">Enable Affiliate</label></th>
+					<td><input type="checkbox" <?php if ($affiliate_user == 'true') { ?>checked="yes" <?php } ?>name="affiliate_user" id="affiliate_user" value="true" /> Is this an affiliate user?</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_facebook_page">Affiliate Facebook Page</label></th>
+					<td>
+						<input class="regular-text" type="text" name="affiliate_facebook_page" id="affiliate_facebook_page" value="<?php echo $affiliate_facebook_page; ?>">
+						<span class="description">Affiliate's Facebook Page.</span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_age">Affiliate Age</label></th>
+					<td>
+						<input type="text" name="affiliate_age" id="affiliate_age" value="<?php echo $affiliate_age; ?>">
+						<span class="description">Affiliate's age.</span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_gender">Affiliate Gender</label></th>
+					<td>
+						<input type="text" name="affiliate_gender" id="affiliate_gender" value="<?php echo $affiliate_gender; ?>">
+						<span class="description">Affiliate's gender.</span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_payout_type">Affiliate Payout Type</label></th>
+					<td>
+						<input type="radio" <?php if ($affiliate_payout_type == 0) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="0">
+						<span class="description">Percentage of each order.</span>
+					</td>
+				</tr>
+				<tr>
+					<th></th>
+					<td>
+						<input type="radio" <?php if ($affiliate_payout_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="1">
+						<span class="description">Dollar amount of each order.</span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_payout">Affiliate Payout</label></th>
+					<td>
+						<input type="text" name="affiliate_payout" id="affiliate_payout" value="<?php echo $affiliate_payout; ?>">
+						<span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30% or $30.00)</b></span>
+					</td>
+				</tr>
+				<tr>
+					<th><label>Affiliate URL</label></th>
+					<td><?php echo $affiliate_url; ?></td>
+				</tr>					
+			</table>
+	<?php }
 }
 
 function foxypress_save_affiliate_profile_fields($user_id) {
@@ -231,17 +239,18 @@ function foxypress_save_affiliate_profile_fields($user_id) {
 
 		$affiliate_user = $_POST['affiliate_user'];
 
-		update_usermeta($user_id, 'affiliate_user', $affiliate_user);
-		update_usermeta($user_id, 'affiliate_facebook_page', $_POST['affiliate_facebook_page']);
-		update_usermeta($user_id, 'affiliate_age', $_POST['affiliate_age']);
-		update_usermeta($user_id, 'affiliate_gender', $_POST['affiliate_gender']);
-		update_usermeta($user_id, 'affiliate_percentage', $_POST['affiliate_percentage']);
+		update_user_meta($user_id, 'affiliate_user', $affiliate_user);
+		update_user_meta($user_id, 'affiliate_facebook_page', $_POST['affiliate_facebook_page']);
+		update_user_meta($user_id, 'affiliate_age', $_POST['affiliate_age']);
+		update_user_meta($user_id, 'affiliate_gender', $_POST['affiliate_gender']);
+		update_user_meta($user_id, 'affiliate_payout_type', $_POST['affiliate_payout_type']);
+		update_user_meta($user_id, 'affiliate_payout', $_POST['affiliate_payout']);
 
 		if ($affiliate_user == 'true') {
 			$affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $user_id;
-			update_usermeta($user_id, 'affiliate_url', $affiliate_url);
+			update_user_meta($user_id, 'affiliate_url', $affiliate_url);
 		} else {
-			update_usermeta($user_id, 'affiliate_url', '');
+			update_user_meta($user_id, 'affiliate_url', '');
 		}
 	}
 }
@@ -2936,21 +2945,21 @@ function foxypress_Installation_HandleTableAlterations()
 	//all tables should be created up to this point if they are upgrading
 	//we can run all the alters everytime for sake of consistency, since they don't update very often it won't be too big of a performance
 	//hit. This way sql will realize its dupe columns and not create as opposed to us manually checking every table for every column needed.
-
-
+		
+	
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_to_category
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	//add sort order to inventory_to_category
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_to_category ADD sort_order int DEFAULT '99' AFTER category_id";
-	$wpdb->query($sql);
-
-
+	$wpdb->query($sql);	
+	
+	
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_transaction
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	//add is test
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country;";
 	$wpdb->query($sql);
@@ -2974,17 +2983,17 @@ function foxypress_Installation_HandleTableAlterations()
 	$wpdb->query($sql);
 	//add blog id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_blog_id BIGINT(20) NULL AFTER foxy_transaction_cc_type;";
-	$wpdb->query($sql);
-	//add affiliate id
+	$wpdb->query($sql);		
+	//add affiliate id		
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_affiliate_id BIGINT(20) NULL AFTER foxy_blog_id;";
 	$wpdb->query($sql);
-
+	
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_iventory_options
 	///////////////////////////////////////////////////////////////////////////
 	// add option order
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_order INT DEFAULT '99' AFTER option_active;";
-	$wpdb->query($sql);
+	$wpdb->query($sql);		
 	//add option extra weight
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_extra_weight FLOAT(10,2) NOT NULL DEFAULT '0' AFTER option_extra_price";
 	$wpdb->query($sql);
@@ -2994,23 +3003,50 @@ function foxypress_Installation_HandleTableAlterations()
 	//add option quantity
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_quantity INT(11) NULL AFTER option_code";
 	$wpdb->query($sql);
-
-
+	
+	
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_categories
 	///////////////////////////////////////////////////////////////////////////
 	//add category image
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_categories ADD category_image VARCHAR(100) NULL AFTER category_name;";
-	$wpdb->query($sql);
-
-
+	$wpdb->query($sql);		
+	
+	
 	///////////////////////////////////////////////////////////////////////////
 	//updates
 	///////////////////////////////////////////////////////////////////////////
-
+	
 	//update blog id
 	$sql = "UPDATE " . $wpdb->prefix . "foxypress_transaction SET foxy_blog_id = (select min(blog_id) from " . $wpdb->prefix . "blogs) where foxy_blog_id = '0' or foxy_blog_id is null;";
 	$wpdb->query($sql);
+
+	///////////////////////////////////////////////////////////////////////////
+	//Upgrading Affiliate Functionality
+	///////////////////////////////////////////////////////////////////////////
+	$affiliate_percentage = $wpdb->get_results("SHOW COLUMNS FROM " . $wpdb->prefix . "foxypress_affiliate_payments LIKE 'foxy_affiliate_percentage'");
+	if (!empty($affiliate_percentage)) {
+		//Add affiliate_payout_type
+        $affiliate_ids = $wpdb->get_results("SELECT user_id FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_percentage'");
+        foreach ($affiliate_ids as $affiliate)
+        {
+        	update_user_meta($affiliate->user_id, 'affiliate_payout_type', '0');
+        }
+
+		//Change affiliate_percentage to affiliate_payout
+		$sql = "UPDATE " . $wpdb->prefix . "usermeta SET meta_key = replace(meta_key, 'affiliate_percentage', 'affiliate_payout');";
+		$wpdb->query($sql);
+
+		//Alter payments table
+		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments CHANGE foxy_affiliate_percentage foxy_affiliate_payout int(11) NOT NULL";
+		$wpdb->query($sql);
+
+		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments ADD foxy_affiliate_payout_type tinyint(1) NOT NULL AFTER foxy_affiliate_payout;";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '0'";
+		$wpdb->query($sql);
+	}
 }
 
 function foxypress_Installation_CreateInventoryCategoryTable()
@@ -3196,7 +3232,7 @@ function foxypress_Installation_CreateDownloadableDownloadTable()
 }
 
 function foxypress_Installation_CreateAffiliateTrackingTable()
-{
+{	
 	global $wpdb;
 	//create affliliate tracking table
 	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_tracking" . " (
@@ -3211,7 +3247,7 @@ function foxypress_Installation_CreateAffiliateTrackingTable()
 }
 
 function foxypress_Installation_CreateAffiliatePaymentsTable()
-{
+{	
 	global $wpdb;
 	//create affliliate payments table
 	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_payments" . " (
@@ -3219,7 +3255,8 @@ function foxypress_Installation_CreateAffiliatePaymentsTable()
 				foxy_affiliate_id bigint(20) NOT NULL,
 				foxy_transaction_id int(11) NOT NULL,
 				foxy_transaction_order_total float(10,2) NOT NULL,
-				foxy_affiliate_percentage int(11) NOT NULL,
+				foxy_affiliate_payout int(11) NOT NULL,
+				foxy_affiliate_payout_type tinyint(1) NOT NULL,
 				foxy_affiliate_commission float(10,2) NOT NULL,
 				foxy_affiliate_payment_method varchar(50) collate utf8_bin NOT NULL,
 				foxy_affiliate_payment_date date NOT NULL,
@@ -3227,7 +3264,6 @@ function foxypress_Installation_CreateAffiliatePaymentsTable()
 			) ";
 	$wpdb->query($sql);
 }
-
 function foxypress_Installation_CreateSettings($encryption_key, $api_key)
 {
 	global $wpdb;
