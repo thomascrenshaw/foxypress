@@ -70,7 +70,8 @@ function import_export_postback()
 					$Product_SubEndDate = "";
 					$Product_StartDate = "";
 					$Product_EndDate = "";
-					$Product_Active = "";					
+					$Product_Active = "";				
+					$Product_Images = "";	
 					$Product_Data_Set = false;
 					$Product_Has_Cats = false;		
 					
@@ -102,6 +103,7 @@ function import_export_postback()
 						$Product_StartDate = mysql_escape_string($row[21]);
 						$Product_EndDate = mysql_escape_string($row[22]);
 						$Product_Active = mysql_escape_string($row[23]);						
+						$Product_Images = mysql_escape_string($row[24]);						
 						$Product_Data_Set = true;
 					}
 					
@@ -199,6 +201,35 @@ function import_export_postback()
 								}
 							}
 						}	
+						
+						//handle images			
+						if(!empty($Product_Images))
+						{
+							$ImagesExploded = explode("|", $Product_Images);
+							if(count($ImagesExploded) > 0)
+							{
+								$directory = dirname(__FILE__) . "/img/";
+								$ImageOrder = 0;
+								foreach($ImagesExploded as $ProductImageURL)
+								{
+									$ImageOrder++;
+									$path_parts = pathinfo($ProductImageURL);
+									//generate random file name
+									$temp_extension = $path_parts['extension'];									
+									$temp_file_name = foxypress_GenerateNewFileName($temp_extension, $inventory_id, $directory, "fp_");									
+									$temp_destination = $directory . $temp_file_name;
+									//try to get file
+									$img = file_get_contents($ProductImageURL);			
+									if($img)
+									{
+										file_put_contents($temp_destination, $img);
+										foxypress_ConvertImage($temp_destination, $inventory_id, $ImageOrder);
+										foxypress_DeleteItem($temp_destination);
+									}	
+								}
+							}
+						}
+						
 					} //end if Product_Data_Set
 				}
 				fclose($file);
@@ -488,7 +519,7 @@ function import_export_page_load()
 				</tr>
 			</table>		
 		</div>
-    </div>	
+    </div>
 	<?php
 }
 

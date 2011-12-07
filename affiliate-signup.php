@@ -9,8 +9,8 @@ function foxypress_create_affiliate_signup()
 {
 	global $current_user;
     get_currentuserinfo();
+    $user_data = get_userdata($current_user->ID); ?>
 
-    $user_id = $current_user->ID; ?>
     <h3>FoxyPress Affiliate Sign Up</h3>
    	<?php if (isset($_POST['affiliate_signup_submit'])) { 
     	
@@ -53,13 +53,13 @@ function foxypress_create_affiliate_signup()
     	}
 
     	if (!$error) {
-	    	update_usermeta($user_id, 'first_name', $first_name);
-	    	update_usermeta($user_id, 'last_name', $last_name);
-	    	update_usermeta($user_id, 'affiliate_facebook_page', $facebook_page);
-	    	update_usermeta($user_id, 'affiliate_age', $age);
-	    	update_usermeta($user_id, 'affiliate_gender', $gender);
-	    	update_usermeta($user_id, 'description', $message);
-	    	update_usermeta($user_id, 'affiliate_user', 'pending'); ?>
+	    	update_user_option($user_data->ID, 'first_name', $first_name);
+	    	update_user_option($user_data->ID, 'last_name', $last_name);
+	    	update_user_option($user_data->ID, 'affiliate_facebook_page', $facebook_page);
+	    	update_user_option($user_data->ID, 'affiliate_age', $age);
+	    	update_user_option($user_data->ID, 'affiliate_gender', $gender);
+	    	update_user_option($user_data->ID, 'description', $message);
+	    	update_user_option($user_data->ID, 'affiliate_user', 'pending'); ?>
 
 	    	<div class="updated" id="message">
         		<p><strong>Affiliate Request Sent Successfully.</strong></p>
@@ -67,43 +67,48 @@ function foxypress_create_affiliate_signup()
 
     	<?php } ?>
     <?php }
-		$affiliate_user = get_the_author_meta('affiliate_user', $user_id);
+		$affiliate_user = get_user_option('affiliate_user', $user_id);
 		if ($affiliate_user === 'pending') { ?>
 	   		<div class="updated" id="message">
 	        	<p><strong>Affiliate Request Currently Pending.</strong></p>
 	    	</div>
-	    <?php } else { ?>
+	    <?php } else { 
+		    //Multisite specific variables
+		    $user_facebook_page = $wpdb->prefix . 'affiliate_facebook_page'; 
+    		$user_age = $wpdb->prefix . 'affiliate_age';
+    		$user_gender = $wpdb->prefix . 'affiliate_gender'; ?>
+
 			<form id="affiliate_signup_form" name="affiliate_signup_form" method="POST">
 			<table class="form-table">
 				<tr class="<?php if ($first_name_error) { ?>form-invalid<?php } ?>">
 					<th><label for="affiliate_first_name">First Name <span class="description">(required)</span></label></th>
-					<td><input class="regular-text" type="text" name="affiliate_first_name" id="affiliate_first_name" value="<?php echo get_the_author_meta('first_name', $user_id); ?>"></td>
+					<td><input class="regular-text" type="text" name="affiliate_first_name" id="affiliate_first_name" value="<?php echo $user_data->first_name; ?>"></td>
 				</tr>
 				<tr class="<?php if ($last_name_error) { ?>form-invalid<?php } ?>">
 					<th><label for="affiliate_last_name">Last Name <span class="description">(required)</span></label></th>
-					<td><input class="regular-text" type="text" name="affiliate_last_name" id="affiliate_last_name" value="<?php echo get_the_author_meta('last_name', $user_id); ?>"></td>
+					<td><input class="regular-text" type="text" name="affiliate_last_name" id="affiliate_last_name" value="<?php echo $user_data->last_name; ?>"></td>
 				</tr>
 				<tr class="<?php if ($facebook_page_error) { ?>form-invalid<?php } ?>">
 					<th><label for="affiliate_facebook_page">Your Facebook Page <span class="description">(required)</span></label></th>
-					<td><input class="regular-text" type="text" name="affiliate_facebook_page" id="affiliate_facebook_page" value="<?php echo get_the_author_meta('affiliate_facebook_page', $user_id); ?>"></td>
+					<td><input class="regular-text" type="text" name="affiliate_facebook_page" id="affiliate_facebook_page" value="<?php echo $user_data->$user_facebook_page; ?>"></td>
 				</tr>
 				<tr class="<?php if ($age_error) { ?>form-invalid<?php } ?>">
 					<th><label for="affiliate_age">Age <span class="description">(required)</span></label></th>
-					<td><input type="text" name="affiliate_age" id="affiliate_age" value="<?php echo get_the_author_meta('affiliate_age', $user_id); ?>"></td>
+					<td><input type="text" name="affiliate_age" id="affiliate_age" value="<?php echo $user_data->$user_age; ?>"></td>
 				</tr>
 				<tr class="<?php if ($gender_error) { ?>form-invalid<?php } ?>">
 					<th><label for="affiliate_gender">Gender <span class="description">(required)</span></label></th>
-					<td><?php $gender = get_the_author_meta('affiliate_gender', $user_id); ?>
+					<td>
 						<select name="affiliate_gender" id="affiliate_gender">
 							<option>Select</option>
-							<option <?php if ($gender == 'Male') { ?>selected<?php } ?> value="Male">Male</option>
-							<option <?php if ($gender == 'Female') { ?>selected<?php } ?> value="Female">Female</option>
+							<option <?php if ($user_data->$user_gender == 'Male') { ?>selected<?php } ?> value="Male">Male</option>
+							<option <?php if ($user_data->$user_gender == 'Female') { ?>selected<?php } ?> value="Female">Female</option>
 						</select>
 					</td>
 				</tr>
 				<tr class="<?php if ($message_error) { ?>form-invalid<?php } ?>">
 					<th><label for="affiliate_description">Message <span class="description">(required)</span></label></th>
-					<td><textarea id="affiliate_description" cols="60" rows="5" name="affiliate_description"><?php echo get_the_author_meta('description', $user_id); ?></textarea><br>
+					<td><textarea id="affiliate_description" cols="60" rows="5" name="affiliate_description"><?php echo $user_data->description; ?></textarea><br>
 					<span class="description">Tell us about yourself.</span></td>
 				</tr>
 			</table>

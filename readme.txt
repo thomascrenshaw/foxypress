@@ -1,6 +1,6 @@
 === FoxyPress ===
 Contributors: webmovementllc
-Donate link: http://www.foxy-press.com/contact
+Donate link: http://www.foxy-press.com/support/
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.0
 Tested up to: 3.3
@@ -24,6 +24,7 @@ Visit <a href="http://www.foxy-press.com" target="_blank">www.foxy-press.com</a>
 * Product attribute options
 * Inventory management
 * Digital Products
+* Demo Store - <a href="http://demo.foxy-press.com" target="_blank">http://demo.foxy-press.com</a>
 
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum user requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
@@ -42,6 +43,16 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - JasonHunterDesign - Affiliate Management inspiration/donation
 
 == Changelog ==
+
+= 0.3.6 =
+* Feature: Inventory Import from CSV file now supports images.
+* Feature: Order Management fields added: credit card type, rma number
+* Feature: Email Template Management available - read details <a href="http://www.foxy-press.com/getting-started/email-management" target="_blank">here</a>
+* Feature: Affiliate Management is now multi-site friendly.  Read details for upgrade <a href="http://www.foxy-press.com/blog/2011/12/07/foxypress-0-3-6" target="_blank">here</a> 
+* Bugfix: Sale Price was saving 0.00 on default. Should save blank if not provided now.
+* Bugfix: Order management detail screen was using customer name at all times, instead of possibly different ship to name.
+* Update: Keep Products on uninstall is now checked by default
+* Update: Small UI enhancements
 
 = 0.3.5.3 =
 * Feature: Template caching update to include text and html email receipt subjects.

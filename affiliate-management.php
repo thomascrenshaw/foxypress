@@ -89,7 +89,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
     function column_management_total_commission($item)
     {
-        if ($item->affiliate_payout_type == 0) {
+        if ($item->affiliate_payout_type == 1) {
             $unpaid_commission = $item->affiliate_payout / 100 * $item->total_unpaid_amount;
             $total_commission  = $unpaid_commission + $item->total_commission;
             $total_commission  = number_format($total_commission, 2, '.', ',');
@@ -198,7 +198,7 @@ class Foxypress_affiliate_management extends WP_List_Table
     
     function column_view_details_order_commission($item)
     {
-        if ($item->affiliate_payout_type == 0) {
+        if ($item->affiliate_payout_type == 1) {
             $order_commission = $item->affiliate_payout / 100 * $item->order_total;
             $order_commission = number_format($order_commission, 2, '.', ',');
         } else {
@@ -241,7 +241,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
     function column_view_past_details_affiliate_payout($item)
     {   
-        if ($item->foxy_affiliate_payout_type == 0) {
+        if ($item->foxy_affiliate_payout_type == 1) {
             $affiliate_payout = $item->foxy_affiliate_payout . '%';
         } else {
             $affiliate_payout = '$' . $item->foxy_affiliate_payout;
@@ -393,8 +393,9 @@ class Foxypress_affiliate_management extends WP_List_Table
         $this->process_bulk_action();
         
         global $wpdb;
-        $sql = "SELECT user_id FROM " . $wpdb->prefix . "usermeta
-                WHERE meta_key = 'affiliate_user' AND meta_value = 'true'";
+
+        $sql = "SELECT user_id FROM " . $wpdb->base_prefix . "usermeta
+                WHERE meta_key = '" . $wpdb->prefix . "affiliate_user' AND meta_value = 'true'";
 
         $affiliate_ids = $wpdb->get_results($sql);
         
@@ -438,21 +439,21 @@ class Foxypress_affiliate_management extends WP_List_Table
             }
 
             $sql_data = "SELECT u.id, u.user_nicename,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout_type' AND user_id = u.id) AS affiliate_payout_type,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout' AND user_id = u.id) AS affiliate_payout,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout_type' AND user_id = u.id) AS affiliate_payout_type,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout' AND user_id = u.id) AS affiliate_payout,
                         (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_tracking WHERE affiliate_id = u.id) AS num_clicks,
                         (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id = u.id) AS num_total_orders,
                         (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = u.id) AS total_commission,
                         (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = u.id AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS num_unpaid_orders,
                         (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = u.id AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_amount
-                        FROM " . $wpdb->prefix . "users AS u
+                        FROM " . $wpdb->base_prefix . "users AS u
                         WHERE u.id in (" . $ids . ")
                         ORDER BY " . $sort_by;
         }
         else if ($mode === 'pending_affiliates')
         {
-            $sql = "SELECT user_id FROM " . $wpdb->prefix . "usermeta
-                WHERE meta_key = 'affiliate_user' AND meta_value = 'pending'";
+            $sql = "SELECT user_id FROM " . $wpdb->base_prefix . "usermeta
+                WHERE meta_key = '" . $wpdb->prefix . "affiliate_user' AND meta_value = 'pending'";
 
             $pending_affiliate_ids = $wpdb->get_results($sql);
         
@@ -467,13 +468,13 @@ class Foxypress_affiliate_management extends WP_List_Table
             $pending_ids = implode(',', $pending_ids);
 
             $sql_data = "SELECT u.id, u.user_nicename,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'first_name' AND user_id = u.id) AS first_name,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'last_name' AND user_id = u.id) AS last_name,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_facebook_page' AND user_id = u.id) AS facebook_page,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_gender' AND user_id = u.id) AS gender,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_age' AND user_id = u.id) AS age,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'description' AND user_id = u.id) AS description
-                        FROM " . $wpdb->prefix . "users AS u
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'first_name' AND user_id = u.id) AS first_name,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'last_name' AND user_id = u.id) AS last_name,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_facebook_page' AND user_id = u.id) AS facebook_page,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_gender' AND user_id = u.id) AS gender,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_age' AND user_id = u.id) AS age,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'description' AND user_id = u.id) AS description
+                        FROM " . $wpdb->base_prefix . "users AS u
                         WHERE u.id in (" . $pending_ids . ")
                         ORDER BY u.id ASC";
 
@@ -510,10 +511,10 @@ class Foxypress_affiliate_management extends WP_List_Table
             $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
 
             $sql_data = "SELECT ft.foxy_transaction_id AS order_id, ft.foxy_transaction_order_total AS order_total, ft.foxy_transaction_date AS order_date, u.id, u.user_nicename,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout_type' AND user_id = ft.foxy_affiliate_id) AS affiliate_payout_type,
-                        (SELECT meta_value FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_payout' AND user_id = ft.foxy_affiliate_id) AS affiliate_payout
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout_type' AND user_id = ft.foxy_affiliate_id) AS affiliate_payout_type,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout' AND user_id = ft.foxy_affiliate_id) AS affiliate_payout
                         FROM " . $wpdb->prefix . "foxypress_transaction AS ft
-                        LEFT JOIN " . $wpdb->prefix . "users AS u ON u.id = ft.foxy_affiliate_id
+                        LEFT JOIN " . $wpdb->base_prefix . "users AS u ON u.id = ft.foxy_affiliate_id
                         WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)
                         ORDER BY " . $sort_by;
         }
@@ -598,14 +599,8 @@ class Foxypress_affiliate_management extends WP_List_Table
     function get_affiliate_user_details()
     {
         $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
-
-        $data = (object) array(
-            'firstname'   => get_user_meta($affiliate_id, 'first_name', true),
-            'lastname'    => get_user_meta($affiliate_id, 'last_name', true),
-            'payout'      => get_user_meta($affiliate_id, 'affiliate_payout', true),
-            'payout_type' => get_user_meta($affiliate_id, 'affiliate_payout_type', true)
-            );
-
+        
+        $data = get_userdata($affiliate_id);
         return $data;
     }
 
@@ -627,8 +622,8 @@ class Foxypress_affiliate_management extends WP_List_Table
         global $wpdb;
         
         $data = "SELECT 
-                (SELECT count(user_id) FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_user' AND meta_value = 'pending') AS total_pending,
-                (SELECT count(user_id) FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_user' AND meta_value = 'true') AS total_approved";
+                (SELECT count(user_id) FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_user' AND meta_value = 'pending') AS total_pending,
+                (SELECT count(user_id) FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_user' AND meta_value = 'true') AS total_approved";
 
         return $wpdb->get_results($data);
     }
@@ -636,11 +631,20 @@ class Foxypress_affiliate_management extends WP_List_Table
 
 function foxypress_create_affiliate_table() {
 
+    global $wpdb;
+
     //Create an instance of our package class...
     $fp_affiliate = new Foxypress_affiliate_management();
     $mode         = $fp_affiliate->foxypress_FixGetVar('mode');
     $order_by     = $fp_affiliate->foxypress_FixGetVar('orderby');
     $order        = $fp_affiliate->foxypress_FixGetVar('order');
+
+    //Get user data object
+    $user_detail  = $fp_affiliate->get_affiliate_user_details();
+    //User detail multisite specific meta variables
+    $user_payout_type = $wpdb->prefix . 'affiliate_payout_type'; 
+    $user_payout = $wpdb->prefix . 'affiliate_payout';
+    $user_affiliate_url = $wpdb->prefix . 'affiliate_url';
 
     if ($mode === 'management' || $mode === 'pending_affiliates'){ 
 
@@ -655,21 +659,15 @@ function foxypress_create_affiliate_table() {
 
             <?php $updated = $fp_affiliate->foxypress_FixGetVar('updated');
             if ($updated === 'true') { 
-                
-                $user_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
-                
-                $payout_type = get_the_author_meta('affiliate_payout_type', $user_id);
-                $payout = get_the_author_meta('affiliate_payout', $user_id);
-                $affiliate_url = get_the_author_meta('affiliate_url', $user_id);
 
-                if ($payout_type == 0) {
-                    $affiliate_commission = 'Affiliate Commission: ' . $payout . '%';
+                if ($user_detail->$user_payout_type == 1) {
+                    $affiliate_commission = 'Affiliate Commission: ' . $user_detail->$user_payout . '%';
                 } else {
-                    $affiliate_commission = 'Affiliate Commission: $' . $payout;
+                    $affiliate_commission = 'Affiliate Commission: $' . $user_detail->$user_payout;
                 }
-                $mail_to = get_the_author_meta('user_email', $user_id);
+                $mail_to = $user_detail->user_email;
                 $mail_subject = 'Affiliate status approved!';
-                $mail_body    = 'You have been approved to be an affiliate. Your affiliate details are below.<br /><br />' . $affiliate_commission . '<br />Affiliate URL: ' . $affiliate_url;
+                $mail_body    = 'You have been approved to be an affiliate. Your affiliate details are below.<br /><br />' . $affiliate_commission . '<br />Affiliate URL: ' . $user_detail->$user_affiliate_url;
 
                 foxypress_Mail($mail_to, $mail_subject, $mail_body); ?>
 
@@ -708,17 +706,17 @@ function foxypress_create_affiliate_table() {
 
                         if (!$error) {
                             if ($payout_type == 'percentage') {
-                                $payout_type_converted = 0;
-                            } else {
                                 $payout_type_converted = 1;
+                            } else {
+                                $payout_type_converted = 2;
                             }
 
-                            update_user_meta($user_id, 'affiliate_payout_type', $payout_type_converted);
-                            update_user_meta($user_id, 'affiliate_payout', $payout);
-                            update_user_meta($user_id, 'affiliate_user', 'true');
+                            update_user_option($user_id, 'affiliate_payout_type', $payout_type_converted);
+                            update_user_option($user_id, 'affiliate_payout', $payout);
+                            update_user_option($user_id, 'affiliate_user', 'true');
 
                             $affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $user_id;
-                            update_user_meta($user_id, 'affiliate_url', $affiliate_url);                         
+                            update_user_option($user_id, 'affiliate_url', $affiliate_url);                         
 
                             $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&updated=%s&affiliate_id=%s',$_REQUEST['page'],'pending_affiliates','true',$user_id); ?>
 
@@ -730,7 +728,7 @@ function foxypress_create_affiliate_table() {
         
                         <?php } else { ?>
                             <div class="error" id="message">
-                                <?php if ($payout_error) { ?>
+                                <?php if ($payout_amount_error) { ?>
                                 <p><strong>You must enter a payout.</strong></p>
                                 <?php } ?>
 
@@ -782,19 +780,18 @@ function foxypress_create_affiliate_table() {
         </div>
 
     <?php } else if ($mode === 'view_details' || $mode === 'view_past_details') { 
-    
+        
+        global $wpdb;
         //Fetch, prepare, sort, and filter our data...
         $fp_affiliate->prepare_items($mode, $order_by, $order); ?>
         
         <?php
-            $affiliate_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
-            $user_detail  = $fp_affiliate->get_affiliate_user_details();
             $order_detail = $fp_affiliate->get_affiliate_order_details();
-            
-            if ($user_detail->payout_type == 0) {
-                $amount_due = $user_detail->payout / 100 * $order_detail[0]->total_unpaid_amount;
+
+            if ($user_detail->$user_payout_type == 1) {
+                $amount_due = $user_detail->$user_payout / 100 * $order_detail[0]->total_unpaid_amount;
             } else {
-                $amount_due = $user_detail->payout * $order_detail[0]->num_unpaid_orders;
+                $amount_due = $user_detail->$user_payout * $order_detail[0]->num_unpaid_orders;
             }
             $amount_due = number_format($amount_due, 2, '.', ',');
         ?>    
@@ -802,7 +799,7 @@ function foxypress_create_affiliate_table() {
         <div class="wrap">
 
             <div id="icon-users" class="icon32"><br/></div>
-            <h2><?php echo $user_detail->firstname . " " . $user_detail->lastname; ?> :: Affiliate Detail <a class="add-new-h2" href="<?php echo get_admin_url(); ?>user-edit.php?user_id=<?php echo $affiliate_id; ?>">Edit User</a></h2>
+            <h2><?php if (!$user_detail->first_name && !$user_detail->last_name) { echo $user_detail->user_nicename; } else { echo $user_detail->first_name . " " . $user_detail->last_name; } ?> :: Affiliate Detail <a class="add-new-h2" href="<?php echo get_admin_url(); ?>user-edit.php?user_id=<?php echo $user_detail->ID; ?>">Edit User</a></h2>
 
             <?php $updated = $fp_affiliate->foxypress_FixGetVar('updated');
             if ($updated === 'true') { ?>
@@ -824,7 +821,7 @@ function foxypress_create_affiliate_table() {
 					<div class='attribute'>Total Orders</div>
 				</div>
 				<div class='quickstats third'>
-					<div class='number'>$<?php echo $order_detail[0]->total_paid_amount; ?></div>
+					<div class='number'>$<?php if(!$order_detail[0]->total_paid_amount) { echo '0.00'; } else { $order_detail[0]->total_paid_amount; } ?></div>
 					<div class='attribute'>Total Paid Out</div>
 				</div>
 				<div class='quickstats third'>
@@ -832,11 +829,11 @@ function foxypress_create_affiliate_table() {
 					<div class='attribute'>Amount Due</div>
 				</div>
 				<div class='quickstats last'>
-					<?php if ($user_detail->payout_type == 0) { ?>
-                    	<div class='number'><?php echo $user_detail->payout; ?>% </div>
+					<?php if ($user_detail->$user_payout_type == 1) { ?>
+                    	<div class='number'><?php echo $user_detail->$user_payout; ?>% </div>
 						<div class='attribute'>Commission <br />(of total transaction)</div>
                     <?php } else { ?>
-                    	<div class='number'>$<?php echo $user_detail->payout; ?></div>
+                    	<div class='number'>$<?php echo $user_detail->$user_payout; ?></div>
 						<div class='attribute'>Commission <br />(per transaction)</div>
                     <?php } ?>
 				</div>
@@ -846,7 +843,7 @@ function foxypress_create_affiliate_table() {
 			<div style="background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;">
 				<p><a class="button bold" style="float:right;" href="http://www.foxy-press.com/getting-started/affiliate-management/" target="_blank">Affiliate Documentation</a></p>
 				<p>
-					<b>Affiliate Link: </b><?=$affiliate_url;?>
+					<b>Affiliate Link: </b><?php echo $user_detail->$user_affiliate_url; ?>
 				</p>
 			</div>
             
@@ -868,15 +865,14 @@ function foxypress_create_affiliate_table() {
 
         add_action('admin_head',$fp_affiliate->pay_affiliate_head);
 
-        $user_detail  = $fp_affiliate->get_affiliate_user_details();
         $order_detail = $fp_affiliate->get_affiliate_order_detail();
         $order_id     = $fp_affiliate->foxypress_FixGetVar('order_id');
         $affiliate_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
 
-        if ($user_detail->payout_type == 0) {
-            $affiliate_commission = $user_detail->payout / 100 * $order_detail[0]->foxy_transaction_order_total;
+        if ($user_detail->$user_payout_type == 1) {
+            $affiliate_commission = $user_detail->$user_payout / 100 * $order_detail[0]->foxy_transaction_order_total;
         } else {
-            $affiliate_commission = $user_detail->payout;
+            $affiliate_commission = $user_detail->$user_payout;
         }
         $commission = number_format($affiliate_commission, 2, '.', ',');
         ?>
@@ -918,8 +914,8 @@ function foxypress_create_affiliate_table() {
                 <input type="hidden" id="pay_affiliate_order_id" name="pay_affiliate_order_id" value="<?php echo $order_id; ?>">
                 <input type="hidden" id="pay_affiliate_order_total" name="pay_affiliate_order_total" value="<?php echo $order_detail[0]->foxy_transaction_order_total; ?>">
                 <input type="hidden" id="pay_affiliate_id" name="pay_affiliate_id" value="<?php echo $affiliate_id; ?>">
-                <input type="hidden" id="pay_affiliate_payout_type" name="pay_affiliate_payout_type" value="<?php echo $user_detail->payout_type; ?>">
-                <input type="hidden" id="pay_affiliate_payout" name="pay_affiliate_payout" value="<?php echo $user_detail->payout; ?>">
+                <input type="hidden" id="pay_affiliate_payout_type" name="pay_affiliate_payout_type" value="<?php echo $user_detail->$payout_type; ?>">
+                <input type="hidden" id="pay_affiliate_payout" name="pay_affiliate_payout" value="<?php echo $user_detail->$payout; ?>">
                 <input type="hidden" id="pay_affiliate_commission" name="pay_affiliate_commission" value="<?php echo $commission; ?>">
                 <table>  
                     <tbody><tr>
@@ -937,7 +933,7 @@ function foxypress_create_affiliate_table() {
                     <tr>
                         <td valign="top" nowrap="" align="right" class=="title"><strong>Affiliate Payout</strong></td>
                         <td align="left">
-                            <?php if($user_detail->payout_type == 0) {
+                            <?php if($user_detail->payout_type == 1) {
                                 echo $user_detail->payout . '%';
                             } else {
                                 echo '$' . $user_detail->payout;

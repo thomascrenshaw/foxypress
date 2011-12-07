@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.5.3
+Version: 0.3.6
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -44,7 +44,7 @@ Thanks and enjoy this plugin!
 **************************************************************************/
 
 register_activation_hook( __FILE__ , 'foxypress_activate');
-register_deactivation_hook( __FILE__ , 'foxypress_deactivate');
+register_uninstall_hook( __FILE__ , 'foxypress_deactivate');
 global $foxypress_url;
 $foxypress_url = get_option('foxycart_storeurl');
 
@@ -95,7 +95,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.5.3");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.6");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -111,6 +111,8 @@ if ( !empty ( $foxypress_url ) ){
 	include_once('affiliate-management.php');
 	include_once('affiliate-signup.php');
 	include_once('foxypress-templates.php');
+	include_once('foxypress-manage-emails.php');
+
 	if(defined('FOXYPRESS_SMTP_MAIL_PATH') && defined('FOXYPRESS_SMTP_MAIL_PATH')!='') {
 		require_once(FOXYPRESS_SMTP_MAIL_PATH);
 	}
@@ -131,6 +133,7 @@ function foxypress_menu()
 	{
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Option Groups'), __('Manage Option Groups'), 'manage_options', 'inventory-option-groups', 'foxypress_inventory_option_groups_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Categories'), __('Manage Categories'), 'manage_options', 'inventory-category', 'foxypress_inventory_category_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Emails'), __('Manage Emails'), 'manage_options', 'manage-emails', 'foxypress_manage_emails_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Order Management'), __('Order Management'), 'manage_options', 'order-management', 'order_management_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Status Management'), __('Status Management'), 'manage_options', 'status-management', 'status_management_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Affiliate Management'), __('Affiliate Management'), 'manage_options', 'affiliate-management', 'foxypress_create_affiliate_table');
@@ -139,7 +142,7 @@ function foxypress_menu()
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Templates'), __('Templates'), 'manage_options', 'templates', 'foxypress_templates_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Import/Export'), __('Import/Export'), 'manage_options', 'import-export', 'import_export_page_load');
 		$user_id = $current_user->ID;
-		$affiliate_user = get_the_author_meta('affiliate_user', $user_id);
+		$affiliate_user = get_user_option('affiliate_user', $user_id);
 		if ($affiliate_user !== 'true' && !current_user_can('administrator')) {
 			add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Affiliate Sign Up'), __('Affiliate Sign Up'), 'read', 'affiliate-signup', 'foxypress_create_affiliate_signup');
 		}
@@ -166,13 +169,15 @@ function foxypress_affiliate_profile_fields($user)
 {
 	if (current_user_can('administrator'))
 	{
-		$affiliate_user 		 = get_the_author_meta('affiliate_user', $user->ID);
-		$affiliate_payout_type   = get_the_author_meta('affiliate_payout_type', $user->ID);
-		$affiliate_payout    	 = get_the_author_meta('affiliate_payout', $user->ID);
-		$affiliate_url  		 = get_the_author_meta('affiliate_url', $user->ID);
-		$affiliate_facebook_page = get_the_author_meta('affiliate_facebook_page', $user->ID);
-		$affiliate_age 			 = get_the_author_meta('affiliate_age', $user->ID);
-		$affiliate_gender		 = get_the_author_meta('affiliate_gender', $user->ID); ?>
+		global $wpdb;
+
+		$affiliate_user 		 = get_user_option('affiliate_user', $user->ID);
+		$affiliate_payout_type   = get_user_option('affiliate_payout_type', $user->ID);
+		$affiliate_payout    	 = get_user_option('affiliate_payout', $user->ID);
+		$affiliate_url  		 = get_user_option('affiliate_url', $user->ID);
+		$affiliate_facebook_page = get_user_option('affiliate_facebook_page', $user->ID);
+		$affiliate_age 			 = get_user_option('affiliate_age', $user->ID);
+		$affiliate_gender		 = get_user_option('affiliate_gender', $user->ID); ?>
 
 		<h3>FoxyPress Affiliate Information</h3>
 			<table class="form-table">
@@ -204,14 +209,14 @@ function foxypress_affiliate_profile_fields($user)
 				<tr>
 					<th><label for="affiliate_payout_type">Affiliate Payout Type</label></th>
 					<td>
-						<input type="radio" <?php if ($affiliate_payout_type == 0) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="0">
+						<input type="radio" <?php if ($affiliate_payout_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="percentage">
 						<span class="description">Percentage of each order.</span>
 					</td>
 				</tr>
 				<tr>
 					<th></th>
 					<td>
-						<input type="radio" <?php if ($affiliate_payout_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="1">
+						<input type="radio" <?php if ($affiliate_payout_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="dollars">
 						<span class="description">Dollar amount of each order.</span>
 					</td>
 				</tr>
@@ -225,7 +230,7 @@ function foxypress_affiliate_profile_fields($user)
 				<tr>
 					<th><label>Affiliate URL</label></th>
 					<td><?php echo $affiliate_url; ?></td>
-				</tr>					
+				</tr>
 			</table>
 	<?php }
 }
@@ -233,24 +238,40 @@ function foxypress_affiliate_profile_fields($user)
 function foxypress_save_affiliate_profile_fields($user_id) {
 	if (current_user_can('administrator'))
 	{
-		global $foxypress_url;
+		global $wpdb, $foxypress_url;
 		if (!current_user_can('edit_user', $user_id))
 			return false;
 
 		$affiliate_user = $_POST['affiliate_user'];
+		//On Save check to see if user is currently pending so we don't clear that with a blank save
+		//Below is for when admin submits form without filling out affiliate fields
+		if (!$affiliate_user) {
+			$affiliate_user = get_user_option('affiliate_user', $user->ID);
+		}
 
-		update_user_meta($user_id, 'affiliate_user', $affiliate_user);
-		update_user_meta($user_id, 'affiliate_facebook_page', $_POST['affiliate_facebook_page']);
-		update_user_meta($user_id, 'affiliate_age', $_POST['affiliate_age']);
-		update_user_meta($user_id, 'affiliate_gender', $_POST['affiliate_gender']);
-		update_user_meta($user_id, 'affiliate_payout_type', $_POST['affiliate_payout_type']);
-		update_user_meta($user_id, 'affiliate_payout', $_POST['affiliate_payout']);
+		$affiliate_facebook_page = $_POST['affiliate_facebook_page'];
+		$affiliate_age = $_POST['affiliate_age'];
+		$affiliate_gender = $_POST['affiliate_gender'];
+		$affiliate_payout_type = $_POST['affiliate_payout_type'];
+		$affiliate_payout = $_POST['affiliate_payout'];
+		if ($affiliate_payout_type == 'percentage') {
+			$affiliate_payout_type = 1;
+		} else if ($affiliate_payout_type == 'dollars') {
+			$affiliate_payout_type = 2;
+		}
+
+		update_user_option($user_id, 'affiliate_user', $affiliate_user);
+		update_user_option($user_id, 'affiliate_facebook_page', $affiliate_facebook_page);
+		update_user_option($user_id, 'affiliate_age', $affiliate_age);
+		update_user_option($user_id, 'affiliate_gender', $affiliate_gender);
+		update_user_option($user_id, 'affiliate_payout_type', $affiliate_payout_type);
+		update_user_option($user_id, 'affiliate_payout', $affiliate_payout);
 
 		if ($affiliate_user == 'true') {
 			$affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $user_id;
-			update_user_meta($user_id, 'affiliate_url', $affiliate_url);
+			update_user_option($user_id, 'affiliate_url', $affiliate_url);
 		} else {
-			update_user_meta($user_id, 'affiliate_url', '');
+			update_user_option($user_id, 'affiliate_url', '');
 		}
 	}
 }
@@ -325,7 +346,6 @@ function foxypress_ShowDashboardStats()
 function foxypress_DashboardSetup()
 {
 	wp_add_dashboard_widget( 'foxypress_dashboard', __( 'FoxyPress Statistics' ), 'foxypress_ShowDashboardStats' );
-	foxypress_Installation_CreateAffiliatePaymentsTable();
 }
 
 function foxypress_addbuttons() {
@@ -363,10 +383,14 @@ function foxypress_GetEditorPluginURL($type) {
 	}
 }
 
-function foxypress_Mail($mail_to, $mail_subject, $mail_body)
+function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
 {
+	$from = $mail_from;
 	if(get_option("foxypress_smtp_host")!='' && get_option("foxypress_email_username")!='' && get_option("foxypress_email_password")!=''){
-		$from = get_option("foxypress_email_username");
+		if($mail_from == "")
+		{
+			$from = get_option("foxypress_email_username");
+		}
 		$to = $mail_to;
 		$subject = $mail_subject;
 
@@ -402,10 +426,14 @@ function foxypress_Mail($mail_to, $mail_subject, $mail_body)
 		  $emailSent="Your status message has been sent.";
 		}
 	}else{
+		if($mail_from == "")
+		{
+			$from = get_settings("admin_email ");
+		}
 		//send email to customer
 		$headers = "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
-		$headers .= 'From: <' . get_settings("admin_email ") . '>' . "\r\n";
+		$headers .= 'From: <' . $mail_from . '>' . "\r\n";
 		mail($mail_to,$subject,$mail_body,$headers);
 	}
 }
@@ -2687,17 +2715,13 @@ function foxypress_deactivate()
 	if (foxypress_IsMultiSite())
 	{
 		$OriginalBlog = $wpdb->blogid;
-		// check if it is a network activation - if so, run the activation function for each blog id
-		if (isset($_GET['networkwide']) && ($_GET['networkwide'] == 1))
+		$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
+		foreach ($blogids as $blog_id)
 		{
-			$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-			foreach ($blogids as $blog_id)
-			{
-				switch_to_blog($blog_id);
-				foxypress_Uninstall();
-			}
-			switch_to_blog($OriginalBlog);
+			switch_to_blog($blog_id);
+			foxypress_Uninstall();
 		}
+		switch_to_blog($OriginalBlog);
 	}
 	else
 	{
@@ -2727,6 +2751,7 @@ function foxypress_Uninstall()
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_downloadable_download");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_tracking");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_payments");
+	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_email_templates");
 
 	//check option first before we delete
 	$keep_products = get_option("foxypress_uninstall_keep_products");
@@ -2774,9 +2799,13 @@ function foxypress_Uninstall()
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='foxycart_customer_id'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='foxypress_foxycart_subscriptions'");
 	//delete affiliate user meta data
-	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='affiliate_user'");
-	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='affiliate_url'");
-	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='affiliate_percentage'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_user'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_url'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_facebook_page'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_gender'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_age'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout_type'");
 
 	if($keep_products != "1")
 	{
@@ -2833,10 +2862,12 @@ function foxypress_Install($apikey, $encryptionkey)
 
 		foxypress_Installation_CreateAffiliatePaymentsTable();
 		foxypress_Installation_CreateAffiliateTrackingTable();
+		foxypress_Installation_CreateEmailTemplatesTable();
 
 		foxypress_Installation_CreateSettings($encryptionkey, $apikey);
 		foxypress_Installation_CreateInventoryDownloadablesDirectory();
 		foxypress_Installation_CreateInventoryImagesDirectory();
+
 	}
 	else
 	{
@@ -2930,6 +2961,11 @@ function foxypress_Install($apikey, $encryptionkey)
 		{
 			foxypress_Installation_CreateAffiliatePaymentsTable();
 		}
+		//email templates
+		if(!in_array($wpdb->prefix . "foxypress_email_templates", $tables))
+		{
+			foxypress_Installation_CreateEmailTemplatesTable();
+		}
 
 		//handle alterations
 		foxypress_Installation_HandleTableAlterations();
@@ -2945,21 +2981,21 @@ function foxypress_Installation_HandleTableAlterations()
 	//all tables should be created up to this point if they are upgrading
 	//we can run all the alters everytime for sake of consistency, since they don't update very often it won't be too big of a performance
 	//hit. This way sql will realize its dupe columns and not create as opposed to us manually checking every table for every column needed.
-		
-	
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_to_category
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//add sort order to inventory_to_category
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_to_category ADD sort_order int DEFAULT '99' AFTER category_id";
-	$wpdb->query($sql);	
-	
-	
+	$wpdb->query($sql);
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_transaction
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//add is test
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country;";
 	$wpdb->query($sql);
@@ -2983,17 +3019,20 @@ function foxypress_Installation_HandleTableAlterations()
 	$wpdb->query($sql);
 	//add blog id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_blog_id BIGINT(20) NULL AFTER foxy_transaction_cc_type;";
-	$wpdb->query($sql);		
-	//add affiliate id		
+	$wpdb->query($sql);
+	//add affiliate id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_affiliate_id BIGINT(20) NULL AFTER foxy_blog_id;";
 	$wpdb->query($sql);
-	
+	//add affiliate id
+	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_rmanumber VARCHAR(100) NULL AFTER foxy_transaction_trackingnumber;";
+	$wpdb->query($sql);
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_iventory_options
 	///////////////////////////////////////////////////////////////////////////
 	// add option order
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_order INT DEFAULT '99' AFTER option_active;";
-	$wpdb->query($sql);		
+	$wpdb->query($sql);
 	//add option extra weight
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_extra_weight FLOAT(10,2) NOT NULL DEFAULT '0' AFTER option_extra_price";
 	$wpdb->query($sql);
@@ -3003,20 +3042,20 @@ function foxypress_Installation_HandleTableAlterations()
 	//add option quantity
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_quantity INT(11) NULL AFTER option_code";
 	$wpdb->query($sql);
-	
-	
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_categories
 	///////////////////////////////////////////////////////////////////////////
 	//add category image
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_categories ADD category_image VARCHAR(100) NULL AFTER category_name;";
-	$wpdb->query($sql);		
-	
-	
+	$wpdb->query($sql);
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//updates
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//update blog id
 	$sql = "UPDATE " . $wpdb->prefix . "foxypress_transaction SET foxy_blog_id = (select min(blog_id) from " . $wpdb->prefix . "blogs) where foxy_blog_id = '0' or foxy_blog_id is null;";
 	$wpdb->query($sql);
@@ -3024,18 +3063,26 @@ function foxypress_Installation_HandleTableAlterations()
 	///////////////////////////////////////////////////////////////////////////
 	//Upgrading Affiliate Functionality
 	///////////////////////////////////////////////////////////////////////////
-	$affiliate_percentage = $wpdb->get_results("SHOW COLUMNS FROM " . $wpdb->prefix . "foxypress_affiliate_payments LIKE 'foxy_affiliate_percentage'");
-	if (!empty($affiliate_percentage)) {
+	$cur_version = get_option('foxypress_version');
+	// Old affiliate versions
+	if ($cur_version === '0.3.5' || $cur_version === '0.3.5.1' || $cur_version === '0.3.5.2') {
 		//Add affiliate_payout_type
-        $affiliate_ids = $wpdb->get_results("SELECT user_id FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_percentage'");
-        foreach ($affiliate_ids as $affiliate)
-        {
-        	update_user_meta($affiliate->user_id, 'affiliate_payout_type', '0');
-        }
+		$affiliate_ids = $wpdb->get_results("SELECT user_id FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'affiliate_user'");
+		foreach ($affiliate_ids as $affiliate)
+		{
+			update_user_option($affiliate->user_id, 'affiliate_payout_type', '1');
+			$primary_blog = get_user_option('primary_blog', $affiliate->user_id);
+			if ($primary_blog && $primary_blog != '1') {
+				//Change affiliate_percentage to affiliate_payout and update to multisite
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_payout' WHERE meta_key = 'affiliate_percentage' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			} else {
+				//Change affiliate_percentage to affiliate_payout and update to multisite
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_payout' WHERE meta_key = 'affiliate_percentage' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			}
 
-		//Change affiliate_percentage to affiliate_payout
-		$sql = "UPDATE " . $wpdb->prefix . "usermeta SET meta_key = replace(meta_key, 'affiliate_percentage', 'affiliate_payout');";
-		$wpdb->query($sql);
+		}
 
 		//Alter payments table
 		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments CHANGE foxy_affiliate_percentage foxy_affiliate_payout int(11) NOT NULL";
@@ -3044,8 +3091,74 @@ function foxypress_Installation_HandleTableAlterations()
 		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments ADD foxy_affiliate_payout_type tinyint(1) NOT NULL AFTER foxy_affiliate_payout;";
 		$wpdb->query($sql);
 
-		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '0'";
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '1'";
 		$wpdb->query($sql);
+	}
+	//Newest Version
+	if ($cur_version === '0.3.5.3') {
+		//Update percentage
+		$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_value = '2' where meta_key = 'affiliate_payout_type' AND meta_value='1';";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_value = '1' where meta_key = 'affiliate_payout_type' AND meta_value='0';";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '2' where foxy_affiliate_payout_type = '1';";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '1' where foxy_affiliate_payout_type = '0' or foxy_affiliate_payout_type is null;";
+		$wpdb->query($sql);
+	}
+
+	if ($cur_version === '0.3.5' || $cur_version === '0.3.5.1' || $cur_version === '0.3.5.2' || $cur_version === '0.3.5.3') {
+		$affiliate_ids = $wpdb->get_results("SELECT user_id FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'affiliate_user'");
+		foreach ($affiliate_ids as $affiliate)
+		{
+			$primary_blog = get_user_option('primary_blog', $affiliate->user_id);
+			if ($primary_blog && $primary_blog != '1') {
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_facebook_page' WHERE meta_key = 'affiliate_facebook_page' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_age' WHERE meta_key = 'affiliate_age' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_gender' WHERE meta_key = 'affiliate_gender' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_user' WHERE meta_key = 'affiliate_user' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_payout' WHERE meta_key = 'affiliate_payout' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_payout_type' WHERE meta_key = 'affiliate_payout_type' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_url' WHERE meta_key = 'affiliate_url' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			} else {
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_facebook_page' WHERE meta_key = 'affiliate_facebook_page' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_age' WHERE meta_key = 'affiliate_age' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_gender' WHERE meta_key = 'affiliate_gender' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_user' WHERE meta_key = 'affiliate_user' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_payout' WHERE meta_key = 'affiliate_payout' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_payout_type' WHERE meta_key = 'affiliate_payout_type' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_url' WHERE meta_key = 'affiliate_url' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			}
+		}
 	}
 }
 
@@ -3068,13 +3181,14 @@ function foxypress_Installation_CreateTransactionTable()
 {
 	global $wpdb;
 	//create main transaction table to hold data that gets synched up.
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_transaction" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_transaction (
 			foxy_transaction_id INT(11) NOT NULL PRIMARY KEY,
 			foxy_transaction_status VARCHAR(30) NOT NULL,
 			foxy_transaction_first_name VARCHAR(50) NULL,
 			foxy_transaction_last_name VARCHAR(50) NULL,
 			foxy_transaction_email VARCHAR(50) NULL,
 			foxy_transaction_trackingnumber VARCHAR(100) NULL,
+			foxy_transaction_rmanumber VARCHAR(100) NULL,
 			foxy_transaction_billing_address1 VARCHAR(50) NULL,
 			foxy_transaction_billing_address2 VARCHAR(50) NULL,
 			foxy_transaction_billing_city VARCHAR(50) NULL,
@@ -3104,7 +3218,7 @@ function foxypress_Installation_CreateTransactionStatusTable()
 {
 	global $wpdb;
 	//create custom status table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_transaction_status" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_transaction_status (
 			foxy_transaction_status INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			foxy_transaction_status_description VARCHAR(50) NULL,
 			foxy_transaction_status_email_flag tinyint(1) NOT NULL DEFAULT '0',
@@ -3122,7 +3236,7 @@ function foxypress_Installation_CreateTransactionNoteTable()
 {
 	global $wpdb;
 	//create transaction note table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_transaction_note" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_transaction_note (
 				foxy_transaction_note_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				foxy_transaction_id INT(11) NOT NULL,
 				foxy_transaction_note TEXT NOT NULL,
@@ -3136,7 +3250,7 @@ function foxypress_Installation_CreateInventoryOptionsTable()
 {
 	global $wpdb;
 	//create options table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_options" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_options (
 				option_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				inventory_id INT(11) NOT NULL ,
 				option_group_id INT(11) NOT NULL ,
@@ -3156,7 +3270,7 @@ function foxypress_Installation_CreateInventoryOptionGroupsTable()
 {
 	global $wpdb;
 	//create options group table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_option_group" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_option_group (
 				option_group_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 				option_group_name VARCHAR(50) NOT NULL
 			)";
@@ -3167,7 +3281,7 @@ function foxypress_Installation_CreateInventoryAttributesTable()
 {
 	global $wpdb;
 	//create custom inventory attributes
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_attributes" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_attributes (
 				attribute_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				inventory_id INT(11) NOT NULL ,
 				attribute_text VARCHAR(50) NOT NULL ,
@@ -3181,7 +3295,7 @@ function foxypress_Installation_CreateInventoryToCategoryTable()
 {
 	global $wpdb;
 	//create inventory to category table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_to_category" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_to_category (
 				itc_id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				inventory_id INT(11) NOT NULL,
 				category_id INT(11) NOT NULL,
@@ -3194,7 +3308,7 @@ function foxypress_Installation_CreateInventoryDownloadablesTable()
 {
 	global $wpdb;
 	//create inventory downloadables table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_downloadables" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_inventory_downloadables (
 				downloadable_id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				inventory_id INT(11) NOT NULL,
 				filename varchar(255) NOT NULL,
@@ -3208,7 +3322,7 @@ function foxypress_Installation_CreateDownloadTransactionTable()
 {
 	global $wpdb;
 	//create inventory download transation table, this id will be unique per download (the id used for the link)
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_downloadable_transaction" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_downloadable_transaction (
 				download_transaction_id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				foxy_transaction_id INT(11) NOT NULL,
 				downloadable_id INT(11) NOT NULL,
@@ -3221,7 +3335,7 @@ function foxypress_Installation_CreateDownloadableDownloadTable()
 {
 	global $wpdb;
 	//create downloadable downloads table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_downloadable_download" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_downloadable_download (
 				download_id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				download_transaction_id INT(11) NOT NULL,
 				download_date DATETIME,
@@ -3232,10 +3346,10 @@ function foxypress_Installation_CreateDownloadableDownloadTable()
 }
 
 function foxypress_Installation_CreateAffiliateTrackingTable()
-{	
+{
 	global $wpdb;
 	//create affliliate tracking table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_tracking" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_tracking (
   				id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   				affiliate_id bigint(20) NOT NULL,
 				destination_url varchar(255) NOT NULL,
@@ -3247,10 +3361,10 @@ function foxypress_Installation_CreateAffiliateTrackingTable()
 }
 
 function foxypress_Installation_CreateAffiliatePaymentsTable()
-{	
+{
 	global $wpdb;
 	//create affliliate payments table
-	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_payments" . " (
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_payments (
   				id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				foxy_affiliate_id bigint(20) NOT NULL,
 				foxy_transaction_id int(11) NOT NULL,
@@ -3264,6 +3378,21 @@ function foxypress_Installation_CreateAffiliatePaymentsTable()
 			) ";
 	$wpdb->query($sql);
 }
+
+function foxypress_Installation_CreateEmailTemplatesTable()
+{
+	global $wpdb;
+	//create email templates table
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_email_templates (
+  				email_template_id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				foxy_email_template_name varchar(50) NOT NULL,
+				foxy_email_template_subject TEXT NULL,
+				foxy_email_template_email_body TEXT NULL,
+				foxy_email_template_from varchar(100) NULL
+			) ";
+	$wpdb->query($sql);
+}
+
 function foxypress_Installation_CreateSettings($encryption_key, $api_key)
 {
 	global $wpdb;
@@ -3286,6 +3415,10 @@ function foxypress_Installation_CreateSettings($encryption_key, $api_key)
 	if(!foxypress_option_exists("foxycart_apikey"))
 	{
 		add_option("foxycart_apikey", $api_key);
+	}
+	if(!foxypress_option_exists("foxypress_uninstall_keep_products"))
+	{
+		add_option("foxypress_uninstall_keep_products", "1");
 	}
 }
 

@@ -31,9 +31,16 @@ function foxypress_view_reports_list()
 ?>
 	<div class="wrap">
     	<h2><?php _e('Reports','reports'); ?></h2><br>
-        <div><a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=1"); ?>">View Daily/Weekly/Monthly Order Totals</a></div>
-        <div><a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=2"); ?>">View Orders By Product Code</a></div>
-    </div>
+		<div class='reports first'>
+
+		</div>
+		<div class='reports second'>
+			<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=1"); ?>">View Daily/Weekly/Monthly Order Totals</a>			
+		</div>
+		<div class='reports second'>
+        	<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=2"); ?>">View Orders By Product Code</a>
+		</div>
+	</div>
 <?php
 }
 
@@ -50,8 +57,8 @@ function foxyprses_view_ordersByCode_report()
 		});
 	</script> 
 	<div class="wrap">
-    	<h2><?php _e('Reports','reports'); ?></h2><br>
-        <div><b><a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports");?>">Reports</a> > View Orders By Product Code and Transaction Status</b></div>
+        <?php foxypress_view_reports_list(); ?>
+		<div class="clearall"></div>
         <div>
         	<form id="frmOrders" name="frmOrders" method="POST">                 
             	<table>
@@ -289,8 +296,8 @@ function foxypress_view_totals_report()
 		});
 	</script> 
 	<div class="wrap">
-    	<h2><?php _e('Reports','reports'); ?></h2><br>
-        <div><b><a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports");?>">Reports</a> > Daily/Weekly/Monthly Order Totals</b></div>
+    	<?php foxypress_view_reports_list(); ?>
+		<div class="clearall"></div>
         <div>
         	<form id="frmOrders" name="frmOrders" method="POST">                 
             	<table>

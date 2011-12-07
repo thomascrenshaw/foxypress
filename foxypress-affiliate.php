@@ -23,7 +23,7 @@ if (isset($_GET['url'])) {
 
 //Insert to database
 global $wpdb;
-$sql = "INSERT INTO wp_foxypress_affiliate_tracking (affiliate_id, destination_url, user_ip, user_agent) values ('" . $affiliate_id . "', '" . $destination_url . "', '" . $user_ip . "', '" . $user_agent . "')";
+$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_tracking (affiliate_id, destination_url, user_ip, user_agent) values ('" . $affiliate_id . "', '" . $destination_url . "', '" . $user_ip . "', '" . $user_agent . "')";
 $wpdb->query($sql);
 
 //Set Session Variable

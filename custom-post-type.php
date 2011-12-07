@@ -726,7 +726,12 @@ function foxypress_product_meta_save($post_id)
 		foxypress_save_meta_data($post_id, '_quantity_max',$_POST['_quantity_max']);
 			
 		//save sale pricing
-		foxypress_save_meta_data($post_id, '_saleprice',number_format((double)str_replace(",","",$_POST['_saleprice']),2,".",""));
+		if($_POST['_saleprice']!=""){
+			foxypress_save_meta_data($post_id, '_saleprice',number_format((double)str_replace(",","",$_POST['_saleprice']),2,".",""));
+		}else{
+			foxypress_save_meta_data($post_id, '_saleprice',$_POST['_saleprice']);
+		}
+		
 		foxypress_save_meta_data($post_id, '_salestartdate',$_POST['_salestartdate']);
 		foxypress_save_meta_data($post_id, '_saleenddate',$_POST['_saleenddate']);
 				

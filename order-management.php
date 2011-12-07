@@ -110,6 +110,7 @@ function order_management_postback()
 			}
 			$NewStatus = foxypress_FixPostVar("foxy_om_ddl_status");
 			$TrackingNumber = foxypress_FixPostVar("foxy_om_tracking_number");
+			$RMANumber = foxypress_FixPostVar("foxy_om_rma_number");
 			//get transaction details & current status
 			$tRow = $wpdb->get_row("select * from " . $wpdb->prefix ."foxypress_transaction where foxy_transaction_id = '$TransactionID'");
 			//if it's different check the table to see if we need to send an email
@@ -131,7 +132,7 @@ function order_management_postback()
 				}
 			}
 			//save transaction status
-			$sql = "update " . $wpdb->prefix ."foxypress_transaction SET foxy_transaction_status = '$NewStatus', foxy_transaction_trackingnumber = '$TrackingNumber' WHERE foxy_transaction_id = '$TransactionID'";
+			$sql = "update " . $wpdb->prefix ."foxypress_transaction SET foxy_transaction_status = '$NewStatus', foxy_transaction_trackingnumber = '$TrackingNumber', foxy_transaction_rmanumber = '$RMANumber' WHERE foxy_transaction_id = '$TransactionID'";
 			$wpdb->query($sql);
 			if($switched_blog) { restore_current_blog(); }
 			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID. "&mode=detail&b=" .$BlogID);
@@ -147,6 +148,12 @@ function order_management_postback()
 		else if($Page_Action == "printslip")
 		{
 			foxypress_PrintPackingSlip(false, true);
+		}
+		else if(isset($_POST['foxy_om_email_template_submit']))
+		{
+			$templateChosen = foxypress_FixPostVar("foxy_om_ddl_email_template");
+			$TransactionID = foxypress_FixGetVar("transaction", "");
+			foxypress_SendEmailTemplate($templateChosen, $TransactionID);
 		}
 	}
 }
@@ -424,18 +431,34 @@ function order_management_page_load()
 					}
 				}
 				$HasSameBillingAndShipping = ($tRow->foxy_transaction_shipping_address1 == "");
-				//show general info
-                echo("<h3>Transaction Details</h3>
+				echo("<h3>Transaction Details</h3>
 					<div>
 						Transaction ID: " . $foxyXMLResponse->transaction->id . " &nbsp; Date: " . $foxyXMLResponse->transaction->transaction_date . "
 					</div> <br>
 					<div>
 						<form method=\"POST\" name=\"statusForm\" id=\"statusForm\">
-							Status:
-							<select id=\"foxy_om_ddl_status\" name=\"foxy_om_ddl_status\">"
-							. $StatusList .
-							"</select> &nbsp; Tracking Number: <input type=\"text\" name=\"foxy_om_tracking_number\" id=\"foxy_om_tracking_number\" value=\"" .  $tRow->foxy_transaction_trackingnumber . "\" />
-							<input type=\"submit\" id=\"foxy_om_transaction_submit\" name=\"foxy_om_transaction_submit\" value=\"Save\" />
+							<table>
+								<tr>
+									<td align=\"right\">Status</td>
+									<td>
+										<select id=\"foxy_om_ddl_status\" name=\"foxy_om_ddl_status\">"
+										. $StatusList .
+										"</select>
+									</td>
+								</tr>
+								<tr>
+									<td align=\"right\">Tracking Number</td>
+									<td><input type=\"text\" name=\"foxy_om_tracking_number\" id=\"foxy_om_tracking_number\" value=\"" .  $tRow->foxy_transaction_trackingnumber . "\" /></td>
+								</tr>
+								<tr>
+									<td align=\"right\">RMA Number</td>
+									<td><input type=\"text\" name=\"foxy_om_rma_number\" id=\"foxy_om_rma_number\" value=\"" .  $tRow->foxy_transaction_rmanumber . "\" /></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td><input type=\"submit\" id=\"foxy_om_transaction_submit\" name=\"foxy_om_transaction_submit\" value=\"Save\" /></td>
+								</tr>
+							</table>
 						</form>
 					</div>
 					<h3>Customer Details</h3>
@@ -458,7 +481,7 @@ function order_management_page_load()
 								<td valign=\"top\">
 								<div>
 									<b>Shipping Address</b> <a href=\"javascript:ToggleEdit();\">(edit)</a><br />" .
-									$foxyXMLResponse->transaction->customer_last_name . " " .  $foxyXMLResponse->transaction->customer_first_name . "<br />" .
+									(($foxyXMLResponse->transaction->shipping_last_name!="") ? $foxyXMLResponse->transaction->shipping_last_name : $foxyXMLResponse->transaction->customer_last_name ) . " " .  (($foxyXMLResponse->transaction->shipping_first_name!="") ? $foxyXMLResponse->transaction->shipping_first_name : $foxyXMLResponse->transaction->customer_first_name ) . "<br />" .
 									(
 										($HasSameBillingAndShipping) ?
 										$tRow->foxy_transaction_billing_address1 . " " .  $tRow->foxy_transaction_billing_address2 . "<br />" .
@@ -613,7 +636,8 @@ function order_management_page_load()
 				   "<div>Product Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->product_total) . "</div>" .
 				   "<div>Tax Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->tax_total) . "</div>" .
 				   "<div>Shipping Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->shipping_total) . "</div>" .
-				   "<div>Order Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->order_total) . "</div>");
+				   "<div>Order Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->order_total) . "</div>" .
+				   "<div>Credit Card Type: " . $tRow->foxy_transaction_cc_type . "</div>");
 					
 				//show notes
 				echo("<div><h3>Notes</h3></div>");
@@ -655,6 +679,44 @@ function order_management_page_load()
 					   	<textarea id=\"foxy_om_note\" name=\"foxy_om_note\" cols=\"50\" rows=\"3\"></textarea> <br>
 						<input type=\"submit\" name=\"foxy_om_note_submit\" id=\"foxy_om_note_submit\" value=\"Add Note\" />
 					  </form>");
+				
+				//email
+				//show general info
+                echo("<h3>Send Email</h3>");
+				$t_options=$wpdb->get_results("SELECT * FROM " . $wpdb->prefix ."foxypress_email_templates");
+				if(count($t_options)==0){	
+					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s','manage-emails', 'new');
+					echo"You do not have any email templates defined.  Add one <a href='" . $destination_url . "'>here</a>.";
+				}else{
+					$PostURL = foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID . "&b=" . $BlogID . "&mode=detail#email";
+					if(!isset($_POST['foxy_om_email_template_submit'])) { echo "<a name=\"email\"></a>"; }
+					echo "<form method=\"POST\" name=\"sendEmailForm\" id=\"sendEmailForm\" action=\"" . $PostURL . "\">
+							Select Template:
+							<select name='foxy_om_ddl_email_template' id='foxy_om_ddl_email_template'>";				
+					foreach ( $t_options as $te ) 
+					{
+						echo "<option value='".$te->email_template_id."' " . ( (foxypress_FixPostVar("foxy_om_ddl_email_template") == $te->email_template_id) ? "selected=\"selected\"" : ""  ) . ">".$te->foxy_email_template_name."</option>";
+					}
+					echo "	</select>" .
+						 "	<input type=\"submit\" id=\"foxy_om_email_template_preview\" name=\"foxy_om_email_template_preview\" value=\"Ok\" />";
+				}
+				if(isset($_POST['foxy_om_email_template_preview']))
+				{
+					$templateDetails=$wpdb->get_row("SELECT * FROM " . $wpdb->prefix ."foxypress_email_templates where email_template_id = '" . foxypress_FixPostVar("foxy_om_ddl_email_template") . "'");
+					echo "<br /><br /><div>" . $templateDetails->foxy_email_template_email_body . "</div>"; 
+					if(preg_match_all("/{{custom_field_.*?}}/", $templateDetails->foxy_email_template_email_body, $matches))
+					{
+						echo "<table>";
+						foreach($matches[0] as $match=>$custom_tag)
+						{			
+							echo "<tr><td>" . $custom_tag . "</td><td><input type=\"text\" id=\"foxy_om_" . $custom_tag . "\" name =\"foxy_om_" . $custom_tag . "\" value=\"\" /></td></tr>";
+						}
+						echo "</table>";
+					}						
+					echo "<br /><div><input type=\"submit\" id=\"foxy_om_email_template_submit\" name=\"foxy_om_email_template_submit\" value=\"Send Email\" /></div>";
+				}					 
+				echo "</form>";
+					  
 			}//end check for success
 			else
 			{
@@ -841,6 +903,53 @@ function order_management_page_load()
 		}
 	}
 	End_Foxy_Order_Management($NeedsSync);
+}
+
+function foxypress_SendEmailTemplate($templateID, $transactionID)
+{
+	global $wpdb;
+	$mailTemplate = $wpdb->get_row("select * from  " . $wpdb->prefix ."foxypress_email_templates where email_template_id='" . $templateID . "'");
+	$transactionDetail = $wpdb->get_row("select * from " . $wpdb->prefix ."foxypress_transaction where foxy_transaction_id = '" . $transactionID . "'");
+	//set up mail objects
+	$mail_to = $transactionDetail->foxy_transaction_email;
+	$mail_subject = $mailTemplate->foxy_email_template_subject;
+    $mail_body = $mailTemplate->foxy_email_template_email_body;	
+	$mail_from = $mailTemplate->foxy_email_template_from;
+	//replace fields
+	$mail_body = str_replace("{{order_id}}", $transactionDetail->foxy_transaction_id, $mail_body);
+	$mail_body = str_replace("{{customer_first_name}}", $transactionDetail->foxy_transaction_first_name, $mail_body);
+	$mail_body = str_replace("{{customer_last_name}}", $transactionDetail->foxy_transaction_last_name, $mail_body);
+	$mail_body = str_replace("{{customer_email}}", $transactionDetail->foxy_transaction_email, $mail_body);	
+	$mail_body = str_replace("{{tracking_number}}", $transactionDetail->foxy_transaction_trackingnumber, $mail_body);
+	$mail_body = str_replace("{{customer_billing_address1}}", $transactionDetail->foxy_transaction_billing_address1, $mail_body);
+	$mail_body = str_replace("{{customer_billing_address2}}", $transactionDetail->foxy_transaction_billing_address2, $mail_body);
+	$mail_body = str_replace("{{customer_billing_city}}", $transactionDetail->foxy_transaction_billing_city, $mail_body);
+	$mail_body = str_replace("{{customer_billing_state}}", $transactionDetail->foxy_transaction_billing_state, $mail_body);
+	$mail_body = str_replace("{{customer_billing_zip}}", $transactionDetail->foxy_transaction_billing_zip, $mail_body);
+	$mail_body = str_replace("{{customer_billing_country}}", $transactionDetail->foxy_transaction_billing_country, $mail_body);
+	$mail_body = str_replace("{{customer_shipping_address1}}", $transactionDetail->foxy_transaction_shipping_address1, $mail_body);
+	$mail_body = str_replace("{{customer_shipping_address2}}", $transactionDetail->foxy_transaction_shipping_address2, $mail_body);
+	$mail_body = str_replace("{{customer_shipping_city}}", $transactionDetail->foxy_transaction_shipping_city, $mail_body);
+	$mail_body = str_replace("{{customer_shipping_state}}", $transactionDetail->foxy_transaction_shipping_state, $mail_body);
+	$mail_body = str_replace("{{customer_shipping_zip}}", $transactionDetail->foxy_transaction_shipping_zip, $mail_body);
+	$mail_body = str_replace("{{customer_shipping_country}}", $transactionDetail->foxy_transaction_shipping_country, $mail_body);
+	$mail_body = str_replace("{{order_date}}", $transactionDetail->foxy_transaction_date, $mail_body);
+	$mail_body = str_replace("{{product_total}}", $transactionDetail->foxy_transaction_product_total, $mail_body);
+	$mail_body = str_replace("{{tax_total}}", $transactionDetail->foxy_transaction_tax_total, $mail_body);
+	$mail_body = str_replace("{{shipping_total}}", $transactionDetail->foxy_transaction_shipping_total, $mail_body);
+	$mail_body = str_replace("{{order_total}}", $transactionDetail->foxy_transaction_order_total, $mail_body);
+	$mail_body = str_replace("{{cc_type}}", $transactionDetail->foxy_transaction_cc_type, $mail_body);
+	
+	if(preg_match_all("/{{custom_field_.*?}}/", $mail_body, $matches))
+	{
+		foreach($matches[0] as $match=>$custom_tag)
+		{			
+			$mail_body = str_replace($custom_tag, foxypress_FixPostVar("foxy_om_" . $custom_tag), $mail_body);
+		}
+	}	
+	
+    foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from);
+	echo("<div class='updated' id='message'>Your email message has been successfully sent!</div>");
 }
 
 function foxypress_PrintPackingSlip($partialSlip, $printPage)

@@ -8,7 +8,7 @@ CKEDITOR.editorConfig = function( config )
 	config.language = 'en';
 	config.toolbar = 'FoxyPress';
 	config.shiftEnterMode = CKEDITOR.ENTER_BR;
-	config.enterMode = CKEDITOR.ENTER_P;
+	config.enterMode = CKEDITOR.ENTER_BR;
 	config.theme = 'default';
  
 	config.toolbar_FoxyPress =

@@ -375,5 +375,24 @@ div.template_holder{
 
 img.template_separator{margin-top:20px;margin-bottom:10px;}
 
+/** REPORT STUFF **/
+div.reports{
+	margin:5px 3px 5px 0px;
+	float:left;
+	height:98px;
+	width:154px;
+	font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+	font-weight: 700;
+	text-align:center;
+	padding-top:30px;
+}
+	div.reports a{color:#fff;}
+	
+div.reports.first{
+	background:url(../img/viewreports.jpg);
+}
+div.reports.second{
+	background:#e01822;
+}
 
 div.clearall{clear:both;}
