@@ -1,3 +1,44 @@
-Item Code,Item Name,Item Description,Item Category,Item Price,Item Sale Price,Item Sale Start Date,Item Sale End Date,Item Weight,Item Quantity,Item Quantity Min,Item Quantity Max,Item Options,Item Attributes,Item Discount Quantity Amount,Item Discount Quantity Percentage,Item Discount Price Amount,Item Discount Price Percentage,Subscription Frequency,Subscription Start Date,Subscription End Date,Item Start Date,Item End Date,Item Active,Item Images
-abc123,Couch,orange couch,Default,5,0,,,1,,,,,,,,,,,,,,,1,http://demo.foxy-press.com/wp-content/uploads/2011/11/UnoSofaLeftArmLobsterAVF11.jpg|http://demo.foxy-press.com/wp-content/uploads/2011/11/UnoSofaLeftArmLobsterF11.jpg|http://demo.foxy-press.com/wp-content/uploads/2011/11/unosofaperimeteroakHD11.jpg
-abc124,Twin Sleeper,sleeper,Default,10,8,,,1,,,,,,,,,,,,,,,1,http://demo.foxy-press.com/wp-content/uploads/2011/11/juliustwinsleeperottomnHD11.jpg|http://demo.foxy-press.com/wp-content/uploads/2011/11/JuliusTwinSlprGrass3QF11.jpg
+"Item Code","Item Name","Item Description","Item Category","Item Price","Item Sale Price","Item Sale Start Date","Item Sale End Date","Item Weight","Item Quantity","Item Quantity Min","Item Quantity Max","Item Options","Item Attributes","Item Discount Quantity Amount","Item Discount Quantity Percentage","Item Discount Price Amount","Item Discount Price Percentage","Subscription Frequency","Subscription Start Date","Subscription End Date","Item Start Date","Item End Date","Item Active"
+COFFEE1,"Bunn HG Phase Brew","The BUNN Phase Brew 8-Cup Home Brewer.",Default,40.00,10.00,,,,36,,,,,,,,,,,,,2011-11-30,1
+BED1,"Marimekko Red Bed Linens","Appearing as a disciplined linear pattern from afar, freeform yet concisely connected dots are revealed upon closer examination, creating an abstract reference to a rag rug. The pattern has been translated into a variety of color schemes, all of which succeed in creating a vibrant optical experience.",Default|Bedding|Featured,225.00,0.00,,,2,10,,,,,,,,,,,,,,1
+CHAIR1,"Alfresco Natural Dining Chair","Casual and stylish Alfresco fools the eye with the look of real wood and fools the elements with waterproof, and UV- and fade-resistant qualities. The result is an outdoor collection that will last season after season for years to come. Slats of innovative Polystyrene faux wood are treated with UV and anti-oxidant protection and finished a neutral natural.","Default|Outdoor Furniture|Featured",50.00,0.00,,,4,,,,,,,,,,,,,,,1
+SOFA1,"Klyne Sofa","Our Klyne is a compact sofa whose bold saffron color fills the room with attitude. Narrow tapered arms cut a sleek profile and make for an even roomier experience.",Default|Furniture,300.00,280.00,,,,,,,,,,,,,,,,,,1
+214942,"new york minute panels","true to life. Ordinary blur of NYC street life triptychs extraordinary life-size scale. Digitally scanned images by artist Parvez Taj montage urban hubbub—taxi cruising for a fare, subway neon, buildings in passing. Monochromatic study charged with urgent reds leans three panels against the wall, eight feet high, placing the viewer in the scene actual size.
+
+Collectors take note: This one-time-only limited edition of prints will not be re-issued, so don't miss out.
+Set of three panels by California-based artist Parvez Taj
+<ul>
+	<li>Limited edition</li>
+	<li>Signed by the artist</li>
+	<li>Mixed media print with aluminum foil rub</li>
+	<li>Lean against wall only; do not hang</li>
+	<li>Wipe with a damp, clean cloth</li>
+	<li>Made in China</li>
+</ul>
+<div>Dimensions: Print (set of three panels). Each measures 36""Wx2""Dx96""H</div>",Default|Prints,999.99,899.99,,,,,,,,,,,,,,,,,,1
+217134,"andes walnut bed","boutique hotel. Walnut veneer platform scales to new lo-heights integrating headboard nightstands that cantilever two stepped shelves each—one wide for books, one narrow with discreet cord cutouts for clock/light/dock. Just right height for pillow propping. Ledge extends around mattress, hovers over corner block feet. Substantial wood composite construction. Dreamy price. Mattresses available, sold separately.
+<ul>
+	<li>Designed by Mark Daniel of Slate Design</li>
+	<li>Walnut veneer over wood composite</li>
+	<li>Integrated headboard nightstands with two shelves each</li>
+	<li>Ultra-low platform cantilevers over base</li>
+	<li>For use with mattress only</li>
+	<li>Made in Vietnam</li>
+	<li>See dimensions below</li>
+</ul>",Furniture|Bedding,849.00,0.00,,,,,,,,,,,,,,,,,,1
+224335,"teak bath accessories","Clean and simple. Spare solid teak stacking boxes and wastecan naturally neatens bath, bedroom, office.
+<ul>
+	<li>Solid teak</li>
+	<li>Natural and oil finish</li>
+	<li>Naturally occurring texture and knots</li>
+	<li>Made in Laos</li>
+	<li>See dimensions below</li>
+</ul>",Default|Furniture,24.95,6.95,,,,,,,,,,,,,,,,,,1
+215514,"valley bowl","come full circle. Handcrafted low-slung circle halos 24 rubberwood panels in radial blond beams. Spans a foot-and-a-half to serve ample greens.
+<ul>
+	<li>Rubberwood with clear lacquer</li>
+	<li>Hand wash</li>
+	<li>Made in Thailand</li>
+</ul>
+Get the recipe for this delicious salad prepared just for us by expert food stylist Adam Pearson on our blog.","Default|Trendy items",59.95,49.95,,,,,,,,,,,,,,,,,,1
+TIMEMAG,"TIME Magazine","This is an example of a subscription based product.  It is set to auto renew every month.  You have the option of choosing a daily renewal, monthly renewal, or yearly renewal.  The ability to set a start and end date for a subscription is possible as well.",Default,16.00,0.00,,,,,,,,,,,,,1m,,,,,1

@@ -1,6 +1,6 @@
 <?php
 /**************************************************************************
-FoxyPress provides a complete shopping cart and inventory management tool
+FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
@@ -11,10 +11,10 @@ load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_d
 
 global $wpdb;
 //page load
-function foxypress_manage_emails_page_load()
+function foxypress_manage_emails_page_load() 
 {
 	global $wpdb;
-
+	
 	if($_GET['mode']=='edit')
 	{
 		if(isset($_POST['foxy_em_save']))
@@ -22,7 +22,7 @@ function foxypress_manage_emails_page_load()
 			$subject=$_POST['subject'];
 			$templatename = $_POST['templatename'];
 			$content=$_POST['content'];
-			$from=$_POST['from'];
+			$from=$_POST['from'];		
 
 			if($templatename!=''&& $subject!=''){
 				$sql = "UPDATE  ". $wpdb->prefix . "foxypress_email_templates set foxy_email_template_name='".$templatename."', foxy_email_template_subject='".$subject."', foxy_email_template_email_body='".$content."', foxy_email_template_from='" . $from . "' WHERE email_template_id=".$_GET[id];
@@ -42,7 +42,7 @@ function foxypress_manage_emails_page_load()
 	        			<td width="180">Template ID</td><td><?php _e($_GET['id']); ?></td>
 	        		</tr>
                     <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
-	        		<form method="POST" name="statusForm" id="statusForm">
+	        		<form method="POST" name="statusForm" id="statusForm"> 
 	        		<tr>
 	        			<td>Template Name</td>
 						<td><input type="text" name="templatename" value="<?php _e($me->foxy_email_template_name); ?>" size="50" /></td>
@@ -52,7 +52,7 @@ function foxypress_manage_emails_page_load()
 						<td><input type="text" name="subject" value="<?php _e($me->foxy_email_template_subject); ?>" size="50" /></td>
 					</tr>
                     <tr>
-                        <td>From Email</td>
+                        <td>From Email</td> 
                         <td><input type="text" name="from" value="<?php _e($me->foxy_email_template_from); ?>" size="50" /></td>
                     </tr>
 					<tr>
@@ -72,97 +72,97 @@ function foxypress_manage_emails_page_load()
 				</table>
 				<div style="float:left; width:400px; margin-left:20px">
 					<p><i> You can use the following legend to populate the email body</i></p>
-					<table style="margin:10px 0; display:block;">
+					<table style="margin:10px 0; display:block;">	
 						<tr>
-							<td width="200">{{order_id}}</td>
+							<td width="200"><strong>{{order_id}}</strong></td>
 							<td>ID of Order</td>
 						</tr>
 						<tr>
-							<td>{{order_date}}</td>
+							<td><strong>{{order_date}}</strong></td>
 							<td>Order Date</td>
 						</tr>
 						<tr>
-							<td>{{product_total}}</td>
+							<td><strong>{{product_total}}</strong></td>
 							<td>Order Product Total</td>
 						</tr>
 						<tr>
-							<td>{{tax_total}}</td>
+							<td><strong>{{tax_total}}</strong></td>
 							<td>Order Tax Total</td>
 						</tr>
 						<tr>
-							<td>{{shipping_total}}</td>
+							<td><strong>{{shipping_total}}</strong></td>
 							<td>Order Shipping Total</td>
 						</tr>
 						<tr>
-							<td>{{order_total}}</td>
+							<td><strong>{{order_total}}</strong></td>
 							<td>Order Total</td>
 						</tr>
 						<tr>
-							<td>{{cc_type}}</td>
+							<td><strong>{{cc_type}}</strong></td>
 							<td>Credit Card Type Used</td>
 						</tr>
 						<tr>
-							<td>{{customer_first_name}}</td>
+							<td><strong>{{customer_first_name}}</strong></td>
 							<td>Customer's First Name</td>
 						</tr>
 						<tr>
-							<td>{{customer_last_name}}</td>
+							<td><strong>{{customer_last_name}}</strong></td>
 							<td>Customers' Last Name</td>
 						</tr>
 						<tr>
-							<td>{{customer_email}}</td>
+							<td><strong>{{customer_email}}</strong></td>
 							<td>Customer's Email</td>
 						</tr>
 						<tr>
-							<td>{{tracking_number}}</td>
+							<td><strong>{{tracking_number}}</strong></td>
 							<td>Tracking Number (if entered)</td>
 						</tr>
 						<tr>
-							<td>{{customer_billing_address1}}</td>
+							<td><strong>{{customer_billing_address1}}</strong></td>
 							<td>Customer's Billing Address 1</td>
 						</tr>
 						<tr>
-							<td>{{customer_billing_address2}}</td>
+							<td><strong>{{customer_billing_address2}}</strong></td>
 							<td>Customer's Billing Address 2</td>
 						</tr>
 						<tr>
-							<td>{{customer_billing_city}}</td>
+							<td><strong>{{customer_billing_city}}</strong></td>
 							<td>Customer's Billing City</td>
 						</tr>
 						<tr>
-							<td>{{customer_billing_state}}</td>
+							<td><strong>{{customer_billing_state}}</strong></td>
 							<td>Customer's Billing State</td>
 						</tr>
 						<tr>
-							<td>{{customer_billing_zip}}</td>
+							<td><strong>{{customer_billing_zip}}</strong></td>
 							<td>Customer's Billing Zip</td>
 						</tr>
 						<tr>
-							<td>{{customer_billing_country}}</td>
+							<td><strong>{{customer_billing_country}}</strong></td>
 							<td>Customer's Billing Country</td>
 						</tr>
 						<tr>
-							<td>{{customer_shipping_address1}}</td>
+							<td><strong>{{customer_shipping_address1}}</strong></td>
 							<td>Customer's Shipping Address 1</td>
 						</tr>
 						<tr>
-							<td>{{customer_shipping_address2}}</td>
+							<td><strong>{{customer_shipping_address2}}</strong></td>
 							<td>Customer's Shipping Address 2</td>
 						</tr>
 						<tr>
-							<td>{{customer_shipping_city}}</td>
+							<td><strong>{{customer_shipping_city}}</strong></td>
 							<td>Customer's Shipping City</td>
 						</tr>
 						<tr>
-							<td>{{customer_shipping_state}}</td>
+							<td><strong>{{customer_shipping_state}}</strong></td>
 							<td>Customer's Shipping State</td>
 						</tr>
 						<tr>
-							<td>{{customer_shipping_zip}}</td>
+							<td><strong>{{customer_shipping_zip}}</strong></td>
 							<td>Customer's Shipping Zip</td>
 						</tr>
 						<tr>
-							<td>{{customer_shipping_country}}</td>
+							<td><strong>{{customer_shipping_country}}</strong></td>
 							<td>Customer's Shipping Country</td>
 						</tr>
 	            	</table>
@@ -180,7 +180,7 @@ function foxypress_manage_emails_page_load()
 
 					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&&action=updated',$_REQUEST['page'],'manage-emails');
 	                echo 'Saving Template...';
-	                echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+	                echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';					
 				}else{
 					$sm_error = "<div class='error' id='message'>Your email template name and subject cannot be blank.</div>";
 				}
@@ -190,17 +190,17 @@ function foxypress_manage_emails_page_load()
 				<div class="wrap">
 					<h2><?php _e('Manage Emails'); ?></h2>
 					<table cellpadding="10" style="float:left; width:650px;">
-						<form method="POST" name="statusForm" id="statusForm">
+						<form method="POST" name="statusForm" id="statusForm"> 
 						<tr>
 							<td>Template Name</td>
 							<td><input type="text" name="templatename" value="" size="50" /></td>
 						</tr>
 						<tr>
-							<td>Subject</td>
+							<td>Subject</td> 
 							<td><input type="text" name="subject" value="" size="50" /></td>
 						</tr>
                         <tr>
-							<td>From Email</td>
+							<td>From Email</td> 
 							<td><input type="text" name="from" value="" size="50" /></td>
 						</tr>
 						<tr>
@@ -220,100 +220,100 @@ function foxypress_manage_emails_page_load()
 					</table>
 					<div style="float:left; width:400px; margin-left:20px">
 						<p><i> You can use the following legend to populate the email body</i></p>
-						<table style="margin:10px 0; display:block;">
+						<table style="margin:10px 0; display:block;">	
 							<tr>
-								<td width="200">{{order_id}}</td>
+								<td width="200"><strong>{{order_id}}</strong></td>
 								<td>ID of Order</td>
 							</tr>
 							<tr>
-								<td>{{order_date}}</td>
+								<td><strong>{{order_date}}</strong></td>
 								<td>Order Date</td>
 							</tr>
 							<tr>
-								<td>{{product_total}}</td>
+								<td><strong>{{product_total}}</strong></td>
 								<td>Order Product Total</td>
 							</tr>
 							<tr>
-								<td>{{tax_total}}</td>
+								<td><strong>{{tax_total}}</strong></td>
 								<td>Order Tax Total</td>
 							</tr>
 							<tr>
-								<td>{{shipping_total}}</td>
+								<td><strong>{{shipping_total}}</strong></td>
 								<td>Order Shipping Total</td>
 							</tr>
 							<tr>
-								<td>{{order_total}}</td>
+								<td><strong>{{order_total}}</strong></td>
 								<td>Order Total</td>
 							</tr>
 							<tr>
-								<td>{{cc_type}}</td>
+								<td><strong>{{cc_type}}</strong></td>
 								<td>Credit Card Type Used</td>
 							</tr>
 							<tr>
-								<td>{{customer_first_name}}</td>
+								<td><strong>{{customer_first_name}}</strong></td>
 								<td>Customer's First Name</td>
 							</tr>
 							<tr>
-								<td>{{customer_last_name}}</td>
+								<td><strong>{{customer_last_name}}</strong></td>
 								<td>Customers' Last Name</td>
 							</tr>
 							<tr>
-								<td>{{customer_email}}</td>
+								<td><strong>{{customer_email}}</strong></td>
 								<td>Customer's Email</td>
 							</tr>
 							<tr>
-								<td>{{tracking_number}}</td>
+								<td><strong>{{tracking_number}}</strong></td>
 								<td>Tracking Number (if entered)</td>
 							</tr>
 							<tr>
-								<td>{{customer_billing_address1}}</td>
+								<td><strong>{{customer_billing_address1}}</strong></td>
 								<td>Customer's Billing Address 1</td>
 							</tr>
 							<tr>
-								<td>{{customer_billing_address2}}</td>
+								<td><strong>{{customer_billing_address2}}</strong></td>
 								<td>Customer's Billing Address 2</td>
 							</tr>
 							<tr>
-								<td>{{customer_billing_city}}</td>
+								<td><strong>{{customer_billing_city}}</strong></td>
 								<td>Customer's Billing City</td>
 							</tr>
 							<tr>
-								<td>{{customer_billing_state}}</td>
+								<td><strong>{{customer_billing_state}}</strong></td>
 								<td>Customer's Billing State</td>
 							</tr>
 							<tr>
-								<td>{{customer_billing_zip}}</td>
+								<td><strong>{{customer_billing_zip}}</strong></td>
 								<td>Customer's Billing Zip</td>
 							</tr>
 							<tr>
-								<td>{{customer_billing_country}}</td>
+								<td><strong>{{customer_billing_country}}</strong></td>
 								<td>Customer's Billing Country</td>
 							</tr>
 							<tr>
-								<td>{{customer_shipping_address1}}</td>
+								<td><strong>{{customer_shipping_address1}}</strong></td>
 								<td>Customer's Shipping Address 1</td>
 							</tr>
 							<tr>
-								<td>{{customer_shipping_address2}}</td>
+								<td><strong>{{customer_shipping_address2}}</strong></td>
 								<td>Customer's Shipping Address 2</td>
 							</tr>
 							<tr>
-								<td>{{customer_shipping_city}}</td>
+								<td><strong>{{customer_shipping_city}}</strong></td>
 								<td>Customer's Shipping City</td>
 							</tr>
 							<tr>
-								<td>{{customer_shipping_state}}</td>
+								<td><strong>{{customer_shipping_state}}</strong></td>
 								<td>Customer's Shipping State</td>
 							</tr>
 							<tr>
-								<td>{{customer_shipping_zip}}</td>
+								<td><strong>{{customer_shipping_zip}}</strong></td>
 								<td>Customer's Shipping Zip</td>
 							</tr>
 							<tr>
-								<td>{{customer_shipping_country}}</td>
+								<td><strong>{{customer_shipping_country}}</strong></td>
 								<td>Customer's Shipping Country</td>
 							</tr>
-	            		</table>
+		            	</table>
 		        	</div>
 				<?php
 			}else{
@@ -322,7 +322,7 @@ function foxypress_manage_emails_page_load()
 			<h2><?php _e('Manage Emails'); ?></h2>
 			<table cellpadding="10" style="float:left; width:650px;">
                <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
-				<form method="POST" name="statusForm" id="statusForm">
+				<form method="POST" name="statusForm" id="statusForm"> 
 				<tr>
 					<td><strong>Template Name: </strong></td><td>  <input type="text" name="templatename" value="" size="50" /></td>
 				</tr>
@@ -349,108 +349,108 @@ function foxypress_manage_emails_page_load()
 			</table>
 			<div style="float:left; width:400px; margin-left:20px">
 				<p><i> You can use the following legend to populate the email body</i></p>
-				<table style="margin:10px 0; display:block;">
+				<table style="margin:10px 0; display:block;">	
 					<tr>
-						<td width="200">{{order_id}}</td>
+						<td width="200"><strong>{{order_id}}</strong></td>
 						<td>ID of Order</td>
 					</tr>
 					<tr>
-						<td>{{order_date}}</td>
+						<td><strong>{{order_date}}</strong></td>
 						<td>Order Date</td>
 					</tr>
 					<tr>
-						<td>{{product_total}}</td>
+						<td><strong>{{product_total}}</strong></td>
 						<td>Order Product Total</td>
 					</tr>
 					<tr>
-						<td>{{tax_total}}</td>
+						<td><strong>{{tax_total}}</strong></td>
 						<td>Order Tax Total</td>
 					</tr>
 					<tr>
-						<td>{{shipping_total}}</td>
+						<td><strong>{{shipping_total}}</strong></td>
 						<td>Order Shipping Total</td>
 					</tr>
 					<tr>
-						<td>{{order_total}}</td>
+						<td><strong>{{order_total}}</strong></td>
 						<td>Order Total</td>
 					</tr>
 					<tr>
-						<td>{{cc_type}}</td>
+						<td><strong>{{cc_type}}</strong></td>
 						<td>Credit Card Type Used</td>
 					</tr>
 					<tr>
-						<td>{{customer_first_name}}</td>
+						<td><strong>{{customer_first_name}}</strong></td>
 						<td>Customer's First Name</td>
 					</tr>
 					<tr>
-						<td>{{customer_last_name}}</td>
+						<td><strong>{{customer_last_name}}</strong></td>
 						<td>Customers' Last Name</td>
 					</tr>
 					<tr>
-						<td>{{customer_email}}</td>
+						<td><strong>{{customer_email}}</strong></td>
 						<td>Customer's Email</td>
 					</tr>
 					<tr>
-						<td>{{tracking_number}}</td>
+						<td><strong>{{tracking_number}}</strong></td>
 						<td>Tracking Number (if entered)</td>
 					</tr>
 					<tr>
-						<td>{{customer_billing_address1}}</td>
+						<td><strong>{{customer_billing_address1}}</strong></td>
 						<td>Customer's Billing Address 1</td>
 					</tr>
 					<tr>
-						<td>{{customer_billing_address2}}</td>
+						<td><strong>{{customer_billing_address2}}</strong></td>
 						<td>Customer's Billing Address 2</td>
 					</tr>
 					<tr>
-						<td>{{customer_billing_city}}</td>
+						<td><strong>{{customer_billing_city}}</strong></td>
 						<td>Customer's Billing City</td>
 					</tr>
 					<tr>
-						<td>{{customer_billing_state}}</td>
+						<td><strong>{{customer_billing_state}}</strong></td>
 						<td>Customer's Billing State</td>
 					</tr>
 					<tr>
-						<td>{{customer_billing_zip}}</td>
+						<td><strong>{{customer_billing_zip}}</strong></td>
 						<td>Customer's Billing Zip</td>
 					</tr>
 					<tr>
-						<td>{{customer_billing_country}}</td>
+						<td><strong>{{customer_billing_country}}</strong></td>
 						<td>Customer's Billing Country</td>
 					</tr>
 					<tr>
-						<td>{{customer_shipping_address1}}</td>
+						<td><strong>{{customer_shipping_address1}}</strong></td>
 						<td>Customer's Shipping Address 1</td>
 					</tr>
 					<tr>
-						<td>{{customer_shipping_address2}}</td>
+						<td><strong>{{customer_shipping_address2}}</strong></td>
 						<td>Customer's Shipping Address 2</td>
 					</tr>
 					<tr>
-						<td>{{customer_shipping_city}}</td>
+						<td><strong>{{customer_shipping_city}}</strong></td>
 						<td>Customer's Shipping City</td>
 					</tr>
 					<tr>
-						<td>{{customer_shipping_state}}</td>
+						<td><strong>{{customer_shipping_state}}</strong></td>
 						<td>Customer's Shipping State</td>
 					</tr>
 					<tr>
-						<td>{{customer_shipping_zip}}</td>
+						<td><strong>{{customer_shipping_zip}}</strong></td>
 						<td>Customer's Shipping Zip</td>
 					</tr>
 					<tr>
-						<td>{{customer_shipping_country}}</td>
+						<td><strong>{{customer_shipping_country}}</strong></td>
 						<td>Customer's Shipping Country</td>
 					</tr>
-				</table>
+            	</table>
         	</div>
 		<?php
 		}
 	}else{
 		$action = foxypress_FixGetVar('action');
-		if ($action === 'updated') {
+		if ($action === 'updated') { 
 			echo("<div class='updated' id='message'>Your email template has been successfully saved!</div>");
-		}else if ($action === 'delete') {
+		}else if ($action === 'delete') { 
 			$sql = "delete from  " . $wpdb->prefix . "foxypress_email_templates WHERE email_template_id = '".$_GET['id']."'";
 			$wpdb->query($sql);
 			echo("<div class='updated' id='message'>Your email template has been successfully deleted!</div>");
@@ -469,7 +469,7 @@ function foxypress_manage_emails_page_load()
 						<th class="manage-column" scope="col" width="80%">Template Name</th>
 	                    <th>&nbsp;</th>
 					</tr>
-				</thead>
+				</thead>            
 	        <?php
 				foreach ($Emails as $e ) {
 					echo("<tr>");
@@ -479,7 +479,7 @@ function foxypress_manage_emails_page_load()
 			}
 			echo "</table>";
 		}
-	?>
+	?>	
 	<?php
 	}
 }

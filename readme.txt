@@ -42,7 +42,15 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 - JasonHunterDesign - Affiliate Management inspiration/donation
 
+- Consolibyte API - Utique Shop
+
 == Changelog ==
+
+= 0.3.6.1 =
+* Feature: If you are using Consolibyte's QuickBooks integration, you can now send QuickBooks inventory quantities back up to FoxyPress
+* Feature: Affiliate users can now have avatars - courtesy of Uploadify
+* Bugfix: Multi-site users could have experienced some warnings about our blog install method based on their PHP settings.  This is resolved.
+* Upgrade notes available <a href="http://www.foxy-press.com/blog/2011/12/09/foxypress-0-3-6-1" target="_blank">here</a> 
 
 = 0.3.6 =
 * Feature: Inventory Import from CSV file now supports images.

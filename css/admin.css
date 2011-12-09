@@ -396,3 +396,19 @@ div.reports.second{
 }
 
 div.clearall{clear:both;}
+
+/* Affiliate */
+div#avatar {
+	background: #EEEEEE;
+	border: 1px dashed #CCCCCC;
+	height: 96px;
+	margin-bottom: 10px;
+	padding: 4px;
+	width: 96px;
+}
+span.avatar-loader {
+	display: block;
+	height: 32px;
+	padding: 32px;
+	width: 32px;
+}
