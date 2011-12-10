@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.6.1
+Version: 0.3.6.2
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -98,7 +98,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.6.1");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.6.2");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -2778,7 +2778,7 @@ function foxypress_deactivate()
 			switch_to_blog($blog_id);
 			foxypress_Uninstall();
 		}
-		switch_to_blog($OriginalBlog);		
+		switch_to_blog($OriginalBlog);
 	}
 	else
 	{
@@ -2920,7 +2920,7 @@ function foxypress_Install($apikey, $encryptionkey)
 		foxypress_Installation_CreateSettings($encryptionkey, $apikey);
 		foxypress_Installation_CreateInventoryDownloadablesDirectory();
 		foxypress_Installation_CreateInventoryImagesDirectory();
-		
+
 	}
 	else
 	{
@@ -3034,21 +3034,21 @@ function foxypress_Installation_HandleTableAlterations()
 	//all tables should be created up to this point if they are upgrading
 	//we can run all the alters everytime for sake of consistency, since they don't update very often it won't be too big of a performance
 	//hit. This way sql will realize its dupe columns and not create as opposed to us manually checking every table for every column needed.
-		
-	
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_to_category
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//add sort order to inventory_to_category
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_to_category ADD sort_order int DEFAULT '99' AFTER category_id";
-	$wpdb->query($sql);	
-	
-	
+	$wpdb->query($sql);
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_transaction
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//add is test
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_is_test tinyint(1) NOT NULL DEFAULT '0' AFTER foxy_transaction_shipping_country;";
 	$wpdb->query($sql);
@@ -3072,20 +3072,20 @@ function foxypress_Installation_HandleTableAlterations()
 	$wpdb->query($sql);
 	//add blog id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_blog_id BIGINT(20) NULL AFTER foxy_transaction_cc_type;";
-	$wpdb->query($sql);		
-	//add affiliate id		
+	$wpdb->query($sql);
+	//add affiliate id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_affiliate_id BIGINT(20) NULL AFTER foxy_blog_id;";
 	$wpdb->query($sql);
-	//add affiliate id		
+	//add affiliate id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_rmanumber VARCHAR(100) NULL AFTER foxy_transaction_trackingnumber;";
 	$wpdb->query($sql);
-	
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_iventory_options
 	///////////////////////////////////////////////////////////////////////////
 	// add option order
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_order INT DEFAULT '99' AFTER option_active;";
-	$wpdb->query($sql);		
+	$wpdb->query($sql);
 	//add option extra weight
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_extra_weight FLOAT(10,2) NOT NULL DEFAULT '0' AFTER option_extra_price";
 	$wpdb->query($sql);
@@ -3095,20 +3095,20 @@ function foxypress_Installation_HandleTableAlterations()
 	//add option quantity
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_quantity INT(11) NULL AFTER option_code";
 	$wpdb->query($sql);
-	
-	
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_inventory_categories
 	///////////////////////////////////////////////////////////////////////////
 	//add category image
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_categories ADD category_image VARCHAR(100) NULL AFTER category_name;";
-	$wpdb->query($sql);		
-	
-	
+	$wpdb->query($sql);
+
+
 	///////////////////////////////////////////////////////////////////////////
 	//updates
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	//update blog id
 	$sql = "UPDATE " . $wpdb->prefix . "foxypress_transaction SET foxy_blog_id = (select min(blog_id) from " . $wpdb->prefix . "blogs) where foxy_blog_id = '0' or foxy_blog_id is null;";
 	$wpdb->query($sql);
@@ -3325,7 +3325,7 @@ function foxypress_Installation_CreateDownloadableDownloadTable()
 }
 
 function foxypress_Installation_CreateAffiliateTrackingTable()
-{	
+{
 	global $wpdb;
 	//create affliliate tracking table
 	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_tracking (
@@ -3340,7 +3340,7 @@ function foxypress_Installation_CreateAffiliateTrackingTable()
 }
 
 function foxypress_Installation_CreateAffiliatePaymentsTable()
-{	
+{
 	global $wpdb;
 	//create affliliate payments table
 	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_payments (
@@ -3359,7 +3359,7 @@ function foxypress_Installation_CreateAffiliatePaymentsTable()
 }
 
 function foxypress_Installation_CreateEmailTemplatesTable()
-{	
+{
 	global $wpdb;
 	//create email templates table
 	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_email_templates (

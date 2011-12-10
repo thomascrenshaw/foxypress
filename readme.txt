@@ -46,6 +46,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.3.6.2 =
+* Bugfix: Affiliate management query fix for multi-sites.
+
 = 0.3.6.1 =
 * Feature: If you are using Consolibyte's QuickBooks integration, you can now send QuickBooks inventory quantities back up to FoxyPress
 * Feature: Affiliate users can now have avatars - courtesy of Uploadify
