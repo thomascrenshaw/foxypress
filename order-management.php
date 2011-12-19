@@ -989,6 +989,7 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 		$HeaderImage = get_option('foxypress_packing_slip_header');
 		$productList = "";
 		$temp_inventory_id = "";
+		
 		foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
 		{
 			if($partialSlip)
@@ -999,29 +1000,64 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 					{
 						$temp_inventory_id = $opt->product_option_value;
 					}
+					if(strtolower($opt->product_option_name) != "downloadable" && strtolower($opt->product_option_name) != "inventory_id")
+					{
+						$temp_inventory_option_name .= $opt->product_option_name . "|";
+						$temp_inventory_option_value .= $opt->product_option_value . "|";
+					}
 				}		
 				foreach($Products as $product)
-				{
+				{				
+					$temp_exploded_option_names = explode("|", $temp_inventory_option_name);
+					$temp_exploded_option_values = explode("|", $temp_inventory_option_value);
+
+					$temp_inventory_option_name = "";
+					$temp_inventory_option_value = "";
+
+					$options="";
+					for($i = 0; $i < sizeof($temp_exploded_option_names)-1; $i++){
+						$options .= $temp_exploded_option_names[$i] . " : " . $temp_exploded_option_values[$i] . "<br />";
+					}
+
 					$temp_exploded = explode("|", $product);
 					if($temp_exploded[0] == $temp_inventory_id || $temp_exploded[1] == $td->product_code)
 					{
+						
 						$productList .= "<div class=\"clearall\"></div>
 								<div class=\"product\">
 									<div class=\"sku\">" . $td->product_code . "</div>
 									<div class=\"qty\">" .  $td->product_quantity . "</div>
-									<div class=\"name\">" .  $td->product_name . "</div>
+									<div class=\"name\">" .  $td->product_name . " <br />" . $options . "</div>
 								</div>";
 						break;
-					}
+					}										
 				}			
 			}
 			else
 			{
+				foreach($td->transaction_detail_options->transaction_detail_option as $opt)
+				{
+					if(strtolower($opt->product_option_name) != "downloadable" && strtolower($opt->product_option_name) != "inventory_id")
+					{
+						$temp_inventory_option_name .= $opt->product_option_name . "|";
+						$temp_inventory_option_value .= $opt->product_option_value . "|";
+					}
+				}
+				$temp_exploded_option_names = explode("|", $temp_inventory_option_name);
+				$temp_exploded_option_values = explode("|", $temp_inventory_option_value);
+
+				$temp_inventory_option_name = "";
+				$temp_inventory_option_value = "";
+
+				$options="";
+				for($i = 0; $i < sizeof($temp_exploded_option_names)-1; $i++){
+					$options .= $temp_exploded_option_names[$i] . " : " . $temp_exploded_option_values[$i] . "<br />";
+				}
 				$productList .= "<div class=\"clearall\"></div>
 							<div class=\"product\">
 								<div class=\"sku\">" . $td->product_code . "</div>
 								<div class=\"qty\">" .  $td->product_quantity . "</div>
-								<div class=\"name\">" .  $td->product_name . "</div>
+								<div class=\"name\">" .  $td->product_name . " <br />" . $options . "</div>
 							</div>";
 			}
 		}
@@ -1098,7 +1134,7 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 			</div>
 			<div class="ship_to">
 				<?php
-				echo($foxyXMLResponse->transaction->customer_last_name . " " .  $foxyXMLResponse->transaction->customer_first_name . "<br />" .
+				echo($foxyXMLResponse->transaction->shipping_first_name . " " .  $foxyXMLResponse->transaction->shipping_last_name . "<br />" .
 						(
 							($HasSameBillingAndShipping) ?
 							$tRow->foxy_transaction_billing_address1 . " " .  $tRow->foxy_transaction_billing_address2 . "<br />" .
@@ -1110,6 +1146,10 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 					);
 				?>
 			</div>
+			<div class="clearall"></div><br />
+			<? if($foxyXMLResponse->transaction->shipto_shipping_service_description!=""){
+				echo("<div class='shipped_via'>Shipped via: " . $foxyXMLResponse->transaction->shipto_shipping_service_description . "</div>");
+			}?>			
 			<div class="clearall"></div>
 		</div>
 		<hr class="breaker" />

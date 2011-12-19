@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.6.2
+Version: 0.3.6.3
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -98,7 +98,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.6.2");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.6.3");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -146,7 +146,7 @@ function foxypress_menu()
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Templates'), __('Templates'), 'manage_options', 'templates', 'foxypress_templates_page_load');
 		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Import/Export'), __('Import/Export'), 'manage_options', 'import-export', 'import_export_page_load');
 		$user_id = $current_user->ID;
-		$affiliate_user = get_the_author_meta('affiliate_user', $user_id);
+		$affiliate_user = get_user_option('affiliate_user', $user_id);
 		if ($affiliate_user !== 'true' && !current_user_can('administrator')) {
 			add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Affiliate Sign Up'), __('Affiliate Sign Up'), 'read', 'affiliate-signup', 'foxypress_create_affiliate_signup');
 		}
@@ -175,15 +175,18 @@ function foxypress_affiliate_profile_fields($user)
 	{
 		global $wpdb;
 
-		$affiliate_user 		 = get_user_option('affiliate_user', $user->ID);
-		$affiliate_avatar_name   = get_user_option('affiliate_avatar_name', $user->ID);
-		$affiliate_avatar_ext    = get_user_option('affiliate_avatar_ext', $user->ID);
-		$affiliate_payout_type   = get_user_option('affiliate_payout_type', $user->ID);
-		$affiliate_payout    	 = get_user_option('affiliate_payout', $user->ID);
-		$affiliate_url  		 = get_user_option('affiliate_url', $user->ID);
-		$affiliate_facebook_page = get_user_option('affiliate_facebook_page', $user->ID);
-		$affiliate_age 			 = get_user_option('affiliate_age', $user->ID);
-		$affiliate_gender		 = get_user_option('affiliate_gender', $user->ID); ?>
+		$affiliate_user 		   = get_user_option('affiliate_user', $user->ID);
+		$affiliate_avatar_name     = get_user_option('affiliate_avatar_name', $user->ID);
+		$affiliate_avatar_ext      = get_user_option('affiliate_avatar_ext', $user->ID);
+		$affiliate_url  		   = get_user_option('affiliate_url', $user->ID);
+		$affiliate_facebook_page   = get_user_option('affiliate_facebook_page', $user->ID);
+		$affiliate_age 			   = get_user_option('affiliate_age', $user->ID);
+		$affiliate_gender		   = get_user_option('affiliate_gender', $user->ID);
+		$affiliate_payout_type     = get_user_option('affiliate_payout_type', $user->ID);
+		$affiliate_payout    	   = get_user_option('affiliate_payout', $user->ID);
+		$affiliate_discount        = get_user_option('affiliate_discount', $user->ID);
+		$affiliate_discount_type   = get_user_option('affiliate_discount_type', $user->ID);
+		$affiliate_discount_amount = get_user_option('affiliate_discount_amount', $user->ID); ?>
 
 		<h3>FoxyPress Affiliate Information</h3>
 			<table class="form-table">
@@ -240,6 +243,31 @@ function foxypress_affiliate_profile_fields($user)
 					<td>
 						<input type="text" name="affiliate_payout" id="affiliate_payout" value="<?php echo $affiliate_payout; ?>">
 						<span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30% or $30.00)</b></span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_discount">Enable Affiliate Discount</label></th>
+					<td><input type="checkbox" <?php if ($affiliate_discount == 'true') { ?>checked="yes" <?php } ?>name="affiliate_discount" id="affiliate_discount" value="true" /> Does this user's link allow for an additional discount?</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_payout_type">Affiliate Discount Type</label></th>
+					<td>
+						<input type="radio" <?php if ($affiliate_discount_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="percentage">
+						<span class="description">Percentage off of each order.</span>
+					</td>
+				</tr>
+				<tr>
+					<th></th>
+					<td>
+						<input type="radio" <?php if ($affiliate_discount_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="dollars">
+						<span class="description">Dollar amount off of each order.</span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_discount_amount">Affiliate Discount Amount</label></th>
+					<td>
+						<input type="text" name="affiliate_discount_amount" id="affiliate_discount_amount" value="<?php echo $affiliate_discount_amount; ?>">
+						<span class="description">How much of a discount will user's receive? <b>(Enter 30 for 30% or $30.00)</b></span>
 					</td>
 				</tr>
 				<tr>
@@ -301,18 +329,27 @@ function foxypress_save_affiliate_profile_fields($user_id) {
 			$affiliate_user = get_user_option('affiliate_user', $user->ID);
 		}
 
-		$affiliate_avatar_name   = $_POST['affiliate_avatar_name'];
-		$affiliate_avatar_ext    = $_POST['affiliate_avatar_ext'];
-		$affiliate_facebook_page = $_POST['affiliate_facebook_page'];
-		$affiliate_age 			 = $_POST['affiliate_age'];
-		$affiliate_gender 		 = $_POST['affiliate_gender'];
-		$affiliate_payout_type 	 = $_POST['affiliate_payout_type'];
-		$affiliate_payout 		 = $_POST['affiliate_payout'];
+		$affiliate_avatar_name     = $_POST['affiliate_avatar_name'];
+		$affiliate_avatar_ext      = $_POST['affiliate_avatar_ext'];
+		$affiliate_facebook_page   = $_POST['affiliate_facebook_page'];
+		$affiliate_age 			   = $_POST['affiliate_age'];
+		$affiliate_gender 		   = $_POST['affiliate_gender'];
+		$affiliate_payout_type 	   = $_POST['affiliate_payout_type'];
+		$affiliate_payout 		   = $_POST['affiliate_payout'];
+		$affiliate_discount        = $_POST['affiliate_discount'];
+		$affiliate_discount_type   = $_POST['affiliate_discount_type'];
+		$affiliate_discount_amount = $_POST['affiliate_discount_amount'];
 
 		if ($affiliate_payout_type == 'percentage') {
 			$affiliate_payout_type = 1;
 		} else if ($affiliate_payout_type == 'dollars') {
 			$affiliate_payout_type = 2;
+		}
+
+		if ($affiliate_discount_type == 'percentage') {
+			$affiliate_discount_type = 1;
+		} else if ($affiliate_discount_type == 'dollars') {
+			$affiliate_discount_type = 2;
 		}
 
 		update_user_option($user_id, 'affiliate_user', $affiliate_user);
@@ -323,6 +360,9 @@ function foxypress_save_affiliate_profile_fields($user_id) {
 		update_user_option($user_id, 'affiliate_gender', $affiliate_gender);
 		update_user_option($user_id, 'affiliate_payout_type', $affiliate_payout_type);
 		update_user_option($user_id, 'affiliate_payout', $affiliate_payout);
+		update_user_option($user_id, 'affiliate_discount', $affiliate_discount);
+		update_user_option($user_id, 'affiliate_discount_type', $affiliate_discount_type);
+		update_user_option($user_id, 'affiliate_discount_amount', $affiliate_discount_amount);
 
 		if ($affiliate_user == 'true') {
 			$affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $user_id;
@@ -1353,6 +1393,8 @@ function foxypress_GetActualWeight($_weight1, $_weight2)
 
 function foxypress_GetActualPrice($price, $saleprice, $startdate, $enddate)
 {
+	$affiliate_discount_type = $_SESSION['affiliate_discount_type'];
+	$affiliate_discount_amount = $_SESSION['affiliate_discount_amount'];
 	$ActualPrice = $price;
 	if($saleprice != "" && $saleprice > 0)
 	{
@@ -1372,7 +1414,22 @@ function foxypress_GetActualPrice($price, $saleprice, $startdate, $enddate)
 			$ActualPrice = $saleprice;
 		}
 	}
-	return $ActualPrice;
+	//Affiliate Discount
+	if ($affiliate_discount_type && $affiliate_discount_amount) {
+		if ($affiliate_discount_type == 1) {
+			$subtract = $affiliate_discount_amount / 100 * $ActualPrice;
+			$affiliate_price = $ActualPrice - $subtract;
+			$affiliate_discount = number_format((double)$affiliate_price,2,".","");
+		} else if ($affiliate_discount_type == 2) {
+			$affiliate_price = $ActualPrice - $affiliate_discount_amount;
+			$affiliate_discount = number_format((double)$affiliate_price,2,".","");
+		} else {
+			$affiliate_discount = $ActualPrice;
+		}
+		return $affiliate_discount;
+	} else {
+		return $ActualPrice;
+	}
 }
 
 function foxypress_CanAddToCart($inventory_id, $quantity)
@@ -2856,9 +2913,13 @@ function foxypress_Uninstall()
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='foxycart_customer_id'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='foxypress_foxycart_subscriptions'");
 	//delete affiliate user meta data
-	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='affiliate_user'");
-	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='affiliate_url'");
-	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='affiliate_percentage'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_user'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_url'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_facebook_page'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_gender'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_age'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout_type'");
 
 	if($keep_products != "1")
 	{
@@ -3116,18 +3177,26 @@ function foxypress_Installation_HandleTableAlterations()
 	///////////////////////////////////////////////////////////////////////////
 	//Upgrading Affiliate Functionality
 	///////////////////////////////////////////////////////////////////////////
-	$affiliate_percentage = $wpdb->get_results("SHOW COLUMNS FROM " . $wpdb->prefix . "foxypress_affiliate_payments LIKE 'foxy_affiliate_percentage'");
-	if (!empty($affiliate_percentage)) {
+	$cur_version = get_option('foxypress_version');
+	// Old affiliate versions
+	if ($cur_version === '0.3.5' || $cur_version === '0.3.5.1' || $cur_version === '0.3.5.2') {
 		//Add affiliate_payout_type
-        $affiliate_ids = $wpdb->get_results("SELECT user_id FROM " . $wpdb->prefix . "usermeta WHERE meta_key = 'affiliate_percentage'");
-        foreach ($affiliate_ids as $affiliate)
-        {
-        	update_user_meta($affiliate->user_id, 'affiliate_payout_type', '0');
-        }
+		$affiliate_ids = $wpdb->get_results("SELECT user_id FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'affiliate_user'");
+		foreach ($affiliate_ids as $affiliate)
+		{
+			update_user_option($affiliate->user_id, 'affiliate_payout_type', '1');
+			$primary_blog = get_user_option('primary_blog', $affiliate->user_id);
+			if ($primary_blog && $primary_blog != '1') {
+				//Change affiliate_percentage to affiliate_payout and update to multisite
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_payout' WHERE meta_key = 'affiliate_percentage' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			} else {
+				//Change affiliate_percentage to affiliate_payout and update to multisite
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_payout' WHERE meta_key = 'affiliate_percentage' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			}
 
-		//Change affiliate_percentage to affiliate_payout
-		$sql = "UPDATE " . $wpdb->prefix . "usermeta SET meta_key = replace(meta_key, 'affiliate_percentage', 'affiliate_payout');";
-		$wpdb->query($sql);
+		}
 
 		//Alter payments table
 		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments CHANGE foxy_affiliate_percentage foxy_affiliate_payout int(11) NOT NULL";
@@ -3136,8 +3205,74 @@ function foxypress_Installation_HandleTableAlterations()
 		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments ADD foxy_affiliate_payout_type tinyint(1) NOT NULL AFTER foxy_affiliate_payout;";
 		$wpdb->query($sql);
 
-		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '0'";
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '1'";
 		$wpdb->query($sql);
+	}
+	//Newest Version
+	if ($cur_version === '0.3.5.3') {
+		//Update percentage
+		$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_value = '2' where meta_key = 'affiliate_payout_type' AND meta_value='1';";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_value = '1' where meta_key = 'affiliate_payout_type' AND meta_value='0';";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '2' where foxy_affiliate_payout_type = '1';";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_payout_type = '1' where foxy_affiliate_payout_type = '0' or foxy_affiliate_payout_type is null;";
+		$wpdb->query($sql);
+	}
+
+	if ($cur_version === '0.3.5' || $cur_version === '0.3.5.1' || $cur_version === '0.3.5.2' || $cur_version === '0.3.5.3') {
+		$affiliate_ids = $wpdb->get_results("SELECT user_id FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'affiliate_user'");
+		foreach ($affiliate_ids as $affiliate)
+		{
+			$primary_blog = get_user_option('primary_blog', $affiliate->user_id);
+			if ($primary_blog && $primary_blog != '1') {
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_facebook_page' WHERE meta_key = 'affiliate_facebook_page' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_age' WHERE meta_key = 'affiliate_age' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_gender' WHERE meta_key = 'affiliate_gender' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_user' WHERE meta_key = 'affiliate_user' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_payout' WHERE meta_key = 'affiliate_payout' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_payout_type' WHERE meta_key = 'affiliate_payout_type' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->base_prefix . $primary_blog . "_affiliate_url' WHERE meta_key = 'affiliate_url' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			} else {
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_facebook_page' WHERE meta_key = 'affiliate_facebook_page' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_age' WHERE meta_key = 'affiliate_age' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_gender' WHERE meta_key = 'affiliate_gender' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_user' WHERE meta_key = 'affiliate_user' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_payout' WHERE meta_key = 'affiliate_payout' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_payout_type' WHERE meta_key = 'affiliate_payout_type' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+
+				$sql = "UPDATE " . $wpdb->base_prefix . "usermeta SET meta_key = '" . $wpdb->prefix . "affiliate_url' WHERE meta_key = 'affiliate_url' AND user_id = '" . $affiliate->user_id . "';";
+				$wpdb->query($sql);
+			}
+		}
 	}
 }
 

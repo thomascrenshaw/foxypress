@@ -44,7 +44,16 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 - Consolibyte API - Utique Shop
 
+- Trinity Hockey Co - Affiliate Management Upgrades
+
 == Changelog ==
+
+= 0.3.6.3 =
+* Feature: Affiliate management now lets you set a discount amount that your customers will see when viewing products through affiliate link.
+* Feature: Added product options into packing slip, when available.
+* Feature: Added shipping options into packing slip.
+* Bugfix: Packing slips weren't using the shipping name when available.
+* Release notes available <a href="http://www.foxy-press.com/blog/2011/12/19/foxypress-0-3-6-3" target="_blank">here</a> 
 
 = 0.3.6.2 =
 * Bugfix: Affiliate management query fix for multi-sites.

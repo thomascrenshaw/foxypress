@@ -690,9 +690,12 @@ function foxypress_create_affiliate_table() {
                 
                     $user_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
                     if (isset($_POST['affiliate_approve_submit'])) {
-                        $payout_type = $fp_affiliate->foxypress_FixPostVar('affiliate_payout_type');
-                        $payout      = $fp_affiliate->foxypress_FixPostVar('affiliate_payout');
-                        $error       = false;
+                        $payout_type     = $fp_affiliate->foxypress_FixPostVar('affiliate_payout_type');
+                        $payout          = $fp_affiliate->foxypress_FixPostVar('affiliate_payout');
+                        $discount        = $fp_affiliate->foxypress_FixPostVar('affiliate_discount');
+                        $discount_type   = $fp_affiliate->foxypress_FixPostVar('affiliate_discount_type');
+                        $discount_amount = $fp_affiliate->foxypress_FixPostVar('affiliate_discount_amount');
+                        $error           = false;
 
                         if (empty($payout)) {
                             $error = true;
@@ -707,13 +710,22 @@ function foxypress_create_affiliate_table() {
                         if (!$error) {
                             if ($payout_type == 'percentage') {
                                 $payout_type_converted = 1;
-                            } else {
+                            } else if ($payout_type == 'dollars') {
                                 $payout_type_converted = 2;
                             }
 
+                            if ($discount_type == 'percentage') {
+                                $discount_type_converted = 1;
+                            } else if ($discount_type == 'dollars') {
+                                $discount_type_converted = 2;
+                            }
+                            
+                            update_user_option($user_id, 'affiliate_user', 'true');
                             update_user_option($user_id, 'affiliate_payout_type', $payout_type_converted);
                             update_user_option($user_id, 'affiliate_payout', $payout);
-                            update_user_option($user_id, 'affiliate_user', 'true');
+                            update_user_option($user_id, 'affiliate_discount', $discount);
+                            update_user_option($user_id, 'affiliate_discount_type', $discount_type_converted);
+                            update_user_option($user_id, 'affiliate_discount_amount', $discount_amount);
 
                             $affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $user_id;
                             update_user_option($user_id, 'affiliate_url', $affiliate_url);                         
@@ -756,9 +768,34 @@ function foxypress_create_affiliate_table() {
                             </td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_first_name">Percentage <span class="description">(required)</span></label></th>
+                            <th><label for="affiliate_payout">Percentage <span class="description">(required)</span></label></th>
                             <td><input type="text" name="affiliate_payout" id="affiliate_payout" value="<?php echo $payout; ?>"> 
                             <span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30% or $30.00)</b></span></td>
+                        </tr>
+                        <tr>
+                            <th><label for="affiliate_discount">Enable Affiliate Discount</label></th>
+                            <td><input type="checkbox" <?php if ($discount == 'true') { ?>checked="yes" <?php } ?>name="affiliate_discount" id="affiliate_discount" value="true" /> Does this user's link allow for an additional discount?</td>
+                        </tr>
+                        <tr>
+                            <th><label for="affiliate_payout_type">Affiliate Discount Type</label></th>
+                            <td>
+                                <input type="radio" <?php if ($discount_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="percentage">
+                                <span class="description">Percentage off of each order.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td>
+                                <input type="radio" <?php if ($discount_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="dollars">
+                                <span class="description">Dollar amount off of each order.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label for="affiliate_discount_amount">Affiliate Discount Amount</label></th>
+                            <td>
+                                <input type="text" name="affiliate_discount_amount" id="affiliate_discount_amount" value="<?php echo $discount_amount; ?>">
+                                <span class="description">How much of a discount will user's receive? <b>(Enter 30 for 30% or $30.00)</b></span>
+                            </td>
                         </tr>
                     </table>
                     <p class="submit"><input type="submit" value="Approve" class="button-primary" id="affiliate_approve_submit" name="affiliate_approve_submit"></p>
