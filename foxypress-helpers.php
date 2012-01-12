@@ -438,6 +438,9 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 	$_sub_frequency = get_post_meta($item->ID,'_sub_frequency',TRUE);
 	$_sub_startdate = get_post_meta($item->ID,'_sub_startdate',TRUE);
 	$_sub_enddate = get_post_meta($item->ID,'_sub_enddate',TRUE);	
+	$_item_deal_active = get_post_meta($item->ID,'_item_deal_active',TRUE);
+	$_item_deal_code_type = get_post_meta($item->ID,'_item_deal_code_type',TRUE);
+	$_item_deal_static_code = get_post_meta($item->ID,'_item_deal_static_code',TRUE);
 	$ActualPrice = foxypress_GetActualPrice($_price, $_sale_price, $_sale_start, $_sale_end);
 	$main_inventory_image = foxypress_GetMainInventoryImage($item->ID);
 
@@ -459,13 +462,23 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 			<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
 			<input type=\"hidden\" name=\"h:blog_id\" value=\"" . $wpdb->blogid . "\" />
 			<input type=\"hidden\" name=\"h:affiliate_id\" value=\"" . $_SESSION['affiliate_id'] . "\" />"
-			 .						 
-				( (get_option('foxypress_include_memberid') == "1")
-					? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />" 
+			 .
+				( ($_item_deal_active == "1" && $_item_deal_code_type == "static")
+					? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . $_item_deal_static_code . "\" />"
 					: ""
 				)
 			 .
-				foxypress_GetMinMaxFormFields($item->downloadable_id, $_quantity_min, $_quantity_max, $_quantity) 
+			 	( ($_item_deal_active == "1" && $_item_deal_code_type == "random")
+					? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . getGUID() . "\" />"
+					: ""
+				)
+			 .
+				( (get_option('foxypress_include_memberid') == "1")
+					? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />"
+					: ""
+				)
+			 .
+				foxypress_GetMinMaxFormFields($item->downloadable_id, $_quantity_min, $_quantity_max, $_quantity)
 			 .
 				( ($_discount_quantity_amount != "") 
 					? "<input type=\"hidden\" name=\"discount_quantity_amount\" value=\"" . stripslashes($_discount_quantity_amount) . "\" />" 

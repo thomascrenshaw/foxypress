@@ -228,6 +228,7 @@ function foxypress_product_meta_init()
 	add_meta_box('product_details_meta', 'Required Product Details', 'foxypress_product_details_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
 	add_meta_box('product_categories_meta', 'Product Categories', 'foxypress_product_categories_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
 	add_meta_box('extra_product_details_meta', 'Extra Product Details', 'foxypress_extra_product_details_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'low');
+	add_meta_box('product_deal_meta', 'Daily Deal', 'foxypress_product_deal_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'low');
 	add_meta_box('product_images_meta', 'Product Images', 'foxypress_product_images_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'normal', 'high');
 	add_meta_box('product_digital_download_meta', 'Digital Downloads', 'foxypress_product_digital_download_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'normal', 'high');
 	add_meta_box('product_options_meta', 'Product Options', 'foxypress_product_options_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'normal', 'high');
@@ -513,7 +514,7 @@ function foxypress_product_details_setup()
 
 function foxypress_extra_product_details_setup()
 {
-	global $post;
+	global $post, $wpdb;
 	$_saleprice = get_post_meta($post->ID,'_saleprice',TRUE);
 	$_salestartdate = get_post_meta($post->ID,'_salestartdate',TRUE);
 	$_saleenddate = get_post_meta($post->ID,'_saleenddate',TRUE);
@@ -529,6 +530,9 @@ function foxypress_extra_product_details_setup()
 	$_item_start_date = get_post_meta($post->ID,'_item_start_date',TRUE);
 	$_item_end_date = get_post_meta($post->ID,'_item_end_date',TRUE);
 	$_item_active = get_post_meta($post->ID,'_item_active',TRUE);
+
+	$_item_email_active = get_post_meta($post->ID, '_item_email_active', TRUE);
+	$_item_email_template = get_post_meta($post->ID, '_item_email_template', TRUE);
 ?>
 	<h4><?php _e('Sale'); ?></h4>
 	<div class="foxypress_field_control">
@@ -609,7 +613,38 @@ function foxypress_extra_product_details_setup()
         </select>
         <div style="clear: both;"></div>
 	</div>
-    <div style="clear: both;"></div>    
+    <div style="clear: both;"></div>
+    <h4><?php _e('Item Email'); ?></h4>
+    <div class="foxypress_field_control">
+		<label for="_item_email_active"><?php _e('Active'); ?></label>
+		<select name="_item_email_active" id="_item_email_active">
+			<option value=""> -- </option>
+        	<option value="1" <?php if($_item_email_active == "1") {echo("selected=\"selected\"");} ?>>Yes</option>
+            <option value="0" <?php if($_item_email_active == "0") {echo("selected=\"selected\"");} ?>>No</option>
+        </select>
+        <div style="clear: both;"></div>
+	</div>
+	<div class="foxypress_field_control">
+		<label for="_item_email_template"><?php _e('Template'); ?></label>
+		<select name="_item_email_template" id="_item_email_template">
+			<option value=""> -- </option>
+			<?php 
+			$t_options=$wpdb->get_results("SELECT * FROM " . $wpdb->prefix ."foxypress_email_templates");
+			if(count($t_options)==0){	
+				//$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s','manage-emails', 'new');
+				//echo"You do not have any email templates defined.  Add one <a href='" . $destination_url . "'>here</a>.";
+			}else{
+								
+				foreach ( $t_options as $te ) 
+				{ ?>
+					<option value="<?php echo $te->email_template_id; ?>" <?php if($_item_email_template == $te->email_template_id) {echo("selected=\"selected\"");} ?>><?php echo $te->foxy_email_template_name; ?></option>
+				<?php }
+			}
+			?>
+        </select>
+        <div style="clear: both;"></div>
+	</div>
+	<div style="clear: both;"></div>
     <script type="text/javascript" langauge="javascript">
 		jQuery(document).ready(function() {
 		  	jQuery("#_salestartdate").datepicker({ dateFormat: 'yy-mm-dd' });
@@ -619,6 +654,40 @@ function foxypress_extra_product_details_setup()
 		});
 	</script>
 <?php	
+}
+
+function foxypress_product_deal_setup()
+{
+	global $post;
+	$_item_deal_active = get_post_meta($post->ID,'_item_deal_active',TRUE);
+	$_item_deal_code_type = get_post_meta($post->ID,'_item_deal_code_type',TRUE);
+	$_item_deal_static_code = get_post_meta($post->ID,'_item_deal_static_code',TRUE);
+?>
+	<div class="foxypress_field_control">
+		<label for="_item_deal_active"><?php _e('Active Deal'); ?></label>
+		<select name="_item_deal_active" id="_item_deal_active">
+			<option value=""> -- </option>
+        	<option value="1" <?php if($_item_deal_active == "1") {echo("selected=\"selected\"");} ?>>Yes</option>
+            <option value="0" <?php if($_item_deal_active == "0") {echo("selected=\"selected\"");} ?>>No</option>
+        </select>
+	</div>
+	<div class="foxypress_field_control">
+		<label for="_item_deal_code_type"><?php _e('Code Type'); ?></label>
+		<select name="_item_deal_code_type" id="_item_deal_code_type">
+			<option value=""> -- </option>
+			<option value="none" <?php if($_item_deal_code_type == "none") {echo("selected=\"selected\"");} ?>>None</option>
+        	<option value="static" <?php if($_item_deal_code_type == "static") {echo("selected=\"selected\"");} ?>>Static</option>
+            <option value="random" <?php if($_item_deal_code_type == "random") {echo("selected=\"selected\"");} ?>>Random</option>
+        </select>
+        <div style="clear: both;"></div>
+	</div>
+	<div class="foxypress_field_control discount_fields">
+		<label for="_item_deal_static_code"><?php _e('Static Code'); ?></label>
+		<input type="text" name="_item_deal_static_code" id="_item_deal_static_code" value="<?php echo $_item_deal_static_code; ?>" />
+		<div style="clear:both;"></div>
+	</div>
+    <div style="clear:both"></div>
+<?php    
 }
 
 function foxypress_product_meta_save($post_id) 
@@ -785,6 +854,15 @@ function foxypress_product_meta_save($post_id)
 				$wpdb->query($sql);	
 			}					
 		}
+
+		//save item email
+		foxypress_save_meta_data($post_id, '_item_email_active',$_POST['_item_email_active']);
+		foxypress_save_meta_data($post_id, '_item_email_template',$_POST['_item_email_template']);
+
+		//save deal info
+		foxypress_save_meta_data($post_id, '_item_deal_active',$_POST['_item_deal_active']);
+		foxypress_save_meta_data($post_id, '_item_deal_code_type',$_POST['_item_deal_code_type']);
+		foxypress_save_meta_data($post_id, '_item_deal_static_code',$_POST['_item_deal_static_code']);
 	}
 	return $post_id;
 }

@@ -10,7 +10,7 @@ $root = dirname(dirname(dirname(dirname(__FILE__))));
 require_once($root.'/wp-config.php');
 require_once($root.'/wp-includes/wp-db.php');	
 include_once('classes/class.rc4crypt.php');
-include_once('classes/class.xmlparser_php5.php');	
+include_once('classes/class.xmlparser_php5.php');
 global $wpdb, $post;	
 $debug = 0;
 $output = "";
@@ -68,12 +68,49 @@ else
 			//get transaction data
 			foreach ($foxyXMLResponse->transactions->transaction as $transaction)
 			{
-				$TransactionID = $transaction->id;
+				$TransactionID   = $transaction->id;
 				$TransactionDate = $transaction->transaction_date;
-				$CustomerID = $transaction->customer_id;
-				$FirstName = $transaction->customer_first_name;
-				$LastName = $transaction->customer_last_name;
-				$Email = $transaction->customer_email;
+				$CustomerID 	 = $transaction->customer_id;
+				$FirstName 	     = $transaction->customer_first_name;
+				$LastName 		 = $transaction->customer_last_name;
+				$Email 			 = $transaction->customer_email;
+				$ProductTotal 	 = $transaction->product_total;
+				$TaxTotal        = $transaction->tax_total;
+				$ShippingTotal   = $transaction->shipping_total;
+				$OrderTotal 	 = $transaction->order_total;
+				$CCType 		 = $transaction->cc_type;
+
+				if ($transaction->shipping_address1 == "")
+				{
+					//use billing for both
+					$BillingAddress   = $transaction->customer_address1;
+					$BillingAddress2  = $transaction->customer_address2;
+					$BillingCity 	  = $transaction->customer_city;
+					$BillingState 	  = $transaction->customer_state;
+					$BillingZip   	  = $transaction->customer_postal_code;
+					$BillingCountry   = $transaction->customer_country;
+					$ShippingAddress  = $transaction->customer_address1;
+					$ShippingAddress2 = $transaction->customer_address2;
+					$ShippingCity 	  = $transaction->customer_city;
+					$ShippingState 	  = $transaction->customer_state;
+					$ShippingZip   	  = $transaction->customer_postal_code;
+					$ShippingCountry  = $transaction->customer_country;
+				}
+				else
+				{
+					$BillingAddress   = $transaction->customer_address1;
+					$BillingAddress2  = $transaction->customer_address2;
+					$BillingCity 	  = $transaction->customer_city;
+					$BillingState 	  = $transaction->customer_state;
+					$BillingZip   	  = $transaction->customer_postal_code;
+					$BillingCountry   = $transaction->customer_country;
+					$ShippingAddress  = $transaction->shipping_address1;
+					$ShippingAddress2 = $transaction->shipping_address2;
+					$ShippingCity 	  = $transaction->shipping_city;
+					$ShippingState 	  = $transaction->shipping_state;
+					$ShippingZip   	  = $transaction->shipping_postal_code;
+					$ShippingCountry  = $transaction->shipping_country;
+				}
 				$x++;
 			}
 			//check for multi-site
@@ -187,6 +224,44 @@ else
 							);		
 							update_user_meta($user_id, 'foxypress_foxycart_subscriptions', serialize($foxypress_foxycart_subscriptions));
 						}		
+					}
+
+					//Check for automatic emails and if active, send.
+					$email_active = get_post_meta(mysql_escape_string($InventoryID), '_item_email_active', TRUE);
+					$email_template = get_post_meta(mysql_escape_string($InventoryID), '_item_email_template', TRUE);
+
+					if ($email_active == "1" && $email_template != "") {
+						$mailTemplate = $wpdb->get_row("select * from  " . $wpdb->prefix ."foxypress_email_templates where email_template_id='" . $email_template . "'");
+						//set up mail objects
+						$mail_to = mysql_escape_string($Email);
+						$mail_subject = $mailTemplate->foxy_email_template_subject;
+					    $mail_body = $mailTemplate->foxy_email_template_email_body;	
+						$mail_from = $mailTemplate->foxy_email_template_from;
+						//replace fields
+						$mail_body = str_replace("{{order_id}}", mysql_escape_string($TransactionID), $mail_body);
+						$mail_body = str_replace("{{customer_first_name}}", mysql_escape_string($FirstName), $mail_body);
+						$mail_body = str_replace("{{customer_last_name}}", mysql_escape_string($LastName), $mail_body);
+						$mail_body = str_replace("{{customer_email}}", mysql_escape_string($Email), $mail_body);
+						$mail_body = str_replace("{{customer_billing_address1}}", mysql_escape_string($BillingAddress), $mail_body);
+						$mail_body = str_replace("{{customer_billing_address2}}", mysql_escape_string($BillingAddress2), $mail_body);
+						$mail_body = str_replace("{{customer_billing_city}}", mysql_escape_string($BillingCity), $mail_body);
+						$mail_body = str_replace("{{customer_billing_state}}", mysql_escape_string($BillingState), $mail_body);
+						$mail_body = str_replace("{{customer_billing_zip}}", mysql_escape_string($BillingZip), $mail_body);
+						$mail_body = str_replace("{{customer_billing_country}}", mysql_escape_string($BillingCountry), $mail_body);
+						$mail_body = str_replace("{{customer_shipping_address1}}", mysql_escape_string($ShippingAddress), $mail_body);
+						$mail_body = str_replace("{{customer_shipping_address2}}", mysql_escape_string($ShippingAddress2), $mail_body);
+						$mail_body = str_replace("{{customer_shipping_city}}", mysql_escape_string($ShippingCity), $mail_body);
+						$mail_body = str_replace("{{customer_shipping_state}}", mysql_escape_string($ShippingState), $mail_body);
+						$mail_body = str_replace("{{customer_shipping_zip}}", mysql_escape_string($ShippingZip), $mail_body);
+						$mail_body = str_replace("{{customer_shipping_country}}", mysql_escape_string($ShippingCountry), $mail_body);
+						$mail_body = str_replace("{{order_date}}", mysql_escape_string($TransactionDate), $mail_body);
+						$mail_body = str_replace("{{product_total}}", mysql_escape_string($ProductTotal), $mail_body);
+						$mail_body = str_replace("{{tax_total}}", mysql_escape_string($TaxTotal), $mail_body);
+						$mail_body = str_replace("{{shipping_total}}", mysql_escape_string($ShippingTotal), $mail_body);
+						$mail_body = str_replace("{{order_total}}", mysql_escape_string($OrderTotal), $mail_body);
+						$mail_body = str_replace("{{cc_type}}", mysql_escape_string($CCType), $mail_body);
+						
+					    foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from);
 					}		
 				}
 				else

@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.6.3
+Version: 0.3.7
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -98,7 +98,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.6.3");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.7");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -889,6 +889,9 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 	$_sub_frequency = get_post_meta($item->ID,'_sub_frequency',TRUE);
 	$_sub_startdate = get_post_meta($item->ID,'_sub_startdate',TRUE);
 	$_sub_enddate = get_post_meta($item->ID,'_sub_enddate',TRUE);
+	$_item_deal_active = get_post_meta($item->ID,'_item_deal_active',TRUE);
+	$_item_deal_code_type = get_post_meta($item->ID,'_item_deal_code_type',TRUE);
+	$_item_deal_static_code = get_post_meta($item->ID,'_item_deal_static_code',TRUE);
 	$ActualPrice = foxypress_GetActualPrice($_price, $_sale_price, $_sale_start, $_sale_end);
 	$Multiship = (get_option('foxycart_enable_multiship') == "1") ?
 				  "<div class=\"shipto_container_wrapper" . $CssSuffix . "\">
@@ -1005,6 +1008,16 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 								<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
 								<input type=\"hidden\" name=\"h:blog_id\" value=\"" . $wpdb->blogid . "\" />
 								<input type=\"hidden\" name=\"h:affiliate_id\" value=\"" . $_SESSION['affiliate_id'] . "\" />"
+								 .
+									( ($_item_deal_active == "1" && $_item_deal_code_type == "static")
+										? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . $_item_deal_static_code . "\" />"
+										: ""
+									)
+								 .
+								 	( ($_item_deal_active == "1" && $_item_deal_code_type == "random")
+										? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . getGUID() . "\" />"
+										: ""
+									)
 								 .
 									( (get_option('foxypress_include_memberid') == "1")
 										? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />"
@@ -1183,6 +1196,9 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	$_sub_frequency = get_post_meta($item->ID,'_sub_frequency',TRUE);
 	$_sub_startdate = get_post_meta($item->ID,'_sub_startdate',TRUE);
 	$_sub_enddate = get_post_meta($item->ID,'_sub_enddate',TRUE);
+	$_item_deal_active = get_post_meta($item->ID,'_item_deal_active',TRUE);
+	$_item_deal_code_type = get_post_meta($item->ID,'_item_deal_code_type',TRUE);
+	$_item_deal_static_code = get_post_meta($item->ID,'_item_deal_static_code',TRUE);
 	$ActualPrice = foxypress_GetActualPrice($_price, $_sale_price, $_sale_start, $_sale_end);
 	$Multiship = (get_option('foxycart_enable_multiship') == "1") ?
 				  "<div class=\"shipto_container_wrapper_detail\">
@@ -1290,6 +1306,16 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 						<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
 						<input type=\"hidden\" name=\"h:blog_id\" value=\"" . $wpdb->blogid . "\" />
 						<input type=\"hidden\" name=\"h:affiliate_id\" value=\"" . $_SESSION['affiliate_id'] . "\" />"
+						 .
+							( ($_item_deal_active == "1" && $_item_deal_code_type == "static")
+								? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . $_item_deal_static_code . "\" />"
+								: ""
+							)
+						 .
+						 	( ($_item_deal_active == "1" && $_item_deal_code_type == "random")
+								? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . getGUID() . "\" />"
+								: ""
+							)
 						 .
 							( (get_option('foxypress_include_memberid') == "1")
 								? "<input type=\"hidden\" name=\"h:m_id\" value=\"" . $_SESSION["MEMBERID"] . "\" />"
@@ -1436,7 +1462,7 @@ function foxypress_CanAddToCart($inventory_id, $quantity)
 {
 	//check the options available, if any of the option lists have 0 items, then we cannot add to cart
 	global $wpdb;
-	if($quantity == "0")
+	if($quantity <= "0")
 	{
 		return false;
 	}
@@ -2514,6 +2540,23 @@ function foxypress_ImportFoxypressScripts()
 	}
 }
 
+function getGUID(){
+    if (function_exists('com_create_guid')){
+        return com_create_guid();
+    }else{
+        mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
+        $charid = strtoupper(md5(uniqid(rand(), true)));
+        $hyphen = chr(45);// "-"
+        $uuid = substr($charid, 0, 8).$hyphen
+            .substr($charid, 8, 4).$hyphen
+            .substr($charid,12, 4).$hyphen
+            .substr($charid,16, 4).$hyphen
+            .substr($charid,20,12);
+            //.chr(125); "}"
+        return $uuid;
+    }
+}
+
 function foxypress_HasCartValidation()
 {
 	global $wpdb;
@@ -2920,6 +2963,11 @@ function foxypress_Uninstall()
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_age'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout_type'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_avatar_name'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_avatar_ext'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_discount'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_discount_type'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_discount_amount'");
 
 	if($keep_products != "1")
 	{
@@ -3323,7 +3371,7 @@ function foxypress_Installation_CreateTransactionTable()
 			foxy_transaction_order_total FLOAT(10, 2),
 			foxy_transaction_cc_type varchar(50),
 			foxy_blog_id BIGINT(20) NULL,
-			foxy_affiliate_id BIGINT(20) NULL
+			foxy_affiliate_id BIGINT(20) NULL,
 		)";
 	$wpdb->query($sql);
 }
