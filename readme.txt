@@ -50,7 +50,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 = 0.3.7 =
 * Feature: Ability to send out a coupon code either static or random with a product purchase
-* Feature: Ability to trigger an email from 'Manage Emails' area when a product is purchased. Custom fields are not allowed, only those in the legend.
+* Feature: Ability to trigger an email from Manage Emails area when a product is purchased. Custom fields are not allowed, only those in the legend.
 * Feature: New Report to view orders containing a coupon by product code - useful for tracking who you sent coupon codes to.
 * Bugfix: Fix for negative quantities received from Consolibyte Connector
 * Release notes available <a href="http://www.foxy-press.com/blog/2012/1/12/foxypress-0-3-7" target="_blank">here</a> 
