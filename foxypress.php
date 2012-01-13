@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.7
+Version: 0.3.7.1
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -98,7 +98,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.7");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.7.1");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -1462,9 +1462,11 @@ function foxypress_CanAddToCart($inventory_id, $quantity)
 {
 	//check the options available, if any of the option lists have 0 items, then we cannot add to cart
 	global $wpdb;
-	if($quantity <= "0")
-	{
-		return false;
+	if($quantity!=""){
+		$quantity = (int)$quantity;
+		if($quantity <= 0){
+			return false;
+		}
 	}
 	//get option groups
 	$itemOptionGroups = $wpdb->get_results("SELECT distinct option_group_id

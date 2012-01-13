@@ -48,6 +48,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.3.7.1 =
+* Bugfix: Fixed a quantity logic bug. 
+
 = 0.3.7 =
 * Feature: Ability to send out a coupon code either static or random with a product purchase
 * Feature: Ability to trigger an email from Manage Emails area when a product is purchased. Custom fields are not allowed, only those in the legend.
