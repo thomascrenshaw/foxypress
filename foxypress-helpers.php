@@ -1,6 +1,6 @@
 <?php
 /**************************************************************************
-FoxyPress provides a complete shopping cart and inventory management tool 
+FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
@@ -13,16 +13,16 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 
 function foxypress_GetProduct($inventory_id)
 {
-	global $wpdb, $post;	
+	global $wpdb, $post;
 	$item = $wpdb->get_row("select i.*
 								,d.*
 							from " . $wpdb->prefix . "posts as i
-							left join " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id 
+							left join " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id
 																									and d.status = 1
 							where i.ID = '" . mysql_escape_string($inventory_id) . "'");
 	if(!empty($item))
-	{		
-		$product = array();				
+	{
+		$product = array();
 		//base info
 		$product['id'] = $inventory_id;
 		$product['code'] = get_post_meta($item->ID,'_code',TRUE);
@@ -33,7 +33,7 @@ function foxypress_GetProduct($inventory_id)
 		$product['weight2'] = get_post_meta($item->ID,'_weight2',TRUE);
 		$product['quantity'] = get_post_meta($item->ID,'_quantity',TRUE);
 		$product['quantity_max'] = get_post_meta($item->ID,'_quantity_max',TRUE);
-		$product['quantity_min'] = get_post_meta($item->ID,'quantity_min',TRUE);	
+		$product['quantity_min'] = get_post_meta($item->ID,'quantity_min',TRUE);
 		$product['price'] = get_post_meta($item->ID,'_price',TRUE);
 		$featuredImageID = (has_post_thumbnail($item->ID)) ? get_post_thumbnail_id($item->ID) : 0;
 		if($featuredImageID != 0)
@@ -58,15 +58,15 @@ function foxypress_GetProduct($inventory_id)
 		$product['sub_frequency'] = get_post_meta($item->ID,'_sub_frequency',TRUE);
 		$product['sub_startdate'] = get_post_meta($item->ID,'_sub_startdate',TRUE);
 		$product['sub_enddate'] = get_post_meta($item->ID,'_sub_enddate',TRUE);
-		$product['downloadable'] = ($item->downloadable_id != "") 
+		$product['downloadable'] = ($item->downloadable_id != "")
 									? array("id" => $item->downloadable_id
 											,"filename" => INVENTORY_DOWNLOADABLE_DIR . "/" . $item->filename
 											,"maxdownloads" => $item->maxdownloads)
-									: null; 
+									: null;
 		//categories
 		$categories = array();
 		$cats = $wpdb->get_results("select itc.category_id
-										, c.category_name 
+										, c.category_name
 										, c.category_image
 									from " . $wpdb->prefix . "foxypress_inventory_to_category as itc
 									inner join  " . $wpdb->prefix . "foxypress_inventory_categories as c on itc.category_id = c.category_id
@@ -75,28 +75,28 @@ function foxypress_GetProduct($inventory_id)
 		{
 			foreach($cats as $cat)
 			{
-				
-				$categories[] = array("id" => $cat->category_id, "name" => $cat->category_name, "image" => INVENTORY_IMAGE_DIR . "/" . $cat->category_image);	
+
+				$categories[] = array("id" => $cat->category_id, "name" => $cat->category_name, "image" => INVENTORY_IMAGE_DIR . "/" . $cat->category_image);
 			}
 		}
-		$product['categories'] = $categories;		
-		
-		//images 
+		$product['categories'] = $categories;
+
+		//images
 		$images = array();
 		$current_images = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
-		foreach ($current_images as $img) 
+		foreach ($current_images as $img)
 		{
 			$src = wp_get_attachment_image_src($img->ID, 'full');
-			$images[] = array("id" => $img->ID, "name" => $src[0], "order" => $img->menu_order);	
+			$images[] = array("id" => $img->ID, "name" => $src[0], "order" => $img->menu_order);
 		}
 		$product['images'] = $images;
-		
+
 		//options
 		$options = array();
 		$opts = $wpdb->get_results("select o.*, og.option_group_name
 									from " . $wpdb->prefix . "foxypress_inventory_options as o
 									inner join " . $wpdb->prefix . "foxypress_inventory_option_group as og on o.option_group_id = og.option_group_id
-									where o.inventory_id = '" . $inventory_id . "' 
+									where o.inventory_id = '" . $inventory_id . "'
 									order by o.option_order");
 		if(!empty($opts))
 		{
@@ -112,11 +112,11 @@ function foxypress_GetProduct($inventory_id)
 								   ,"code" => $opt->option_code
 								   ,"quantity" => $opt->option_quantity
 								   ,"active" => $opt->option_active
-								   ,"order" => $opt->option_order);	
+								   ,"order" => $opt->option_order);
 			}
 		}
 		$product['options'] = $options;
-		
+
 		//attributes
 		$attributes = array();
 		$atts = $wpdb->get_results("select * from " . $wpdb->prefix . "foxypress_inventory_attributes where inventory_id = '" . $inventory_id . "' order by attribute_id");
@@ -124,15 +124,15 @@ function foxypress_GetProduct($inventory_id)
 		{
 			foreach($atts as $att)
 			{
-				$attributes[] = array("id" => $att->attribute_id, "text" => $att->attribute_text, "value" => $att->attribute_value);	
+				$attributes[] = array("id" => $att->attribute_id, "text" => $att->attribute_text, "value" => $att->attribute_value);
 			}
 		}
 		$product['attributes'] = $attributes;
-		
+
 		return $product;
-	
+
 	}
-	return null;	
+	return null;
 }
 
 function foxypress_GetProductQuantitySold($inventory_id)
@@ -149,8 +149,8 @@ function foxypress_GetProductQuantitySold($inventory_id)
 	$foxyData["transaction_date_filter_begin"] = $StartDate;
 	$foxyData["transaction_date_filter_end"] = $EndDate;
 	$foxyData["hide_transaction_filter"] = "";
-	$foxyData["is_test_filter"] = "";	
-	$foxyData["product_code_filter"] =  $code;	
+	$foxyData["is_test_filter"] = "";
+	$foxyData["product_code_filter"] =  $code;
 	//$foxyData["pagination_start"] = $PageStart;
 	$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
 	$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
@@ -182,29 +182,29 @@ function foxypress_GetProductsByCategory($category_id, $items_per_page = 999999,
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																						and pm_start_date.meta_key = '_item_start_date'	
+																						and pm_start_date.meta_key = '_item_start_date'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																						and pm_end_date.meta_key = '_item_end_date'													
+																						and pm_end_date.meta_key = '_item_end_date'
 								WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE. "'
 									AND i.post_status = 'publish'
 									AND pm_active.meta_value = '1'
-									AND (coalesce(pm_start_date.meta_value, now()) <= now() AND coalesce(pm_end_date.meta_value, now()) >= now())	
+									AND (coalesce(pm_start_date.meta_value, now()) <= now() AND coalesce(pm_end_date.meta_value, now()) >= now())
 								ORDER BY ic.sort_order, i.ID DESC");
 	$total_pages = ceil($drRows->RowCount/$items_per_page);
-	$items = $wpdb->get_results("SELECT i.ID									
+	$items = $wpdb->get_results("SELECT i.ID
 								FROM " . $wpdb->prefix . "posts as i
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic ON i.ID=ic.inventory_id and
 																								ic.category_id = '" .  $category_id . "'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																						and pm_start_date.meta_key = '_item_start_date'	
+																						and pm_start_date.meta_key = '_item_start_date'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																						and pm_end_date.meta_key = '_item_end_date'													
+																						and pm_end_date.meta_key = '_item_end_date'
 								WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE. "'
 									AND i.post_status = 'publish'
 									AND pm_active.meta_value = '1'
-									AND (coalesce(pm_start_date.meta_value, now()) <= now() AND coalesce(pm_end_date.meta_value, now()) >= now())	
+									AND (coalesce(pm_start_date.meta_value, now()) <= now() AND coalesce(pm_end_date.meta_value, now()) >= now())
 								ORDER BY ic.sort_order, i.ID DESC
 								LIMIT $start, $items_per_page");
 	$products = array();
@@ -224,10 +224,10 @@ function foxypress_GetProductsByCategory($category_id, $items_per_page = 999999,
 	return null;
 }
 
-function foxypress_GetProducts($items_per_page = 999999, $page_number = 1, $include_history="1")
+function foxypress_GetProducts($items_per_page = 999999, $page_number = 1, $onlyShowActive = "1")
 {
 	global $wpdb;
-	if ( $include_history == "1" ){
+	if ( $onlyShowActive == "1" ){
 		$historySQL="AND (coalesce(pm_start_date.meta_value, now()) <= now() AND coalesce(pm_end_date.meta_value, now()) >= now())";
 	}
 	$start = ($page_number != "" && $page_number != "0") ? ($page_number - 1) * $items_per_page : 0;
@@ -236,27 +236,27 @@ function foxypress_GetProducts($items_per_page = 999999, $page_number = 1, $incl
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																						and pm_start_date.meta_key = '_item_start_date'	
+																						and pm_start_date.meta_key = '_item_start_date'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																						and pm_end_date.meta_key = '_item_end_date'													
+																						and pm_end_date.meta_key = '_item_end_date'
 								WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 									AND i.post_status = 'publish'
 									AND pm_active.meta_value = '1'
-									" . $historySQL . "								
+									" . $historySQL . "
 								ORDER BY i.ID DESC");
 	$total_pages = ceil($drRows->RowCount/$items_per_page);
-	$items = $wpdb->get_results("SELECT i.ID									
+	$items = $wpdb->get_results("SELECT i.ID
 								FROM " . $wpdb->prefix . "posts as i
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																						and pm_start_date.meta_key = '_item_start_date'	
+																						and pm_start_date.meta_key = '_item_start_date'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																						and pm_end_date.meta_key = '_item_end_date'													
+																						and pm_end_date.meta_key = '_item_end_date'
 								WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 									AND i.post_status = 'publish'
 									AND pm_active.meta_value = '1'
-									" . $historySQL . "								
+									" . $historySQL . "
 								ORDER BY i.ID DESC
 								LIMIT $start, $items_per_page");
 	$products = array();
@@ -276,6 +276,7 @@ function foxypress_GetProducts($items_per_page = 999999, $page_number = 1, $incl
 	return null;
 }
 
+
 function foxypress_SearchProducts($search_term, $items_per_page = 999999, $page_number = 1)
 {
 	global $wpdb;
@@ -287,11 +288,11 @@ function foxypress_SearchProducts($search_term, $items_per_page = 999999, $page_
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																				and pm_active.meta_key = '_item_active'
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																							and pm_start_date.meta_key = '_item_start_date'	
+																							and pm_start_date.meta_key = '_item_start_date'
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																							and pm_end_date.meta_key = '_item_end_date'	
+																							and pm_end_date.meta_key = '_item_end_date'
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_code on i.ID = pm_code.post_ID
-																							and pm_code.meta_key = '_code'													
+																							and pm_code.meta_key = '_code'
 									WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 										AND i.post_status = 'publish'
 										AND pm_active.meta_value = '1'
@@ -307,11 +308,11 @@ function foxypress_SearchProducts($search_term, $items_per_page = 999999, $page_
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																				and pm_active.meta_key = '_item_active'
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																							and pm_start_date.meta_key = '_item_start_date'	
+																							and pm_start_date.meta_key = '_item_start_date'
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																							and pm_end_date.meta_key = '_item_end_date'	
+																							and pm_end_date.meta_key = '_item_end_date'
 									LEFT JOIN " . $wpdb->prefix . "postmeta as pm_code on i.ID = pm_code.post_ID
-																							and pm_code.meta_key = '_code'													
+																							and pm_code.meta_key = '_code'
 									WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 										AND i.post_status = 'publish'
 										AND pm_active.meta_value = '1'
@@ -321,18 +322,18 @@ function foxypress_SearchProducts($search_term, $items_per_page = 999999, $page_
 													or i.post_title LIKE '%" . mysql_escape_string($search_term) . "%'
 													or i.post_content LIKE '%" . mysql_escape_string($search_term) . "%'
 											)
-								) as Counts");	
+								) as Counts");
 	$total_pages = ceil($drRows->RowCount/$items_per_page);
-	$searchSQL = "(SELECT i.* 
+	$searchSQL = "(SELECT i.*
 					FROM " . $wpdb->prefix ."posts as i
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																and pm_active.meta_key = '_item_active'
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																			and pm_start_date.meta_key = '_item_start_date'	
+																			and pm_start_date.meta_key = '_item_start_date'
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																			and pm_end_date.meta_key = '_item_end_date'	
+																			and pm_end_date.meta_key = '_item_end_date'
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_code on i.ID = pm_code.post_ID
-																			and pm_code.meta_key = '_code'													
+																			and pm_code.meta_key = '_code'
 					WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 						AND i.post_status = 'publish'
 						AND pm_active.meta_value = '1'
@@ -349,11 +350,11 @@ function foxypress_SearchProducts($search_term, $items_per_page = 999999, $page_
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																and pm_active.meta_key = '_item_active'
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																			and pm_start_date.meta_key = '_item_start_date'	
+																			and pm_start_date.meta_key = '_item_start_date'
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																			and pm_end_date.meta_key = '_item_end_date'	
+																			and pm_end_date.meta_key = '_item_end_date'
 					LEFT JOIN " . $wpdb->prefix . "postmeta as pm_code on i.ID = pm_code.post_ID
-																			and pm_code.meta_key = '_code'													
+																			and pm_code.meta_key = '_code'
 					WHERE i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 						AND i.post_status = 'publish'
 						AND pm_active.meta_value = '1'
@@ -364,7 +365,7 @@ function foxypress_SearchProducts($search_term, $items_per_page = 999999, $page_
 									or i.post_content LIKE '%" . mysql_escape_string($search_term) . "%'
 							)
 					ORDER BY i.ID
-				  ) 
+				  )
 				  LIMIT $start, $items_per_page";
 	$items = $wpdb->get_results($searchSQL);
 	$products = array();
@@ -381,12 +382,12 @@ function foxypress_SearchProducts($search_term, $items_per_page = 999999, $page_
 		}
 		return array("products" => $products, "pagination" => $paging);
 	}
-	return null;   
+	return null;
 }
 
 function foxypress_GetProductFormEnd()
 {
-	return "</form>";	
+	return "</form>";
 }
 
 function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form", $include_quantity_field = true)
@@ -394,21 +395,21 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 	global $wpdb, $post;
 	$form = "";
 	$item = $wpdb->get_row("SELECT i.*
-									,c.category_name									
+									,c.category_name
 									,d.downloadable_id
 							FROM " . $wpdb->prefix . "posts as i
 							INNER JOIN (SELECT min( itc_id ) AS itc_id, inventory_id, category_id
 											FROM " . $wpdb->prefix . "foxypress_inventory_to_category
 											GROUP BY inventory_id) as ic on i.ID = ic.inventory_id
-							INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id							
-							LEFT JOIN " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id 
+							INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id
+							LEFT JOIN " . $wpdb->prefix . "foxypress_inventory_downloadables as d on i.ID = d.inventory_id
 																								and d.status = 1
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																					and pm_start_date.meta_key = '_item_start_date'	
+																					and pm_start_date.meta_key = '_item_start_date'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																					and pm_end_date.meta_key = '_item_end_date'													
+																					and pm_end_date.meta_key = '_item_end_date'
 							WHERE (i.ID = '" . mysql_escape_string($inventory_id) . "')
 								AND i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE . "'
 								AND i.post_status = 'publish'
@@ -423,8 +424,8 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 	$_weight2 = get_post_meta($item->ID,'_weight2',TRUE);
 	$_quantity = get_post_meta($item->ID,'_quantity',TRUE);
 	$_quantity_min = get_post_meta($item->ID,'_quantity_min',TRUE);
-	$_quantity_max = get_post_meta($item->ID,'_quantity_max',TRUE);	
-	$_price = get_post_meta($item->ID,'_price',TRUE);	
+	$_quantity_max = get_post_meta($item->ID,'_quantity_max',TRUE);
+	$_price = get_post_meta($item->ID,'_price',TRUE);
 	$_sale_price = get_post_meta($item->ID,'_saleprice',TRUE);
 	$_sale_start = get_post_meta($item->ID,'_salestartdate',TRUE);
 	$_sale_end = get_post_meta($item->ID,'_saleenddate',TRUE);
@@ -437,17 +438,17 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 	$_active = get_post_meta($item->ID,'_item_active',TRUE);
 	$_sub_frequency = get_post_meta($item->ID,'_sub_frequency',TRUE);
 	$_sub_startdate = get_post_meta($item->ID,'_sub_startdate',TRUE);
-	$_sub_enddate = get_post_meta($item->ID,'_sub_enddate',TRUE);	
+	$_sub_enddate = get_post_meta($item->ID,'_sub_enddate',TRUE);
 	$_item_deal_active = get_post_meta($item->ID,'_item_deal_active',TRUE);
 	$_item_deal_code_type = get_post_meta($item->ID,'_item_deal_code_type',TRUE);
 	$_item_deal_static_code = get_post_meta($item->ID,'_item_deal_static_code',TRUE);
 	$ActualPrice = foxypress_GetActualPrice($_price, $_sale_price, $_sale_start, $_sale_end);
 	$main_inventory_image = foxypress_GetMainInventoryImage($item->ID);
 
-	
+
 	$form  = "<form action=\"https://" . get_option('foxycart_storeurl') . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\" id=\"" . $form_id . "\">"
 			.
-			( 
+			(
 				($include_quantity_field)
 					? "<input type=\"hidden\" name=\"quantity\" value=\"1\" />"
 					: ""
@@ -480,58 +481,58 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 			 .
 				foxypress_GetMinMaxFormFields($item->downloadable_id, $_quantity_min, $_quantity_max, $_quantity)
 			 .
-				( ($_discount_quantity_amount != "") 
-					? "<input type=\"hidden\" name=\"discount_quantity_amount\" value=\"" . stripslashes($_discount_quantity_amount) . "\" />" 
-					: "" 
-				)									 
-			 .
-				( ($_discount_quantity_percentage != "") 
-					? "<input type=\"hidden\" name=\"discount_quantity_percentage\" value=\"" . stripslashes($_discount_quantity_percentage) . "\" />" 
-					: "" 
-				)	
-			 .
-				( ($_discount_price_amount != "") 
-					? "<input type=\"hidden\" name=\"discount_price_amount\" value=\"" . stripslashes($_discount_price_amount) . "\" />" 
-					: "" 
-				)	
-			 .
-				( ($_discount_price_percentage != "") 
-					? "<input type=\"hidden\" name=\"discount_price_percentage\" value=\"" . stripslashes($_discount_price_percentage) . "\" />" 
-					: "" 
-				)	
-			 .
-				( ($_sub_frequency != "") 
-					? "<input type=\"hidden\" name=\"sub_frequency\" value=\"" . stripslashes($_sub_frequency) . "\" />" 
-					: "" 
-				)								 
-			 .
-				( ($_sub_startdate != "") 
-					? "<input type=\"hidden\" name=\"sub_startdate\" value=\"" . stripslashes($_sub_startdate) . "\" />" 
-					: "" 
+				( ($_discount_quantity_amount != "")
+					? "<input type=\"hidden\" name=\"discount_quantity_amount\" value=\"" . stripslashes($_discount_quantity_amount) . "\" />"
+					: ""
 				)
 			 .
-				( ($_sub_enddate != "") 
-					? "<input type=\"hidden\" name=\"sub_enddate\" value=\"" . stripslashes($_sub_enddate) . "\" />" 
-					: "" 
+				( ($_discount_quantity_percentage != "")
+					? "<input type=\"hidden\" name=\"discount_quantity_percentage\" value=\"" . stripslashes($_discount_quantity_percentage) . "\" />"
+					: ""
+				)
+			 .
+				( ($_discount_price_amount != "")
+					? "<input type=\"hidden\" name=\"discount_price_amount\" value=\"" . stripslashes($_discount_price_amount) . "\" />"
+					: ""
+				)
+			 .
+				( ($_discount_price_percentage != "")
+					? "<input type=\"hidden\" name=\"discount_price_percentage\" value=\"" . stripslashes($_discount_price_percentage) . "\" />"
+					: ""
+				)
+			 .
+				( ($_sub_frequency != "")
+					? "<input type=\"hidden\" name=\"sub_frequency\" value=\"" . stripslashes($_sub_frequency) . "\" />"
+					: ""
+				)
+			 .
+				( ($_sub_startdate != "")
+					? "<input type=\"hidden\" name=\"sub_startdate\" value=\"" . stripslashes($_sub_startdate) . "\" />"
+					: ""
+				)
+			 .
+				( ($_sub_enddate != "")
+					? "<input type=\"hidden\" name=\"sub_enddate\" value=\"" . stripslashes($_sub_enddate) . "\" />"
+					: ""
 				)
 			  . foxypress_BuildAttributeForm($inventory_id);
 
 	return $form;
-}	
+}
 
 function foxypress_GetCategories()
-{	
-	global $wpdb;	
+{
+	global $wpdb;
 	$categories = array();
 	$cats = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories ORDER BY  category_id");
 	if(!empty($cats))
 	{
 		foreach($cats as $cat)
 		{
-			$categories[] = array("id" => $cat->category_id, "name" => $cat->category_name, "image" => INVENTORY_IMAGE_DIR . "/" . $cat->category_image);	
+			$categories[] = array("id" => $cat->category_id, "name" => $cat->category_name, "image" => INVENTORY_IMAGE_DIR . "/" . $cat->category_image);
 		}
 		return $categories;
-	}	
+	}
 	return null;
 }
 
@@ -546,9 +547,9 @@ function foxypress_GetCategoryCount($category_id)
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
-																					and pm_start_date.meta_key = '_item_start_date'	
+																					and pm_start_date.meta_key = '_item_start_date'
 							LEFT JOIN " . $wpdb->prefix . "postmeta as pm_end_date on i.ID = pm_end_date.post_ID
-																					and pm_end_date.meta_key = '_item_end_date'													
+																					and pm_end_date.meta_key = '_item_end_date'
 							WHERE c.category_id='" . $category_id . "'
 								AND i.post_type = '" . FOXYPRESS_CUSTOM_POST_TYPE. "'
 								AND i.post_status = 'publish'
@@ -573,7 +574,7 @@ function foxypress_GetTrackingModule()
 		 </div>
 		 <div id=\"foxypress_find_tracking_return\"></div>
 	 ";
-	return $trackingform;	
+	return $trackingform;
 }
 
 function foxypress_GetMiniCartWidget($dropdowndisplay, $hideonzero)

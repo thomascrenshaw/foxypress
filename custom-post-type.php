@@ -17,6 +17,7 @@ add_action('admin_init', 'foxypress_product_meta_init');
 add_action('before_delete_post', 'foxypress_delete_product');
 wp_enqueue_script('jquery-ui-core');
 wp_enqueue_script('jquery-ui-sortable');
+//wp_enqueue_script('ui-timepicker', plugins_url('/js/jquery-ui-timepicker-addon.js', __FILE__));
 add_action( 'admin_head', 'wpt_portfolio_icons' );
  
 function wpt_portfolio_icons() {
@@ -534,6 +535,8 @@ function foxypress_extra_product_details_setup()
 	$_item_email_active = get_post_meta($post->ID, '_item_email_active', TRUE);
 	$_item_email_template = get_post_meta($post->ID, '_item_email_template', TRUE);
 ?>
+	<h4><?php _e('Current Time: ');
+		echo date('m-d-y h:m:s', current_time('mysql')); ?></h4>
 	<h4><?php _e('Sale'); ?></h4>
 	<div class="foxypress_field_control">
 		<label for="_saleprice"><?php _e('Sale Price'); ?></label>
@@ -647,10 +650,10 @@ function foxypress_extra_product_details_setup()
 	<div style="clear: both;"></div>
     <script type="text/javascript" langauge="javascript">
 		jQuery(document).ready(function() {
-		  	jQuery("#_salestartdate").datepicker({ dateFormat: 'yy-mm-dd' });
-			jQuery("#_saleenddate").datepicker({ dateFormat: 'yy-mm-dd' });
-			jQuery("#_item_start_date").datepicker({ dateFormat: 'yy-mm-dd' });
-			jQuery("#_item_end_date").datepicker({ dateFormat: 'yy-mm-dd' });
+		  	jQuery("#_salestartdate").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
+			jQuery("#_saleenddate").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
+			jQuery("#_item_start_date").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
+			jQuery("#_item_end_date").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
 		});
 	</script>
 <?php	
