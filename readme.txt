@@ -51,7 +51,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 = 0.3.7.2 =
 * Feature: We added the ability to have the hour and minute for sale and availability start/end date. 
 * Update: Updated the GetProducts function parameter and query to be more logical. 
-* Update: Updated the jQuery UI version and smoothness css file.
+* Update: Updated the jQuery UI version and smoothness css file. 
 
 = 0.3.7.1 =
 * Bugfix: Fixed a quantity logic bug. 
