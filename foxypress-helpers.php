@@ -711,6 +711,142 @@ function foxypress_GetMiniCartWidget($dropdowndisplay, $hideonzero)
 	<?php
 	}
 }
+
+function foxypress_GetUserTransactions($user_email, $type = '')
+{
+	global $wpdb, $post;
+
+	$sql = "SELECT *, fts.foxy_transaction_status, fts.foxy_transaction_status_description
+			FROM " . $wpdb->prefix ."foxypress_transaction
+			LEFT JOIN " . $wpdb->prefix . "foxypress_transaction_status AS fts ON " . $wpdb->prefix ."foxypress_transaction.foxy_transaction_status = fts.foxy_transaction_status
+			WHERE foxy_blog_id = " . (foxypress_IsMultiSite() ? "'" . $wpdb->blogid . "'" : "foxy_blog_id") . "
+			AND foxy_transaction_email = '" . $user_email . "'";
+
+	if ($type == 'current' || $type == '') {
+		$sql .= " AND foxy_transaction_trackingnumber IS NULL";
+	}
+
+	if ($type == 'past') {
+		$sql .= " AND foxy_transaction_trackingnumber IS NOT NULL";
+	}
+	
+	$sql .= " ORDER BY foxy_transaction_id desc";
+
+	$trans = $wpdb->get_results($sql);
+
+	if (!empty($trans))
+	{
+		$transactions = array();
+
+		foreach ($trans as $t)
+		{
+			$transactions[] = array(
+				"id" 				=> $t->foxy_transaction_id,
+				"status" 			=> $t->foxy_transaction_status_description,
+				"first_name" 		=> $t->foxy_transaction_first_name,
+				"last_name" 		=> $t->foxy_transaction_last_name,
+				"email" 			=> $t->foxy_transaction_email,
+				"tracking_number" 	=> $t->foxy_transaction_trackingnumber,
+				"rma_number" 		=> $t->foxy_transaction_rmanumber,
+				"billing_address1" 	=> $t->foxy_transaction_billing_address1,
+				"billing_address2" 	=> $t->foxy_transaction_billing_address2,
+				"billing_city" 		=> $t->foxy_transaction_billing_city,
+				"billing_state" 	=> $t->foxy_transaction_billing_state,
+				"billing_zip" 		=> $t->foxy_transaction_billing_zip,
+				"billing_country" 	=> $t->foxy_transaction_billing_country,
+				"shipping_address1" => $t->foxy_transaction_shipping_address1,
+				"shipping_address2" => $t->foxy_transaction_shipping_address2,
+				"shipping_city" 	=> $t->foxy_transaction_shipping_city,
+				"shipping_state" 	=> $t->foxy_transaction_shipping_state,
+				"shipping_zip" 		=> $t->foxy_transaction_shipping_zip,
+				"shipping_country" 	=> $t->foxy_transaction_shipping_country,
+				"date" 				=> $t->foxy_transaction_date,
+				"product_total" 	=> $t->foxy_transaction_product_total,
+				"tax_total" 		=> $t->foxy_transaction_tax_total,
+				"shipping_total" 	=> $t->foxy_transaction_shipping_total,
+				"order_total" 		=> $t->foxy_order_total
+			);
+		}
+		return $transactions;
+	}
+	return null;
+}
+
+function foxypress_GetTransactionDetails($transaction)
+{
+	global $wpdb, $post;
+
+	$foxyStoreURL = get_option('foxycart_storeurl');
+	$foxyAPIKey =  get_option('foxycart_apikey');
+	$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
+	$foxyData = array();
+	$foxyData["api_token"] =  $foxyAPIKey;
+	$foxyData["api_action"] = "transaction_get";
+	$foxyData["transaction_id"] = $transaction;
+	$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
+	$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
+
+	if($foxyXMLResponse->result == "SUCCESS")
+	{
+		$i=1;
+		$items = array();
+		foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
+		{
+			$Downloadable = false;
+			$Inventory_ID = "";
+			$options = array();
+			foreach($td->transaction_detail_options->transaction_detail_option as $opt)
+			{
+				if(strtolower($opt->product_option_name) == "inventory_id")
+				{
+					$Inventory_ID = $opt->product_option_value;
+				}
+				else
+				{
+					$options[] =  array(
+						"option_name"  => $opt->product_option_name,
+						"option_value" => $opt->product_option_value
+					);
+				}
+			}								
+												
+			//check if the item is a downloadable
+			$dt_downloadable = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_downloadables WHERE inventory_id = '" . mysql_escape_string($Inventory_ID) . "' and status = '1'");
+			if(!empty($dt_downloadable) && count($dt_downloadable) > 0)
+			{
+				$Downloadable = true;
+			}	
+					
+			//check to see if we need to show downloadable information
+			if($Downloadable && $Inventory_ID != "")
+			{
+				$dt = $wpdb->get_row("SELECT dt.* 
+									  FROM " . $wpdb->prefix . "foxypress_inventory_downloadables as d 
+									  INNER JOIN " . $wpdb->prefix . "foxypress_downloadable_transaction as dt on dt.downloadable_id = d.downloadable_id
+									  and dt.foxy_transaction_id = '" . $foxyXMLResponse->transaction->id . "'
+									  WHERE d.inventory_id = '" . mysql_escape_string($Inventory_ID) . "'");
+				//generate url
+				$DownloadURL = plugins_url() . "/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($dt->download_transaction_id)) . "&b=" . urlencode(foxypress_Encrypt($BlogID));
+
+				$options .= "<a href=\"" . $DownloadURL . "\">Downloadable Link</a><br />";
+			} 
+
+			$items[] = array(
+				"product_code"    => $td->product_code,
+				"product_name" 	  => $td->product_name,
+				"product_price"   => $td->product_price,
+				"product_options" => $options
+			);
+	
+			$i+=1;
+		}
+	return $items;		
+	}//end check for success
+	else
+	{
+		return null;
+	}
+}
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*********************************** End Functions For Users ***************************************/

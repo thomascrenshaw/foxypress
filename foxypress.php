@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.7.2
+Version: 0.3.8
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -69,6 +69,16 @@ if ( !empty ( $foxypress_url ) ){
 	add_action('admin_print_scripts-user-edit.php', 'affiliate_profile_enqueue');
 	add_action('admin_print_scripts-profile.php', 'affiliate_profile_enqueue');
 	add_action('admin_print_scripts-foxypress_product_page_affiliate-signup', 'affiliate_profile_enqueue');
+
+	//user info page
+	if(get_option('foxypress_user_portal') == "1")
+	{
+		add_filter('rewrite_rules_array','foxy_user_portal_rewrite_rules');
+		add_filter('query_vars','foxy_user_portal_vars');
+		add_action('wp_loaded','foxy_user_portal_flush_check');
+	} else {
+		add_action('wp_loaded','foxy_user_portal_remove_flush_check');
+	}
 }
 if(get_option('foxycart_enable_sso') == "1")
 {
@@ -98,7 +108,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.7.2");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.8");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -175,18 +185,21 @@ function foxypress_affiliate_profile_fields($user)
 	{
 		global $wpdb;
 
-		$affiliate_user 		   = get_user_option('affiliate_user', $user->ID);
-		$affiliate_avatar_name     = get_user_option('affiliate_avatar_name', $user->ID);
-		$affiliate_avatar_ext      = get_user_option('affiliate_avatar_ext', $user->ID);
-		$affiliate_url  		   = get_user_option('affiliate_url', $user->ID);
-		$affiliate_facebook_page   = get_user_option('affiliate_facebook_page', $user->ID);
-		$affiliate_age 			   = get_user_option('affiliate_age', $user->ID);
-		$affiliate_gender		   = get_user_option('affiliate_gender', $user->ID);
-		$affiliate_payout_type     = get_user_option('affiliate_payout_type', $user->ID);
-		$affiliate_payout    	   = get_user_option('affiliate_payout', $user->ID);
-		$affiliate_discount        = get_user_option('affiliate_discount', $user->ID);
-		$affiliate_discount_type   = get_user_option('affiliate_discount_type', $user->ID);
-		$affiliate_discount_amount = get_user_option('affiliate_discount_amount', $user->ID); ?>
+		$affiliate_user 		   		= get_user_option('affiliate_user', $user->ID);
+		$affiliate_avatar_name     		= get_user_option('affiliate_avatar_name', $user->ID);
+		$affiliate_avatar_ext      		= get_user_option('affiliate_avatar_ext', $user->ID);
+		$affiliate_url  		   		= get_user_option('affiliate_url', $user->ID);
+		$affiliate_facebook_page   		= get_user_option('affiliate_facebook_page', $user->ID);
+		$affiliate_age 			   		= get_user_option('affiliate_age', $user->ID);
+		$affiliate_gender		   		= get_user_option('affiliate_gender', $user->ID);
+		$affiliate_payout_type     		= get_user_option('affiliate_payout_type', $user->ID);
+		$affiliate_payout    	   		= get_user_option('affiliate_payout', $user->ID);
+		$affiliate_referral 			= get_user_option('affiliate_referral', $user->ID);
+		$affiliate_referral_payout_type = get_user_option('affiliate_referral_payout_type', $user->ID);
+		$affiliate_referral_payout 	 	= get_user_option('affiliate_referral_payout', $user->ID);
+		$affiliate_discount        		= get_user_option('affiliate_discount', $user->ID);
+		$affiliate_discount_type   		= get_user_option('affiliate_discount_type', $user->ID);
+		$affiliate_discount_amount 		= get_user_option('affiliate_discount_amount', $user->ID); ?>
 
 		<h3>FoxyPress Affiliate Information</h3>
 			<table class="form-table">
@@ -197,7 +210,7 @@ function foxypress_affiliate_profile_fields($user)
 				<tr>
 					<th><label for="affiliate_avatar">Avatar</label></th>
 					<td>
-						<div id="avatar"><?php if ($affiliate_avatar_name) { ?><img src="<?php echo content_url(); ?>/wp-content/affiliate_images/<?php echo $affiliate_avatar_name; ?>-large<?php echo $affiliate_avatar_ext; ?>" width="96" height="96" alt="" /><?php } ?></div>
+						<div id="avatar"><?php if ($affiliate_avatar_name) { ?><img src="<?php echo content_url(); ?>/affiliate_images/<?php echo $affiliate_avatar_name; ?>-large<?php echo $affiliate_avatar_ext; ?>" width="96" height="96" alt="" /><?php } ?></div>
 						<input type="file" name="avatar_upload" id="avatar_upload" value="">
 						<input type="hidden" name="affiliate_avatar_name" id="affiliate_avatar_name" value="<?php echo $affiliate_avatar_name; ?>">
 						<input type="hidden" name="affiliate_avatar_ext" id="affiliate_avatar_ext" value="<?php echo $affiliate_avatar_ext; ?>">
@@ -243,6 +256,31 @@ function foxypress_affiliate_profile_fields($user)
 					<td>
 						<input type="text" name="affiliate_payout" id="affiliate_payout" value="<?php echo $affiliate_payout; ?>">
 						<span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30% or $30.00)</b></span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_referral">Enable Affiliate Referrals</label></th>
+					<td><input type="checkbox" <?php if ($affiliate_referral == 'true') { ?>checked="yes" <?php } ?>name="affiliate_referral" id="affiliate_referral" value="true" /> Does this user's link allow for affiliate referrals?</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_referral_payout_type">Affiliate Referral Payout Type</label></th>
+					<td>
+						<input type="radio" <?php if ($affiliate_referral_payout_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_referral_payout_type" id="affiliate_referral_payout_type" value="percentage">
+						<span class="description">Percentage of each order.</span>
+					</td>
+				</tr>
+				<tr>
+					<th></th>
+					<td>
+						<input type="radio" <?php if ($affiliate_referral_payout_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_referral_payout_type" id="affiliate_referral_payout_type" value="dollars">
+						<span class="description">Dollar amount of each order.</span>
+					</td>
+				</tr>
+				<tr>
+					<th><label for="affiliate_referral_payout">Affiliate Referral Payout</label></th>
+					<td>
+						<input type="text" name="affiliate_referral_payout" id="affiliate_referral_payout" value="<?php echo $affiliate_referral_payout; ?>">
+						<span class="description">How much will this affiliate earn per sale of their referrals? <b>(Enter 30 for 30% or $30.00)</b></span>
 					</td>
 				</tr>
 				<tr>
@@ -307,7 +345,7 @@ function affiliate_profile_enqueue() { ?>
 					var fileinfo = jQuery.parseJSON(data);
 					$('input#affiliate_avatar_name').val(fileinfo.raw_file_name);
 					$('input#affiliate_avatar_ext').val(fileinfo.file_ext);
-					$('div#avatar').html('<img src="<?php echo content_url(); ?>/wp-content/affiliate_images/' + fileinfo.raw_file_name + '-large' + fileinfo.file_ext + '" width="96" height="96" alt="" />');
+					$('div#avatar').html('<img src="<?php echo content_url(); ?>/affiliate_images/' + fileinfo.raw_file_name + '-large' + fileinfo.file_ext + '" width="96" height="96" alt="" />');
 				}
 			});
 		});
@@ -326,24 +364,36 @@ function foxypress_save_affiliate_profile_fields($user_id) {
 		//On Save check to see if user is currently pending so we don't clear that with a blank save
 		//Below is for when admin submits form without filling out affiliate fields
 		if (!$affiliate_user) {
-			$affiliate_user = get_user_option('affiliate_user', $user->ID);
+			$affiliate_check = get_user_option('affiliate_user', $user_id);
+			if ($affiliate_check == 'pending') {
+				$affiliate_user = $affiliate_check;
+			}
 		}
 
-		$affiliate_avatar_name     = $_POST['affiliate_avatar_name'];
-		$affiliate_avatar_ext      = $_POST['affiliate_avatar_ext'];
-		$affiliate_facebook_page   = $_POST['affiliate_facebook_page'];
-		$affiliate_age 			   = $_POST['affiliate_age'];
-		$affiliate_gender 		   = $_POST['affiliate_gender'];
-		$affiliate_payout_type 	   = $_POST['affiliate_payout_type'];
-		$affiliate_payout 		   = $_POST['affiliate_payout'];
-		$affiliate_discount        = $_POST['affiliate_discount'];
-		$affiliate_discount_type   = $_POST['affiliate_discount_type'];
-		$affiliate_discount_amount = $_POST['affiliate_discount_amount'];
+		$affiliate_avatar_name     		= $_POST['affiliate_avatar_name'];
+		$affiliate_avatar_ext      		= $_POST['affiliate_avatar_ext'];
+		$affiliate_facebook_page   		= $_POST['affiliate_facebook_page'];
+		$affiliate_age 			   		= $_POST['affiliate_age'];
+		$affiliate_gender 		   		= $_POST['affiliate_gender'];
+		$affiliate_payout_type 	   		= $_POST['affiliate_payout_type'];
+		$affiliate_payout 		   		= $_POST['affiliate_payout'];
+		$affiliate_referral 			= $_POST['affiliate_referral'];
+		$affiliate_referral_payout_type = $_POST['affiliate_referral_payout_type'];
+		$affiliate_referral_payout 		= $_POST['affiliate_referral_payout'];
+		$affiliate_discount        		= $_POST['affiliate_discount'];
+		$affiliate_discount_type   		= $_POST['affiliate_discount_type'];
+		$affiliate_discount_amount 		= $_POST['affiliate_discount_amount'];
 
 		if ($affiliate_payout_type == 'percentage') {
 			$affiliate_payout_type = 1;
 		} else if ($affiliate_payout_type == 'dollars') {
 			$affiliate_payout_type = 2;
+		}
+
+		if ($affiliate_referral_payout_type == 'percentage') {
+			$affiliate_referral_payout_type = 1;
+		} else if ($affiliate_referral_payout_type == 'dollars') {
+			$affiliate_referral_payout_type = 2;
 		}
 
 		if ($affiliate_discount_type == 'percentage') {
@@ -360,6 +410,9 @@ function foxypress_save_affiliate_profile_fields($user_id) {
 		update_user_option($user_id, 'affiliate_gender', $affiliate_gender);
 		update_user_option($user_id, 'affiliate_payout_type', $affiliate_payout_type);
 		update_user_option($user_id, 'affiliate_payout', $affiliate_payout);
+		update_user_option($user_id, 'affiliate_referral', $affiliate_referral);
+		update_user_option($user_id, 'affiliate_referral_payout_type', $affiliate_referral_payout_type);
+		update_user_option($user_id, 'affiliate_referral_payout', $affiliate_referral_payout);
 		update_user_option($user_id, 'affiliate_discount', $affiliate_discount);
 		update_user_option($user_id, 'affiliate_discount_type', $affiliate_discount_type);
 		update_user_option($user_id, 'affiliate_discount_amount', $affiliate_discount_amount);
@@ -371,6 +424,40 @@ function foxypress_save_affiliate_profile_fields($user_id) {
 			update_user_option($user_id, 'affiliate_url', '');
 		}
 	}
+}
+
+function foxy_user_portal_flush_check()
+{
+	$rules = get_option('rewrite_rules');
+
+	if (!isset($rules['(' . FOXYPRESS_USER_PORTAL . ')/(.*?)/(.*?)$'])) {
+		global $wp_rewrite;
+	   	$wp_rewrite->flush_rules();
+	}
+}
+
+function foxy_user_portal_remove_flush_check()
+{
+	$rules = get_option('rewrite_rules');
+
+	if (isset($rules['(' . FOXYPRESS_USER_PORTAL . ')/(.*?)/(.*?)$'])) {
+		global $wp_rewrite;
+	   	$wp_rewrite->flush_rules();
+	}
+}
+
+function foxy_user_portal_rewrite_rules($rules)
+{
+	$newrules = array();
+	$newrules['(' . FOXYPRESS_USER_PORTAL . ')/(.*?)/(.*?)$'] = 'index.php?pagename=$matches[1]&user_name=$matches[2]&mode=$matches[3]';
+	return $newrules + $rules;
+}
+
+function foxy_user_portal_vars( $vars )
+{
+    array_push($vars, 'user_name');
+    array_push($vars, 'mode');
+    return $vars;
 }
 
 function foxypress_FlushRewrites()
@@ -2911,6 +2998,7 @@ function foxypress_Uninstall()
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_downloadable_download");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_tracking");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_payments");
+	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_referrals");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_email_templates");
 
 	//check option first before we delete
@@ -2944,6 +3032,7 @@ function foxypress_Uninstall()
 		'foxypress_last_permalink_structure',
 		'foxypress_skip_settings_wizard',
 		'foxypress_packing_slip_header',
+		'foxypress_user_portal',
 		'foxycart_hmac',
 		'foxypress_include_default_stylesheet',
 		'foxypress_smtp_host',
@@ -2966,11 +3055,15 @@ function foxypress_Uninstall()
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_age'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_payout_type'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_referral'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_referral_payout'");
+	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_referral_payout_type'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_avatar_name'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_avatar_ext'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_discount'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_discount_type'");
 	$wpdb->query("DELETE FROM $wpdb->usermeta WHERE meta_key='" . $wpdb->prefix . "affiliate_discount_amount'");
+
 
 	if($keep_products != "1")
 	{
@@ -3027,6 +3120,7 @@ function foxypress_Install($apikey, $encryptionkey)
 
 		foxypress_Installation_CreateAffiliatePaymentsTable();
 		foxypress_Installation_CreateAffiliateTrackingTable();
+		foxypress_Installation_CreateAffiliateReferralsTable();
 		foxypress_Installation_CreateEmailTemplatesTable();
 
 		foxypress_Installation_CreateSettings($encryptionkey, $apikey);
@@ -3125,6 +3219,11 @@ function foxypress_Install($apikey, $encryptionkey)
 		if(!in_array($wpdb->prefix . "foxypress_affiliate_payments", $tables))
 		{
 			foxypress_Installation_CreateAffiliatePaymentsTable();
+		}
+		//affiliate referrals
+		if(!in_array($wpdb->prefix . "foxypress_affiliate_referrals", $tables))
+		{
+			foxypress_Installation_CreateAffiliateReferralsTable();
 		}
 		//email templates
 		if(!in_array($wpdb->prefix . "foxypress_email_templates", $tables))
@@ -3250,7 +3349,7 @@ function foxypress_Installation_HandleTableAlterations()
 		}
 
 		//Alter payments table
-		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments CHANGE foxy_affiliate_percentage foxy_affiliate_payout int(11) NOT NULL";
+		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments CHANGE foxy_affiliate_percentage foxy_affiliate_payout float(10,2) NOT NULL";
 		$wpdb->query($sql);
 
 		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments ADD foxy_affiliate_payout_type tinyint(1) NOT NULL AFTER foxy_affiliate_payout;";
@@ -3325,6 +3424,15 @@ function foxypress_Installation_HandleTableAlterations()
 			}
 		}
 	}
+
+	if ($cur_version === '0.3.5' || $cur_version === '0.3.5.1' || $cur_version === '0.3.5.2' || $cur_version === '0.3.5.3' || $cur_version === '0.3.6' || $cur_version === '0.3.6.1' || $cur_version === '0.3.6.2' || $cur_version === '0.3.6.3' || $cur_version === '0.3.7' || $cur_version === '0.3.7.1' || $cur_version === '0.3.7.2') {
+		//add commission type
+		$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_affiliate_payments ADD foxy_affiliate_commission_type tinyint(1) NOT NULL AFTER foxy_affiliate_commission";
+		$wpdb->query($sql);
+
+		$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_payments SET foxy_affiliate_commission_type = '1'";
+		$wpdb->query($sql);
+	}
 }
 
 function foxypress_Installation_CreateInventoryCategoryTable()
@@ -3374,7 +3482,7 @@ function foxypress_Installation_CreateTransactionTable()
 			foxy_transaction_order_total FLOAT(10, 2),
 			foxy_transaction_cc_type varchar(50),
 			foxy_blog_id BIGINT(20) NULL,
-			foxy_affiliate_id BIGINT(20) NULL,
+			foxy_affiliate_id BIGINT(20) NULL
 		)";
 	$wpdb->query($sql);
 }
@@ -3534,12 +3642,25 @@ function foxypress_Installation_CreateAffiliatePaymentsTable()
 				foxy_affiliate_id bigint(20) NOT NULL,
 				foxy_transaction_id int(11) NOT NULL,
 				foxy_transaction_order_total float(10,2) NOT NULL,
-				foxy_affiliate_payout int(11) NOT NULL,
+				foxy_affiliate_payout float(10,2) NOT NULL,
 				foxy_affiliate_payout_type tinyint(1) NOT NULL,
 				foxy_affiliate_commission float(10,2) NOT NULL,
+				foxy_affiliate_commission_type tinyint(1) NOT NULL,
 				foxy_affiliate_payment_method varchar(50) collate utf8_bin NOT NULL,
 				foxy_affiliate_payment_date date NOT NULL,
 				date_submitted timestamp NOT NULL default CURRENT_TIMESTAMP
+			) ";
+	$wpdb->query($sql);
+}
+
+function foxypress_Installation_CreateAffiliateReferralsTable()
+{
+	global $wpdb;
+	//create affliliate payments table
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_referrals (
+  				id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				foxy_affiliate_referred_by_id int(11) NOT NULL,
+				foxy_affiliate_id int(11) NOT NULL
 			) ";
 	$wpdb->query($sql);
 }

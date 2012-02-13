@@ -29,24 +29,26 @@ Visit <a href="http://www.foxy-press.com" target="_blank">www.foxy-press.com</a>
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum user requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
 --Site credits--
-
 - WebMovement, LLC - Plugin Development and conception
-
 - Scott Hollencamp - Order Management inspiration
-
 - Quesinberry - donation
-
 - Uploadify - Multi-image support
-
 - Green Egg Media - Multi Datafeed inspiration
-
 - JasonHunterDesign - Affiliate Management inspiration/donation
-
 - Consolibyte API - Utique Shop
-
 - Trinity Hockey Co - Affiliate Management Upgrades
+- Adam Morrissey (Delgado Protocol) - Affiliate Tier addition - affiliates can gain referral bonuses
+- WeThePrinters - User Portal addition
 
 == Changelog ==
+
+= 0.3.8 =
+* Feature: We added the ability for affiliates to receive refferal payouts in dollar amounts or percentages per transaction
+* Feature: We added a user portal that contains your order history. Read release notes.
+* Feature: New API Methods available for User Transactions.  Documentation will be up shortly <a href="http://www.foxy-press.com/getting-started/helper-functions-api/" target="_blank">here</a>.
+* Update: Added some documentation to the Manage Category page
+* Release notes available <a href="http://www.foxy-press.com/blog/2012/02/13/foxypress-0-3-8/" target="_blank">here</a> 
+* User Request/Voting available <a href="https://foxypress.uservoice.com/forums/149794-main-request-forum" target="_blank">here</a> 
 
 = 0.3.7.2 =
 * Feature: We added the ability to have the hour and minute for sale and availability start/end date. 

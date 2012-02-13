@@ -17,7 +17,6 @@ add_action('admin_init', 'foxypress_product_meta_init');
 add_action('before_delete_post', 'foxypress_delete_product');
 wp_enqueue_script('jquery-ui-core');
 wp_enqueue_script('jquery-ui-sortable');
-//wp_enqueue_script('ui-timepicker', plugins_url('/js/jquery-ui-timepicker-addon.js', __FILE__));
 add_action( 'admin_head', 'wpt_portfolio_icons' );
  
 function wpt_portfolio_icons() {

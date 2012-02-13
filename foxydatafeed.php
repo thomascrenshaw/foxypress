@@ -69,6 +69,7 @@ else
 			foreach ($foxyXMLResponse->transactions->transaction as $transaction)
 			{
 				$TransactionID   = $transaction->id;
+				$IsTest 		 = $transaction->is_test;
 				$TransactionDate = $transaction->transaction_date;
 				$CustomerID 	 = $transaction->customer_id;
 				$FirstName 	     = $transaction->customer_first_name;
@@ -120,6 +121,11 @@ else
 				{
 					$BlogID = $customfield->custom_field_value;
 				}
+
+				if (strtolower($customfield->custom_field_name) == "affiliate_id")
+				{
+					$affiliate_id = $customfield->custom_field_value;
+				}
 			}
 			
 			//if we have a mult-site, we need to switch to the correct blog
@@ -127,6 +133,37 @@ else
 			{
 				switch_to_blog($BlogID);
 			}
+
+			//insert transaction into database
+			$sql = "INSERT INTO " . $wpdb->prefix ."foxypress_transaction" .
+				  " SET foxy_transaction_id = '" . mysql_escape_string($TransactionID) . "'" .
+				  ", foxy_transaction_status = '1'" .
+				  ", foxy_transaction_first_name='" . mysql_escape_string($FirstName) . "'" .
+				  ", foxy_transaction_last_name='" . mysql_escape_string($LastName) . "'" .
+				  ", foxy_transaction_email='" . mysql_escape_string($Email) . "'" .
+				  ", foxy_transaction_is_test='" . mysql_escape_string($IsTest) . "'" . 
+				  ", foxy_transaction_date = '" .mysql_escape_string($TransactionDate) . "'" .
+				  ", foxy_transaction_product_total = '" . mysql_escape_string($ProductTotal) . "'" .
+				  ", foxy_transaction_tax_total = '" . mysql_escape_string($TaxTotal) . "'" .
+				  ", foxy_transaction_shipping_total = '" . mysql_escape_string($ShippingTotal) . "'" .
+				  ", foxy_transaction_order_total = '" . mysql_escape_string($OrderTotal) . "'" .
+				  ", foxy_transaction_cc_type = '" . mysql_escape_string($CCType) . "'" . 
+				  ", foxy_blog_id = '" . mysql_escape_string($BlogID) . "'" . 
+				  ", foxy_affiliate_id = '" . mysql_escape_string($affiliate_id) . "'"
+				  ", foxy_transaction_billing_address1 = '" . mysql_escape_string($BillingAddress) . "'" .
+		  		  ", foxy_transaction_billing_address2 = '" . mysql_escape_string($BillingAddress2) . "'" .
+				  ", foxy_transaction_billing_city = '" . mysql_escape_string($BillingCity) . "'" .
+				  ", foxy_transaction_billing_state = '" . mysql_escape_string($BillingState) . "'" .
+				  ", foxy_transaction_billing_zip = '" . mysql_escape_string($BillingZip) . "'" .
+				  ", foxy_transaction_billing_country = '" . mysql_escape_string($BillingCountry) . "'" .
+				  ", foxy_transaction_shipping_address1 = '" . mysql_escape_string($ShippingAddress) . "'" .
+				  ", foxy_transaction_shipping_address2 = '" . mysql_escape_string($tShippingAddress2) . "'" .
+				  ", foxy_transaction_shipping_city = '" . mysql_escape_string($ShippingCity) . "'" .
+				  ", foxy_transaction_shipping_state = '" . mysql_escape_string($ShippingState) . "'" .
+				  ", foxy_transaction_shipping_zip = '" . mysql_escape_string($ShippingZip) . "'" .
+				  ", foxy_transaction_shipping_country = '" . mysql_escape_string($ShippingCountry) . "'";
+
+			$wpdb->query($sql);
 			
 			//get order details		
 			foreach ($transaction->transaction_details->transaction_detail as $detail)

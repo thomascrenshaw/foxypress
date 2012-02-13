@@ -14,15 +14,16 @@ function foxypress_create_affiliate_signup()
     <h3>FoxyPress Affiliate Sign Up</h3>
    	<?php if (isset($_POST['affiliate_signup_submit'])) { 
     	
-    	$first_name    = foxypress_FixPostVar('affiliate_first_name');
-    	$last_name     = foxypress_FixPostVar('affiliate_last_name');
-    	$facebook_page = foxypress_FixPostVar('affiliate_facebook_page');
-    	$age 		   = foxypress_FixPostVar('affiliate_age');
-    	$gender 	   = foxypress_FixPostVar('affiliate_gender');
-    	$message 	   = foxypress_FixPostVar('affiliate_description');
-    	$avatar_name   = foxypress_FixPostVar('affiliate_avatar_name');
-    	$avatar_ext    = foxypress_FixPostVar('affiliate_avatar_ext');
-    	$error 		   = false;
+    	$first_name    			   = foxypress_FixPostVar('affiliate_first_name');
+    	$last_name     			   = foxypress_FixPostVar('affiliate_last_name');
+    	$facebook_page 			   = foxypress_FixPostVar('affiliate_facebook_page');
+    	$age 		   			   = foxypress_FixPostVar('affiliate_age');
+    	$gender 	   			   = foxypress_FixPostVar('affiliate_gender');
+    	$message 	   			   = foxypress_FixPostVar('affiliate_description');
+    	$avatar_name   			   = foxypress_FixPostVar('affiliate_avatar_name');
+    	$avatar_ext    			   = foxypress_FixPostVar('affiliate_avatar_ext');
+    	$affiliate_referred_by_id  = foxypress_FixPostVar('affiliate_referred_by_id');
+    	$error 		   			   = false;
 
     	if (empty($first_name)) {
     		$error = true;
@@ -55,6 +56,11 @@ function foxypress_create_affiliate_signup()
     	}
 
     	if (!$error) {
+    		if ($affiliate_referred_by_id != "") {
+    			$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_referrals (foxy_affiliate_referred_by_id, foxy_affiliate_id) values ('" . $affiliate_referred_by_id . "', '" . $user_data->ID . "')";
+				$wpdb->query($sql);
+    		}
+
 	    	update_user_meta($user_data->ID, 'first_name', $first_name);
 	    	update_user_meta($user_data->ID, 'last_name', $last_name);
 	    	update_user_option($user_data->ID, 'affiliate_facebook_page', $facebook_page);
@@ -63,7 +69,8 @@ function foxypress_create_affiliate_signup()
 	    	update_user_meta($user_data->ID, 'description', $message);
 	    	update_user_option($user_data->ID, 'affiliate_avatar_name', $avatar_name);
 	    	update_user_option($user_data->ID, 'affiliate_avatar_ext', $avatar_ext);
-	    	update_user_option($user_data->ID, 'affiliate_user', 'pending'); ?>
+	    	update_user_option($user_data->ID, 'affiliate_user', 'pending');
+	    	update_user_option($user_data->ID, 'affiliate_referred_by_id', $affiliate_referred_by_id); ?>
 
 	    	<div class="updated" id="message">
         		<p><strong>Affiliate Request Sent Successfully.</strong></p>
@@ -130,6 +137,7 @@ function foxypress_create_affiliate_signup()
 					<span class="description">Tell us about yourself.</span></td>
 				</tr>
 			</table>
+			<input type="hidden" name="affiliate_referred_by_id" id="affiliate_referred_by_id" value="<?php echo $_SESSION['affiliate_id']; ?>">
 			<p class="submit"><input type="submit" value="Send Request" class="button-primary" id="affiliate_signup_submit" name="affiliate_signup_submit"></p>
 			</form>
 		<?php }
