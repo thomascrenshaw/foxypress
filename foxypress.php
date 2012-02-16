@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.3.8
+Version: 0.3.8.1
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -108,7 +108,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.8");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.3.8.1");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -571,14 +571,13 @@ function foxypress_GetEditorPluginURL($type) {
 function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
 {
 	$from = $mail_from;
+	$subject = $mail_subject;
 	if(get_option("foxypress_smtp_host")!='' && get_option("foxypress_email_username")!='' && get_option("foxypress_email_password")!=''){
-		if($mail_from == "")
+		if($from == "")
 		{
 			$from = get_option("foxypress_email_username");
 		}
 		$to = $mail_to;
-		$subject = $mail_subject;
-
 		$host = get_option("foxypress_smtp_host");
 		$username = get_option("foxypress_email_username");
 		$password = get_option("foxypress_email_password");
@@ -611,9 +610,13 @@ function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
 		  $emailSent="Your status message has been sent.";
 		}
 	}else{
-		if($mail_from == "")
+		if($from == "")
 		{
 			$from = get_settings("admin_email ");
+		}
+		if($from == "")
+		{
+			$from = get_option('admin_email');
 		}
 		//send email to customer
 		$headers = "MIME-Version: 1.0" . "\r\n";

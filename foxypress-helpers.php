@@ -722,7 +722,7 @@ function foxypress_GetUserTransactions($user_email, $type = '')
 			WHERE foxy_blog_id = " . (foxypress_IsMultiSite() ? "'" . $wpdb->blogid . "'" : "foxy_blog_id") . "
 			AND foxy_transaction_email = '" . $user_email . "'";
 
-	if ($type == 'current' || $type == '') {
+	if ($type == 'current') {
 		$sql .= " AND foxy_transaction_trackingnumber IS NULL";
 	}
 
@@ -764,7 +764,7 @@ function foxypress_GetUserTransactions($user_email, $type = '')
 				"product_total" 	=> $t->foxy_transaction_product_total,
 				"tax_total" 		=> $t->foxy_transaction_tax_total,
 				"shipping_total" 	=> $t->foxy_transaction_shipping_total,
-				"order_total" 		=> $t->foxy_order_total
+				"order_total" 		=> $t->foxy_transaction_order_total
 			);
 		}
 		return $transactions;

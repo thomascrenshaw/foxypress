@@ -42,6 +42,13 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.3.8.1 =
+* Bugfix: The datafeed was corrected so that the new feature to push orders automatically without syncing now works.
+* Bugfix: foxypress_Mail was not sending a subject unless SMTP was used. This has been corrected.
+* Update: New API method foxypress_GetUserTransactions was modified to allow for $type to be left blank so all orders can come through.
+* Update: FoxyPress User Portal Sample file updated. Download the example file <a href="http://www.foxy-press.com/wp-content/uploads/2012/02/foxypress-user-portal.php.zip" target="_blank">here</a>
+* Release notes available <a href="http://www.foxy-press.com/blog/2012/02/16/foxypress-0-3-8-1/" target="_blank">here</a> 
+
 = 0.3.8 =
 * Feature: We added the ability for affiliates to receive refferal payouts in dollar amounts or percentages per transaction
 * Feature: We added a user portal that contains your order history. Read release notes.

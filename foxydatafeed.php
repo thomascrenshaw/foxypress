@@ -149,7 +149,7 @@ else
 				  ", foxy_transaction_order_total = '" . mysql_escape_string($OrderTotal) . "'" .
 				  ", foxy_transaction_cc_type = '" . mysql_escape_string($CCType) . "'" . 
 				  ", foxy_blog_id = '" . mysql_escape_string($BlogID) . "'" . 
-				  ", foxy_affiliate_id = '" . mysql_escape_string($affiliate_id) . "'"
+				  ", foxy_affiliate_id = '" . mysql_escape_string($affiliate_id) . "'" .
 				  ", foxy_transaction_billing_address1 = '" . mysql_escape_string($BillingAddress) . "'" .
 		  		  ", foxy_transaction_billing_address2 = '" . mysql_escape_string($BillingAddress2) . "'" .
 				  ", foxy_transaction_billing_city = '" . mysql_escape_string($BillingCity) . "'" .
