@@ -16,9 +16,13 @@ function foxypress_theme_redirect()
 	$currentProduct = (isset($wp->query_vars[FOXYPRESS_CUSTOM_POST_TYPE]) ? $wp->query_vars[FOXYPRESS_CUSTOM_POST_TYPE] : "");	
 	if ($currentPostType == FOXYPRESS_CUSTOM_POST_TYPE && FOXYPRESS_CUSTOM_POST_TYPE != "") 
 	{
-		if (have_posts()) 
+		if (have_posts())
 		{
-			if(defined('FOXYPRESS_PRODUCT_TEMPLATE_PATH') && FOXYPRESS_PRODUCT_TEMPLATE_PATH != "")
+			if (get_option('fp_product_template', "") !== "")
+			{
+				include get_theme_root() . '/' . get_template() . '/' . get_option('fp_product_template');
+			}
+			else if(defined('FOXYPRESS_PRODUCT_TEMPLATE_PATH') && FOXYPRESS_PRODUCT_TEMPLATE_PATH != "")
 			{
 				include FOXYPRESS_PRODUCT_TEMPLATE_PATH;	
 			}
