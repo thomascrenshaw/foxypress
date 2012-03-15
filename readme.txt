@@ -42,6 +42,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.0.1 =
+* Bugfix: Fixed some bugs in the datafeed.
+
 = 0.4.0 =
 * Feature: We've added some support for our theme panel. You will want to upgrade to the latest version in order to use themes properly.
 * Release notes available <a href="http://www.foxy-press.com/blog/2012/03/12/foxypress-0-4-0/" target="_blank">here</a> 

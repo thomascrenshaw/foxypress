@@ -1,6 +1,6 @@
-<?php	
+<?php
 /**************************************************************************
-FoxyPress provides a complete shopping cart and inventory management tool 
+FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
@@ -8,10 +8,10 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 session_start();
 $root = dirname(dirname(dirname(dirname(__FILE__))));
 require_once($root.'/wp-config.php');
-require_once($root.'/wp-includes/wp-db.php');	
+require_once($root.'/wp-includes/wp-db.php');
 include_once('classes/class.rc4crypt.php');
 include_once('classes/class.xmlparser_php5.php');
-global $wpdb, $post;	
+global $wpdb, $post;
 $debug = 0;
 $output = "";
 $xmlkey = get_option('foxycart_apikey');
@@ -30,35 +30,35 @@ else
 		{
 			$responses = array();
 			$urls = explode(",", $foxycart_datafeeds);
-			foreach($urls as $url) 
+			foreach($urls as $url)
 			{
 				$ch = curl_init();
-				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_URL, trim($url));
 				curl_setopt($ch, CURLOPT_HEADER, FALSE);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 				curl_setopt($ch, CURLOPT_POST, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, array("FoxyData" => $_POST["FoxyData"]));
 				$result = curl_exec($ch);
-				curl_close($ch);	
-				if($result != "foxy") 
+				curl_close($ch);
+				if($result != "foxy")
 				{
 					$foxy_response = FALSE;
 				}
 				$responses[$url] = $result;
 				$result = "";
-			}	
-		}	
-		if($foxy_response === FALSE) 
+			}
+		}
+		if($foxy_response === FALSE)
 		{
-			foreach($responses as $k => $v) 
+			foreach($responses as $k => $v)
 			{
 				$output .= $k . " responded " . $v . "\n";
 			}
-		}	
-		
+		}
+
 		//get data
 		$FoxyData_encrypted = urldecode($_POST['FoxyData']);
-		$FoxyData_decrypted = rc4crypt::decrypt($xmlkey,$FoxyData_encrypted);		
+		$FoxyData_decrypted = rc4crypt::decrypt($xmlkey,$FoxyData_encrypted);
 		$foxyXMLResponse = simplexml_load_string($FoxyData_decrypted, NULL, LIBXML_NOCDATA);
 		if (!empty($foxyXMLResponse)){
 			$x = 1;
@@ -116,7 +116,7 @@ else
 			}
 			//check for multi-site
 			foreach ($transaction->custom_fields->custom_field as $customfield)
-			{	
+			{
 				if($BlogID == "" && strtolower($customfield->custom_field_name) == "blog_id")
 				{
 					$BlogID = $customfield->custom_field_value;
@@ -127,7 +127,7 @@ else
 					$affiliate_id = $customfield->custom_field_value;
 				}
 			}
-			
+
 			//if we have a mult-site, we need to switch to the correct blog
 			if($BlogID != "" && $BlogID != "0")
 			{
@@ -141,14 +141,14 @@ else
 				  ", foxy_transaction_first_name='" . mysql_escape_string($FirstName) . "'" .
 				  ", foxy_transaction_last_name='" . mysql_escape_string($LastName) . "'" .
 				  ", foxy_transaction_email='" . mysql_escape_string($Email) . "'" .
-				  ", foxy_transaction_is_test='" . mysql_escape_string($IsTest) . "'" . 
+				  ", foxy_transaction_is_test='" . mysql_escape_string($IsTest) . "'" .
 				  ", foxy_transaction_date = '" .mysql_escape_string($TransactionDate) . "'" .
 				  ", foxy_transaction_product_total = '" . mysql_escape_string($ProductTotal) . "'" .
 				  ", foxy_transaction_tax_total = '" . mysql_escape_string($TaxTotal) . "'" .
 				  ", foxy_transaction_shipping_total = '" . mysql_escape_string($ShippingTotal) . "'" .
 				  ", foxy_transaction_order_total = '" . mysql_escape_string($OrderTotal) . "'" .
-				  ", foxy_transaction_cc_type = '" . mysql_escape_string($CCType) . "'" . 
-				  ", foxy_blog_id = '" . mysql_escape_string($BlogID) . "'" . 
+				  ", foxy_transaction_cc_type = '" . mysql_escape_string($CCType) . "'" .
+				  ", foxy_blog_id = '" . mysql_escape_string($BlogID) . "'" .
 				  ", foxy_affiliate_id = '" . mysql_escape_string($affiliate_id) . "'" .
 				  ", foxy_transaction_billing_address1 = '" . mysql_escape_string($BillingAddress) . "'" .
 		  		  ", foxy_transaction_billing_address2 = '" . mysql_escape_string($BillingAddress2) . "'" .
@@ -164,38 +164,38 @@ else
 				  ", foxy_transaction_shipping_country = '" . mysql_escape_string($ShippingCountry) . "'";
 
 			$wpdb->query($sql);
-			
-			//get order details		
+
+			//get order details
 			foreach ($transaction->transaction_details->transaction_detail as $detail)
-			{			
+			{
 				$InventoryID = "";
 				$SubTokenURL = "";
 				$ProductCode = "";
 				$Downloadable = false;
-			
-				$ProductCode = $detail->product_code;			
-				$SubTokenURL = $detail->sub_token_url;	
-				
+
+				$ProductCode = $detail->product_code;
+				$SubTokenURL = $detail->sub_token_url;
+
 				//get inventory id
-				foreach ($detail->transaction_detail_options->transaction_detail_option as $option) 
+				foreach ($detail->transaction_detail_options->transaction_detail_option as $option)
 				{
-					if (strtolower($option->product_option_name) == 'inventory_id') 
+					if (strtolower($option->product_option_name) == 'inventory_id')
 					{
 						$InventoryID = $option->product_option_value;
 					}
-				}	
-				
+				}
+
 				if ($InventoryID != '')
-				{										
+				{
 					//check if the item is a downloadable
 					$dt_downloadable = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_downloadables WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' and status = '1'");
 					if(!empty($dt_downloadable) && count($dt_downloadable) > 0)
 					{
 						$Downloadable = true;
-					}	
-									
+					}
+
 					//if we have a downloadable product, we need to insert into our transactions table(s)
-					//and send out appropriate emails					
+					//and send out appropriate emails
 					if($Downloadable)
 					{
 						//delete transaction if one exists already
@@ -204,35 +204,35 @@ else
 						$wpdb->query("INSERT INTO " . $wpdb->prefix . "foxypress_downloadable_transaction SET foxy_transaction_id='" . mysql_escape_string($TransactionID) . "', downloadable_id='" . mysql_escape_string($dt_downloadable->downloadable_id) . "', download_count='0'");
 						$download_transaction_id = $wpdb->insert_id;
 						//generate link & store in array
-						$Downloads[] = plugins_url() . "/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt_downloadable->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($download_transaction_id)) . "&b=" . urlencode(foxypress_Encrypt($wpdb->blogid));					
-					}			
-					
+						$Downloads[] = plugins_url() . "/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt_downloadable->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($download_transaction_id)) . "&b=" . urlencode(foxypress_Encrypt($wpdb->blogid));
+					}
+
 					//get quantity and adjust table as needed
-					$QuantityPurchased = $detail->product_quantity;				
-					
+					$QuantityPurchased = $detail->product_quantity;
+
 					//check to see if we have a option level product code
-					$dt_OptionLevelCount = $wpdb->get_row("SELECT count(*) as ProductCount FROM " . $wpdb->prefix . "foxypress_inventory_options where inventory_id='" . mysql_escape_string($InventoryID) . "' and option_code='" . mysql_escape_string($ProductCode) . "'");		
+					$dt_OptionLevelCount = $wpdb->get_row("SELECT count(*) as ProductCount FROM " . $wpdb->prefix . "foxypress_inventory_options where inventory_id='" . mysql_escape_string($InventoryID) . "' and option_code='" . mysql_escape_string($ProductCode) . "'");
 					if(!empty($dt_OptionLevelCount) && $dt_OptionLevelCount->ProductCount == 1)
 					{
-						//update quantity 
-						$wpdb->query("UPDATE " . $wpdb->prefix . "foxypress_inventory_options SET option_quantity = (option_quantity - " . $QuantityPurchased . ") WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND option_code='" . mysql_escape_string($ProductCode) . "' AND option_quantity != 'null'");					
+						//update quantity
+						$wpdb->query("UPDATE " . $wpdb->prefix . "foxypress_inventory_options SET option_quantity = (option_quantity - " . $QuantityPurchased . ") WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND option_code='" . mysql_escape_string($ProductCode) . "' AND option_quantity != 'null'");
 						if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0")
 						{
 							//check new quantity to see if we need to send an email
-							$dt_item = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_options WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND option_code='" . mysql_escape_string($ProductCode) . "'");						
+							$dt_item = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_options WHERE inventory_id = '" . mysql_escape_string($InventoryID) . "' AND option_code='" . mysql_escape_string($ProductCode) . "'");
 							if($dt_item->option_quantity != null && $dt_item->option_quantity >= 0 && $dt_item->option_quantity < $QuantityAlertLevel)
 							{
 								//uh oh!
 								$body = $dt_item->option_code . " is running low, " . $dt_item->option_quantity . " remain.  Please check your inventory by logging into your WordPress dashboard.";
-								foxypress_Mail($tRow->foxy_transaction_email, get_bloginfo("name") . " - Quantity Alert", $body);								
-							}						
-						}	
+								foxypress_Mail($tRow->foxy_transaction_email, get_bloginfo("name") . " - Quantity Alert", $body);
+							}
+						}
 					}
 					else //standard product
-					{	
-						//update quantity 
+					{
+						//update quantity
 						$wpdb->query("UPDATE " . $wpdb->prefix . "postmeta SET meta_value = (meta_value - " . $QuantityPurchased . ") WHERE post_id = '" . mysql_escape_string($InventoryID) . "' AND meta_key = '_quantity' AND meta_value != 'null'");
-						
+
 						if($QuantityAlertLevel != "" && $QuantityAlertLevel != "0")
 						{
 							//check new quantity to see if we need to send an email
@@ -244,23 +244,23 @@ else
 								$body = $inventory_name . " is running low, " . $inventory_quantity . " remain.  Please check your inventory by logging into your WordPress dashboard.";
 								foxypress_Mail(get_settings("admin_email"), get_bloginfo("name") . " - Quantity Alert", $body);
 							}
-						}		
-					}		
-					
+						}
+					}
+
 					//subscription logic, add active subscription to our wp user
-					if ($SubTokenURL != "") 
+					if ($SubTokenURL != "")
 					{
 						$user_id = $wpdb->get_var("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'foxycart_customer_id' AND meta_value = '$CustomerID'");
-						if ($user_id) 
-						{		
+						if ($user_id)
+						{
 							$foxypress_foxycart_subscriptions = unserialize(get_user_meta($user_id, 'foxypress_foxycart_subscriptions', true));
-							if (!is_array($foxypress_foxycart_subscriptions)) $foxypress_foxycart_subscriptions = array();		
+							if (!is_array($foxypress_foxycart_subscriptions)) $foxypress_foxycart_subscriptions = array();
 							$foxypress_foxycart_subscriptions[$InventoryID] = array(
 								"is_active" => 1,
 								"sub_token_url" => $SubTokenURL
-							);		
+							);
 							update_user_meta($user_id, 'foxypress_foxycart_subscriptions', serialize($foxypress_foxycart_subscriptions));
-						}		
+						}
 					}
 
 					//Check for automatic emails and if active, send.
@@ -272,7 +272,7 @@ else
 						//set up mail objects
 						$mail_to = mysql_escape_string($Email);
 						$mail_subject = $mailTemplate->foxy_email_template_subject;
-					    $mail_body = $mailTemplate->foxy_email_template_email_body;	
+					    $mail_body = $mailTemplate->foxy_email_template_email_body;
 						$mail_from = $mailTemplate->foxy_email_template_from;
 						//replace fields
 						$mail_body = str_replace("{{order_id}}", mysql_escape_string($TransactionID), $mail_body);
@@ -297,28 +297,28 @@ else
 						$mail_body = str_replace("{{shipping_total}}", mysql_escape_string($ShippingTotal), $mail_body);
 						$mail_body = str_replace("{{order_total}}", mysql_escape_string($OrderTotal), $mail_body);
 						$mail_body = str_replace("{{cc_type}}", mysql_escape_string($CCType), $mail_body);
-						
+
 					    foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from);
-					}		
+					}
 				}
 				else
 				{
 					$output .= "Error: Invalid product\n";
 					continue;
 				}
-			} //end order details foreach 
-			
+			} //end order details foreach
+
 			//email downloads
 			if(count($Downloads) > 0)
-			{				
+			{
 				$body = "Thank you for shopping in our store! The link(s) to download your product(s) are below. <br /><br />";
 				foreach($Downloads as $d)
 				{
-					$body .= "<a href=\"" . $d . "\" target=\"_blank\">" . $d . "</a> <br /><br />";	
+					$body .= "<a href=\"" . $d . "\" target=\"_blank\">" . $d . "</a> <br /><br />";
 				}
 				//email customer
-				foxypress_Mail($Email, get_bloginfo("name") . " - Digital Downloads", $body);	
-			}		
+				foxypress_Mail($Email, get_bloginfo("name") . " - Digital Downloads", $body);
+			}
 
 			//if we have a mult-site, we need to restore the blog
 			if($BlogID != ""  && $BlogID != "0") {	restore_current_blog();	}
@@ -346,45 +346,45 @@ else
 				$transaction_date = $subscription->transaction_date;
 
 				foreach ($subscription->transaction_details->transaction_detail as $detail)
-				{	
-					$product_code = $detail->product_code;						
-					foreach ($detail->transaction_detail_options->transaction_detail_option as $option) 
+				{
+					$product_code = $detail->product_code;
+					foreach ($detail->transaction_detail_options->transaction_detail_option as $option)
 					{
-						if (strtolower($option->product_option_name) == 'inventory_id') 
+						if (strtolower($option->product_option_name) == 'inventory_id')
 						{
 							$inventory_id = $option->product_option_value;
 						}
-					}					
-				}		
+					}
+				}
 
 				$canceled = 0;
-				if (date("Y-m-d",strtotime("now")) == date("Y-m-d", strtotime($end_date))) 
+				if (date("Y-m-d",strtotime("now")) == date("Y-m-d", strtotime($end_date)))
 				{
 					$canceled = 1;
 				}
-				if (!$canceled && $past_due_amount > 0) 
+				if (!$canceled && $past_due_amount > 0)
 				{
 					$failedDays = floor((strtotime("now") - strtotime($transaction_date)) / (60 * 60 * 24));
-					if ($failedDays > $failedDaysBeforeCancel) 
+					if ($failedDays > $failedDaysBeforeCancel)
 					{
 						$canceled = 1;
-					} 
-				}		
-				if ($canceled) 
-				{		
+					}
+				}
+				if ($canceled)
+				{
 					$user_id = $wpdb->get_var("SELECT user_id FROM $wpdb->usermeta WHERE meta_key = 'foxycart_customer_id' AND meta_value = '$customer_id'");
-					if ($user_id) 
-					{		
+					if ($user_id)
+					{
 						//Get User's Subscription Array
 						$foxypress_foxycart_subscriptions = unserialize(get_user_meta($user_id, 'foxypress_foxycart_subscriptions', true));
-						if (!is_array($foxypress_foxycart_subscriptions)) $foxypress_foxycart_subscriptions = array();		
+						if (!is_array($foxypress_foxycart_subscriptions)) $foxypress_foxycart_subscriptions = array();
 						$foxypress_foxycart_subscriptions[$inventory_id] = array(
 							"is_active" => 0,
 							"sub_token_url" => $sub_token_url
-						);		
+						);
 						//Write Serialized Array Back to DB
 						update_user_meta($user_id, 'foxypress_foxycart_subscriptions', serialize($foxypress_foxycart_subscriptions));
-					 }		
+					 }
 				 }
 
 	 		}//foreach sub
@@ -395,7 +395,7 @@ else
 		}
 	}
 }
-			
+
 //check for errors
 if ($output != '')
 {
@@ -411,7 +411,7 @@ else
 	{
 		$output = 'foxy';
 	}
-}	
+}
 print "$output";
 exit;
 ?>
