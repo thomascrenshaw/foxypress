@@ -42,6 +42,10 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.0.2 =
+* Feature: Added additional sortable columns in the affiliate management datagrids. First Name, Last Name, total $ due, and total commission made.
+* Feature: Set the number of affiliates in grid to 20.
+
 = 0.4.0.1 =
 * Bugfix: Fixed some bugs in the datafeed.
 

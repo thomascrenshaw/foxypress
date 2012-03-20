@@ -80,10 +80,57 @@ class Foxypress_affiliate_management extends WP_List_Table
         );
     }
 
+    function column_management_first_name($item)
+    {
+        return sprintf('%1$s',
+            /*$1%s*/ $item->first_name
+        );
+    }
+
+    function column_management_last_name($item)
+    {
+        return sprintf('%1$s',
+            /*$1%s*/ $item->last_name
+        );
+    }
+
     function column_management_clicks($item)
     {
         return sprintf('%1$s',
             /*$1%s*/ $item->num_clicks
+        );
+    }
+
+    function column_management_total_due($item)
+    {
+        global $wpdb;
+        $affiliate_id = $item->id;
+        $user_detail  = get_userdata($affiliate_id);
+        //User detail multisite specific meta variables
+        $user_payout_type = $wpdb->prefix . 'affiliate_payout_type'; 
+        $user_payout = $wpdb->prefix . 'affiliate_payout';
+        $user_referral = $wpdb->prefix . 'affiliate_referral';
+        $user_referral_payout_type = $wpdb->prefix . 'affiliate_referral_payout_type'; 
+        $user_referral_payout = $wpdb->prefix . 'affiliate_referral_payout';
+
+        $order_detail = $this->get_affiliate_order_details($affiliate_id);
+
+        if ($user_detail->$user_payout_type == 1) {
+            $amount_due = $user_detail->$user_payout / 100 * $order_detail[0]->total_unpaid_amount;
+        } else {
+            $amount_due = $user_detail->$user_payout * $order_detail[0]->num_unpaid_orders;
+        }
+        $amount_due = number_format($amount_due, 2, '.', ',');
+
+        if ($user_detail->$user_referral_payout_type == 1) {
+            $referral_amount_due = $user_detail->$user_referral_payout / 100 * $order_detail[0]->total_unpaid_referral_amount;
+        } else {
+            $referral_amount_due = $user_detail->$user_referral_payout * $order_detail[0]->num_unpaid_referral_orders;
+        }
+        $referral_amount_due = number_format($referral_amount_due, 2, '.', ',');
+
+        return sprintf('$%1$s',
+            /*$1%s*/ $amount_due + $referral_amount_due
         );
     }
 
@@ -148,33 +195,10 @@ class Foxypress_affiliate_management extends WP_List_Table
         global $wpdb;
         $affiliate_id = $item->id;
 
-        $referral = get_user_option('affiliate_referral', $affiliate_id);
+        $order_detail = $this->get_affiliate_order_details($affiliate_id);
 
-        $sql = "SELECT foxy_affiliate_id FROM " . $wpdb->prefix . "foxypress_affiliate_referrals
-                    WHERE foxy_affiliate_referred_by_id = " . $affiliate_id;
-
-        $referred_affiliate_ids = $wpdb->get_results($sql);
-
-        if ($referral == 'true' && $referred_affiliate_ids) {
-        
-            $commission_ids = array();
-            $i = 0;
-
-            foreach ($referred_affiliate_ids as $referred_affiliate)
-            {
-                $commission_ids[$i] = $referred_affiliate->foxy_affiliate_id;
-                $i++;
-            }
-            $commission_ids = implode(',', $commission_ids);
-
-            $sql = "SELECT count(foxy_transaction_id) AS num_total_orders FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id IN (" . $commission_ids . "," . $affiliate_id . ")";
-            $orders = $wpdb->get_results($sql);
-        } else {
-            $sql = "SELECT count(foxy_transaction_id) AS num_total_orders FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id = " . $affiliate_id;
-            $orders = $wpdb->get_results($sql);
-        }
         return sprintf('%1$s',
-            /*$1%s*/ $orders[0]->num_total_orders
+            /*$1%s*/ $order_detail[0]->num_total_orders
         );
     }
     
@@ -388,7 +412,10 @@ class Foxypress_affiliate_management extends WP_List_Table
         {
             $columns = array(
                 'management_affiliate'          => 'Affiliate',
+                'management_first_name'         => 'First Name',
+                'management_last_name'          => 'Last Name',
                 'management_clicks'             => 'Clicks',
+                'management_total_due'          => 'Total Due',
                 'management_total_commission'   => 'Total Commission',
                 'management_total_transactions' => 'Total Transactions'
             );
@@ -438,7 +465,10 @@ class Foxypress_affiliate_management extends WP_List_Table
         {
             $sortable_columns = array(
                 'management_affiliate'          => array('management_affiliate',true),     //true means its already sorted
+                'management_first_name'         => array('management_first_name',false),
+                'management_last_name'          => array('management_last_name',false),
                 'management_clicks'             => array('management_clicks',false),
+                'management_total_due'          => array('management_total_due',false),
                 'management_total_commission'   => array('management_total_commission',false),
                 'management_total_transactions' => array('management_total_transactions', false)
             );
@@ -489,7 +519,7 @@ class Foxypress_affiliate_management extends WP_List_Table
     function prepare_items($mode, $order_by = '', $order = '')
     {
         //How many items per page
-        $per_page = 10;
+        $per_page = 20;
         
         $columns = $this->get_columns($mode);
         $hidden = array();
@@ -512,10 +542,22 @@ class Foxypress_affiliate_management extends WP_List_Table
             if ($order_by === 'management_affiliate')
             {
                 $sort_by = 'u.user_nicename ' . $sort_order;
-            } 
+            }
+            else if ($order_by === 'management_first_name')
+            {
+                $sort_by = 'first_name ' . $sort_order;
+            }
+            else if ($order_by === 'management_last_name')
+            {
+                $sort_by = 'last_name ' . $sort_order;
+            }
             else if ($order_by === 'management_clicks')
             {
                 $sort_by = 'num_clicks ' . $sort_order;
+            }
+            else if ($order_by === 'management_total_due')
+            {
+                $sort_by = 'total_unpaid_amount ' . $sort_order;
             }
             else if ($order_by === 'management_total_commission')
             {
@@ -546,6 +588,8 @@ class Foxypress_affiliate_management extends WP_List_Table
             $ids = implode(',', $ids);
 
             $sql_data = "SELECT u.id, u.user_nicename,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'first_name' AND user_id = u.id) AS first_name,
+                        (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'last_name' AND user_id = u.id) AS last_name,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout_type' AND user_id = u.id) AS affiliate_payout_type,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout' AND user_id = u.id) AS affiliate_payout,
                         (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_tracking WHERE affiliate_id = u.id) AS num_clicks,
@@ -703,10 +747,13 @@ class Foxypress_affiliate_management extends WP_List_Table
         ));
     }
 
-    function get_affiliate_order_details()
+    function get_affiliate_order_details($affiliate_id = '')
     {
         global $wpdb;
-        $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
+
+        if ($affiliate_id == '') {
+            $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
+        }
 
         $referral = get_user_option('affiliate_referral', $affiliate_id);
 
