@@ -75,7 +75,7 @@ function get_extension($filename) {
 } 
 
 if (!empty($_FILES)) {
-	$path = $_SERVER['DOCUMENT_ROOT'] . '/wp-content/affiliate_images/';
+	$path = ABSPATH . 'wp-content/affiliate_images/';
 	if(!file_exists($path)) {
 		@mkdir($path, 0775, true);
 		@chmod($path, 0775);

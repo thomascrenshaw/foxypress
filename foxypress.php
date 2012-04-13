@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.0.2
+Version: 0.4.1
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -76,6 +76,15 @@ if ( !empty ( $foxypress_url ) ){
 		add_filter('rewrite_rules_array','foxy_user_portal_rewrite_rules');
 		add_filter('query_vars','foxy_user_portal_vars');
 		add_action('wp_loaded','foxy_user_portal_flush_check');
+
+		// Add the scripts to the portal page
+		add_action('template_redirect','add_portal_scripts');
+		function add_portal_scripts() {
+			if (is_page(FOXYPRESS_USER_PORTAL)) {
+				add_action('wp_head', 'affiliate_profile_enqueue');
+			}
+		}
+
 	} else {
 		add_action('wp_loaded','foxy_user_portal_remove_flush_check');
 	}
@@ -108,7 +117,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.0.2");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.1");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -351,6 +360,8 @@ function affiliate_profile_enqueue() { ?>
 		});
 	</script>
 <?php }
+
+
 
 
 function foxypress_save_affiliate_profile_fields($user_id) {
@@ -621,7 +632,7 @@ function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
 		//send email to customer
 		$headers = "MIME-Version: 1.0" . "\r\n";
 		$headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
-		$headers .= 'From: <' . $mail_from . '>' . "\r\n";
+		$headers .= 'From: ' . get_option('blogname') . ' <' . $from . '>' . "\r\n";
 		mail($mail_to,$subject,$mail_body,$headers);
 	}
 }

@@ -38,9 +38,17 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - Consolibyte API - Utique Shop
 - Trinity Hockey Co - Affiliate Management Upgrades
 - Adam Morrissey (Delgado Protocol) - Affiliate Tier addition - affiliates can gain referral bonuses
-- WeThePrinters - User Portal addition
+- WeThePrinters - User Portal addition - Order History
+- Adam Morrissey (Delgado Protocol) - User Portal addition - Affiliate Stats
+- MamaDoo Kids - Status Management enhancements
 
 == Changelog ==
+
+= 0.4.1 =
+* Feature: Added the ability to use placeholders in Status emails. 
+* Feature: Added functionality to the API to allow querying of affiliate statistics
+* Bugfix: Mail function is now pulling WordPress admin email and blog name for all FoxyPress generated emails.
+* Release notes available <a href="http://www.foxy-press.com/blog/2012/04/13/foxypress-0-4-1/" target="_blank">here</a> 
 
 = 0.4.0.2 =
 * Feature: Added additional sortable columns in the affiliate management datagrids. First Name, Last Name, total $ due, and total commission made.

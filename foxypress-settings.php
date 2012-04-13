@@ -29,6 +29,7 @@ function foxypress_settings_postback()
 		update_option("foxypress_include_default_stylesheet", foxypress_FixPostVar('foxypress_include_default_stylesheet'));		
 		update_option("foxypress_image_mode", foxypress_FixPostVar('foxypress_image_mode'));		
 		update_option("foxypress_uninstall_keep_products", foxypress_FixPostVar('foxypress_uninstall_keep_products'));
+        update_option("foxypress_third_party_products", foxypress_FixPostVar('foxypress_third_party_products'));
         update_option("foxypress_user_portal", foxypress_FixPostVar('foxypress_user_portal'));
 		update_option("foxycart_hmac", foxypress_FixPostVar('foxycart_hmac'));
 		update_option("foxycart_enable_multiship", foxypress_FixPostVar('foxycart_enable_multiship'));
@@ -245,6 +246,13 @@ function foxypress_settings_page_load()
         </div>		
         <div class="settings_inside">
             <table>
+                <tr valign="top">
+                    <td align="right" valign="top" nowrap class="title">Enable Third Party Products</td>
+                    <td align="left">                                
+                        <input type="checkbox" name="foxypress_third_party_products" value="1" <?php echo(((get_option('foxypress_third_party_products') == "1") ? "checked=\"checked\"" : "")) ?> /> *Allow third party products. <br />
+                        <p>Select to suppress error messages when not using FoxyPress products.</p>
+                    </td>
+                </tr>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title">Enable User Status</td>
                     <td align="left">                                

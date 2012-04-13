@@ -130,7 +130,7 @@ class Foxypress_affiliate_management extends WP_List_Table
         $referral_amount_due = number_format($referral_amount_due, 2, '.', ',');
 
         return sprintf('$%1$s',
-            /*$1%s*/ $amount_due + $referral_amount_due
+            /*$1%s*/ number_format($amount_due + $referral_amount_due, 2, '.', ',')
         );
     }
 
@@ -161,7 +161,7 @@ class Foxypress_affiliate_management extends WP_List_Table
                     (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_referral_payout_type' AND user_id = " . $affiliate_id . ") AS affiliate_referral_payout_type,
                     (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_referral_payout' AND user_id = " . $affiliate_id . ") AS affiliate_referral_payout,
                     (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '2')) AS num_unpaid_referral_orders,
-                    (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_referral_amount,
+                    (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_referral_amount,
                     (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . " AND foxy_affiliate_commission_type = '2') AS total_paid_referral_amount,
                     (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_referrals WHERE foxy_affiliate_referred_by_id = " . $affiliate_id . ") AS num_referrals";
 
@@ -173,7 +173,6 @@ class Foxypress_affiliate_management extends WP_List_Table
                 $unpaid_referral_commission = $referral[0]->affiliate_referral_payout * $referral[0]->num_unpaid_referral_orders;
             }
             $total_referral_commission = $unpaid_referral_commission + $referral[0]->total_paid_referral_amount;
-            $total_referral_commission = number_format($total_referral_commission, 2, '.', ',');
         }
 
         if ($item->affiliate_payout_type == 1) {
@@ -182,11 +181,10 @@ class Foxypress_affiliate_management extends WP_List_Table
             $unpaid_commission = $item->affiliate_payout * $item->num_unpaid_orders;
         }
         $total_commission  = $unpaid_commission + $item->total_commission;
-        $total_commission  = number_format($total_commission, 2, '.', ',');
             
                     
         return sprintf('$%1$s',
-            /*$1%s*/ $total_commission + $total_referral_commission
+            /*$1%s*/ number_format($total_commission + $total_referral_commission, 2, '.', ',')
         );
     }
 
@@ -293,14 +291,14 @@ class Foxypress_affiliate_management extends WP_List_Table
         $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
         if ($item->id == $affiliate_id) {
             if ($item->affiliate_payout_type == 1) {
-                $order_commission = $item->affiliate_payout / 100 * $item->order_total;
+                $order_commission = $item->affiliate_payout / 100 * $item->product_total;
                 $order_commission = number_format($order_commission, 2, '.', ',');
             } else {
                 $order_commission  = number_format($item->affiliate_payout, 2, '.', ',');
             }
         } else {
             if ($item->affiliate_referral_payout_type == 1) {
-                $order_commission = $item->affiliate_referral_payout / 100 * $item->order_total;
+                $order_commission = $item->affiliate_referral_payout / 100 * $item->product_total;
                 $order_commission = number_format($order_commission, 2, '.', ',');
             } else {
                 $order_commission  = number_format($item->affiliate_referral_payout, 2, '.', ',');
@@ -595,7 +593,7 @@ class Foxypress_affiliate_management extends WP_List_Table
                         (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_tracking WHERE affiliate_id = u.id) AS num_clicks,
                         (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = u.id AND foxy_affiliate_commission_type = '1') AS total_commission,
                         (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = u.id AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS num_unpaid_orders,
-                        (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = u.id AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_amount
+                        (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = u.id AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_amount
                         FROM " . $wpdb->base_prefix . "users AS u
                         WHERE u.id in (" . $ids . ")
                         ORDER BY " . $sort_by;
@@ -675,7 +673,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             array_push($commission_ids, $affiliate_id);
             $commission_ids = implode(',', $commission_ids);
 
-            $sql_data = "SELECT ft.foxy_transaction_id AS order_id, ft.foxy_transaction_order_total AS order_total, ft.foxy_transaction_date AS order_date, u.id, u.user_nicename,
+            $sql_data = "SELECT ft.foxy_transaction_id AS order_id, ft.foxy_transaction_product_total AS product_total, ft.foxy_transaction_order_total AS order_total, ft.foxy_transaction_date AS order_date, u.id, u.user_nicename,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout_type' AND user_id = " . $affiliate_id . ") AS affiliate_payout_type,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_payout' AND user_id = " . $affiliate_id . ") AS affiliate_payout,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = '" . $wpdb->prefix . "affiliate_referral_payout_type' AND user_id = " . $affiliate_id . ") AS affiliate_referral_payout_type,
@@ -779,9 +777,9 @@ class Foxypress_affiliate_management extends WP_List_Table
                     (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id IN (" . $commission_ids . "," . $affiliate_id . ")) AS num_total_orders,
                     (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_paid_orders,
                     (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS num_unpaid_orders,
-                    (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS total_unpaid_amount,
+                    (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS total_unpaid_amount,
                     (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '2')) AS num_unpaid_referral_orders,
-                    (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_referral_amount,
+                    (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_referral_amount,
                     (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . " AND foxy_affiliate_commission_type = '1') AS total_paid_amount,
                     (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_referrals WHERE foxy_affiliate_referred_by_id = " . $affiliate_id . ") AS num_referrals,
                     (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . " AND foxy_affiliate_commission_type = '2') AS total_paid_referral_amount";
@@ -792,7 +790,7 @@ class Foxypress_affiliate_management extends WP_List_Table
                 (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_total_orders,
                 (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_paid_orders,
                 (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS num_unpaid_orders,
-                (SELECT sum(foxy_transaction_order_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS total_unpaid_amount,
+                (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS total_unpaid_amount,
                 (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . " AND foxy_affiliate_commission_type = '1') AS total_paid_amount";
         }
         return $wpdb->get_results($data);
@@ -1183,11 +1181,11 @@ function foxypress_create_affiliate_table() {
         
         if ($order_detail[0]->foxy_affiliate_id == $affiliate_id) {
             if ($user_detail->$user_payout_type == 1) {
-                $affiliate_commission = $user_detail->$user_payout / 100 * $order_detail[0]->foxy_transaction_order_total;
+                $affiliate_commission = $user_detail->$user_payout / 100 * $order_detail[0]->foxy_transaction_product_total;
                 $affiliate_payout = $user_detail->$user_payout . '%';
             } else {
                 $affiliate_commission = $user_detail->$user_payout;
-                $affiliate_payout = '$' . $user_detail->$user_payout;
+                $affiliate_payout = '$' . number_format($user_detail->$user_payout, 2, '.', ',');
             }
             $affiliate_referral = FALSE;
             $commission_type = 1;
@@ -1195,11 +1193,11 @@ function foxypress_create_affiliate_table() {
             $pay_affiliate_payout = $user_detail->$user_payout;
         } else {
             if ($user_detail->$user_referral_payout_type == 1) {
-                $affiliate_commission = $user_detail->$user_referral_payout / 100 * $order_detail[0]->foxy_transaction_order_total;
+                $affiliate_commission = $user_detail->$user_referral_payout / 100 * $order_detail[0]->foxy_transaction_product_total;
                 $affiliate_payout = $user_detail->$user_referral_payout . '%';
             } else {
                 $affiliate_commission = $user_detail->$user_referral_payout;
-                $affiliate_payout = '$' . $user_detail->$user_referral_payout;
+                $affiliate_payout = '$' . number_format($user_detail->$user_referral_payout, 2, '.', ',');
             }
             $affiliate_referral = TRUE;
             $commission_type = 2;

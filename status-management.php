@@ -85,7 +85,7 @@ function status_management_page_load()
 			?>
             <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
             <form id="statusForm" name="statusForm" method="POST">
-            	<table>
+            	<table style="float:left; width:650px">
                 	<tr>
                     	<td>Status ID &nbsp;</td>
                         <td><?php echo($drStatus->foxy_transaction_status) ?></td>
@@ -112,15 +112,132 @@ function status_management_page_load()
 							</script>
                         </td>
                     </tr>
-                    <tr>
+                    <!--<tr>
                     	<td>Include Tracking</td>
-                        <td><input type="checkbox" value="1" <?php echo(($drStatus->foxy_transaction_status_email_tracking == "1") ? "checked='checked'"  : "") ?> id="foxy_sm_status_email_tracking" name="foxy_sm_status_email_tracking" /></td>
-                    </tr>
+                        <td><input type="checkbox" value="1" <?php //echo(($drStatus->foxy_transaction_status_email_tracking == "1") ? "checked='checked'"  : "") ?> id="foxy_sm_status_email_tracking" name="foxy_sm_status_email_tracking" /></td>
+                    </tr>-->
                     <?php } ?>
                      <tr>
                     	<td colspan="2"><input type="submit" id="foxy_sm_status_submit" name="foxy_sm_status_submit" value="Save" /> <?php echo($sm_error) ?></td>
                     </tr>
             	</table>
+            	<div style="float:left; width:400px; margin-left:20px">
+					<p><i> You can use the following legend to populate the email body</i></p>
+					<table style="margin:10px 0; display:block;">	
+						<tr>
+							<td width="200"><strong>{{order_id}}</strong></td>
+							<td>ID of Order</td>
+						</tr>
+						<tr>
+							<td><strong>{{order_date}}</strong></td>
+							<td>Order Date</td>
+						</tr>
+						<tr>
+							<td><strong>{{product_total}}</strong></td>
+							<td>Order Product Total</td>
+						</tr>
+						<tr>
+							<td><strong>{{product_listing}}</strong></td>
+							<td>Product Item listing</td>
+						</tr>
+						<tr>
+							<td><strong>{{tax_total}}</strong></td>
+							<td>Order Tax Total</td>
+						</tr>
+						<tr>
+							<td><strong>{{shipping_total}}</strong></td>
+							<td>Order Shipping Total</td>
+						</tr>
+						<tr>
+							<td><strong>{{shipping_method}}</strong></td>
+							<td>Order Shipping Total</td>
+						</tr>
+						<tr>
+							<td><strong>{{order_total}}</strong></td>
+							<td>Order Total</td>
+						</tr>
+						<tr>
+							<td><strong>{{discount_codes}}</strong></td>
+							<td>Discount Codes and Amounts Used</td>
+						</tr>
+						<tr>
+							<td><strong>{{cc_type}}</strong></td>
+							<td>Credit Card Type Used</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_first_name}}</strong></td>
+							<td>Customer's First Name</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_last_name}}</strong></td>
+							<td>Customers' Last Name</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_email}}</strong></td>
+							<td>Customer's Email</td>
+						</tr>
+						<tr>
+							<td><strong>{{tracking_number}}</strong></td>
+							<td>Tracking Number (if entered)</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_billing_address1}}</strong></td>
+							<td>Customer's Billing Address 1</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_billing_address2}}</strong></td>
+							<td>Customer's Billing Address 2</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_billing_city}}</strong></td>
+							<td>Customer's Billing City</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_billing_state}}</strong></td>
+							<td>Customer's Billing State</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_billing_zip}}</strong></td>
+							<td>Customer's Billing Zip</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_billing_country}}</strong></td>
+							<td>Customer's Billing Country</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_first_name}}</strong></td>
+							<td>Customer's Shipping First Name</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_last_name}}</strong></td>
+							<td>Customer's Shipping Last Name</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_address1}}</strong></td>
+							<td>Customer's Shipping Address 1</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_address2}}</strong></td>
+							<td>Customer's Shipping Address 2</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_city}}</strong></td>
+							<td>Customer's Shipping City</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_state}}</strong></td>
+							<td>Customer's Shipping State</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_zip}}</strong></td>
+							<td>Customer's Shipping Zip</td>
+						</tr>
+						<tr>
+							<td><strong>{{customer_shipping_country}}</strong></td>
+							<td>Customer's Shipping Country</td>
+						</tr>
+	            	</table>
+	        	</div>
             </form>
             <?php
 		}

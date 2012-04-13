@@ -847,6 +847,287 @@ function foxypress_GetTransactionDetails($transaction)
 		return null;
 	}
 }
+
+function foxypress_IsAffiliate($user_id)
+{
+	global $wpdb;
+
+	$affiliate_user = get_user_option('affiliate_user', $user_id);
+	if ($affiliate_user == 'true')
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return false;
+
+}
+
+function foxypress_IsReferral($user_id)
+{
+	global $wpdb;
+
+	$affiliate_user = get_user_option('affiliate_referral', $user_id);
+	if ($affiliate_user == 'true')
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return false;
+}
+
+function foxypress_GetAffiliateData($affiliate_id)
+{
+	global $wpdb;
+
+	$referral = get_user_option('affiliate_referral', $affiliate_id);
+
+	// Get ids of affiliate referrals
+    $sql = "SELECT foxy_affiliate_id FROM " . $wpdb->prefix . "foxypress_affiliate_referrals
+                WHERE foxy_affiliate_referred_by_id = " . $affiliate_id;
+
+    $referred_affiliate_ids = $wpdb->get_results($sql);
+
+    $commission_ids = array();
+    $i = 0;
+    foreach ($referred_affiliate_ids as $referred_affiliate)
+    {
+        $commission_ids[$i] = $referred_affiliate->foxy_affiliate_id;
+        $i++;
+    }
+    $commission_id_array = $commission_ids;
+    $commission_ids = implode(',', $commission_ids);
+
+    array_push($commission_id_array, $affiliate_id);
+    $commission_ids_user = implode(',', $commission_id_array);
+
+    // Get counts for user with referrals or without
+    if ($referral == 'true' && $referred_affiliate_ids) {
+        $data = "SELECT 
+                (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_tracking WHERE affiliate_id = " . $affiliate_id . ") AS num_clicks,
+                (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id IN (" . $commission_ids . "," . $affiliate_id . ")) AS num_total_orders,
+                (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_paid_orders,
+                (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS num_unpaid_orders,
+                (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS total_unpaid_amount,
+                (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '2')) AS num_unpaid_referral_orders,
+                (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id IN (" . $commission_ids . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id)) AS total_unpaid_referral_amount,
+                (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . " AND foxy_affiliate_commission_type = '1') AS total_paid_amount,
+                (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_referrals WHERE foxy_affiliate_referred_by_id = " . $affiliate_id . ") AS num_referrals,
+                (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . " AND foxy_affiliate_commission_type = '2') AS total_paid_referral_amount";
+
+    } else {
+        $data = "SELECT 
+            (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_tracking WHERE affiliate_id = " . $affiliate_id . ") AS num_clicks,
+            (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_referrals WHERE foxy_affiliate_referred_by_id = " . $affiliate_id . ") AS num_referrals,
+            (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_total_orders,
+            (SELECT count(id) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . ") AS num_paid_orders,
+            (SELECT count(foxy_transaction_id) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS num_unpaid_orders,
+            (SELECT sum(foxy_transaction_product_total) FROM " . $wpdb->prefix . "foxypress_transaction AS ft WHERE ft.foxy_affiliate_id = " . $affiliate_id . " AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_affiliate_commission_type = '1')) AS total_unpaid_amount,
+            (SELECT sum(foxy_affiliate_commission) FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE foxy_affiliate_id = " . $affiliate_id . " AND foxy_affiliate_commission_type = '1') AS total_paid_amount";
+    }
+
+    $order_detail = $wpdb->get_results($data);
+    
+    // Get all open orders
+    $open_orders_data = "SELECT ft.foxy_transaction_id AS order_id, ft.foxy_transaction_product_total AS product_total, ft.foxy_transaction_order_total AS order_total, ft.foxy_transaction_date AS order_date, u.id, u.user_nicename
+                	FROM " . $wpdb->prefix . "foxypress_transaction AS ft
+                	LEFT JOIN " . $wpdb->base_prefix . "users AS u ON u.id = ft.foxy_affiliate_id
+                	WHERE ft.foxy_affiliate_id IN (" . $commission_ids_user . ") AND NOT EXISTS (SELECT foxy_transaction_id FROM " . $wpdb->prefix . "foxypress_affiliate_payments WHERE " . $wpdb->prefix . "foxypress_affiliate_payments.foxy_transaction_id = ft.foxy_transaction_id AND foxy_affiliate_id = " . $affiliate_id . ")
+                	ORDER BY ft.foxy_transaction_id DESC";
+
+    $user_open_orders = $wpdb->get_results($open_orders_data);
+
+    // Get all paid orders
+    $paid_orders_data = "SELECT *
+                		FROM " . $wpdb->prefix . "foxypress_affiliate_payments
+                		WHERE foxy_affiliate_id = " . $affiliate_id . " 
+                		ORDER BY foxy_transaction_id DESC";
+
+    $user_paid_orders = $wpdb->get_results($paid_orders_data);
+
+    // User payment fields
+    $user_payout_type = get_user_option('affiliate_payout_type', $affiliate_id);
+    $user_payout = get_user_option('affiliate_payout', $affiliate_id);
+    $user_referral = get_user_option('affiliate_referral', $affiliate_id);
+    $user_referral_payout_type = get_user_option('affiliate_referral_payout_type', $affiliate_id);
+    $user_referral_payout = get_user_option('affiliate_referral_payout', $affiliate_id);
+    $user_affiliate_url = get_user_option('affiliate_url', $affiliate_id);
+
+    // Create open orders array
+    if (!empty($user_open_orders))
+    {
+	    $open_orders = array();
+	    foreach ($user_open_orders as $uoo)
+	    {	
+	    	// Calculate order commission
+	    	if ($uoo->id == $affiliate_id)
+	    	{
+	            if ($user_payout_type == 1)
+	            {
+	                $order_commission = $user_payout / 100 * $uoo->product_total;
+	                $order_commission = number_format($order_commission, 2, '.', ',');
+	            }
+	            else
+	            {
+	                $order_commission  = number_format($user_payout, 2, '.', ',');
+	            }
+	            $order_type = 'Regular';
+	        }
+	        else
+	        {
+	            if ($user_referral_payout_type == 1)
+	            {
+	                $order_commission = $user_referral_payout / 100 * $uoo->product_total;
+	                $order_commission = number_format($order_commission, 2, '.', ',');
+	            }
+	            else
+	            {
+	                $order_commission  = number_format($user_referral_payout, 2, '.', ',');
+	            }
+	            $order_type = 'Referral';
+	        }
+
+	    	$open_orders[] = array(
+	    		"order_id" => $uoo->order_id,
+	    		"order_total" => $uoo->order_total,
+	    		"affiliate_commission" => $order_commission,
+	    		"order_date" => $uoo->order_date,
+	    		"order_type" => $order_type
+	    	);
+	    }
+	}
+
+	// Create paid orders array
+	if (!empty($user_paid_orders))
+	{	
+		$paid_orders = array();
+		foreach ($user_paid_orders as $upo)
+		{
+			// Calculate order type
+			if ($upo->foxy_affiliate_commission_type == 1)
+			{
+            	$order_type = 'Regular';
+        	}
+        	else
+        	{
+            	$order_type = 'Referral';
+        	}
+
+        	// Calculate payout
+        	if ($upo->foxy_affiliate_payout_type == 1)
+        	{
+            	$affiliate_payout = $upo->foxy_affiliate_payout . '%';
+        	}
+        	else
+        	{
+            	$affiliate_payout = '$' . $upo->foxy_affiliate_payout;
+        	}
+
+			$paid_orders[] = array(
+	    		"order_id" => $upo->foxy_transaction_id,
+	    		"order_total" => $upo->foxy_transaction_order_total,
+	    		"affiliate_payout" => $affiliate_payout,
+	    		"affiliate_commission" => $upo->foxy_affiliate_commission,
+	    		"payment_method" => $upo->foxy_affiliate_payment_method,
+	    		"payment_date" => $upo->foxy_affiliate_payment_date,
+	    		"order_type" => $order_type
+	    	);
+		}
+	}
+
+	// Calculate amount due and format
+    if ($user_payout_type == 1)
+    {
+        $amount_due = $user_payout / 100 * $order_detail[0]->total_unpaid_amount;
+    }
+    else
+    {
+        $amount_due = $user_payout * $order_detail[0]->num_unpaid_orders;
+    }
+    $amount_due = number_format($amount_due, 2, '.', ',');
+
+    // Calculate referral amount due and format
+    if ($user_referral_payout_type == 1)
+    {
+        $referral_amount_due = $user_referral_payout / 100 * $order_detail[0]->total_unpaid_referral_amount;
+    }
+    else
+    {
+        $referral_amount_due = $user_referral_payout * $order_detail[0]->num_unpaid_referral_orders;
+    }
+    $referral_amount_due = number_format($referral_amount_due, 2, '.', ',');
+
+    // Create affiliate stats array
+    if (!empty($order_detail))
+	{
+		$affiliate_stats = array();
+
+		if (!$order_detail[0]->total_paid_referral_amount)
+		{ 
+			$total_referral_paid_out = '0.00';
+		}
+		else
+		{ 
+			$total_referral_paid_out = $order_detail[0]->total_paid_referral_amount;
+		}
+
+		if (!$order_detail[0]->total_paid_amount)
+		{ 
+			$total_paid_out = '0.00';
+		}
+		else
+		{ 
+			$total_paid_out = $order_detail[0]->total_paid_amount;
+		}
+
+		if ($user_referral_payout_type == 1)
+		{
+            $referral_commission = $user_referral_payout . '%';
+        }
+        else
+        { 
+        	$referral_commission = '$' . $user_referral_payout;
+        }
+
+        if ($user_payout_type == 1)
+		{
+            $commission = $user_payout . '%';
+        }
+        else
+        { 
+        	$commission = '$' . $user_payout;
+        }
+
+		$affiliate_stats[] = array(
+			"total_clicks" 				=> $order_detail[0]->num_clicks,
+			"total_referrals"			=> $order_detail[0]->num_referrals,
+			"total_orders"				=> $order_detail[0]->num_total_orders,
+			"total_referral_paid_out"	=> $total_referral_paid_out,
+			"total_paid_out"			=> $total_paid_out,
+			"referral_amount_due"		=> $referral_amount_due,
+			"amount_due"				=> $amount_due,
+			"referral_commission"		=> $referral_commission,
+			"commission"				=> $commission,
+			"affiliate_url"				=> $user_affiliate_url,
+			"user_facebook_page"		=> get_user_option('affiliate_facebook_page', $affiliate_id),
+			"user_age"					=> get_user_option('affiliate_age', $affiliate_id),
+			"user_gender"				=> get_user_option('affiliate_gender', $affiliate_id),
+			"avatar_name"				=> get_user_option('affiliate_avatar_name', $affiliate_id),
+			"avatar_ext"				=> get_user_option('affiliate_avatar_ext', $affiliate_id),
+			"open_orders"				=> $open_orders,
+			"paid_orders"				=> $paid_orders
+		);
+
+		return current($affiliate_stats);
+	}
+
+    return null;
+}
 /***************************************************************************************************/
 /***************************************************************************************************/
 /*********************************** End Functions For Users ***************************************/

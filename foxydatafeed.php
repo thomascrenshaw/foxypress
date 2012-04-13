@@ -303,7 +303,10 @@ else
 				}
 				else
 				{
-					$output .= "Error: Invalid product\n";
+					if (get_option('foxypress_third_party_products') != "1")
+					{ 
+						$output .= "Error: Invalid product\n";
+					}
 					continue;
 				}
 			} //end order details foreach
@@ -392,7 +395,7 @@ else
 		else
 		{
 			$output .= "Error: not an object (subscriptions) - check your key.\n";
-		}
+		}	
 	}
 }
 
