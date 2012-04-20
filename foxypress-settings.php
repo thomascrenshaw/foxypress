@@ -1,6 +1,6 @@
 <?php
 /**************************************************************************
-FoxyPress provides a complete shopping cart and inventory management tool 
+FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
@@ -8,26 +8,26 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 add_action('admin_init', 'foxypress_settings_postback');
 
 function foxypress_settings_postback()
-{	
+{
 	global $wpdb;
 	if(isset($_POST['btnFoxyPressSettingsSaveWizard']))
 	{
-		update_option("foxycart_storeurl", foxypress_FixPostVar('foxycart_storeurl_wizard'));	
+		update_option("foxycart_storeurl", foxypress_FixPostVar('foxycart_storeurl_wizard'));
 		update_option("foxycart_storeversion", foxypress_FixPostVar('foxycart_storeversion_wizard'));
 		update_option("foxycart_include_jquery", foxypress_FixPostVar('foxycart_include_jquery_wizard'));
 		update_option("foxypress_image_mode", foxypress_FixPostVar('foxypress_image_mode_wizard'));
-		
+
 		update_option("foxypress_skip_settings_wizard", "1");
 		header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=foxypress-settings");
 	}
 	else if(isset($_POST['btnFoxyPressSettingsSave']))
-	{	
-		update_option("foxycart_storeurl", foxypress_FixPostVar('foxycart_storeurl'));	
+	{
+		update_option("foxycart_storeurl", foxypress_FixPostVar('foxycart_storeurl'));
 		update_option("foxycart_apikey", foxypress_FixPostVar('foxycart_apikey'));
 		update_option("foxycart_storeversion", foxypress_FixPostVar('foxycart_storeversion'));
 		update_option("foxycart_include_jquery", foxypress_FixPostVar('foxycart_include_jquery'));
-		update_option("foxypress_include_default_stylesheet", foxypress_FixPostVar('foxypress_include_default_stylesheet'));		
-		update_option("foxypress_image_mode", foxypress_FixPostVar('foxypress_image_mode'));		
+		update_option("foxypress_include_default_stylesheet", foxypress_FixPostVar('foxypress_include_default_stylesheet'));
+		update_option("foxypress_image_mode", foxypress_FixPostVar('foxypress_image_mode'));
 		update_option("foxypress_uninstall_keep_products", foxypress_FixPostVar('foxypress_uninstall_keep_products'));
         update_option("foxypress_third_party_products", foxypress_FixPostVar('foxypress_third_party_products'));
         update_option("foxypress_user_portal", foxypress_FixPostVar('foxypress_user_portal'));
@@ -46,7 +46,7 @@ function foxypress_settings_postback()
 		update_option("foxypress_secure_port", foxypress_FixPostVar('foxypress_secure_port'));
 		update_option("foxypress_email_username", foxypress_FixPostVar('foxypress_email_username'));
 		update_option("foxypress_email_password", foxypress_FixPostVar('foxypress_email_password'));
-		
+
 
 		if(function_exists('is_multisite') && is_multisite())
 		{
@@ -54,16 +54,16 @@ function foxypress_settings_postback()
 			$is_main_blog = foxypress_FixPostVar('foxypress_main_blog');
 			if($is_main_blog != foxypress_FixPostVar('foxypress_main_blog_previous'))
 			{
-				//if we mark this as the main site and it wasn't already marked, we need to update in this database 
+				//if we mark this as the main site and it wasn't already marked, we need to update in this database
 				//and then update the other db's if it's now a 1
 				update_option("foxypress_main_blog", $is_main_blog);
 				if($is_main_blog == "1")
 				{
 					$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs WHERE blog_id != '" . $wpdb->blogid . "'"));
-					foreach ($blogids as $blog_id) 
-					{	
+					foreach ($blogids as $blog_id)
+					{
 						switch_to_blog($blog_id);
-						update_option("foxypress_main_blog", "0");						
+						update_option("foxypress_main_blog", "0");
 					}
 					switch_to_blog($OriginalBlog);
 				}
@@ -74,32 +74,32 @@ function foxypress_settings_postback()
 				//this needs to be updated in all the db's
 				update_option("foxycart_enable_sso", $enable_sso);
 				$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs WHERE blog_id != '" . $wpdb->blogid . "'"));
-				foreach ($blogids as $blog_id) 
+				foreach ($blogids as $blog_id)
 				{
 					switch_to_blog($blog_id);
-					update_option("foxycart_enable_sso", $enable_sso);	
+					update_option("foxycart_enable_sso", $enable_sso);
 				}
 				switch_to_blog($OriginalBlog);
 			}
 		}
 		header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=foxypress-settings");
-	}	
+	}
 }
 
 function foxypress_settings_page_load()
 {
-	global $wpdb;			
+	global $wpdb;
 	if(get_option("foxypress_skip_settings_wizard") == "1")
-	{	
+	{
     ?>
 <form method="POST">
     <div id="" class="settings_widefat">
         <div class="settings_head main">
             FoxyPress <?php echo(WP_FOXYPRESS_CURRENT_VERSION) ?>
-        </div>		
+        </div>
         <div class="settings_inside">
             <img src="<?php echo(plugins_url())?>/foxypress/img/logo.png" />
-            <p>The FoxyPress Plugin was created to provide users a way to harness the easy to use e-commerce functionality of FoxyCart along with the power of the WordPress Content Management System.</p>		
+            <p>The FoxyPress Plugin was created to provide users a way to harness the easy to use e-commerce functionality of FoxyCart along with the power of the WordPress Content Management System.</p>
             <p>View some of our resources below.</p>
             <a class="button bold" href="http://www.facebook.com/foxypress" target="_blank">Facebook Fan Page</a>
             <a class="button bold" href="http://www.foxy-press.com/faq/" target="_blank">FoxyPress FAQ</a>
@@ -111,7 +111,7 @@ function foxypress_settings_page_load()
     <div id="" class="settings_widefat">
         <div class="settings_head settings">
             Main Settings
-        </div>		
+        </div>
         <div class="settings_inside">
             <table>
                 <tr valign="top">
@@ -163,18 +163,18 @@ function foxypress_settings_page_load()
                 <tr valign="top">
                     <td align="right" valign="top" nowrap>Currency Locale Code</td>
                     <td align="left">
-                        <input type="text" name="foxycart_currency_locale" value="<?php echo get_option('foxycart_currency_locale'); ?>" size="50" /><br />                              
-                        <?php 
+                        <input type="text" name="foxycart_currency_locale" value="<?php echo get_option('foxycart_currency_locale'); ?>" size="50" /><br />
+                        <?php
                         if (!function_exists('money_format'))
                         {
                             echo("Attention, you are using Windows which does not support internationalization. You will be limited to $ or £.");
                         }
                         else
-                        {								
+                        {
                             echo("If you would like to use something other than $ for your currency, enter your locale code. <br />
-                                 <a href=\"http://www.roseindia.net/tutorials/I18N/locales-list.shtml\" target=\"_blank\">View the full list of 
+                                 <a href=\"http://www.roseindia.net/tutorials/I18N/locales-list.shtml\" target=\"_blank\">View the full list of
                                  locale codes.</a><br />
-                                 You must also change your locale setting in FoxyCart by going to Templates -> Language and updating \"store locale\"");                              
+                                 You must also change your locale setting in FoxyCart by going to Templates -> Language and updating \"store locale\"");
                         }
                         ?>
                     </td>
@@ -185,7 +185,7 @@ function foxypress_settings_page_load()
     <div id="" class="settings_widefat">
         <div class="settings_head advanced">
             Advanced Options
-        </div>		
+        </div>
         <div class="settings_inside">
             <table>
                 <tr valign="top">
@@ -209,7 +209,6 @@ function foxypress_settings_page_load()
                         <select name="foxypress_image_mode" id="foxypress_image_mode">
                             <option value="" <?php if($image_mode == "") { echo("selected=\"selected\""); } ?>>Neither</option>
                             <option value="<?php echo(FOXYPRESS_USE_COLORBOX); ?>" <?php if($image_mode == FOXYPRESS_USE_COLORBOX) { echo("selected=\"selected\""); } ?>>Use Colorbox</option>
-                            <option value="<?php echo(FOXYPRESS_USE_LIGHTBOX); ?>" <?php if($image_mode == FOXYPRESS_USE_LIGHTBOX) { echo("selected=\"selected\""); } ?>>Use Lightbox</option>
                         </select><br />
                          *If you choose neither, Foxypress will swap the main image with the thumbnail clicked.
                     </td>
@@ -221,7 +220,7 @@ function foxypress_settings_page_load()
                         *Sets the maximum number of downloads allowed for a downloadable product. <br />
                         You can specify this at a global level here and also at a product level.
                     </td>
-                </tr>  
+                </tr>
                 <tr>
                     <td align="right" valign="top" nowrap>Quantity Alert Level</td>
                     <td align="left">
@@ -229,7 +228,7 @@ function foxypress_settings_page_load()
                         *You will be notified via email when the quantity of an item goes below this threshold. <br />
                         You can set this to 0 or blank if you do not want any notifications.
                     </td>
-                </tr>    
+                </tr>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap>Keep Products On Uninstall</td>
                     <td align="left">
@@ -239,36 +238,36 @@ function foxypress_settings_page_load()
             </table>
         </div>
     </div>
-    
+
     <div id="" class="settings_widefat">
         <div class="settings_head store">
             Store Options
-        </div>		
+        </div>
         <div class="settings_inside">
             <table>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title">Enable Third Party Products</td>
-                    <td align="left">                                
+                    <td align="left">
                         <input type="checkbox" name="foxypress_third_party_products" value="1" <?php echo(((get_option('foxypress_third_party_products') == "1") ? "checked=\"checked\"" : "")) ?> /> *Allow third party products. <br />
                         <p>Select to suppress error messages when not using FoxyPress products.</p>
                     </td>
                 </tr>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title">Enable User Status</td>
-                    <td align="left">                                
+                    <td align="left">
                         <input type="checkbox" name="foxypress_user_portal" value="1" <?php echo(((get_option('foxypress_user_portal') == "1") ? "checked=\"checked\"" : "")) ?> /> *Allows user portal page to be activated. <br />
                         <p>Default usage allows for the portal to live at /user but may be changed in wp-config.php. See the <a href="http://www.foxy-press.com/getting-started/helper-functions-api/" target="_blank">API</a> and <a href="http://www.foxy-press.com/getting-started/wp-config-options/" target="_blank">CONFIG</a> documentation for this functionality.</p>
                     </td>
                 </tr>
             	<tr valign="top">
                     <td align="right" valign="top" nowrap class="title">Enable Cart Validation</td>
-                    <td align="left">                                
+                    <td align="left">
                         <input type="checkbox" name="foxycart_hmac" value="1" <?php echo(((get_option('foxycart_hmac') == "1") ? "checked=\"checked\"" : "")) ?> /> *If you want to take advantage of cart validation, you must enable the cart validation feature in the FoxyCart admin panel under Store->Advanced.
                     </td>
                 </tr>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title">Enable Multi-Ship</td>
-                    <td align="left">                                
+                    <td align="left">
                         <input type="checkbox" name="foxycart_enable_multiship" value="1" <?php echo(((get_option('foxycart_enable_multiship') == "1") ? "checked=\"checked\"" : "")) ?> /> *Allows customers to ship to multiple addresses
                     </td>
                 </tr>
@@ -284,7 +283,7 @@ function foxypress_settings_page_load()
                   <td align="right" valign="top" nowrap>SSO Endpoint</td>
                   <td align="left">
                     <input type="text" name="foxycart_sso_endpoint" id="foxycart_sso_endpoint" value="<?php echo(plugins_url() . "/foxypress/foxysso.php") ?>" size="125" readonly="readonly" /><br />
-                    <p>*FoxyPress can automatically sync your WordPress and FoxyCart users. If you want to take advantage of this feature, copy this url and enable the Single Sign On feature in the FoxyCart admin panel and above in the FoxyPress Settings. Also, be sure to set the 'Customer Password Hash Type' to phpass, portable mode and 'Customer Password Hash Config' to 8 
+                    <p>*FoxyPress can automatically sync your WordPress and FoxyCart users. If you want to take advantage of this feature, copy this url and enable the Single Sign On feature in the FoxyCart admin panel and above in the FoxyPress Settings. Also, be sure to set the 'Customer Password Hash Type' to phpass, portable mode and 'Customer Password Hash Config' to 8
                     </td>
                 </tr>
                 <tr valign="top">
@@ -322,31 +321,31 @@ function foxypress_settings_page_load()
                         <input type="checkbox" name="foxypress_main_blog" value="1" <?php echo(((get_option('foxypress_main_blog') == "1") ? "checked=\"checked\"" : "")) ?> /> *If you mark this as your main site, you will be able to see orders from all of your sub-sites.
                     </td>
                 </tr>
-                <? } ?>                
+                <? } ?>
             </table>
         </div>
     </div>
-     
+
 	<div id="" class="settings_widefat">
         <div class="settings_head custom">
             Packing Slip Wizard Settings
-        </div>		
+        </div>
         <div class="settings_inside">
-            <table>  
+            <table>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap>Header Image</td>
                     <td align="left">
                         <input type="text" name="foxypress_packing_slip_header" size="125" value="<?php echo(get_option('foxypress_packing_slip_header')); ?>" /> <br />
                         *If you would like a custom header image on your packing slip, use the media library to upload an image and set the url here.
                     </td>
-                </tr>   
+                </tr>
 				<tr valign="top">
                     <td align="right" valign="top" nowrap>Default Footer Message</td>
                     <td align="left">
                         <textarea name="foxypress_packing_slip_footer_message" cols="75" rows="3"><?php echo(get_option('foxypress_packing_slip_footer_message')); ?></textarea> <br />
                         *A custom message can be generated for the footer of packing slips.  Set a default here so you don't have to type it each time if you'd prefer.
                     </td>
-                </tr>                
+                </tr>
             </table>
         </div>
     </div>
@@ -354,23 +353,23 @@ function foxypress_settings_page_load()
     <div id="" class="settings_widefat">
         <div class="settings_head custom">
             Custom Instructions
-        </div>		
+        </div>
         <div class="settings_inside">
-            <table>  
+            <table>
                 <tr>
                     <td align="right" valign="top" nowrap class="title">Item Out Of Stock Message</td>
                     <td align="left">
                         <input type="text" name="foxypress_out_of_stock_message" value="<?php echo(get_option("foxypress_out_of_stock_message")) ?>"  size="125" /><br />
                         *Foxypress will show this message instead of the default out of stock message
                     </td>
-                </tr>  
+                </tr>
                  <tr>
                     <td align="right" valign="top" nowrap>Item Unavailable/Inactive Message</td>
                     <td align="left">
                         <input type="text" name="foxypress_inactive_message" value="<?php echo(get_option("foxypress_inactive_message")) ?>" size="125" /><br />
                         *Foxypress will show this message instead of the default unavailable message
                     </td>
-                </tr>                   
+                </tr>
             </table>
         </div>
     </div>
@@ -378,45 +377,45 @@ function foxypress_settings_page_load()
 	<div id="" class="settings_widefat">
         <div class="settings_head custom">
             SMTP Mail Settings
-        </div>		
+        </div>
         <div class="settings_inside">
 			<p>Should you need to configure SMTP settings for secure mail through your webhost, we've allowed you to define these values below.  Keep in mind that these settings are only for mail going out of FoxyPress <i>(order management)</i>.  It will not change your overall WordPress mail() functionality.</p>
-            <table>  
+            <table>
                 <tr>
                     <td align="right" valign="top" nowrap class="title">SMTP Host</td>
                     <td align="left">
                         <input type="text" name="foxypress_smtp_host" value="<?php echo(get_option("foxypress_smtp_host")) ?>"  size="50" /><br />
                         <i>*your smtp host here</i>
                     </td>
-                </tr>  
+                </tr>
                  <tr>
                     <td align="right" valign="top" nowrap>Secure Port (optional)</td>
                     <td align="left">
                         <input type="text" name="foxypress_secure_port" value="<?php echo(get_option("foxypress_secure_port")) ?>" size="50" /><br />
                         <i>*465</i>
                     </td>
-                </tr>       
+                </tr>
 			 	<tr>
                     <td align="right" valign="top" nowrap>Email Username</td>
                     <td align="left">
                         <input type="text" name="foxypress_email_username" value="<?php echo(get_option("foxypress_email_username")) ?>" size="50" /><br />
                         <i>*your full email here</i>
                     </td>
-                </tr>    
+                </tr>
 				 <tr>
                     <td align="right" valign="top" nowrap>Email Password</td>
                     <td align="left">
                         <input type="text" name="foxypress_email_password" value="<?php echo(get_option("foxypress_email_password")) ?>" size="50" /><br />
                         <i>*your email password here</i>
                     </td>
-                </tr>                
+                </tr>
             </table>
         </div>
     </div>
-    
+
      <p class="submit"><input type="submit" class="button-primary" id="btnFoxyPressSettingsSave" name="btnFoxyPressSettingsSave" value="<?php _e('Save Changes') ?>" /></p>
  </form>
- <?php 
+ <?php
  } else { ?>
  <form method="POST">
      <div id="wizard_container">
@@ -437,7 +436,7 @@ function foxypress_settings_page_load()
             <select name="foxycart_storeversion_wizard" width="300" style="width: 300px">
 				<option value="0.7.2">0.7.2</option>
                 <option value="0.7.1">0.7.1</option>
-                <option value="0.7.0">0.7.0</option>             
+                <option value="0.7.0">0.7.0</option>
             </select>
 			<img id="step-two-nav" class="wizard_nav next" src="<?php echo(plugins_url())?>/foxypress/img/next.png" />
         </div>
@@ -452,8 +451,7 @@ function foxypress_settings_page_load()
             <p>By default, FoxyPress comes loaded with the ability to choose different ways to display your photos.  Which will you choose?</p>
             <select name="foxypress_image_mode_wizard" id="foxypress_image_mode_wizard" style="width: 300px">
             	<option value="<?php echo(FOXYPRESS_USE_COLORBOX); ?>">Use Colorbox</option>
-                <option value="<?php echo(FOXYPRESS_USE_LIGHTBOX); ?>">Use Lightbox</option>
-                <option value="">Neither</option>                
+                <option value="">Neither</option>
             </select>
 			<img id="step-one-nav" class="wizard_nav prev" src="<?php echo(plugins_url())?>/foxypress/img/prev.png" />
 			<img id="step-three-nav" class="wizard_nav next" src="<?php echo(plugins_url())?>/foxypress/img/next.png" />
@@ -552,7 +550,7 @@ function foxypress_settings_page_load()
 				return false;
 			});
 		});
-		
+
 		function CheckWizardInputs()
 		{
 			var storedomain = jQuery('#foxycart_storeurl_wizard').val();

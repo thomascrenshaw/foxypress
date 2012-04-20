@@ -2511,10 +2511,10 @@ function foxypress_GetFoxyPressIncludes()
 	}
 	if(get_option('foxypress_image_mode') == FOXYPRESS_USE_LIGHTBOX)
 	{
-		$scripts .= "<script type=\"text/javascript\" src=\"" . plugins_url() ."/foxypress/js/prototype.js\"></script>
+		/*$scripts .= "<script type=\"text/javascript\" src=\"" . plugins_url() ."/foxypress/js/prototype.js\"></script>
 					 <script type=\"text/javascript\" src=\"" . plugins_url() ."/foxypress/js/scriptaculous.js?load=effects,builder\"></script>
 					 <script type=\"text/javascript\" src=\"" . plugins_url() ."/foxypress/js/lightbox.js\"></script>
-					 <link rel=\"stylesheet\" href=\"". plugins_url() ."/foxypress/css/lightbox.css\" type=\"text/css\" media=\"screen\" />";
+					 <link rel=\"stylesheet\" href=\"". plugins_url() ."/foxypress/css/lightbox.css\" type=\"text/css\" media=\"screen\" />";*/
 	}
 	return $scripts;
 }
