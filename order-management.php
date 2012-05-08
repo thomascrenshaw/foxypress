@@ -98,195 +98,6 @@ function order_management_postback()
 			if($switched_blog) { restore_current_blog(); }
 			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID. "&mode=detail&b=" .$BlogID);
 		}
-		else if(isset($_POST['foxy_om_transaction_submit']))
-		{
-			if(foxypress_IsMultiSite() && foxypress_IsMainBlog())
-			{
-				if($wpdb->blogid != $BlogID)
-				{
-					$switched_blog = true;
-					switch_to_blog($BlogID);
-				}
-			}
-			$NewStatus = foxypress_FixPostVar("foxy_om_ddl_status");
-			$TrackingNumber = foxypress_FixPostVar("foxy_om_tracking_number");
-			$RMANumber = foxypress_FixPostVar("foxy_om_rma_number");
-			
-				//get transaction details & current status
-				$tRow = $wpdb->get_row("select * from " . $wpdb->prefix ."foxypress_transaction where foxy_transaction_id = '$TransactionID'");
-				//if it's different check the table to see if we need to send an email
-				if($tRow->foxy_transaction_status != $NewStatus)
-				{
-					$statusEmail = $wpdb->get_row("select * from " . $wpdb->prefix . "foxypress_transaction_status where foxy_transaction_status = '$NewStatus'");
-					if($statusEmail->foxy_transaction_status_email_flag == "1")
-					{
-						if($tRow->foxy_transaction_email != "")
-						{
-							$EmailBody = stripslashes($statusEmail->foxy_transaction_status_email_body);
-							$EmailSubject = $statusEmail->foxy_transaction_status_email_subject;
-
-							$foxyStoreURL = get_option('foxycart_storeurl');
-							$foxyAPIKey =  get_option('foxycart_apikey');
-							$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
-							$foxyData = array();
-							$foxyData["api_token"] =  $foxyAPIKey;
-							$foxyData["api_action"] = "transaction_get";
-							$foxyData["transaction_id"] = $TransactionID;
-							$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
-							$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
-							if($foxyXMLResponse->result == "SUCCESS")
-							{
-								$shipping_method = $foxyXMLResponse->transaction->shipto_shipping_service_description;
-								$shipping_first_name = $foxyXMLResponse->transaction->shipping_first_name;
-								$shipping_last_name = $foxyXMLResponse->transaction->shipping_last_name;
-
-								//get discount code and amount
-								$discounts = "";
-								$d = 1;
-								foreach($foxyXMLResponse->transaction->discounts->discount as $discount)
-								{
-									if ($d == 1) 
-									{
-										$discounts .= $discount->code . ": " . number_format($discount->amount, 2, '.', ',');
-									}
-									else
-									{
-										$discounts .= "<br />" . $discount->code . ": " . number_format($discount->amount, 2, '.', ',');
-									}
-									$d += 1;
-								}
-
-								$product_listing = "<table class='product_listing' width='600'><tbody><tr><td height='20' valign='middle' align='center' bgcolor='#cccccc'>Item</td><td height='20' valign='middle' align='center' bgcolor='#cccccc'>Quantity</td><td height='20' valign='middle' align='center' bgcolor='#cccccc'>Price</td></tr>";
-								$total_product_price = 0;
-								foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
-								{
-									$options = "";
-									$Downloadable = false;
-									$Inventory_ID = "";
-									foreach($td->transaction_detail_options->transaction_detail_option as $opt)
-									{
-										if(strtolower($opt->product_option_name) == "inventory_id")
-										{
-											$Inventory_ID = $opt->product_option_value;
-										}
-										else
-										{
-											$options .=  $opt->product_option_name . ": " . $opt->product_option_value . "<br>";
-										}
-									}								
-																		
-									//check if the item is a downloadable
-									$dt_downloadable = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_downloadables WHERE inventory_id = '" . mysql_escape_string($Inventory_ID) . "' and status = '1'");
-									if(!empty($dt_downloadable) && count($dt_downloadable) > 0)
-									{
-										$Downloadable = true;
-									}	
-											
-									//check to see if we need to show downloadable information
-									if($Downloadable && $Inventory_ID != "")
-									{
-										$dt = $wpdb->get_row("SELECT dt.* 
-															  FROM " . $wpdb->prefix . "foxypress_inventory_downloadables as d 
-															  INNER JOIN " . $wpdb->prefix . "foxypress_downloadable_transaction as dt on dt.downloadable_id = d.downloadable_id
-																								and dt.foxy_transaction_id = '" . $foxyXMLResponse->transaction->id . "'
-															  WHERE d.inventory_id = '" . mysql_escape_string($Inventory_ID) . "'");
-										//generate url
-										$DownloadURL = plugins_url() . "/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($dt->download_transaction_id)) . "&b=" . urlencode(foxypress_Encrypt($BlogID));
-										$options .= "<a href=\"" . $DownloadURL . "\">Download</a><br />";	
-									}			
-									
-									$ProductCode = $td->product_code;
-
-									// Check for image custom field
-									$third_party_image = "";
-									if (get_option('foxypress_third_party_products') == "1" && $td->image != "")
-									{
-										$third_party_image = $td->image;
-									}
-
-									$ProductImage = "";
-									if($third_party_image != "")
-									{
-										$ProductImage = "<img src=\"" . $third_party_image . "\" style=\"width: 100px; \" width=\"100\"/>";
-									}
-									else if($Inventory_ID != "")
-									{						
-										$ProductImage = "<img src=\"" . foxypress_GetMainInventoryImage($Inventory_ID) . "\" style=\"width: 100px; \" width=\"100\"/>";					
-									}
-									$total_product_price = (double)$td->product_price * $td->product_quantity;
-									$product_listing .="<tr><td valign='top' align='left'><table><tbody><tr>" .
-														"<td valign='top' align='left' width='120'>" . $ProductImage . "</td>" .
-														"<td valign='top' align='left'>Product: " . $td->product_name . "<br />" .
-														(($ProductCode != "") ? "Code: " . $ProductCode . "<br />" : "") .
-														"Weight: " . $td->product_weight . "<br />" .
-														$options .
-														"</td></tr></tbody></table></td>" .
-														"<td valign='top' align='center'>" . $td->product_quantity . "</td>" .
-														"<td valign='top' align='center'>" . foxypress_FormatCurrency($total_product_price) . "</td></tr>";
-									$all_products_price =  $all_products_price + $total_product_price;				
-								}
-								$product_listing .= "</tbody></table>";
-							  
-								//replace fields
-								$EmailSubject = str_replace("{{order_id}}", $tRow->foxy_transaction_id, $EmailSubject);
-
-								$EmailBody = str_replace("{{order_id}}", $tRow->foxy_transaction_id, $EmailBody);
-								$EmailBody = str_replace("{{customer_first_name}}", $tRow->foxy_transaction_first_name, $EmailBody);
-								$EmailBody = str_replace("{{customer_last_name}}", $tRow->foxy_transaction_last_name, $EmailBody);
-								$EmailBody = str_replace("{{customer_email}}", $tRow->foxy_transaction_email, $EmailBody);	
-								$EmailBody = str_replace("{{tracking_number}}", $TrackingNumber, $EmailBody);
-								$EmailBody = str_replace("{{customer_billing_address1}}", $tRow->foxy_transaction_billing_address1, $EmailBody);
-								$EmailBody = str_replace("{{customer_billing_address2}}", $tRow->foxy_transaction_billing_address2, $EmailBody);
-								$EmailBody = str_replace("{{customer_billing_city}}", $tRow->foxy_transaction_billing_city, $EmailBody);
-								$EmailBody = str_replace("{{customer_billing_state}}", $tRow->foxy_transaction_billing_state, $EmailBody);
-								$EmailBody = str_replace("{{customer_billing_zip}}", $tRow->foxy_transaction_billing_zip, $EmailBody);
-								$EmailBody = str_replace("{{customer_billing_country}}", $tRow->foxy_transaction_billing_country, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_first_name}}", $shipping_first_name, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_last_name}}", $shipping_last_name, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_address1}}", $tRow->foxy_transaction_shipping_address1, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_address2}}", $tRow->foxy_transaction_shipping_address2, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_city}}", $tRow->foxy_transaction_shipping_city, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_state}}", $tRow->foxy_transaction_shipping_state, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_zip}}", $tRow->foxy_transaction_shipping_zip, $EmailBody);
-								$EmailBody = str_replace("{{customer_shipping_country}}", $tRow->foxy_transaction_shipping_country, $EmailBody);
-								$EmailBody = str_replace("{{order_date}}", $tRow->foxy_transaction_date, $EmailBody);
-								$EmailBody = str_replace("{{product_total}}", foxypress_FormatCurrency($all_products_price), $EmailBody);
-								$EmailBody = str_replace("{{tax_total}}", $tRow->foxy_transaction_tax_total, $EmailBody);
-								$EmailBody = str_replace("{{shipping_total}}", $tRow->foxy_transaction_shipping_total, $EmailBody);
-								$EmailBody = str_replace("{{shipping_method}}", $shipping_method, $EmailBody);
-								$EmailBody = str_replace("{{order_total}}", $tRow->foxy_transaction_order_total, $EmailBody);
-								$EmailBody = str_replace("{{cc_type}}", $tRow->foxy_transaction_cc_type, $EmailBody);
-								$EmailBody = str_replace("{{product_listing}}", $product_listing, $EmailBody);
-								$EmailBody = str_replace("{{discount_codes}}", str_replace('-', '-$', $discounts), $EmailBody);
-
-								
-								if(preg_match_all("/{{custom_field_.*?}}/", $EmailBody, $matches))
-								{
-									foreach($matches[0] as $match=>$custom_tag)
-									{			
-										$EmailBody = str_replace($custom_tag, foxypress_FixPostVar("foxy_om_" . $custom_tag), $EmailBody);
-									}
-								}	
-
-								//check if user decided to fill out SMTP form
-								foxypress_Mail($tRow->foxy_transaction_email, $EmailSubject, $EmailBody);
-
-							}//end check for success
-							else
-							{
-								echo("FoxyCart Connection Error. Email was not sent.");
-							}
-						}
-					}
-				}
-
-				//save transaction status
-				$sql = "update " . $wpdb->prefix ."foxypress_transaction SET foxy_transaction_status = '$NewStatus', foxy_transaction_trackingnumber = '$TrackingNumber', foxy_transaction_rmanumber = '$RMANumber' WHERE foxy_transaction_id = '$TransactionID'";
-				$wpdb->query($sql);
-
-				if($switched_blog) { restore_current_blog(); }
-				header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID. "&mode=detail&b=" . $BlogID . "&updated=true");
-		}
 		else if($Page_Action == "previewslip")
 		{
 			foxypress_PrintPackingSlip(true, false);
@@ -541,10 +352,6 @@ function order_management_page_load()
 	else if($Page_Mode == "detail")
 	{
 		$TransactionID = foxypress_FixGetVar("transaction", "");
-		$Updated = foxypress_FixGetVar("updated", "");
-		if($Updated=="true"){
-			$message = ' Status Saved Sucessfully';
-		} 
 		if($TransactionID == "")
 		{
 			echo("Invalid Transaction ID");
@@ -581,11 +388,21 @@ function order_management_page_load()
 				{
 					foreach ( $TransactionStatuses as $ts )
 					{
+						if ($tRow->foxy_transaction_status == $ts->foxy_transaction_status)
+						{
+							$trans_status_desc = stripslashes($ts->foxy_transaction_status_description);
+						}
+
 						$StatusList .= "<option value=\"" . $ts->foxy_transaction_status . "\"" . (($tRow->foxy_transaction_status == $ts->foxy_transaction_status) ? " selected='selected'" : "") . ">" . stripslashes($ts->foxy_transaction_status_description) . "</option>";
 					}
 				}
 				$HasSameBillingAndShipping = ($tRow->foxy_transaction_shipping_address1 == "");
-				echo("<h3>Transaction Details</h3>
+				echo("<ul class=\"subsubsub\">
+						<li class=\"order-management\"><a href=\"" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management\">Order Management</a> |</li>
+						<li class=\"" . $trans_status_desc . "\"><a href=\"" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&status=" . $tRow->foxy_transaction_status . "&mode=list&b=" . $tRow->foxy_blog_id . "\">" . $trans_status_desc . "</a> |</li>
+						<li class=\"order-number\">" . $foxyXMLResponse->transaction->id . "</li>
+					</ul>
+					<br><br><h3>Transaction Details</h3>
 					<div>
 						Transaction ID: " . $foxyXMLResponse->transaction->id . " &nbsp; Date: " . $foxyXMLResponse->transaction->transaction_date . "
 					</div> <br>
@@ -609,8 +426,8 @@ function order_management_page_load()
 									<td><input type=\"text\" name=\"foxy_om_rma_number\" id=\"foxy_om_rma_number\" value=\"" .  $tRow->foxy_transaction_rmanumber . "\" /></td>
 								</tr>
 								<tr>
-									<td></td>
-									<td><input type=\"submit\" id=\"foxy_om_transaction_submit\" name=\"foxy_om_transaction_submit\" value=\"Save\" />" . $message . "</td>
+									<td><input type=\"hidden\" name=\"foxy_user_session_id\" id=\"foxy_user_session_id\" value=\"" . session_id() . "\" /><input type=\"hidden\" name=\"foxy_baseurl\" id=\"foxy_baseurl\" value=\"" . plugins_url() . "/foxypress/ajax.php" . "\" /><input type=\"hidden\" name=\"foxy_transaction_submit_id\" id=\"foxy_transaction_submit_id\" value=\"" . $TransactionID . "\" /></td>
+									<td><input type=\"submit\" id=\"foxy_om_transaction_submit\" name=\"foxy_om_transaction_submit\" value=\"Save\" /> <img src=\"" . plugins_url() . "/foxypress/img/ajax-loader.gif\" id=\"foxypress_transaction_submit_loading\" name=\"foxypress_transaction_submit_loading\" style=\"display:none;\" /><span id=\"transaction_submit_msg\"></span></td>
 								</tr>
 							</table>
 						</form>
@@ -1403,6 +1220,43 @@ function Begin_Foxy_Order_Management()
 {
 	?>
     <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/jquery.qtip.js"></script>
+    <script type="text/javascript">
+    	jQuery(document).ready(function() {
+    		jQuery('#foxy_om_transaction_submit').click(function(){
+				transaction_id = jQuery('#foxy_transaction_submit_id').val();
+				baseurl = jQuery('#foxy_baseurl').val();
+				sid = jQuery('#foxy_user_session_id').val();
+				status = jQuery('#foxy_om_ddl_status').val();
+				tracking_num = jQuery('#foxy_om_tracking_number').val();
+				rma_num = jQuery('#foxy_om_rma_number').val();
+
+				foxypress_transaction_submit(baseurl, sid, status, tracking_num, rma_num)
+
+				return false;
+			});
+
+			function foxypress_transaction_submit(baseurl, sid, status, tracking_num, rma_num)
+			{
+				jQuery('#foxypress_transaction_submit_loading').show();
+				jQuery('#transaction_submit_msg').html("");
+				var url = baseurl + "?m=transaction_submit&sid=" + sid + "&transaction_id=" + transaction_id + "&status=" + status + "&tracking_num=" + tracking_num + "&rma_num=" + rma_num;
+				jQuery.ajax({
+								url : url,
+								type : "GET",
+								datatype : "json",
+								cache : "false",
+								success : function(data){
+									if (data.ajax_status !== 'ok') {
+										alert(data.ajax_status);
+									}
+
+									jQuery('#foxypress_transaction_submit_loading').hide();
+									jQuery('#transaction_submit_msg').html("Status Updated Successfully");
+								}
+							});
+			}
+		});
+	</script>
 	<div class="wrap">
     	<h2><?php _e('Order Management','order-management'); ?></h2>
         <div>

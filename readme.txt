@@ -5,15 +5,13 @@ Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscr
 Requires at least: 3.0
 Tested up to: 3.3
 Stable tag: 3.0.1
-FoxyPress is a one stop shopping cart and management tool for use with FoxyCart's hosted e-commerce solution.
+FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
 == Description ==
 
-FoxyPress is a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
+FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. Take an in-depth look at some of our major features below, aimed to help alleviate the stress of building your site, so you can focus on making your products shine.
 
-FoxyPress was built to make the integration of FoxyCart and WordPress effortless and easy to understand. Our ever growing features and fantastic support make it easy to get your store up and running quickly!
-
-Visit <a href="http://www.foxy-press.com" target="_blank">www.foxy-press.com</a> for documentation, examples, and webcasts to help you get started.
+The FoxyPress Team bases their features on their customers' needs, so if you don't see a tool you need, they will build it for you. For more information or to submit a request, visit <a href="http://www.foxy-press.com" target="_blank">Foxy-Press.com</a>.
 
 [vimeo http://vimeo.com/22047284]
 
@@ -25,6 +23,7 @@ Visit <a href="http://www.foxy-press.com" target="_blank">www.foxy-press.com</a>
 * Inventory management
 * Digital Products
 * Demo Store - <a href="http://demo.foxy-press.com" target="_blank">http://demo.foxy-press.com</a>
+* Knowledgebase/Tutorials - <a href="http://forum.foxy-press.com" target="_blank">http://forum.foxy-press.com</a>
 
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum user requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
@@ -43,6 +42,11 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - MamaDoo Kids - Status Management enhancements
 
 == Changelog ==
+
+= 0.4.1.1 =
+* Feature: Modified status change in order management details to be an AJAX call rather than full postback.
+* Feature: Added breadcrumb area above transaction details for easy navigation back to previous status.
+* Feature: New KnowledgeBase articles available <a href="http://forum.foxy-press.com/" target="_blank">here</a>.
 
 = 0.4.1 =
 * Feature: Added the ability to use placeholders in Status emails. 
