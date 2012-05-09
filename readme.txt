@@ -5,7 +5,7 @@ Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscr
 Requires at least: 3.0
 Tested up to: 3.3
 Stable tag: 3.0.1
-FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
+FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution.
 
 == Description ==
 
