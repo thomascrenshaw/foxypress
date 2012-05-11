@@ -326,7 +326,7 @@ Copy the folder to your WordPress
 2. Go to '*FoxyPress / Manage Settings*' in your WordPress admin.
 3. Enter your FoxyCart domain.
 4. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
-5. See installation documentation <a href="http://www.foxy-press.com/documentation/installation-instructions/" target="_blank">here</a>.
+5. See installation documentation <a href="http://forum.foxy-press.com/kb/installation-instructions/installation-instructions" target="_blank">here</a>.
 
 [vimeo http://vimeo.com/21743308]
 
@@ -336,9 +336,9 @@ Copy the folder to your WordPress
 
 Yes, you do. Please signup for a FoxyCart account <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182" target="_blank">here</a>.
 
-**Where do I submit requests for new features or any comments I have?**
+**Where can I get help or view tutorials on how to use the plugin?**
 
-Go to the <a href="http://www.foxy-press.com/forum" target="_blank">FoxyPress Forum</a> to submit your question/comment/feature request.
+Go to the <a href="http://forum.foxy-press.com/home" target="_blank">FoxyPress Forum</a> to submit your question/comment/feature request.
 
 View a full list of questions on our <a href="http://www.foxy-press.com/frequently-asked-questions/" target="_blank">site</a>.
 
