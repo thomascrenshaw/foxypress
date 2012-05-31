@@ -43,6 +43,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.1 =
+* BugFix: Fixed IE8 issue found in order management when changing statuses.  If you use IE8 or lower and you changed statuses on orders since the last release of 0.4.1.1, you might need to search for those orders and fix the transaction status. Contact us if you need additional help.
+
 = 0.4.2 =
 * Feature: Import/Export now supports images and all product options.
 * Feature: Affiliate Management - administrators can now upload banners for their affiliates. <a href="http://forum.foxy-press.com/kb/affiliate-management/create-and-edit-an-affiliate-banner" target="_blank">Tutorial</a> - These can be shown on the Affiliate stats page through our API. <a href="http://forum.foxy-press.com/kb/api-usage/query-affiliate-banners" target="_blank">Tutorial</a>
