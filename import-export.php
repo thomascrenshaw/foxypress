@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 add_action('admin_init', 'import_export_postback');
@@ -81,7 +81,7 @@ function import_export_postback()
 						
 						$Product_Code = mysql_escape_string($row[0]);
 						$Product_Name = mysql_escape_string($row[1]);
-						$Product_Description = mysql_escape_string($row[2]);
+						$Product_Description = $row[2];
 						$Product_Categories = $row[3];
 						$Product_Price = mysql_escape_string(str_replace('$','',$row[4]));
 						$Product_SalePrice =  mysql_escape_string(str_replace('$','',$row[5]));
@@ -173,11 +173,11 @@ function import_export_postback()
 									foreach($OptionsExploded as $Option)
 									{
 										$OptionExploded = explode("|", $Option);
-										if(count($OptionExploded) == 6)
+										if(count($OptionExploded) == 9)
 										{
 											//get option group id
 											$OptionGroupID = foxypress_GetOptionGroupID($OptionExploded[0]);					
-											$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_active, option_order) values ('$inventory_id', '" . $OptionGroupID . "', '" . mysql_escape_string($OptionExploded[1]) . "', '" . mysql_escape_string($OptionExploded[2]) . "' , '" . mysql_escape_string(str_replace('$','',$OptionExploded[3])) . "', '" . mysql_escape_string($OptionExploded[4]) . "', '" . mysql_escape_string($OptionExploded[5]) . "')");
+											$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active, option_order) values ('$inventory_id', '" . $OptionGroupID . "', '" . mysql_escape_string($OptionExploded[1]) . "', '" . mysql_escape_string($OptionExploded[2]) . "' , '" . mysql_escape_string(str_replace('$','',$OptionExploded[3])) . "', '" . mysql_escape_string($OptionExploded[4]) . "', '" . mysql_escape_string($OptionExploded[5]) . "', '" . mysql_escape_string($OptionExploded[6]) . "', '" . mysql_escape_string($OptionExploded[7]) . "', '" . mysql_escape_string($OptionExploded[8]) . "')");
 										}					
 									}
 								}
@@ -237,7 +237,7 @@ function import_export_postback()
 			}//end if uploaded
 			else 
 			{
-				$error = "Invalid Data";	
+				$error = 'Invalid Data';	
 			}
 		}//end if posted
 		else if(isset($_POST['export_submit'])) //start export
@@ -269,7 +269,8 @@ function import_export_postback()
 			$row[] = 'Item Start Date';	
 			$row[] = 'Item End Date';	
 			$row[] = 'Item Active';				
-			
+			$row[] = 'Item Images';
+						
 			//$data .= join(',', $row)."\r\n";		
 			$list[] = $row;
 			foxypress_GetImportExportCategories();
@@ -325,6 +326,20 @@ function import_export_postback()
 						}
 					}			
 					
+					//get images
+					$images = "";
+					//get images
+					$imageList = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
+					if(!empty($imageList))
+					{
+						foreach ($imageList as $img) 
+						{
+							$image_source = wp_get_attachment_image_src($img->ID, "full");
+							$images .= ($images == "") ? $image_source[0] : "|" . $image_source[0];							
+						}
+					}
+					
+					
 					//write row					
 					$row = array(); //clear previous items
 					$row[] = get_post_meta($item->ID, "_code", true);
@@ -350,12 +365,12 @@ function import_export_postback()
 					$row[] = get_post_meta($item->ID,'_sub_enddate',TRUE);
 					$row[] = get_post_meta($item->ID,'_item_start_date',TRUE);
 					$row[] = get_post_meta($item->ID,'_item_end_date',TRUE);
-					$row[] = get_post_meta($item->ID,'_item_active',TRUE);										
+					$row[] = get_post_meta($item->ID,'_item_active',TRUE);		
+					$row[] = $images;								
 					//$data .= join(',', $row)."\r\n";	
 					$list[] = $row;
 				}
 			}
-	
 			if (file_exists(WP_PLUGIN_DIR . "/foxypress/Export.csv")) 
 			{
 				unlink(WP_PLUGIN_DIR . "/foxypress/Export.csv");
@@ -412,17 +427,35 @@ function foxypress_GetImportExportCategories()
 function import_export_page_load()
 {
 	global $error;
+	
+	//for($i=0; $i <= 50; $i++)
+	//{
+		$url = "http://www.thenerdmachine.com/wp-content/uploads/2011/10/fp_m134w9oz7s_1.jpg";
+		$img = file_get_contents($url);		
+		
+		if($img)
+		{
+			//echo("true <Br>");	
+		}
+		else
+		{
+			//echo("false <br>");	
+		}
+	//}
+	
+	//exit;
+	
 	?>
 	<div class="wrap">
 		<div id="" class="settings_widefat">
 			<div class="settings_head settings">
-	            <?php _e('Import Inventory','status-management'); ?>
+	            <?php _e('Import Inventory','foxypress'); ?>
 	        </div>
 	        <div>
-	            <p>We recommend reading the import instructions before selecting a file to upload.  When you are ready, simply browse to the file and click import.</p>
+	            <p><?php _e('We recommend reading the import instructions before selecting a file to upload.  When you are ready, simply browse to the file and click import.', 'foxypress'); ?></p>
 				<form method="POST" enctype="multipart/form-data" id="frmImport" name="frmImport">
 	                <input type="file" name="file_import" id="file_import" /> 
-	                <input type="submit" name="file_submit" id="file_submit" value="Import" /> 
+	                <input type="submit" name="file_submit" id="file_submit" value="<?php _e('Import', 'foxypress'); ?>" /> 
 	                <?php
 						if( $error != "" && isset($_POST['file_submit']) )
 						{
@@ -435,12 +468,12 @@ function import_export_page_load()
         <br />
 		<div id="" class="settings_widefat">
 			<div class="settings_head advanced">
-	            <?php _e('Export Inventory','status-management'); ?>
+	            <?php _e('Export Inventory','foxypress'); ?>
 	        </div>
 	        <div>
-	        	<p>Click the button below to export an excel document of your inventory.</p>
+	        	<p><?php _e('Click the button below to export an excel document of your inventory', 'foxypress'); ?>.</p>
 				<form method="POST" id="frmExport" name="frmExport">
-	            	<input type="submit" name="export_submit" id="export_submit" value="Export" /> 
+	            	<input type="submit" name="export_submit" id="export_submit" value="<?php _e('Export', 'foxypress'); ?>" /> 
 	                <?php
 						if( $error != "" && isset($_POST['export_submit']) )
 						{
@@ -453,64 +486,65 @@ function import_export_page_load()
 		<br />
 		<div id="" class="settings_widefat">
 			<div class="settings_head custom">
-	            <?php _e('Import Notes - read before importing','status-management'); ?>
+	            <?php _e('Import Notes - read before importing','foxypress'); ?>
 	        </div>		
 			<table>
 				<tr>
 					<td valign="top" width="325px;">
 						<ul>
-							<li><b>Column Order</b>
+							<li><b><?php _e('Column Order', 'foxypress'); ?></b>
 								<ul style="list-style-type:disc;margin-left:40px;">
-				                    <li>Item Code</li>
-				                    <li>Item Name</li>
-				                    <li>Item Description</li>
-				                    <li>Item Category</li>
-				                    <li>Item Price</li>
-				                    <li>Item Sale Price</li>
-				                    <li>Item Sale Start Date</li>
-				                    <li>Item Sale End Date</li>
-				                    <li>Item Weight</li>
-				                    <li>Item Quantity</li>
-				                    <li>Item Quantity Min</li>
-				                    <li>Item Quantity Max</li>
-				                    <li>Item Options</li>
-				                    <li>Item Attributes</li>
-				                    <li>Item Discount Quantity Amount</li>
-				                    <li>Item Discount Quantity Percentage</li>
-				                    <li>Item Discount Price Amount</li>
-				                    <li>Item Discount Price Percentage</li>
-				                    <li>Subscription Frequency</li>
-				                    <li>Subscription Start Date</li>
-				                    <li>Subscription End Date</li>
-				                    <li>Item Start Date</li>
-				                    <li>Item End Date</li>
-				                    <li>Item Active</li>
+				                    <li><?php _e('Item Code', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Name', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Description', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Category', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Price', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Sale Price', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Sale Start Date', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Sale End Date', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Weight', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Quantity', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Quantity Min', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Quantity Max', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Options', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Attributes', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Discount Quantity Amount', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Discount Quantity Percentage', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Discount Price Amount', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Discount Price Percentage', 'foxypress'); ?></li>
+				                    <li><?php _e('Subscription Frequency', 'foxypress'); ?></li>
+				                    <li><?php _e('Subscription Start Date', 'foxypress'); ?></li>
+				                    <li><?php _e('Subscription End Date', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Start Date', 'foxypress'); ?></li>
+				                    <li><?php _e('Item End Date', 'foxypress'); ?></li>
+				                    <li><?php _e('Item Active', 'foxypress'); ?></li>
 								</ul>
 							</li>
 						</ul>
 					</td>
 					<td valign="top">
 						<ul>
-							<li><b>Formatting Notes</b>
+							<li><b><?php _e('Formatting Notes', 'foxypress'); ?></b>
 								<ul style="list-style-type:disc;margin-left:40px;">
-									<li>Categories must match exactly with categories that you have created in foxypress. If there are multiple categories for an item you can split them up by using "|" (without quotes). 
-										<br /><b>Example:</b> General|Shirts|Fun Items
+									<li><?php _e('Categories must match exactly with categories that you have created in foxypress. If there are multiple categories for an item you can split them up by using "|" (without quotes)', 'foxypress'); ?>. 
+										<br /><?php _e("<b>Example:</b> General|Shirts|Fun Items", "foxypress"); ?>
 									</li>
-									<li>Price does not need to have a currency symbol</li>
-									<li>Options will be in this format: Option Group Name|Option Name|Option Value|Option Extra Price|Option Extra Weight|Option Code|Option Quantity|Active|Sort Order
+									<li><?php _e('Price does not need to have a currency symbol', 'foxypress'); ?></li>
+									<li><?php _e('Options will be in this format: Option Group Name|Option Name|Option Value|Option Extra Price|Option Extra Weight|Option Code|Option Quantity|Active|Sort Order', 'foxypress'); ?>
 										<ul style="list-style-type:disc;margin-left:40px;">
-											<li>Active can be either 1(true) or 0(false)</li>
-											<li>Option Group Name must match exactly with option groups that you have created in foxypress.</li>
-											<li>Multiple options can be imported by using "~~" (without quotes) between sets.
-												<br /><b>Example:</b> Color|Red|red|0.00|0|mycode|100|1|5~~Color|Blue|blue|0.00|0|mycode|100|1|6
+											<li><?php _e('Active can be either 1(true) or 0(false)', 'foxypress'); ?></li>
+											<li><?php _e('Option Group Name must match exactly with option groups that you have created in foxypress', 'foxypress'); ?>.</li>
+											<li><?php _e('Multiple options can be imported by using "~~" (without quotes) between sets', 'foxypress'); ?>.
+												<br /><?php _e("<b>Example:</b> Color|Red|red|0.00|0|mycode|100|1|5~~Color|Blue|blue|0.00|0|mycode|100|1|6", "foxypress"); ?>
 											</li>
+                                        </ul>
 									</li>
 								</ul>
 							</li>
-							<li>Attributes will be in this format: Attribute Name|Attribute Value
+							<li><?php _e('Attributes will be in this format: Attribute Name|Attribute Value', 'foxypress'); ?>
 								<ul style="list-style-type:disc;margin-left:40px;">
-									<li>Multiple attributes can be imported by using "~~" (without quotes) between sets.
-										<br /><b>Example:</b> MyAttributeName|MyValue~~AnotheName|AnotherValue
+									<li><?php _e('Multiple attributes can be imported by using "~~" (without quotes) between sets', 'foxypress'); ?>.
+										<br /><?php _e("<b>Example:</b> MyAttributeName|MyValue~~AnotheName|AnotherValue", 'foxypress'); ?>
 									</li>
 								</ul>
 							</li>

@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 	session_start();
@@ -93,7 +93,7 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 			{
 				//restore blog
 				if($switched_blog) { restore_current_blog(); }
-				echo("Sorry, this download is no longer valid, you have reached maximum number of downloads");
+				_e('Sorry, this download is no longer valid, you have reached maximum number of downloads');
 				exit;
 			}
 		}
@@ -101,7 +101,7 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 		{
 			//restore blog
 			if($switched_blog) { restore_current_blog(); }
-			echo("Invalid Download ID");
+			_e('Invalid Download ID');
 			exit;
 		}	
 	}
@@ -109,7 +109,7 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 	{
 		//restore blog
 		if($switched_blog) { restore_current_blog(); }
-		echo("Invalid Download ID");
+		_e('Invalid Download ID');
 		exit;
 	}
 ?>

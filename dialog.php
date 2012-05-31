@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 	/** Load WordPress Administration Bootstrap */
@@ -60,7 +60,7 @@ Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.
 "http://www.w3.org/TR/html4/loose.dtd">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>FoxyPress Plugin</title>
+<title><?php _e('FoxyPress Plugin', 'foxypress'); ?></title>
 <script type="text/javascript" src="../../../wp-includes/js/tinymce/tiny_mce_popup.js"></script>
 <script type="text/javascript" src="js/dialog.js"></script>
 <script type="text/javascript" language="javascript">
@@ -186,7 +186,7 @@ function ShowCategoryListing()
     	<table class="center">
         	<tr>
             	<td>
-                	 <span class="DialogHeading">Show Items From:</span>
+                	 <span class="DialogHeading"><?php _e('Show Items From', 'foxypress'); ?>:</span>
                 </td>
                 <td>
                 	<select id="foxy_category_listing" name="foxy_category_listing">
@@ -200,32 +200,32 @@ function ShowCategoryListing()
                 </td>
 			</tr>
             <tr>
-            	<td><span class="DialogHeading">Show Add To Cart:</span> </td>
+            	<td><span class="DialogHeading"><?php _e('Show Add To Cart', 'foxypress'); ?>:</span> </td>
             	<td>
                 	<select id="foxy_show_addtocart" name="foxy_show_addtocart">
-                    	<option value="0">No</option>
-                        <option value="1">Yes</option>
+                    	<option value="0"><?php _e('No', 'foxypress'); ?></option>
+                        <option value="1"><?php _e('Yes', 'foxypress'); ?></option>
                     </select>
                 </td>
             </tr>
             <tr>
-            	<td><span class="DialogHeading">Items Per Page:</span> </td>
+            	<td><span class="DialogHeading"><?php _e('Items Per Page', 'foxypress'); ?>:</span> </td>
             	<td><input type="text" id="foxy_paging_items" name="foxy_paging_items" value="10" maxlength="3" /></td>
             </tr>
             <tr>
-            	<td><span class="DialogHeading">Items Per Row:</span> </td>
+            	<td><span class="DialogHeading"><?php _e('Items Per Row', 'foxypress'); ?>:</span> </td>
             	<td><input type="text" id="foxy_paging_itemsperrow" name="foxy_paging_itemsperrow" value="2" maxlength="3" /></td>
             </tr>
-            <td><span class="DialogHeading">Show More Detail Link:</span> </td>
+            <td><span class="DialogHeading"><?php _e('Show More Detail Link', 'foxypress'); ?>:</span> </td>
             	<td>
                 	<select id="foxy_show_moredetail" name="foxy_show_moredetail">
-                    	<option value="0">No</option>
-                        <option value="1" selected="selected">Yes</option>
+                    	<option value="0"><?php _e('No', 'foxypress'); ?></option>
+                        <option value="1" selected="selected"><?php _e('Yes', 'foxypress'); ?>Yes</option>
                     </select>
                 </td>
             <tr>
             	<td>&nbsp;</td>
-            	<td><input type="button" onclick="InsertCategory();" value="Go" name="foxy_lsting_button" id="foxy_lsting_button" /></td>
+            	<td><input type="button" onclick="InsertCategory();" value="<?php _e('Go', 'foxypress'); ?>" name="foxy_lsting_button" id="foxy_lsting_button" /></td>
             </tr>
         </table>
     </form>
@@ -240,18 +240,18 @@ function SearchResults($searchitems)
 	if ( !empty($searchitems) ) {
     ?>
     <div style="width:100%; text-align:center;">
-    	<span class="DialogHeading">Search Results</span>
+    	<span class="DialogHeading"><?php _e('texthere', 'foxypress'); ?>Search Results</span>
     </div>
     <form onsubmit="FoxyPressDialog.insert();return false;" id="foxypress-search-insert" action="#">
-        <div class="DialogHeading">Add Item From Inventory</div>
+        <div class="DialogHeading"><?php _e('texthere', 'foxypress'); ?>Add Item From Inventory</div>
         <table class="widefat page fixed" cellpadding="3" cellspacing="0" style="clear: both; width: 100%; margin-bottom: 15px;">
             <thead>
                 <tr class="inventory-head-row">
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Select','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Image','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Code','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Name','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Price','inventory') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Select','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Image','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Code','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Name','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Price','foxypress') ?></th>
                 <?php
                 $class = '';
                 foreach ( $searchitems as $item ) {
@@ -284,8 +284,8 @@ function SearchResults($searchitems)
  	else
   	{
 		?>
-		<div class="centertext"><?php _e("There are no items matching your search",'inventory')  ?></div>
-        <div class="centertext"><a href="<?=foxypress_GetCurrentPageURL()?>">Full Inventory List</a></div>
+		<div class="centertext"><?php _e("There are no items matching your search",'foxypress')  ?></div>
+        <div class="centertext"><a href="<?=foxypress_GetCurrentPageURL()?>"><?php _e('Full Inventory List', 'foxypress'); ?></a></div>
     <?
   }
 }
@@ -295,7 +295,8 @@ function ShowSearch()
 	?>
     <div class="centertext">
         <form method="POST" name="foxy_inventory_search_frm" id="foxy_inventory_search_frm">
-            <span class="DialogHeading">Search Inventory:</span> <input type="text" id="foxy_search" name="foxy_search" /> <input type="submit" value="Go" name="foxy_search_button" id="foxy_search_button" />
+            <span class="DialogHeading"><?php _e('Search Inventory', 'foxypress'); ?>:</span> <input type="text" id="foxy_search" name="foxy_search" /> 
+			<input type="submit" value="<?php _e('Go', 'foxypress'); ?>" name="foxy_search_button" id="foxy_search_button" />
         </form>
     </div><Br>
     <hr /><br />
@@ -332,18 +333,18 @@ function ShowInventory()
   if ( !empty($items) ) {
     ?>
     <div style="width:100%; text-align:center;">
-    	<span class="DialogHeading">Add Item From Inventory</span>
+    	<span class="DialogHeading"><?php _e('Add Item From Inventory', 'foxypress'); ?></span>
     </div>
     <form onsubmit="FoxyPressDialog.insert();return false;" id="foxypress-insert" action="#">
     	<input id="code" name="code" type="hidden" class="text" size="30" value="" />
         <table class="widefat page fixed" cellpadding="3" cellspacing="0" style="clear: both; width: 100%; margin-bottom: 15px;">
             <thead>
                 <tr class="inventory-head-row">
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Select','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Image','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Code','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Name','inventory') ?></th>
-                    <th class="manage-column inventory-heading" scope="col"><?php _e('Price','inventory') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Select','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Image','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Code','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Name','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Price','foxypress') ?></th>
                 <?php
                 $class = '';
                 foreach ( $items as $item ) {
@@ -375,7 +376,7 @@ function ShowInventory()
 		if($drRows->RowCount > $limit)
 		{
 			$Pagination = foxypress_GetPagination($pageNumber, $drRows->RowCount, $limit, $targetpage, 'fp_pn');
-			echo ("<Br>" . $Pagination);
+			echo ("<br />" . $Pagination);
 		}
 		?>
 	</form>
@@ -384,7 +385,7 @@ function ShowInventory()
  	else
   	{
 		?>
-		<div class="centertext"><?php _e("There are no inventory items in the database!",'inventory')  ?></div>
+		<div class="centertext"><?php _e("There are no inventory items in the database!",'foxypress')  ?></div>
     <?
   }
 }

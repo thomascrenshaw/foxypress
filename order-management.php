@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 $plugin_dir = basename(dirname(__FILE__));
@@ -98,6 +98,28 @@ function order_management_postback()
 			if($switched_blog) { restore_current_blog(); }
 			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID. "&mode=detail&b=" .$BlogID);
 		}
+		else if(isset($_POST['foxy_om_submit_customer']))
+		{
+			if(foxypress_IsMultiSite() && foxypress_IsMainBlog())
+			{
+				if($wpdb->blogid != $BlogID)
+				{
+					$switched_blog = true;
+					switch_to_blog($BlogID);
+				}
+			}
+			$Cust_LastName = foxypress_FixPostVar("foxy_om_cust_lastname");
+			$Cust_FirstName = foxypress_FixPostVar("foxy_om_cust_firstname");
+			$Cust_Email = foxypress_FixPostVar("foxy_om_cust_email");
+			$updateSQL = "update " . $wpdb->prefix ."foxypress_transaction" . "
+						set foxy_transaction_last_name = '$Cust_LastName'
+							,foxy_transaction_first_name = '$Cust_FirstName'
+							,foxy_transaction_email = '$Cust_Email'
+						where foxy_transaction_id = '$TransactionID'";
+			$wpdb->query($updateSQL);
+			if($switched_blog) { restore_current_blog(); }
+			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID. "&mode=detail&b=" .$BlogID);
+		}
 		else if($Page_Action == "previewslip")
 		{
 			foxypress_PrintPackingSlip(true, false);
@@ -156,12 +178,12 @@ function order_management_page_load()
 							   group by foxy_transaction_status )
 						lj on ts.foxy_transaction_status = lj.StatusID";
 			$TransactionStatuses = $wpdb->get_results($sql);
-			_e('<h3>View Orders</h3>');
+			_e('<h3>View Orders</h3>', 'foxypress');
 			echo("<table class=\"widefat page fixed\">
 					<thead>
 						<tr>
-							<th class=\"manage-column\" scope=\"col\">Order Status</th>
-							<th class=\"manage-column\" scope=\"col\">Status Quantity</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Order Status', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Status Quantity', 'foxypress') . "</th>
 						</tr>
 					</thead>");
 			if( !empty($TransactionStatuses) )
@@ -219,8 +241,8 @@ function order_management_page_load()
 							  <table class=\"widefat page fixed\">
 								<thead>
 									<tr>
-										<th class=\"manage-column\" scope=\"col\">Order Status</th>
-										<th class=\"manage-column\" scope=\"col\">Status Quantity</th>
+										<th class=\"manage-column\" scope=\"col\">" . __('Order Status', 'foxypress') . "</th>
+										<th class=\"manage-column\" scope=\"col\">" . __('Status Quantity', 'foxypress') . "</th>
 									</tr>
 								</thead>");
 					if( !empty($TransactionStatuses) )
@@ -250,14 +272,14 @@ function order_management_page_load()
 			
 			//get last sync date
 		$foxypress_transaction_sync_timestamp = get_option("foxypress_transaction_sync_timestamp");
-			_e('<h3>Sync Transactions </h3>');
-			echo("Please click the button below to sync your latest transactions from FoxyCart.<br>
+			_e('<h3>Sync Transactions </h3>', 'foxypress');
+			echo(__('Please click the button below to sync your latest transactions from FoxyCart.', 'foxypress') . "<br />
 				   <form id=\"syncForm\" name=\"syncForm\" method=\"POST\">
 					<div>
-						<input type=\"button\" id=\"foxy_om_sync_now\"  name=\"foxy_om_sync_now\" value=\"Sync Latest Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE. "&page=order-management', '" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&action=sync', '" . plugins_url() . "/foxypress/img/ajax-loader.gif', true);\" /> 
-						<input type=\"button\" id=\"foxy_om_sync_all\"  name=\"foxy_om_sync_all\" value=\"Sync All Transactions\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management', '" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&action=syncall', '" . plugins_url() . "/foxypress/img/ajax-loader.gif', true);\" />
+						<input type=\"button\" id=\"foxy_om_sync_now\"  name=\"foxy_om_sync_now\" value=\"" . __('Sync Latest Transactions', 'foxypress') . "\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE. "&page=order-management', '" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&action=sync', '" . plugins_url() . "/foxypress/img/ajax-loader.gif', true);\" /> 
+						<input type=\"button\" id=\"foxy_om_sync_all\"  name=\"foxy_om_sync_all\" value=\"" . __('Sync All Transactions', 'foxypress') . "\" onclick=\"SyncTransactionsJS('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management', '" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&action=syncall', '" . plugins_url() . "/foxypress/img/ajax-loader.gif', true);\" />
 						<span id=\"foxy_om_sync\"></span>
-						<br><i>Last Synchronized: " . $foxypress_transaction_sync_timestamp . "</i>
+						<br><i>" . __('Last Synchronized', 'foxypress') . ": " . $foxypress_transaction_sync_timestamp . "</i>
 					</div>
 				  </form>");
 		}
@@ -277,14 +299,14 @@ function order_management_page_load()
 			$TransactionFilter = ($Transaction_Type == "1") ? " and foxy_transaction_is_test='1'" : (($Transaction_Type == "0") ? " and foxy_transaction_is_test='0'" : "");
 			$Status = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_transaction_status WHERE foxy_transaction_status = '$List_Status'");
 			if ( !empty($Status) ) {
-				_e('<h3>View your ' . $Status->foxy_transaction_status_description . ' orders:</h3>');				
+				_e('<h3>View your ' . $Status->foxy_transaction_status_description . ' orders:</h3>', 'foxypress');				
 			}
 			
 			echo("<form id=\"foxy_om_filter_form\" name=\"foxy_om_filter_form\" method=\"POST\" \">
 				 	<select id=\"foxy_om_transaction_type_filter\" name=\"foxy_om_transaction_type_filter\" onChange=\"RedirectFilter()\">
-						<option value=\"" . $basePage  . "\"" . (($Transaction_Type == "") ? "selected='selected'" : "") . ">All Transactions</option>
-						<option value=\"". $basePage . "&transactiontype=0" . "\"" . (($Transaction_Type == "0") ? "selected='selected'" : "") . ">Live Transactions</option>
-						<option value=\"". $basePage . "&transactiontype=1" ."\"" . (($Transaction_Type == "1") ? "selected='selected'" : ""). ">Test Transactions</option>
+						<option value=\"" . $basePage  . "\"" . (($Transaction_Type == "") ? "selected='selected'" : "") . ">" . __('All Transactions', 'foxypress') . "</option>
+						<option value=\"". $basePage . "&transactiontype=0" . "\"" . (($Transaction_Type == "0") ? "selected='selected'" : "") . ">" . __('Live Transactions', 'foxypress') . "</option>
+						<option value=\"". $basePage . "&transactiontype=1" ."\"" . (($Transaction_Type == "1") ? "selected='selected'" : ""). ">" . __('Test Transactions', 'foxypress') . "</option>
 				 	</select>
 				 </form> <br>");
 			$targetpage = $basePage . "&transactiontype=" . $Transaction_Type;
@@ -304,19 +326,19 @@ function order_management_page_load()
 												order by foxy_transaction_id desc 
 												LIMIT $start, $limit");
 			echo("<select onchange=\"HandleBulkAction(this.value, '" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&b=" . $wpdb->blogid . "&action=printslip')\" id=\"foxypress_bulk_select\">
-					<option value=\"\">Bulk Actions</option>
-					<option value=\"bulk_print\">Print Packing Slip(s)</option>
+					<option value=\"\">" . __('Bulk Actions', 'foxypress') . "</option>
+					<option value=\"bulk_print\">" . __('Print Packing Slip(s)', 'foxypress') . "</option>
 				</select><br /><br />");
 			echo("<table class=\"widefat page fixed\">
 					<thead>
 						<tr>
 							<th class=\"small-column\" scope=\"col\"><input type=\"checkbox\" name=\"foxypress_bulk_all\" onclick=\"BulkSelectAll(this.checked);\" /></th>
-							<th class=\"manage-column\" scope=\"col\">Transaction ID</th>
-							<th class=\"manage-column\" scope=\"col\">Date of Order</th>
-							<th class=\"manage-column\" scope=\"col\">Name</th>
-							<th class=\"manage-column\" scope=\"col\">Email</th>
-							<th class=\"medium-column\" scope=\"col\">Packing Slip</th>
-							<th class=\"manage-column\" scope=\"col\">Tracking</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Transaction ID', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Date of Order', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Name', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Email', 'foxypress') . "</th>
+							<th class=\"medium-column\" scope=\"col\">" . __('Packing Slip', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Tracking', 'foxypress') . "</th>
 						</tr>
 					</thead>");
 			if ( !empty($Transactions) ) {
@@ -336,13 +358,13 @@ function order_management_page_load()
 			}
 			else
 			{
-				echo("<tr><td colspan=\"4\">There are currently no orders with this transaction status</td></tr>");
+				_e("<tr><td colspan=\"4\">There are currently no orders with this transaction status</td></tr>", "foxypress");
 			}
 			echo("</table>");
 			if($drRows->RowCount > $limit)
 			{
 				$Pagination = foxypress_GetPagination($pageNumber, $drRows->RowCount, $limit, $targetpage);
-				echo("<Br>" . $Pagination);
+				echo("<br />" . $Pagination);
 			}
 			
 			
@@ -402,7 +424,7 @@ function order_management_page_load()
 						<li class=\"" . $trans_status_desc . "\"><a href=\"" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&status=" . $tRow->foxy_transaction_status . "&mode=list&b=" . $tRow->foxy_blog_id . "\">" . $trans_status_desc . "</a> |</li>
 						<li class=\"order-number\">" . $foxyXMLResponse->transaction->id . "</li>
 					</ul>
-					<br><br><h3>Transaction Details</h3>
+					<br><br><h3>" . __('Transaction Details', 'foxypress') . "</h3>
 					<div>
 						Transaction ID: " . $foxyXMLResponse->transaction->id . " &nbsp; Date: " . $foxyXMLResponse->transaction->transaction_date . "
 					</div> <br>
@@ -410,7 +432,7 @@ function order_management_page_load()
 						<form method=\"POST\" name=\"statusForm\" id=\"statusForm\">
 							<table>
 								<tr>
-									<td align=\"right\">Status</td>
+									<td align=\"right\">" . __('Status', 'foxypress') . "</td>
 									<td>
 										<select id=\"foxy_om_ddl_status\" name=\"foxy_om_ddl_status\">"
 										. $StatusList .
@@ -418,11 +440,11 @@ function order_management_page_load()
 									</td>
 								</tr>
 								<tr>
-									<td align=\"right\">Tracking Number</td>
+									<td align=\"right\">" . __('Tracking Number', 'foxypress') . "</td>
 									<td><input type=\"text\" name=\"foxy_om_tracking_number\" id=\"foxy_om_tracking_number\" value=\"" .  $tRow->foxy_transaction_trackingnumber . "\" /></td>
 								</tr>
 								<tr>
-									<td align=\"right\">RMA Number</td>
+									<td align=\"right\">" . __('RMA Number', 'foxypress') . "</td>
 									<td><input type=\"text\" name=\"foxy_om_rma_number\" id=\"foxy_om_rma_number\" value=\"" .  $tRow->foxy_transaction_rmanumber . "\" /></td>
 								</tr>
 								<tr>
@@ -432,18 +454,37 @@ function order_management_page_load()
 							</table>
 						</form>
 					</div>
-					<h3>Customer Details</h3>
-                    <div>
-                    	Name: " . $foxyXMLResponse->transaction->customer_last_name  . ", " . $foxyXMLResponse->transaction->customer_first_name .
-						"<br> Email: " . $foxyXMLResponse->transaction->customer_email .
-						"<br> Phone: " . $foxyXMLResponse->transaction->customer_phone . 	
-                    "</div> <br><br>
+					<div id=\"divViewCustomer\">
+						<h3>" . __('Customer Details', 'foxypress') . " <a style=\"font-weight:normal;font-size:12px;\" href=\"javascript:ToggleEditCustomer();\">" . __('(edit)', 'foxypress') . "</a></h3>
+                    	" . __('Name', 'foxypress') . ": " . $tRow->foxy_transaction_last_name  . ", " . $tRow->foxy_transaction_first_name .
+						"<br> " . __('Email', 'foxypress') . ": " . $tRow->foxy_transaction_email .
+						"<br> " . __('Phone', 'foxypress') . ": " . $foxyXMLResponse->transaction->customer_phone . 	
+                    "</div>
+                    <div id=\"divEditCustomer\" class=\"Hide\">													
+						<form name=\"CustomerForm\" id=\"CustomerForm\" method=\"POST\">
+							<div><h3>" . __('Customer Details', 'foxypress') . " <a style=\"font-weight:normal;font-size:12px;\" href=\"javascript:ToggleEditCustomer();\">" . __('(cancel)', 'foxypress') . "</a></h3></div>
+							<table>
+								<tr>
+									<td>" . __('Name', 'foxypress') . "</td>
+									<td><input type=\"text\" value=\"" . $tRow->foxy_transaction_last_name . "\" id=\"foxy_om_cust_lastname\" name=\"foxy_om_cust_lastname\" /> <input type=\"text\" value=\"" . $tRow->foxy_transaction_first_name . "\" id=\"foxy_om_cust_firstname\" name=\"foxy_om_cust_firstname\" /></td>
+								</tr>
+								<tr>
+									<td>" . __('Email', 'foxypress') . "</td>
+									<td><input type=\"text\" value=\"" . $tRow->foxy_transaction_email . "\" id=\"foxy_om_cust_email\" name=\"foxy_om_cust_email\" style=\"width:200px;\" /></td>
+								</tr>
+							</table>
+							<div><input type=\"submit\" id=\"foxy_om_submit_customer\" name=\"foxy_om_submit_customer\" value=\"" . __('Save Customer Information', 'foxypress') . "\" /></div>
+						</form>
+						</td>
+						</tr>
+						</table>
+					</div><br><br>
 					<div id=\"divViewAddress\">
 						<table>
 							<tr>
 								<td valign=\"top\" style=\"padding-right:30px;\">
 								<div>
-									<b>Billing Address</b> <a href=\"javascript:ToggleEdit();\">(edit)</a> <br />" .
+									<b>" . __('Billing Address', 'foxypress') . "</b> <a href=\"javascript:ToggleEdit();\">" . __('(edit)', 'foxypress') . "</a> <br />" .
 									$foxyXMLResponse->transaction->customer_last_name . " " . $foxyXMLResponse->transaction->customer_first_name . "<br />" .
 									$tRow->foxy_transaction_billing_address1 . " " .  $tRow->foxy_transaction_billing_address2 . "<br />" .
 									$tRow->foxy_transaction_billing_city . ", " . $tRow->foxy_transaction_billing_state . " " . $tRow->foxy_transaction_billing_zip . " " . $tRow->foxy_transaction_billing_country .
@@ -451,7 +492,7 @@ function order_management_page_load()
 								</td>
 								<td valign=\"top\">
 								<div>
-									<b>Shipping Address</b> <a href=\"javascript:ToggleEdit();\">(edit)</a><br />" .
+									<b>" . __('Shipping Address', 'foxypress') . "</b> <a href=\"javascript:ToggleEdit();\">" . __('(edit)', 'foxypress') . "</a><br />" .
 									(($foxyXMLResponse->transaction->shipping_last_name!="") ? $foxyXMLResponse->transaction->shipping_last_name : $foxyXMLResponse->transaction->customer_last_name ) . " " .  (($foxyXMLResponse->transaction->shipping_first_name!="") ? $foxyXMLResponse->transaction->shipping_first_name : $foxyXMLResponse->transaction->customer_first_name ) . "<br />" .
 									(
 										($HasSameBillingAndShipping) ?
@@ -468,21 +509,21 @@ function order_management_page_load()
 					</div>
 					<div id=\"divEditAddress\" class=\"Hide\">
 						<table>
-													<tr>
+							<tr>
 								<td valign=\"top\" style=\"padding-right:30px;\">
-						<form name=\"AddressForm\" id=\"AddressForm\" method=\"POST\">
-							<div><b>Billing Address</b> <a href=\"javascript:ToggleEdit();\">(cancel)</a></div>
+							<form name=\"AddressForm\" id=\"AddressForm\" method=\"POST\">
+							<div><b>" . __('Billing Address', 'foxypress') . "</b> <a href=\"javascript:ToggleEdit();\">" . __('(cancel)', 'foxypress') . "</a></div>
 							<table>
 								<tr>
-									<td>Address 1</td>
+									<td>" . __('Address 1', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $tRow->foxy_transaction_billing_address1 . "\" id=\"foxy_om_txtBillingAddress1\" name=\"foxy_om_txtBillingAddress1\" /></td>
 								</tr>
 								<tr>
-									<td>Address 2</td>
+									<td>" . __('Address 2', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $tRow->foxy_transaction_billing_address2 . "\" id=\"foxy_om_txtBillingAddress2\" name=\"foxy_om_txtBillingAddress2\" /></td>
 								</tr>
 								<tr>
-									<td>City, State, Zip</td>
+									<td>" . __('City, State, Zip', 'foxypress') . "</td>
 									<td>
 										<input type=\"text\" value=\"" . $tRow->foxy_transaction_billing_city . "\" id=\"foxy_om_txtBillingCity\" name=\"foxy_om_txtBillingCity\" />
 										<input type=\"text\" value=\"" . $tRow->foxy_transaction_billing_state . "\" id=\"foxy_om_txtBillingState\" name=\"foxy_om_txtBillingState\" maxlength=\"2\" size=\"4\" />
@@ -492,18 +533,18 @@ function order_management_page_load()
 							</table><br>
 							</td>
 								<td valign=\"top\">
-							<div><b>Shipping Address</b> <a href=\"javascript:ToggleEdit();\">(cancel)</a></div>
+							<div><b>" . __('Shipping Address', 'foxypress') . "</b> <a href=\"javascript:ToggleEdit();\">" . __('texthere', 'foxypress') . "(cancel)</a></div>
 							<table>
 								<tr>
-									<td>Address 1</td>
+									<td>" . __('Address 1', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $tRow->foxy_transaction_shipping_address1 . "\" id=\"foxy_om_txtShippingAddress1\" name=\"foxy_om_txtShippingAddress1\" /></td>
 								</tr>
 								<tr>
-									<td>Address 2</td>
+									<td>" . __('Address 2', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $tRow->foxy_transaction_shipping_address2 . "\" id=\"foxy_om_txtShippingAddress2\" name=\"foxy_om_txtShippingAddress2\" /></td>
 								</tr>
 								<tr>
-									<td>City, State, Zip</td>
+									<td>" . __('City, State, Zip', 'foxypress') . "</td>
 									<td>
 										<input type=\"text\" value=\"" . $tRow->foxy_transaction_shipping_city . "\" id=\"foxy_om_txtShippingCity\" name=\"foxy_om_txtShippingCity\" />
 										<input type=\"text\" value=\"" . $tRow->foxy_transaction_shipping_state . "\" id=\"foxy_om_txtShippingState\" name=\"foxy_om_txtShippingState\" maxlength=\"2\" size=\"4\" />
@@ -511,16 +552,16 @@ function order_management_page_load()
 									</td>
 								</tr>
 							</table>
-							<div><input type=\"submit\" id=\"foxy_om_submit_Address\" name=\"foxy_om_submit_Address\" value=\"Save Address Information\" /></div>
+							<div><input type=\"submit\" id=\"foxy_om_submit_Address\" name=\"foxy_om_submit_Address\" value=\"" . __('Save Address Information', 'foxypress') . "\" /></div>
 						</form>
 						</td>
-													</tr>
+						</tr>
 						</table>
 					</div>
 					<br>");
 
 				//show transaction info
-				echo("<div><b>Transaction Details</b></div>
+				echo("<div><b>" . __('Transaction Details', 'foxypress') . "</b></div>
 					   <table>
 						<tr>");
 				$i=1;
@@ -558,7 +599,7 @@ function order_management_page_load()
 											  WHERE d.inventory_id = '" . mysql_escape_string($Inventory_ID) . "'");
 						//generate url
 						$DownloadURL = plugins_url() . "/foxypress/download.php?d=" . urlencode(foxypress_Encrypt($dt->downloadable_id)) . "&t=" . urlencode(foxypress_Encrypt($dt->download_transaction_id)) . "&b=" . urlencode(foxypress_Encrypt($BlogID));
-						$options .= "<a href=\"" . $DownloadURL . "\">Downloadable Link</a><br />";	
+						$options .= "<a href=\"" . $DownloadURL . "\">" . __('Downloadable Link', 'foxypress') . "</a><br />";	
 						$options .= "Download Count: <span id=\"foxypress_downloadable_count\">" . $dt->download_count . "</span> <a href=\"javascript:ResetDownloadCount('" . plugins_url() . "/foxypress/ajax.php" . "', '" . session_id() . "', '" . $dt->downloadable_id . "', '" . $dt->download_transaction_id . "');\">Reset</a> <img src=\"" . plugins_url() . "/foxypress/img/ajax-loader.gif\" id=\"foxypress_downloadable_loading\" name=\"foxypress_downloadable_loading\" style=\"display:none;\" /><br />";
 					}			
 					
@@ -598,7 +639,7 @@ function order_management_page_load()
 				}
 				if($HiddenFields != "")
 				{
-					_e("<div><b>Hidden Fields</b></div>");
+					_e("<div><b>Hidden Fields</b></div>", "foxypress");
 					_e($HiddenFields);
 					_e("<br>");
 				}
@@ -608,16 +649,16 @@ function order_management_page_load()
 				   "<div>Tax Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->tax_total) . "</div>" .
 				   "<div>Shipping Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->shipping_total) . "</div>" .
 				   "<div>Order Total: " . foxypress_FormatCurrency($foxyXMLResponse->transaction->order_total) . "</div>" .
-				   "<div>Credit Card Type: " . $tRow->foxy_transaction_cc_type . "</div>");
+				   "<div>Credit Card Type: " . $tRow->foxy_transaction_cc_type . "</div>", "foxypress");
 					
 				//show notes
-				echo("<div><h3>Notes</h3></div>");
+				_e("<div><h3>Notes</h3></div>", "foxypress");
 				echo("<table class=\"widefat page fixed\">
 						<thead>
 							<tr>
-								<th class=\"manage-column\" scope=\"col\">Note</th>
-								<th class=\"manage-column\" scope=\"col\">Posted By</th>
-								<th class=\"manage-column\" scope=\"col\">Date</th>
+								<th class=\"manage-column\" scope=\"col\">" . __('Note', 'foxypress') . "</th>
+								<th class=\"manage-column\" scope=\"col\">" . __('Posted By', 'foxypress') . "</th>
+								<th class=\"manage-column\" scope=\"col\">" . __('Date', 'foxypress') . "</th>
 								<th class=\"manage-column\" scope=\"col\">&nbsp;</th>
 							</tr>
 						</thead>");				
@@ -644,25 +685,25 @@ function order_management_page_load()
 					echo("<tr><td colspan=\"4\">There are currently no notes</td></tr>");
 				}
 				echo("</table>");			
-				echo("<h3>New Note</h3>");
+				_e("<h3>New Note</h3>", "foxypress");
 				//show form for new notes
 				echo("<form name=\"noteForm\" id=\"noteform\" method=\"POST\">
 					   	<textarea id=\"foxy_om_note\" name=\"foxy_om_note\" cols=\"50\" rows=\"3\"></textarea> <br>
-						<input type=\"submit\" name=\"foxy_om_note_submit\" id=\"foxy_om_note_submit\" value=\"Add Note\" />
+						<input type=\"submit\" name=\"foxy_om_note_submit\" id=\"foxy_om_note_submit\" value=\"" . __('Add Note', 'foxypress') . "\" />
 					  </form>");
 				
 				//email
 				//show general info
-                echo("<h3>Send Email</h3>");
+                _e("<h3>Send Email</h3>", "foxypress");
 				$t_options=$wpdb->get_results("SELECT * FROM " . $wpdb->prefix ."foxypress_email_templates");
 				if(count($t_options)==0){	
 					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s','manage-emails', 'new');
-					echo"You do not have any email templates defined.  Add one <a href='" . $destination_url . "'>here</a>.";
+					_e("You do not have any email templates defined.  Add one <a href='" . $destination_url . "'>here</a>.", "foxypress");
 				}else{
 					$PostURL = foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID . "&b=" . $BlogID . "&mode=detail#email";
 					if(!isset($_POST['foxy_om_email_template_submit'])) { echo "<a name=\"email\"></a>"; }
 					echo "<form method=\"POST\" name=\"sendEmailForm\" id=\"sendEmailForm\" action=\"" . $PostURL . "\">
-							Select Template:
+							" . __('Select Template', 'foxypress') . ":
 							<select name='foxy_om_ddl_email_template' id='foxy_om_ddl_email_template'>";				
 					foreach ( $t_options as $te ) 
 					{
@@ -684,14 +725,14 @@ function order_management_page_load()
 						}
 						echo "</table>";
 					}						
-					echo "<br /><div><input type=\"submit\" id=\"foxy_om_email_template_submit\" name=\"foxy_om_email_template_submit\" value=\"Send Email\" /></div>";
+					echo "<br /><div><input type=\"submit\" id=\"foxy_om_email_template_submit\" name=\"foxy_om_email_template_submit\" value=\"" . __('Send Email', 'foxypress') . "\" /></div>";
 				}					 
 				echo "</form>";
 					  
 			}//end check for success
 			else
 			{
-				echo("Invalid Transaction ID");
+				_e("Invalid Transaction ID", "foxypress");
 			}
 			
 			//restore blog in case we are on the main blog viewing sub site orders
@@ -730,21 +771,21 @@ function order_management_page_load()
 				}				
 				$productList .= "<li><input type=\"checkbox\" name=\"foxypress_packing_products[]\" value=\"" . $temp_inventory_id . "|" . $td->product_code . "\" checked=\"checked\" /> " . $td->product_name . " (" . $td->product_code . ")</li>";
 			}
-			_e('<h3>Create a Partial Packing slip</h3>');
-			_e('<p>Below is a wizard that will guide you through creating a packing slip.  You may not want to include all of your items, for a partial order perhaps, so feel free to modify your slip and preview it until it looks correct.</p>');
+			_e('<h3>Create a Partial Packing slip</h3>', 'foxypress');
+			_e('<p>Below is a wizard that will guide you through creating a packing slip.  You may not want to include all of your items, for a partial order perhaps, so feel free to modify your slip and preview it until it looks correct.</p>', 'foxypress');
 	?>
 		<form method="POST">
 		     <div id="packing_wizard_container">
 		        <ul class="packing_wizard_menu">
-		            <li id="step-one" class="active">Step 1</li>
-		            <li id="step-two">Step 2</li>
-		            <li id="step-three">Step 3</li>
+		            <li id="step-one" class="active"><?php _e('Step 1', 'foxypress'); ?></li>
+		            <li id="step-two"><?php _e('Step 2', 'foxypress'); ?></li>
+		            <li id="step-three"><?php _e('Step 3', 'foxypress'); ?></li>
 		        </ul>
 		
 		        <span class="wizard_clear"></span>
 		        <div class="wizard_tab_content step-one">
-					<p>You've chosen to create a packing slip for <?php echo($TransactionID); ?>.</p>
-					<p>Please choose which products you'd like to include on this packing slip, then click the next arrow below.</p>
+					<p><?php _e('You\'ve chosen to create a packing slip for', 'foxypress'); ?> <?php echo($TransactionID); ?>.</p>
+					<p><?php _e('Please choose which products you\'d like to include on this packing slip, then click the next arrow below.', 'foxypress'); ?></p>
 		            <ul>
 						<?php echo($productList); ?>
 					</ul>
@@ -752,16 +793,16 @@ function order_management_page_load()
 		        </div>
 		
 		        <div class="wizard_tab_content step-two">
-		            <p>Now that you've selected your products, please enter your custom message that will appear on the packing slip.</p>
-					<p class="label">Message/Notes</p>
+		            <p><?php _e('Now that you\'ve selected your products, please enter your custom message that will appear on the packing slip.', 'foxypress'); ?></p>
+					<p class="label"><?php _e('Message/Notes', 'foxypress'); ?></p>
 					<textarea class="message_notes" id="foxypress_packing_notes" name="foxypress_packing_notes"><?php echo(get_option('foxypress_packing_slip_footer_message')); ?></textarea>
 					<img id="step-one-nav" class="wizard_nav prev" src="<?php echo(plugins_url())?>/foxypress/img/prev.png" />
 					<img id="step-three-nav" class="wizard_nav next" src="<?php echo(plugins_url())?>/foxypress/img/next.png" />
 		        </div>
 		        <div class="wizard_tab_content step-three">
-		           <p>All of your information has been collected and now you may preview your packing slip.  If something looks wrong, feel free to go backwards through the wizard and modify it.</p>
+					<p><?php _e('All of your information has been collected and now you may preview your packing slip.  If something looks wrong, feel free to go backwards through the wizard and modify it.', 'foxypress'); ?></p>
 					<?php echo("<a href=\"javascript:PrintSlip('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID . "&b=" . $wpdb->blogid . "&action=previewslip');\">Preview Packing Slip</a>");?>
-					<p>Everything look ok?</p>
+					<p><?php _e('Everything look ok?', 'foxypress'); ?></p>
 					<p class="submit">
                     <input type="button" class="button-primary" id="btnFoxyPressPackingSlipWizardPrint" name="btnFoxyPressPackingSlipWizardPrint" value="<?php _e('Print Packing Slip') ?>" onclick="<?php echo("javascript:PrintSlip('" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID . "&b=" . $wpdb->blogid . "&action=printpartialslip');return false;");?>" />
 				</p>
@@ -859,7 +900,7 @@ function order_management_page_load()
 		}
 		else
 		{
-			echo("Invalid Transaction ID");	
+			_e("Invalid Transaction ID", "foxypress");	
 		}
 	}
 	//check to see how much time has passed since the last time we synched. If it has been more than 10 minutes, sync it up.
@@ -920,7 +961,7 @@ function foxypress_SendEmailTemplate($templateID, $transactionID)
 	}	
 	
     foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from);
-	echo("<div class='updated' id='message'>Your email message has been successfully sent!</div>");
+	echo("<div class='updated' id='message'>" . __('Your email message has been successfully sent!', 'foxypress') . "</div>");
 }
 
 function foxypress_PrintPackingSlip($partialSlip, $printPage)
@@ -936,8 +977,8 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 	
 	if(!$printPage)
 	{
-		_e('<h3>Preview Your Packing Slip</h3>');
-		_e('<p>This is what your packing slip will look like:</p>');
+		_e('<h3>Preview Your Packing Slip</h3>', 'foxypress');
+		_e('<p>This is what your packing slip will look like:</p>', 'foxypress');
 	}
 	//get transaction
 	$foxyStoreURL = get_option('foxycart_storeurl');
@@ -1089,10 +1130,10 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 	<div class="wrapper">
         <?php if($HeaderImage != "") { echo("<div class=\"header\"><img src=\"" . $HeaderImage . "\" /></div>"); } ?>
 		<div class="order_details">
-			<span>Order Date</span> <?php echo($foxyXMLResponse->transaction->transaction_date); ?>
+			<span><?php _e('Order Date', 'foxypress'); ?></span> <?php echo($foxyXMLResponse->transaction->transaction_date); ?>
 		</div>
 		<div class="order_details">
-			<span>Order Number</span> <?php echo($TransactionID); ?>
+			<span><?php _e('Order Number', 'foxypress'); ?></span> <?php echo($TransactionID); ?>
 		</div>
 		<div class="customer_information">
 			<div class="bill_to">
@@ -1119,16 +1160,16 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 			</div>
 			<div class="clearall"></div><br />
 			<? if($foxyXMLResponse->transaction->shipto_shipping_service_description!=""){
-				echo("<div class='shipped_via'>Shipped via: " . $foxyXMLResponse->transaction->shipto_shipping_service_description . "</div>");
+				_e("<div class='shipped_via'>Shipped via: " . $foxyXMLResponse->transaction->shipto_shipping_service_description . "</div>", "foxypress");
 			}?>			
 			<div class="clearall"></div>
 		</div>
 		<hr class="breaker" />
 		<div class="product_information">
 			<div class="product_headers">
-				<div class="sku">SKU</div>
-				<div class="qty">QTY</div>
-				<div class="name">PRODUCT</div>
+				<div class="sku"><?php _e('SKU', 'foxypress'); ?></div>
+				<div class="qty"><?php _e('QTY', 'foxypress'); ?></div>
+				<div class="name"><?php _e('PRODUCT', 'foxypress'); ?></div>
 			</div>
             <?php echo($productList); ?>
 			<div class="clearall"></div>
@@ -1155,7 +1196,7 @@ function ProcessSearch($SearchValue)
 	global $wpdb;
 	if($SearchValue == "")
 	{
-		echo("Invalid search term, please try again. You can search by First Name, Last Name, or Transaction ID.");
+		_e("Invalid search term, please try again. You can search by First Name, Last Name, or Transaction ID.", "foxypress");
 	}
 	else
 	{
@@ -1186,11 +1227,11 @@ function ProcessSearch($SearchValue)
 		echo("<br><table class=\"widefat page fixed\">
 					<thead>
 						<tr>
-							<th class=\"manage-column\" scope=\"col\">Transaction ID</th>
-							<th class=\"manage-column\" scope=\"col\">Date of Order</th>
-							<th class=\"manage-column\" scope=\"col\">Name</th>
-							<th class=\"manage-column\" scope=\"col\">Email</th>
-							<th class=\"manage-column\" scope=\"col\">Tracking</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Transaction ID', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Date of Order', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Name', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Email', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Tracking', 'foxypress') . "</th>
 						</tr>
 					</thead>");
 		if( !empty($Transactions) )
@@ -1210,7 +1251,7 @@ function ProcessSearch($SearchValue)
 		}
 		else
 		{
-			echo("<tr><td colspan=\"4\">Your search did not return any results, please try again</td></tr>");
+			_e("<tr><td colspan=\"4\">Your search did not return any results, please try again</td></tr>", "foxypress");
 		}
 		echo("</table>");
 	}
@@ -1258,9 +1299,9 @@ function Begin_Foxy_Order_Management()
 		});
 	</script>
 	<div class="wrap">
-    	<h2><?php _e('Order Management','order-management'); ?></h2>
+    	<h2><?php _e('Order Management','foxypress'); ?></h2>
         <div>
-            <div><i>Search by First Name, Last Name, or Transaction ID</i></div>            
+            <div><i><?php _e('Search by First Name, Last Name, or Transaction ID', 'foxypress'); ?></i></div>            
             <form name="foxy_om_search" id="foxy_om_search" class="wrap" method="post">
             	<input type="hidden" name="foxy_om_mode" id="foxy_om_mode" value="search" />
                 <div id="linkadvanceddiv" class="postbox">
@@ -1314,6 +1355,21 @@ function End_Foxy_Order_Management($NeedsSync)
 					jQuery('#divViewAddress').removeClass("Hide");
 				}
 			}
+
+			function ToggleEditCustomer()
+			{
+				var show = jQuery('#divEditCustomer').hasClass("Hide");
+				if(show)
+				{
+					jQuery('#divEditCustomer').removeClass("Hide");
+					jQuery('#divViewCustomer').addClass("Hide");
+				}
+				else
+				{
+					jQuery('#divEditCustomer').addClass("Hide");
+					jQuery('#divViewCustomer').removeClass("Hide");
+				}
+			}
 			
 			function RedirectFilter()
 			{
@@ -1344,7 +1400,7 @@ function End_Foxy_Order_Management($NeedsSync)
 				{
 					jQuery('#foxy_om_sync').html('<img src="' + loadingimage + '" />');
 					jQuery.get(fullurl, function(data) {
-					  jQuery('#foxy_om_sync').html('Synchronization Complete <a href="' + baseurl + '">Refresh Page</a>');
+					  jQuery('#foxy_om_sync').html('<?php _e('Synchronization Complete', 'foxypress'); ?> <a href="' + baseurl + '"><?php _e('Refresh Page', 'foxypress'); ?></a>');
 					});
 				}
 				else

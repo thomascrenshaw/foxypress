@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 $plugin_dir = basename(dirname(__FILE__));
@@ -87,24 +87,24 @@ function status_management_page_load()
             <form id="statusForm" name="statusForm" method="POST">
             	<table style="float:left; width:650px">
                 	<tr>
-                    	<td>Status ID &nbsp;</td>
+                    	<td><?php _e('Status ID', 'foxypress'); ?> &nbsp;</td>
                         <td><?php echo($drStatus->foxy_transaction_status) ?></td>
                     </tr>
                     <tr>
-                    	<td>Status Description &nbsp;</td>
+                    	<td><?php _e('Status Description', 'foxypress'); ?> &nbsp;</td>
                         <td><input type="text" name="foxy_sm_status_description" id="foxy_sm_status_description" value="<?php echo(stripslashes($drStatus->foxy_transaction_status_description)) ?>" /></td>
                     </tr>
                     <?php if($StatusID != 1) { ?>
                     <tr>
-                    	<td>Email Customer</td>
+                    	<td><?php _e('Email Customer', 'foxypress'); ?></td>
                         <td><input type="checkbox" value="1" <?php echo (($drStatus->foxy_transaction_status_email_flag == "1") ? "checked='checked'"  : "") ?> id="foxy_sm_status_email_flag" name="foxy_sm_status_email_flag" /> <small>If this is checked, the customer will be emailed when the status on their transaction is changed to this status</small></td>
                     </tr>
                     <tr>	
-                    	<td>Email Subject</td>
+                    	<td><?php _e('Email Subject', 'foxypress'); ?></td>
                         <td><input type="text" value="<?php echo(stripslashes($drStatus->foxy_transaction_status_email_subject)) ?>" id="foxy_sm_status_email_subject" name="foxy_sm_status_email_subject" /></td>
                     </tr>
                     <tr>	
-                    	<td>Email Body</td>
+                    	<td><?php _e('Email Body', 'foxypress'); ?></td>
                         <td>
                         	<textarea id="foxy_sm_status_email_body" name="foxy_sm_status_email_body" cols="50" rows="5"><?php echo(stripslashes($drStatus->foxy_transaction_status_email_body)) ?></textarea>
                             <script type="text/javascript">
@@ -118,123 +118,123 @@ function status_management_page_load()
                     </tr>-->
                     <?php } ?>
                      <tr>
-                    	<td colspan="2"><input type="submit" id="foxy_sm_status_submit" name="foxy_sm_status_submit" value="Save" /> <?php echo($sm_error) ?></td>
+                    	<td colspan="2"><input type="submit" id="foxy_sm_status_submit" name="foxy_sm_status_submit" value="<?php _e('Save', 'foxypress'); ?>" /> <?php echo($sm_error) ?></td>
                     </tr>
             	</table>
             	<div style="float:left; width:400px; margin-left:20px">
-					<p><i> You can use the following legend to populate the email body</i></p>
+					<p><i><?php _e('You can use the following legend to populate the email body', 'foxypress'); ?></i></p>
 					<table style="margin:10px 0; display:block;">	
 						<tr>
 							<td width="200"><strong>{{order_id}}</strong></td>
-							<td>ID of Order</td>
+							<td><?php _e('ID of Order', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{order_date}}</strong></td>
-							<td>Order Date</td>
+							<td><?php _e('Order Date', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{product_total}}</strong></td>
-							<td>Order Product Total</td>
+							<td><?php _e('Order Product Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{product_listing}}</strong></td>
-							<td>Product Item listing</td>
+							<td><?php _e('Product Item listing', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{tax_total}}</strong></td>
-							<td>Order Tax Total</td>
+							<td><?php _e('Order Tax Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{shipping_total}}</strong></td>
-							<td>Order Shipping Total</td>
+							<td><?php _e('Order Shipping Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{shipping_method}}</strong></td>
-							<td>Order Shipping Total</td>
+							<td><?php _e('Order Shipping Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{order_total}}</strong></td>
-							<td>Order Total</td>
+							<td><?php _e('Order Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{discount_codes}}</strong></td>
-							<td>Discount Codes and Amounts Used</td>
+							<td><?php _e('Discount Codes and Amounts Used', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{cc_type}}</strong></td>
-							<td>Credit Card Type Used</td>
+							<td><?php _e('Credit Card Type Used', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_first_name}}</strong></td>
-							<td>Customer's First Name</td>
+							<td><?php _e('Customer\'s First Name', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_last_name}}</strong></td>
-							<td>Customers' Last Name</td>
+							<td><?php _e('Customer\'s Last Name', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_email}}</strong></td>
-							<td>Customer's Email</td>
+							<td><?php _e('Customer\'s Email', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{tracking_number}}</strong></td>
-							<td>Tracking Number (if entered)</td>
+							<td><?php _e('Tracking Number (if entered)', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_address1}}</strong></td>
-							<td>Customer's Billing Address 1</td>
+							<td><?php _e('Customer\'s Billing Address 1', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_address2}}</strong></td>
-							<td>Customer's Billing Address 2</td>
+							<td><?php _e('Customer\'s Billing Address 2', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_city}}</strong></td>
-							<td>Customer's Billing City</td>
+							<td><?php _e('Customer\'s Billing City', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_state}}</strong></td>
-							<td>Customer's Billing State</td>
+							<td><?php _e('Customer\'s Billing State', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_zip}}</strong></td>
-							<td>Customer's Billing Zip</td>
+							<td><?php _e('Customer\'s Billing Zip', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_country}}</strong></td>
-							<td>Customer's Billing Country</td>
+							<td><?php _e('Customer\'s Billing Country', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_first_name}}</strong></td>
-							<td>Customer's Shipping First Name</td>
+							<td><?php _e('Customer\'s Shipping First Name', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_last_name}}</strong></td>
-							<td>Customer's Shipping Last Name</td>
+							<td><?php _e('Customer\'s Shipping Last Name', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_address1}}</strong></td>
-							<td>Customer's Shipping Address 1</td>
+							<td><?php _e('Customer\'s Shipping Address 1', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_address2}}</strong></td>
-							<td>Customer's Shipping Address 2</td>
+							<td><?php _e('Customer\'s Shipping Address 2', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_city}}</strong></td>
-							<td>Customer's Shipping City</td>
+							<td><?php _e('Customer\'s Shipping City', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_state}}</strong></td>
-							<td>Customer's Shipping State</td>
+							<td><?php _e('Customer\'s Shipping State', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_zip}}</strong></td>
-							<td>Customer's Shipping Zip</td>
+							<td><?php _e('Customer\'s Shipping Zip', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_country}}</strong></td>
-							<td>Customer's Shipping Country</td>
+							<td><?php _e('Customer\'s Shipping Country', 'foxypress'); ?></td>
 						</tr>
 	            	</table>
 	        	</div>
@@ -274,7 +274,7 @@ function GetStatuses()
 							<td>" . ($ts->foxy_transaction_status_email_tracking == "1" ? "Y" : "N") . "</td>
 							<td> " .
 								(( $ts->foxy_transaction_status != "1" ) ? 
-								"<a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management&action=delete&status=" . $ts->foxy_transaction_status . "\" onclick=\"return confirm('Are you sure you want to delete this status? Any transaction tied to this status will be set back to Uncategorized.')\">Delete</a>"
+								"<a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management&action=delete&status=" . $ts->foxy_transaction_status . "\" onclick=\"return confirm('" . __('Are you sure you want to delete this status? Any transaction tied to this status will be set back to Uncategorized.', 'foxypress') . "')\">" . __('Delete', 'foxypress') . "</a>"
 								: "") . 
 						"   </td>
 						</tr>";
@@ -286,9 +286,9 @@ function GetStatuses()
             <div style="float: left; width: 98%; clear: both;" class="inside">
                 <table cellspacing="5" cellpadding="5">
                     <tr>
-                        <td><legend>New Status: </legend></td>
+                        <td><legend><?php _e('New Status', 'foxypress'); ?>: </legend></td>
                         <td><input type="text" name="foxy_sm_new_status" id="foxy_sm_new_status" class="input" size="30" maxlength="30" value="" /></td>
-                        <td><input type="submit" name="foxy_sm_new_status_submit" id="foxy_sm_new_status_submit" class="button bold" value="<?php _e('Save','inventory'); ?> &raquo;" /></td>
+                        <td><input type="submit" name="foxy_sm_new_status_submit" id="foxy_sm_new_status_submit" class="button bold" value="<?php _e('Save','foxypress'); ?> &raquo;" /></td>
                     </tr>
                 </table>
             </div>
@@ -299,9 +299,9 @@ function GetStatuses()
 	<table class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">	
             <thead>
                 <tr>
-                    <th class="manage-column" scope="col">Status</th>
-                    <th class="manage-column" scope="col">Email Customer</th>
-                    <th class="manage-column" scope="col">Include Tracking</th>
+                    <th class="manage-column" scope="col"><?php _e('Status', 'foxypress'); ?></th>
+                    <th class="manage-column" scope="col"><?php _e('Email Customer', 'foxypress'); ?></th>
+                    <th class="manage-column" scope="col"><?php _e('Include Tracking', 'foxypress'); ?></th>
                     <th class="manage-column" scope="col">&nbsp;</th>
                 </tr>
             </thead>

@@ -5,13 +5,13 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.1.1
+Version: 0.4.2
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
 
 FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC
+Copyright (C) 2008-2012 WebMovement, LLC
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ global $foxypress_url;
 $foxypress_url = get_option('foxycart_storeurl');
 
 //init
+add_action('init', 'foxypress_localization', 1);
 include_once('custom-post-type.php');
 include_once('foxypress-settings.php');
 add_action('admin_menu', 'foxypress_menu');
@@ -69,6 +70,7 @@ if ( !empty ( $foxypress_url ) ){
 	add_action('admin_print_scripts-user-edit.php', 'affiliate_profile_enqueue');
 	add_action('admin_print_scripts-profile.php', 'affiliate_profile_enqueue');
 	add_action('admin_print_scripts-foxypress_product_page_affiliate-signup', 'affiliate_profile_enqueue');
+	add_action('admin_print_scripts-foxypress_product_page_affiliate-management', 'affiliate_profile_enqueue');
 
 	//user info page
 	if(get_option('foxypress_user_portal') == "1")
@@ -81,7 +83,7 @@ if ( !empty ( $foxypress_url ) ){
 		add_action('template_redirect','add_portal_scripts');
 		function add_portal_scripts() {
 			if (is_page(FOXYPRESS_USER_PORTAL)) {
-				add_action('wp_head', 'affiliate_profile_enqueue');
+				add_action('wp_head', 'client_affiliate_profile_enqueue');
 			}
 		}
 
@@ -117,7 +119,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.1.1");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -148,22 +150,28 @@ if(get_option("foxycart_show_dashboard_widget") == "1")
 	add_action('wp_dashboard_setup', 'foxypress_DashboardSetup');
 }
 
+function foxypress_localization()
+{
+//echo(dirname( plugin_basename( __FILE__ ) ) . '/languages/');
+	load_plugin_textdomain( 'foxypress', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+}
+
 function foxypress_menu()
 {
 	global $foxypress_url;
 	global $current_user;
 	if ( !empty ( $foxypress_url  ) )
 	{
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Option Groups'), __('Manage Option Groups'), 'manage_options', 'inventory-option-groups', 'foxypress_inventory_option_groups_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Categories'), __('Manage Categories'), 'manage_options', 'inventory-category', 'foxypress_inventory_category_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Emails'), __('Manage Emails'), 'manage_options', 'manage-emails', 'foxypress_manage_emails_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Order Management'), __('Order Management'), 'manage_options', 'order-management', 'order_management_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Status Management'), __('Status Management'), 'manage_options', 'status-management', 'status_management_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Affiliate Management'), __('Affiliate Management'), 'manage_options', 'affiliate-management', 'foxypress_create_affiliate_table');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Reports'), __('Reports'), 'manage_options', 'reports', 'foxypress_reports_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Subscriptions'), __('Subscriptions'), 'manage_options', 'subscriptions', 'foxypress_subscriptions_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Templates'), __('Templates'), 'manage_options', 'templates', 'foxypress_templates_page_load');
-		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Import/Export'), __('Import/Export'), 'manage_options', 'import-export', 'import_export_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Option Groups', 'foxypress'), __('Manage Option Groups', 'foxypress'), 'manage_options', 'inventory-option-groups', 'foxypress_inventory_option_groups_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Categories', 'foxypress'), __('Manage Categories', 'foxypress'), 'manage_options', 'inventory-category', 'foxypress_inventory_category_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Manage Emails', 'foxypress'), __('Manage Emails', 'foxypress'), 'manage_options', 'manage-emails', 'foxypress_manage_emails_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Order Management', 'foxypress'), __('Order Management', 'foxypress'), 'manage_options', 'order-management', 'order_management_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Status Management', 'foxypress'), __('Status Management', 'foxypress'), 'manage_options', 'status-management', 'status_management_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Affiliate Management', 'foxypress'), __('Affiliate Management', 'foxypress'), 'manage_options', 'affiliate-management', 'foxypress_create_affiliate_table');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Reports', 'foxypress'), __('Reports', 'foxypress'), 'manage_options', 'reports', 'foxypress_reports_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Subscriptions', 'foxypress'), __('Subscriptions', 'foxypress'), 'manage_options', 'subscriptions', 'foxypress_subscriptions_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Templates', 'foxypress'), __('Templates', 'foxypress'), 'manage_options', 'templates', 'foxypress_templates_page_load');
+		add_submenu_page('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE, __('Import/Export', 'foxypress'), __('Import/Export', 'foxypress'), 'manage_options', 'import-export', 'import_export_page_load');
 		$user_id = $current_user->ID;
 		$affiliate_user = get_user_option('affiliate_user', $user_id);
 		if ($affiliate_user !== 'true' && !current_user_can('administrator')) {
@@ -210,14 +218,14 @@ function foxypress_affiliate_profile_fields($user)
 		$affiliate_discount_type   		= get_user_option('affiliate_discount_type', $user->ID);
 		$affiliate_discount_amount 		= get_user_option('affiliate_discount_amount', $user->ID); ?>
 
-		<h3>FoxyPress Affiliate Information</h3>
+		<h3><?php _e('FoxyPress Affiliate Information', 'foxypress'); ?></h3>
 			<table class="form-table">
 				<tr>
-					<th><label for="affiliate_user">Enable Affiliate</label></th>
-					<td><input type="checkbox" <?php if ($affiliate_user == 'true') { ?>checked="yes" <?php } ?>name="affiliate_user" id="affiliate_user" value="true" /> Is this an affiliate user?</td>
+					<th><label for="affiliate_user"><?php _e('Enable Affiliate', 'foxypress'); ?></label></th>
+					<td><input type="checkbox" <?php if ($affiliate_user == 'true') { ?>checked="yes" <?php } ?>name="affiliate_user" id="affiliate_user" value="true" /> <?php _e('Is this an affiliate user?', 'foxypress'); ?></td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_avatar">Avatar</label></th>
+					<th><label for="affiliate_avatar"><?php _e('Avatar', 'foxypress'); ?></label></th>
 					<td>
 						<div id="avatar"><?php if ($affiliate_avatar_name) { ?><img src="<?php echo content_url(); ?>/affiliate_images/<?php echo $affiliate_avatar_name; ?>-large<?php echo $affiliate_avatar_ext; ?>" width="96" height="96" alt="" /><?php } ?></div>
 						<input type="file" name="avatar_upload" id="avatar_upload" value="">
@@ -226,99 +234,99 @@ function foxypress_affiliate_profile_fields($user)
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_facebook_page">Affiliate Facebook Page</label></th>
+					<th><label for="affiliate_facebook_page"><?php _e('Affiliate Facebook Page', 'foxypress'); ?></label></th>
 					<td>
 						<input class="regular-text" type="text" name="affiliate_facebook_page" id="affiliate_facebook_page" value="<?php echo $affiliate_facebook_page; ?>">
-						<span class="description">Affiliate's Facebook Page.</span>
+						<span class="description"><?php _e('Affiliate\'s Facebook Page.', 'foxypress'); ?></span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_age">Affiliate Age</label></th>
+					<th><label for="affiliate_age"><?php _e('Affiliate Age', 'foxypress'); ?></label></th>
 					<td>
 						<input type="text" name="affiliate_age" id="affiliate_age" value="<?php echo $affiliate_age; ?>">
-						<span class="description">Affiliate's age.</span>
+						<span class="description"><?php _e('Affiliate\'s age.', 'foxypress'); ?></span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_gender">Affiliate Gender</label></th>
+					<th><label for="affiliate_gender"><?php _e('Affiliate Gender', 'foxypress'); ?></label></th>
 					<td>
 						<input type="text" name="affiliate_gender" id="affiliate_gender" value="<?php echo $affiliate_gender; ?>">
-						<span class="description">Affiliate's gender.</span>
+						<span class="description"><?php _e('Affiliate\'s gender.', 'foxypress'); ?></span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_payout_type">Affiliate Payout Type</label></th>
+					<th><label for="affiliate_payout_type"><?php _e('Affiliate Payout Type', 'foxypress'); ?></label></th>
 					<td>
 						<input type="radio" <?php if ($affiliate_payout_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="percentage">
-						<span class="description">Percentage of each order.</span>
+						<span class="description"><?php _e('Percentage of each order.', 'foxypress'); ?></span>
 					</td>
 				</tr>
 				<tr>
 					<th></th>
 					<td>
 						<input type="radio" <?php if ($affiliate_payout_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="dollars">
-						<span class="description">Dollar amount of each order.</span>
+						<span class="description"><?php _e('Dollar amount of each order.', 'foxypress'); ?></span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_payout">Affiliate Payout</label></th>
+					<th><label for="affiliate_payout"><?php _e('Affiliate Payout', 'foxypress'); ?></label></th>
 					<td>
 						<input type="text" name="affiliate_payout" id="affiliate_payout" value="<?php echo $affiliate_payout; ?>">
-						<span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30% or $30.00)</b></span>
+						<span class="description"><?php _e('How much will this affiliate earn per sale?', 'foxypress'); ?> <b>(<?php _e('Enter 30 for 30% or $30.00', 'foxypress'); ?>)</b></span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_referral">Enable Affiliate Referrals</label></th>
-					<td><input type="checkbox" <?php if ($affiliate_referral == 'true') { ?>checked="yes" <?php } ?>name="affiliate_referral" id="affiliate_referral" value="true" /> Does this user's link allow for affiliate referrals?</td>
+					<th><label for="affiliate_referral"><?php _e('Enable Affiliate Referrals', 'foxypress'); ?></label></th>
+					<td><input type="checkbox" <?php if ($affiliate_referral == 'true') { ?>checked="yes" <?php } ?>name="affiliate_referral" id="affiliate_referral" value="true" /> <?php _e('Does this user\'s link allow for affiliate referrals?', 'foxypress'); ?></td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_referral_payout_type">Affiliate Referral Payout Type</label></th>
+					<th><label for="affiliate_referral_payout_type"><?php _e('Affiliate Referral Payout Type', 'foxypress'); ?></label></th>
 					<td>
 						<input type="radio" <?php if ($affiliate_referral_payout_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_referral_payout_type" id="affiliate_referral_payout_type" value="percentage">
-						<span class="description">Percentage of each order.</span>
+						<span class="description"><?php _e('Percentage of each order', 'foxypress'); ?>.</span>
 					</td>
 				</tr>
 				<tr>
 					<th></th>
 					<td>
 						<input type="radio" <?php if ($affiliate_referral_payout_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_referral_payout_type" id="affiliate_referral_payout_type" value="dollars">
-						<span class="description">Dollar amount of each order.</span>
+						<span class="description"><?php _e('Dollar amount of each order', 'foxypress'); ?>.</span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_referral_payout">Affiliate Referral Payout</label></th>
+					<th><label for="affiliate_referral_payout"><?php _e('Affiliate Referral Payout', 'foxypress'); ?></label></th>
 					<td>
 						<input type="text" name="affiliate_referral_payout" id="affiliate_referral_payout" value="<?php echo $affiliate_referral_payout; ?>">
-						<span class="description">How much will this affiliate earn per sale of their referrals? <b>(Enter 30 for 30% or $30.00)</b></span>
+						<span class="description"><?php _e('How much will this affiliate earn per sale of their referrals?', 'foxypress'); ?> <b>(<?php _e('Enter 30 for 30% or $30.00', 'foxypress'); ?>)</b></span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_discount">Enable Affiliate Discount</label></th>
-					<td><input type="checkbox" <?php if ($affiliate_discount == 'true') { ?>checked="yes" <?php } ?>name="affiliate_discount" id="affiliate_discount" value="true" /> Does this user's link allow for an additional discount?</td>
+					<th><label for="affiliate_discount"><?php _e('Enable Affiliate Discount', 'foxypress'); ?></label></th>
+					<td><input type="checkbox" <?php if ($affiliate_discount == 'true') { ?>checked="yes" <?php } ?>name="affiliate_discount" id="affiliate_discount" value="true" /> <?php _e('Does this user\'s link allow for an additional discount?', 'foxypress'); ?></td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_payout_type">Affiliate Discount Type</label></th>
+					<th><label for="affiliate_payout_type"><?php _e('Affiliate Discount Type', 'foxypress'); ?></label></th>
 					<td>
 						<input type="radio" <?php if ($affiliate_discount_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="percentage">
-						<span class="description">Percentage off of each order.</span>
+						<span class="description"><?php _e('Percentage off of each order', 'foxypress'); ?>.</span>
 					</td>
 				</tr>
 				<tr>
 					<th></th>
 					<td>
 						<input type="radio" <?php if ($affiliate_discount_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="dollars">
-						<span class="description">Dollar amount off of each order.</span>
+						<span class="description"><?php _e('Dollar amount off of each order', 'foxypress'); ?>.</span>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="affiliate_discount_amount">Affiliate Discount Amount</label></th>
+					<th><label for="affiliate_discount_amount"><?php _e('Affiliate Discount Amount', 'foxypress'); ?></label></th>
 					<td>
 						<input type="text" name="affiliate_discount_amount" id="affiliate_discount_amount" value="<?php echo $affiliate_discount_amount; ?>">
-						<span class="description">How much of a discount will user's receive? <b>(Enter 30 for 30% or $30.00)</b></span>
+						<span class="description"><?php _e('How much of a discount will user\'s receive?', 'foxypress'); ?> <b>(<?php _e('Enter 30 for 30% or $30.00', 'foxypress'); ?>)</b></span>
 					</td>
 				</tr>
 				<tr>
-					<th><label>Affiliate URL</label></th>
+					<th><label><?php _e('Affiliate URL', 'foxypress'); ?></label></th>
 					<td><?php echo $affiliate_url; ?></td>
 				</tr>
 			</table>
@@ -326,11 +334,11 @@ function foxypress_affiliate_profile_fields($user)
 }
 
 function affiliate_profile_enqueue() { ?>
-	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />	
 	<script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" language="javascript" src="<?php echo plugins_url(); ?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
 	<script type="text/javascript" language="javascript">
-		$(document).ready(function() {
+		jQuery(document).ready(function() {
 			$("#avatar_upload").uploadify({
 				'swf'			: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.swf',
 				'uploader'		: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.php',
@@ -348,21 +356,53 @@ function affiliate_profile_enqueue() { ?>
 				'auto'			: true,
 				'buttonText'	: 'UPLOAD IMAGE',
 				'onUploadStart' : function(file) {
-					$('div#avatar').html('<span class="avatar-loader"><img src="<?php echo plugins_url(); ?>/foxypress/img/ajax-loader-cir.gif" width="32" height="32" alt="" /></span>');
+					jQuery('div#avatar').html('<span class="avatar-loader"><img src="<?php echo plugins_url(); ?>/foxypress/img/ajax-loader-cir.gif" width="32" height="32" alt="" /></span>');
 				},
 				'onUploadSuccess': function (file,data,response) {
 					var fileinfo = jQuery.parseJSON(data);
-					$('input#affiliate_avatar_name').val(fileinfo.raw_file_name);
-					$('input#affiliate_avatar_ext').val(fileinfo.file_ext);
-					$('div#avatar').html('<img src="<?php echo content_url(); ?>/affiliate_images/' + fileinfo.raw_file_name + '-large' + fileinfo.file_ext + '" width="96" height="96" alt="" />');
+					jQuery('input#affiliate_avatar_name').val(fileinfo.raw_file_name);
+					jQuery('input#affiliate_avatar_ext').val(fileinfo.file_ext);
+					jQuery('div#avatar').html('<img src="<?php echo content_url(); ?>/affiliate_images/' + fileinfo.raw_file_name + '-large' + fileinfo.file_ext + '" width="96" height="96" alt="" />');
 				}
 			});
 		});
 	</script>
 <?php }
 
-
-
+function client_affiliate_profile_enqueue() { ?>
+	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" language="javascript" src="<?php echo plugins_url(); ?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
+	<script type="text/javascript" language="javascript">
+		jQuery(document).ready(function() {
+			$("#avatar_upload").uploadify({
+				'swf'			: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.swf',
+				'uploader'		: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.php',
+				'cancelImage'	: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify-cancel.png',
+				'createFolder'  : true,
+				'checkExisting' : false,
+				'fileSizeLimit' : 1*1024, // 1MB
+				'fileTypeDesc'  : 'Only images with extensions: *.jpg, *.jpeg, *.png, *.gif are allowed',
+				'fileTypeExts'  : '*.gif;*.jpg;*.jpeg;*.png',
+				'method'        : 'post',
+				'queueSizeLimit': 1,
+				'postData'      : {},
+				'progressData'  : 'all',
+				'multi'			: false,
+				'auto'			: true,
+				'buttonText'	: 'UPLOAD IMAGE',
+				'onUploadStart' : function(file) {
+					jQuery('div#avatar').html('<span class="avatar-loader"><img src="<?php echo plugins_url(); ?>/foxypress/img/ajax-loader-cir.gif" width="32" height="32" alt="" /></span>');
+				},
+				'onUploadSuccess': function (file,data,response) {
+					var fileinfo = jQuery.parseJSON(data);
+					jQuery('input#affiliate_avatar_name').val(fileinfo.raw_file_name);
+					jQuery('input#affiliate_avatar_ext').val(fileinfo.file_ext);
+					jQuery('div#avatar').html('<img src="<?php echo content_url(); ?>/affiliate_images/' + fileinfo.raw_file_name + '-large' + fileinfo.file_ext + '" width="96" height="96" alt="" />');
+				}
+			});
+		});
+	</script>
+<?php }
 
 function foxypress_save_affiliate_profile_fields($user_id) {
 	if (current_user_can('administrator'))
@@ -522,14 +562,14 @@ function foxypress_ShowDashboardStats()
 					,(select count(category_id) from " . $wpdb->prefix . "foxypress_inventory_categories) TotalCategories";
 	$dtStats = $wpdb->get_row($statsQuery);
 	echo("<div style=\"float:left;\">
-			<h4>Order History</h4>
+			<h4>" . __('Order History', 'foxypress') . "</h4>
 			<p>
-				1 Day: " . $dtStats->DayOrders . " order" . (($dtStats->DayOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->OneDayTotal) . "<br />
-				7 Days: " . $dtStats->WeekOrders . " order" . (($dtStats->WeekOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->WeekTotal) . "<br />
-				30 Days: " . $dtStats->MonthOrders . " order" . (($dtStats->MonthOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->MonthTotal) . " <br />
-				Overall: " . $dtStats->OverallOrders . " order" . (($dtStats->OverallOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->OverallTotal) .
+				" . __('1 Day', 'foxypress') . ": " . $dtStats->DayOrders . " order" . (($dtStats->DayOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->OneDayTotal) . "<br />
+				" . __('7 Days', 'foxypress') . ": " . $dtStats->WeekOrders . " order" . (($dtStats->WeekOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->WeekTotal) . "<br />
+				" . __('30 Days', 'foxypress') . ": " . $dtStats->MonthOrders . " order" . (($dtStats->MonthOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->MonthTotal) . " <br />
+				" . __('Overall', 'foxypress') . ": " . $dtStats->OverallOrders . " order" . (($dtStats->OverallOrders == 1) ? "" : "s")   . ", " . foxypress_FormatCurrency($dtStats->OverallTotal) .
 			"</p>
-			<h4>Product Summary</h4>
+			<h4>" . __('Product Summary', 'foxypress') . "</h4>
 			<p>
 				" . $dtStats->TotalProducts . " Product" . (($dtStats->TotalProducts == 1) ? "" : "s") . "<br />
 				" . $dtStats->TotalCategories . (($dtStats->TotalCategories == 1) ? " Category" : " Categories") .
@@ -669,7 +709,7 @@ function foxypress_handle_search_module()
 						<form name=\"foxypress_search_form\" id=\"foxypress_search_form\" method=\"POST\">
 							<div>
 								<input type=\"text\" id=\"foxy_search_term\" name=\"foxy_search_term\" value=\"" . $current_search_term . "\" />
-								<input type=\"submit\" id=\"foxy_search_submit\" name=\"foxy_search_submit\" value=\"Search\" />
+								<input type=\"submit\" id=\"foxy_search_submit\" name=\"foxy_search_submit\" value=\"" . __('Search', 'foxypress') . "\" />
 							</div>
 					   </form>
 				   </div>";
@@ -1901,7 +1941,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 					{
 						$soldOutItems .= ($soldOutItems == "") ? $soldOutItem : ", " . $soldOutItem;
 					}
-					$soldOutItems = "<div class=\"foxypress_item_otions_soldout\">Sold Out Options: " . $soldOutItems . "</div>";
+					$soldOutItems = "<div class=\"foxypress_item_otions_soldout\">" . __('Sold Out Options', 'foxypress') . ": " . $soldOutItems . "</div>";
 				}
 				$JsToAdd = "";
 				if(count($optionGroups) == 1 && $jsData != "")
@@ -2352,7 +2392,7 @@ function foxypress_UploadImage($key, $image_id)
 		$ext = strtoupper( substr($name ,strlen($name )-(strlen( $name  ) - (strrpos($name ,".") ? strrpos($name ,".")+1 : 0) ))  ) ;
 		if (!in_array($ext, $imgtypes))
 		{
-			echo "Warning! NOT an image file! File not uploaded.";
+			_e("Warning! NOT an image file! File not uploaded.", 'foxypress');
 			return "";
 		}
 		//get new file name
@@ -2393,28 +2433,28 @@ function foxypress_UploadFile($field, $filename, $savetopath, $overwrite, $name=
     if ( $field["error"] > 0 ) {
 		switch ($field["error"]) {
 			case 1:
-				$error = "The file is too big. (php.ini)"; // php installation max file size error
+				$error = _e("The file is too big. (php.ini)", 'foxypress'); // php installation max file size error
 				break;
 			case 2:
-				$error = "The file is too big. (form)"; // form max file size error
+				$error = _e("The file is too big. (form)", 'foxypress'); // form max file size error
 				break;
 			case 3:
-				$error = "Only part of the file was uploaded";
+				$error = _e("Only part of the file was uploaded", 'foxypress');
 				break;
 			case 4:
-				$error = "No file was uploaded";
+				$error = _e("No file was uploaded", 'foxypress');
 				break;
 			case 6:
-				$error = "Missing a temporary folder.";
+				$error = _e("Missing a temporary folder.", 'foxypress');
 				break;
 			case 7:
-				$error = "Failed to write file to disk";
+				$error = _e("Failed to write file to disk", 'foxypress');
 				break;
 			case 8:
-				$error = "File upload stopped by extension";
+				$error = _e("File upload stopped by extension", 'foxypress');
 				break;
 			default:
-			  	$error = "Unknown error (" . $field["error"] . ")";
+			  	$error = _e("Unknown error (" . $field["error"] . ")", 'foxypress');
 			  	break;
 		}
 
@@ -2463,18 +2503,32 @@ function foxypress_GetFoxyPressIncludes()
 	$includejq = get_option('foxycart_include_jquery');
 	$enablemuliship = get_option('foxycart_enable_multiship');
 	$scripts = "";
-	if($version == "0.7.2")
+	if($version == "1.0.0")
 	{
 		$scripts = "<!-- BEGIN FOXYCART FILES -->"
 					.
 					(
 						($includejq)
-							? "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js\"></script>"
+							? "<script type=\"text/javascript\" src=\"//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js\"></script>"
 							: ""
 					)
 					.
-					"<script src=\"http://cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
-					<link rel=\"stylesheet\" href=\"http://cdn.foxycart.com/static/scripts/colorbox/1.3.17/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
+					"<script src=\"//cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
+					<link rel=\"stylesheet\" href=\"//cdn.foxycart.com/static/scripts/colorbox/1.3.19/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
+					<!-- END FOXYCART FILES -->";
+	}
+	else if($version == "0.7.2")
+	{
+		$scripts = "<!-- BEGIN FOXYCART FILES -->"
+					.
+					(
+						($includejq)
+							? "<script type=\"text/javascript\" src=\"//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js\"></script>"
+							: ""
+					)
+					.
+					"<script src=\"//cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
+					<link rel=\"stylesheet\" href=\"//cdn.foxycart.com/static/scripts/colorbox/1.3.18/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
 					<!-- END FOXYCART FILES -->";
 	}
 	else if($version=="0.7.1")
@@ -2497,12 +2551,12 @@ function foxypress_GetFoxyPressIncludes()
 					.
 					(
 						($includejq)
-							? "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js\"></script>"
+							? "<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js\"></script>"
 							: ""
 					)
 					.
-					"<script src=\"http://cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.complete.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
-					<link rel=\"stylesheet\" href=\"http://static.foxycart.com/scripts/colorbox/1.3.9/style1/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
+					"<script src=\"http://cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.complete.2.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
+					<link rel=\"stylesheet\" href=\"http://static.foxycart.com/scripts/colorbox/1.3.16/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
 					<!-- END FOXYCART FILES -->";
 	}
 	if($enablemuliship == "1")
@@ -2550,7 +2604,7 @@ function foxypress_ImportFoxypressScripts()
 				}
 				else
 				{
-					alert('Please fill out both the order number and you last name');
+					alert(__('Please fill out both the order number and you last name', 'foxypress'));
 				}
 			}
 
@@ -3014,6 +3068,7 @@ function foxypress_Uninstall()
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_payments");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_referrals");
 	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_email_templates");
+	$wpdb->query("DROP TABLE " . $wpdb->prefix  . "foxypress_affiliate_assets");
 
 	//check option first before we delete
 	$keep_products = get_option("foxypress_uninstall_keep_products");
@@ -3135,6 +3190,8 @@ function foxypress_Install($apikey, $encryptionkey)
 		foxypress_Installation_CreateAffiliatePaymentsTable();
 		foxypress_Installation_CreateAffiliateTrackingTable();
 		foxypress_Installation_CreateAffiliateReferralsTable();
+		foxypress_Installation_CreateAffiliateAssetsTable();
+
 		foxypress_Installation_CreateEmailTemplatesTable();
 
 		foxypress_Installation_CreateSettings($encryptionkey, $apikey);
@@ -3239,6 +3296,12 @@ function foxypress_Install($apikey, $encryptionkey)
 		{
 			foxypress_Installation_CreateAffiliateReferralsTable();
 		}
+		//affiliate assets
+		if(!in_array($wpdb->prefix . "foxypress_affiliate_assets", $tables))
+		{
+			foxypress_Installation_CreateAffiliateAssetsTable();
+		}
+
 		//email templates
 		if(!in_array($wpdb->prefix . "foxypress_email_templates", $tables))
 		{
@@ -3679,6 +3742,21 @@ function foxypress_Installation_CreateAffiliateReferralsTable()
 	$wpdb->query($sql);
 }
 
+function foxypress_Installation_CreateAffiliateAssetsTable()
+{
+	global $wpdb;
+	//create affliliate payments table
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_affiliate_assets (
+  				id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				foxy_asset_type varchar(50) collate utf8_bin NOT NULL,
+				foxy_asset_name varchar(100) collate utf8_bin NOT NULL,
+				foxy_asset_file_name varchar(100) collate utf8_bin NOT NULL,
+				foxy_asset_file_ext varchar(20) collate utf8_bin NOT NULL,
+				foxy_asset_landing_url varchar(250) collate utf8_bin NOT NULL
+			) ";
+	$wpdb->query($sql);
+}
+
 function foxypress_Installation_CreateEmailTemplatesTable()
 {
 	global $wpdb;
@@ -3719,6 +3797,14 @@ function foxypress_Installation_CreateSettings($encryption_key, $api_key)
 	if(!foxypress_option_exists("foxypress_uninstall_keep_products"))
 	{
 		add_option("foxypress_uninstall_keep_products", "1");
+	}
+	if(!foxypress_option_exists("foxypress_affiliate_approval_email_subject"))
+	{
+		add_option("foxypress_affiliate_approval_email_subject", "Affiliate status approved!");
+	}
+	if(!foxypress_option_exists("foxypress_affiliate_approval_email_body"))
+	{
+		add_option("foxypress_affiliate_approval_email_body", "Hi {{first_name}} {{last_name}},<br />You have been approved to be an affiliate. Your affiliate details are below.<br /><br />{{affiliate_commission}}<br /><br />Affiliate URL: {{affiliate_url}}");
 	}
 }
 
@@ -3912,13 +3998,13 @@ class FoxyPress_MiniCart extends WP_Widget {
 
 	function FoxyPress_MiniCart() {
 		/* Widget settings. */
-		$widget_ops = array( 'classname' => 'min', 'description' => __('A widget that will display the FoxyCart cart as a dropdown or in your website\'s sidebar.', 'example') );
+		$widget_ops = array( 'classname' => 'min', 'description' => __('A widget that will display the FoxyCart cart as a dropdown or in your website\'s sidebar.', 'foxypress') );
 
 		/* Widget control settings. */
 		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'mini-cart-widget' );
 
 		/* Create the widget. */
-		$this->WP_Widget( 'mini-cart-widget', __('FoxyPress Mini-Cart', 'example'), $widget_ops, $control_ops );
+		$this->WP_Widget( 'mini-cart-widget', __('FoxyPress Mini-Cart', 'foxypress'), $widget_ops, $control_ops );
 	}
 
 	//Display widget on frontend
@@ -4079,19 +4165,19 @@ class FoxyPress_MiniCart extends WP_Widget {
 	//displays the widget settings
 	function form( $instance ) {
 		//default settings
-		$defaults = array( 'title' => __('Your Cart', 'example'), 'hideonzero' => __('0', 'example'), 'dropdowndisplay' => __('0', 'example'));
+		$defaults = array( 'title' => __('Your Cart', 'foxypress'), 'hideonzero' => __('0', 'foxypress'), 'dropdowndisplay' => __('0', 'foxypress'));
 		$instance = wp_parse_args( (array) $instance, $defaults ); ?>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', 'hybrid'); ?></label><br />
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e('Title:', 'foxypress'); ?></label><br />
 			<input id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" style="width:100%;" type="text" />
 		</p>
 		<p>
         	<input id="<?php echo $this->get_field_id( 'hideonzero' ); ?>" name="<?php echo $this->get_field_name( 'hideonzero' ); ?>" value="1" <?php echo(($instance['hideonzero'] == "1") ? "checked=\"checked\"" : "") ?>  type="checkbox" />
-			<label for="<?php echo $this->get_field_id( 'hideonzero' ); ?>"><?php _e('Hide Cart with 0 Items', 'hybrid'); ?></label>
+			<label for="<?php echo $this->get_field_id( 'hideonzero' ); ?>"><?php _e('Hide Cart with 0 Items', 'foxypress'); ?></label>
 		</p>
 		<p>
         	<input id="<?php echo $this->get_field_id( 'dropdowndisplay' ); ?>" name="<?php echo $this->get_field_name( 'dropdowndisplay' ); ?>" value="1" <?php echo(($instance['dropdowndisplay'] == "1") ? "checked=\"checked\"" : "") ?> type="checkbox" />
-			<label for="<?php echo $this->get_field_id( 'dropdowndisplay' ); ?>"><?php _e('Drop Down Display', 'hybrid'); ?></label>
+			<label for="<?php echo $this->get_field_id( 'dropdowndisplay' ); ?>"><?php _e('Drop Down Display', 'foxypress'); ?></label>
 		</p>
 	<?php
 	}

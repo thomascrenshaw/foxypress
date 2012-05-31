@@ -3,7 +3,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 add_action('admin_init', 'inventory_option_groups_postback');
@@ -55,11 +55,11 @@ function foxypress_inventory_option_groups_page_load() {
 	global $wpdb;
 ?>
     <div class="wrap">
-        <h2> Manage Option Groups</h2>
+        <h2><?php _e('Manage Option Groups', 'foxypress'); ?></h2>
         <div>
             <i>
-                To create a list of options you must first create an option group. Example: "Color" or "Size". 
-                These option groups can be used for options on any item.
+                <?php _e('To create a list of options you must first create an option group. Example: "Color" or "Size".', 'foxypress'); ?> 
+                <?php _e('These option groups can be used for options on any item.', 'foxypress'); ?>
             </i>
         </div>
                 
@@ -68,9 +68,9 @@ function foxypress_inventory_option_groups_page_load() {
                 <div style="float: left; width: 98%; clear: both;" class="inside">
                     <table cellspacing="5" cellpadding="5">
                         <tr>
-                            <td><legend>New Option Group: </legend></td>
+                            <td><legend><?php _e('New Option Group', 'foxypress'); ?>: </legend></td>
                             <td><input type="text" name="option_group_name" id="option_group_name" class="input" size="30" maxlength="30" value="" /></td>
-                            <td><input type="submit" name="option_group_save" id="option_group_save" class="button bold" value="<?php _e('Save','inventory'); ?> &raquo;" /></td>
+                            <td><input type="submit" name="option_group_save" id="option_group_save" class="button bold" value="<?php _e('Save','foxypress'); ?> &raquo;" /></td>
                         </tr>
                     </table>
                 </div>
@@ -81,7 +81,7 @@ function foxypress_inventory_option_groups_page_load() {
          <table class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">	
             <thead>
                 <tr>
-                    <th class="manage-column" scope="col">Option Group Name</th>
+                    <th class="manage-column" scope="col"><?php _e('Option Group Name', 'foxypress'); ?></th>
                     <th class="manage-column" scope="col">&nbsp;</th>
                 </tr>
             </thead>
@@ -109,16 +109,16 @@ function foxypress_inventory_option_groups_page_load() {
 									<form name=\"foxy_edit_option_group_form\" id=\"foxy_edit_option_group_form\" method=\"POST\">
 										<input type=\"text\" id=\"foxypress_edit_option_name\" name=\"foxypress_edit_option_name\" value=\"" . stripslashes($group->option_group_name)  . "\" />
 										<input type=\"hidden\" id=\"foxypress_edit_option_id\" name=\"foxypress_edit_option_id\" value=\"" . $group->option_group_id . "\" />
-										<input type=\"submit\" id=\"foxypress_edit_option_save\" name=\"foxypress_edit_option_save\" value=\"Save\" />
+										<input type=\"submit\" id=\"foxypress_edit_option_save\" name=\"foxypress_edit_option_save\" value=\"" . __('Save', 'foxypress') . "\" />
 									</form>
 								</td>
-                                <td><a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups&action=deleteoptiongroup&optiongroupid=" . $group->option_group_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to delete this option group? All of the options related to this option group will be deleted.');\">Delete</td>
+                                <td><a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups&action=deleteoptiongroup&optiongroupid=" . $group->option_group_id . "\" class=\"delete\" onclick=\"return confirm('" . __('Are you sure you want to delete this option group? All of the options related to this option group will be deleted.', 'foxypress') . "');\">Delete</td>
                              </tr>");
                     }
                 }		
                 else
                 {
-                    echo("<tr><td colspan=\"2\">There are currently no option groups</td></tr>");
+                    echo("<tr><td colspan=\"2\">" . __('There are currently no option groups', 'foxypress') . "</td></tr>");
                 }		
             ?>
         </table>
@@ -126,7 +126,7 @@ function foxypress_inventory_option_groups_page_load() {
 			if($drRows->RowCount > $limit)
 			{
 				$Pagination = foxypress_GetPagination($pageNumber, $drRows->RowCount, $limit, $targetpage, 'fp_pn');
-				echo ("<Br>" . $Pagination);
+				echo ("<br />" . $Pagination);
 			}	
 		?>
 	</div>

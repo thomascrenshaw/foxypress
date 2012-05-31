@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 require_once('../../../wp-includes/wp-db.php');	
@@ -37,11 +37,11 @@ if (!empty($_FILES)) {
 	else
 	{
 		//failure	
-		echo('<Error>Error uploading file</Error>');
+		esc_html_e('<Error>Error uploading file</Error>', 'foxypress');
 	}		
 }
 else
 {
-	echo('<Error>Invalid post data</Error>');	
+	esc_html_e('<Error>Invalid post data</Error>', 'foxypress');	
 }
 ?>

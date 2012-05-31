@@ -25,7 +25,7 @@ THE SOFTWARE.
 */
 require_once('../../../../wp-includes/wp-db.php');	
 require_once('../../../../wp-config.php');
-	
+
 function set_filename($path, $filename, $file_ext, $encrypt_name = TRUE)
 {
 	if ($encrypt_name == TRUE) {		

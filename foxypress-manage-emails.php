@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 $plugin_dir = basename(dirname(__FILE__));
@@ -27,36 +27,36 @@ function foxypress_manage_emails_page_load()
 			if($templatename!=''&& $subject!=''){
 				$sql = "UPDATE  ". $wpdb->prefix . "foxypress_email_templates set foxy_email_template_name='".$templatename."', foxy_email_template_subject='".$subject."', foxy_email_template_email_body='".$content."', foxy_email_template_from='" . $from . "' WHERE email_template_id=".$_GET[id];
 				$wpdb->query($sql);
-				$sm_error = "<div class='updated' id='message'>Your email template has been successfully saved!</div>";
+				$sm_error = "<div class='updated' id='message'>" . __('Your email template has been successfully saved', 'foxypress') . "!</div>";
 			}else{
-				$sm_error = "<div class='error' id='message'>Your email template name and subject cannot be blank.</div>";
+				$sm_error = "<div class='error' id='message'>" . __('Your email template name and subject cannot be blank', 'foxypress') . ".</div>";
 			}
 			echo $sm_error;
 		}
 		$me = $wpdb->get_row("SELECT * from " . $wpdb->prefix ."foxypress_email_templates 	WHERE email_template_id='".$_GET[id]."'");
 	?>
 	        <div class="wrap">
-	    		<h2><?php _e('Manage Emails'); ?> <a href='<?php bloginfo('url') ?>/wp-admin/edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2">Add New</a></h2>
+	    		<h2><?php _e('Manage Emails', 'foxypress'); ?> <a href='<?php bloginfo('url') ?>/wp-admin/edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2"><?php _e('Add New', 'foxypress'); ?></a></h2>
 	        	<table cellpadding="10" style="float:left; width:650px">
 	        		<tr>
-	        			<td width="180">Template ID</td><td><?php _e($_GET['id']); ?></td>
+	        			<td width="180"><?php _e('Template ID', 'foxypress'); ?></td><td><?php _e($_GET['id']); ?></td>
 	        		</tr>
                     <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
 	        		<form method="POST" name="statusForm" id="statusForm"> 
 	        		<tr>
-	        			<td>Template Name</td>
+	        			<td><?php _e('Template Name', 'foxypress'); ?></td>
 						<td><input type="text" name="templatename" value="<?php _e($me->foxy_email_template_name); ?>" size="50" /></td>
 	        		</tr>
 	        		<tr>
-						<td>Subject</td>
+						<td><?php _e('Subject', 'foxypress'); ?></td>
 						<td><input type="text" name="subject" value="<?php _e($me->foxy_email_template_subject); ?>" size="50" /></td>
 					</tr>
                     <tr>
-                        <td>From Email</td> 
+                        <td><?php _e('From Email', 'foxypress'); ?></td> 
                         <td><input type="text" name="from" value="<?php _e($me->foxy_email_template_from); ?>" size="50" /></td>
                     </tr>
 					<tr>
-				        <td>Content</td>
+				        <td><?php _e('Content', 'foxypress'); ?></td>
 						<td>
                         	<textarea name="content" cols="50" rows="5"><?php echo($me->foxy_email_template_email_body); ?></textarea>
                             <script type="text/javascript">
@@ -66,104 +66,104 @@ function foxypress_manage_emails_page_load()
 			        </tr>
 					<tr>
 						<td>&nbsp;</td>
-						<td><input type="submit" name="foxy_em_save" id="foxy_em_save" value="Save" /></td>
+						<td><input type="submit" name="foxy_em_save" id="foxy_em_save" value="<?php _e('Save', 'foxypress'); ?>" /></td>
 			        </tr>
 					</form>
 				</table>
 				<div style="float:left; width:400px; margin-left:20px">
-					<p><i> You can use the following legend to populate the email body</i></p>
+					<p><i><?php _e('You can use the following legend to populate the email body', 'foxypress'); ?></i></p>
 					<table style="margin:10px 0; display:block;">	
 						<tr>
 							<td width="200"><strong>{{order_id}}</strong></td>
-							<td>ID of Order</td>
+							<td><?php _e('ID of Order', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{order_date}}</strong></td>
-							<td>Order Date</td>
+							<td><?php _e('Order Date', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{product_total}}</strong></td>
-							<td>Order Product Total</td>
+							<td><?php _e('Order Product Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{tax_total}}</strong></td>
-							<td>Order Tax Total</td>
+							<td><?php _e('Order Tax Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{shipping_total}}</strong></td>
-							<td>Order Shipping Total</td>
+							<td><?php _e('Order Shipping Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{order_total}}</strong></td>
-							<td>Order Total</td>
+							<td><?php _e('Order Total', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{cc_type}}</strong></td>
-							<td>Credit Card Type Used</td>
+							<td><?php _e('Credit Card Type Used', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_first_name}}</strong></td>
-							<td>Customer's First Name</td>
+							<td><?php _e('Customer\'s First Name', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_last_name}}</strong></td>
-							<td>Customers' Last Name</td>
+							<td><?php _e('Customer\'s Last Name', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_email}}</strong></td>
-							<td>Customer's Email</td>
+							<td><?php _e('Customer\'s Email', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{tracking_number}}</strong></td>
-							<td>Tracking Number (if entered)</td>
+							<td><?php _e('Tracking Number (if entered)', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_address1}}</strong></td>
-							<td>Customer's Billing Address 1</td>
+							<td><?php _e('Customer\'s Billing Address 1', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_address2}}</strong></td>
-							<td>Customer's Billing Address 2</td>
+							<td><?php _e('Customer\'s Billing Address 2', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_city}}</strong></td>
-							<td>Customer's Billing City</td>
+							<td><?php _e('Customer\'s Billing City', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_state}}</strong></td>
-							<td>Customer's Billing State</td>
+							<td><?php _e('Customer\'s Billing State', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_zip}}</strong></td>
-							<td>Customer's Billing Zip</td>
+							<td><?php _e('Customer\'s Billing Zip', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_billing_country}}</strong></td>
-							<td>Customer's Billing Country</td>
+							<td><?php _e('Customer\'s Billing Country', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_address1}}</strong></td>
-							<td>Customer's Shipping Address 1</td>
+							<td><?php _e('Customer\'s Shipping Address 1', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_address2}}</strong></td>
-							<td>Customer's Shipping Address 2</td>
+							<td><?php _e('Customer\'s Shipping Address 2', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_city}}</strong></td>
-							<td>Customer's Shipping City</td>
+							<td><?php _e('Customer\'s Shipping City', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_state}}</strong></td>
-							<td>Customer's Shipping State</td>
+							<td><?php _e('Customer\'s Shipping City', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_zip}}</strong></td>
-							<td>Customer's Shipping Zip</td>
+							<td><?php _e('Customer\'s Shipping Zip', 'foxypress'); ?></td>
 						</tr>
 						<tr>
 							<td><strong>{{customer_shipping_country}}</strong></td>
-							<td>Customer's Shipping Country</td>
+							<td><?php _e('Customer\'s Shipping Country', 'foxypress'); ?></td>
 						</tr>
 	            	</table>
 	        	</div>
@@ -182,29 +182,29 @@ function foxypress_manage_emails_page_load()
 	                echo 'Saving Template...';
 	                echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';					
 				}else{
-					$sm_error = "<div class='error' id='message'>Your email template name and subject cannot be blank.</div>";
+					$sm_error = "<div class='error' id='message'>" . __('Your email template name and subject cannot be blank', 'foxypress') . ".</div>";
 				}
 				echo $sm_error;
 				?>
     	        <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
 				<div class="wrap">
-					<h2><?php _e('Manage Emails'); ?></h2>
+					<h2><?php _e('Manage Emails', 'foxypress'); ?></h2>
 					<table cellpadding="10" style="float:left; width:650px;">
 						<form method="POST" name="statusForm" id="statusForm"> 
 						<tr>
-							<td>Template Name</td>
+							<td><?php _e('Template Name', 'foxypress'); ?></td>
 							<td><input type="text" name="templatename" value="" size="50" /></td>
 						</tr>
 						<tr>
-							<td>Subject</td> 
+							<td><?php _e('Subject', 'foxypress'); ?></td> 
 							<td><input type="text" name="subject" value="" size="50" /></td>
 						</tr>
                         <tr>
-							<td>From Email</td> 
+							<td><?php _e('From Email', 'foxypress'); ?></td> 
 							<td><input type="text" name="from" value="" size="50" /></td>
 						</tr>
 						<tr>
-							<td>Content</td>
+							<td><?php _e('Content', 'foxypress'); ?></td>
 							<td>
                             	<textarea name="content" cols="70" rows="10"></textarea>
                                 <script type="text/javascript">
@@ -214,104 +214,104 @@ function foxypress_manage_emails_page_load()
 						</tr>
 						<tr>
 							<td>&nbsp;</td>
-							<td><input type="submit" name="foxy_em_save" id="foxy_em_save" value="Save" /></td>
+							<td><input type="submit" name="foxy_em_save" id="foxy_em_save" value="<?php _e('Save', 'foxypress'); ?>" /></td>
 						</tr>
 						</form>
 					</table>
 					<div style="float:left; width:400px; margin-left:20px">
-						<p><i> You can use the following legend to populate the email body</i></p>
+						<p><i><?php _e('You can use the following legend to populate the email body', 'foxypress'); ?></i></p>
 						<table style="margin:10px 0; display:block;">	
 							<tr>
 								<td width="200"><strong>{{order_id}}</strong></td>
-								<td>ID of Order</td>
+								<td><?php _e('ID of Order', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{order_date}}</strong></td>
-								<td>Order Date</td>
+								<td><?php _e('Order Date', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{product_total}}</strong></td>
-								<td>Order Product Total</td>
+								<td><?php _e('Order Product Total', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{tax_total}}</strong></td>
-								<td>Order Tax Total</td>
+								<td><?php _e('Order Tax Total', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{shipping_total}}</strong></td>
-								<td>Order Shipping Total</td>
+								<td><?php _e('Order Shipping Total', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{order_total}}</strong></td>
-								<td>Order Total</td>
+								<td><?php _e('Order Total', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{cc_type}}</strong></td>
-								<td>Credit Card Type Used</td>
+								<td><?php _e('Credit Card Type Used', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_first_name}}</strong></td>
-								<td>Customer's First Name</td>
+								<td><?php _e('Customer\'s First Name', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_last_name}}</strong></td>
-								<td>Customers' Last Name</td>
+								<td><?php _e('Customer\'s Last Name', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_email}}</strong></td>
-								<td>Customer's Email</td>
+								<td><?php _e('Customer\'s Email', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{tracking_number}}</strong></td>
-								<td>Tracking Number (if entered)</td>
+								<td><?php _e('Tracking Number (if entered)', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_billing_address1}}</strong></td>
-								<td>Customer's Billing Address 1</td>
+								<td><?php _e('Customer\'s Billing Address 1', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_billing_address2}}</strong></td>
-								<td>Customer's Billing Address 2</td>
+								<td><?php _e('Customer\'s Billing Address 2', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_billing_city}}</strong></td>
-								<td>Customer's Billing City</td>
+								<td><?php _e('Customer\'s Billing City', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_billing_state}}</strong></td>
-								<td>Customer's Billing State</td>
+								<td><?php _e('Customer\'s Billing State', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_billing_zip}}</strong></td>
-								<td>Customer's Billing Zip</td>
+								<td><?php _e('Customer\'s Billing Zip', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_billing_country}}</strong></td>
-								<td>Customer's Billing Country</td>
+								<td><?php _e('Customer\'s Billing Country', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_shipping_address1}}</strong></td>
-								<td>Customer's Shipping Address 1</td>
+								<td><?php _e('Customer\'s Shipping Address 1', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_shipping_address2}}</strong></td>
-								<td>Customer's Shipping Address 2</td>
+								<td><?php _e('Customer\'s Shipping Address 2', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_shipping_city}}</strong></td>
-								<td>Customer's Shipping City</td>
+								<td><?php _e('Customer\'s Shipping City', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_shipping_state}}</strong></td>
-								<td>Customer's Shipping State</td>
+								<td><?php _e('Customer\'s Shipping City', 'foxypress'); ?>x</td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_shipping_zip}}</strong></td>
-								<td>Customer's Shipping Zip</td>
+								<td><?php _e('Customer\'s Shipping Zip', 'foxypress'); ?></td>
 							</tr>
 							<tr>
 								<td><strong>{{customer_shipping_country}}</strong></td>
-								<td>Customer's Shipping Country</td>
+								<td><?php _e('Customer\'s Shipping Country', 'foxypress'); ?></td>
 							</tr>
 		            	</table>
 		        	</div>
@@ -319,21 +319,21 @@ function foxypress_manage_emails_page_load()
 			}else{
 			?>
 		<div class="wrap">
-			<h2><?php _e('Manage Emails'); ?></h2>
+			<h2><?php _e('Manage Emails', 'foxypress'); ?></h2>
 			<table cellpadding="10" style="float:left; width:650px;">
                <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
 				<form method="POST" name="statusForm" id="statusForm"> 
 				<tr>
-					<td><strong>Template Name: </strong></td><td>  <input type="text" name="templatename" value="" size="50" /></td>
+					<td><strong><?php _e('Template Name', 'foxypress'); ?>: </strong></td><td>  <input type="text" name="templatename" value="" size="50" /></td>
 				</tr>
 				<tr>
-					<td><strong>Subject</strong></td> <td><input type="text" name="subject" value="" size="50" /></td>
+					<td><strong><?php _e('Subject', 'foxypress'); ?></strong></td> <td><input type="text" name="subject" value="" size="50" /></td>
 				</tr>
                 <tr>
-					<td><strong>From Email</strong></td> <td><input type="text" name="from" value="" size="50" /></td>
+					<td><strong><?php _e('From Email', 'foxypress'); ?></strong></td> <td><input type="text" name="from" value="" size="50" /></td>
 				</tr>
 				<tr>
-					<td><strong>Content</strong></td>
+					<td><strong><?php _e('Content', 'foxypress'); ?></strong></td>
 					<td>
                     	<textarea name="content" cols="70" rows="10"></textarea>
 						 <script type="text/javascript">
@@ -343,104 +343,104 @@ function foxypress_manage_emails_page_load()
 				</tr>
 				<tr>
 					<td>&nbsp;</td>
-					<td><input type="submit" name="foxy_em_save" id="foxy_em_save" value="Save" /></td>
+					<td><input type="submit" name="foxy_em_save" id="foxy_em_save" value="<?php _e('Save', 'foxypress'); ?>" /></td>
 				</tr>
 				</form>
 			</table>
 			<div style="float:left; width:400px; margin-left:20px">
-				<p><i> You can use the following legend to populate the email body</i></p>
+				<p><i><?php _e('You can use the following legend to populate the email body', 'foxypress'); ?></i></p>
 				<table style="margin:10px 0; display:block;">	
 					<tr>
 						<td width="200"><strong>{{order_id}}</strong></td>
-						<td>ID of Order</td>
+						<td><?php _e('ID of Order', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{order_date}}</strong></td>
-						<td>Order Date</td>
+						<td><?php _e('Order Date', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{product_total}}</strong></td>
-						<td>Order Product Total</td>
+						<td><?php _e('Order Product Total', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{tax_total}}</strong></td>
-						<td>Order Tax Total</td>
+						<td><?php _e('Order Tax Total', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{shipping_total}}</strong></td>
-						<td>Order Shipping Total</td>
+						<td><?php _e('Order Shipping Total', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{order_total}}</strong></td>
-						<td>Order Total</td>
+						<td><?php _e('Order Total', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{cc_type}}</strong></td>
-						<td>Credit Card Type Used</td>
+						<td><?php _e('Credit Card Type Used', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_first_name}}</strong></td>
-						<td>Customer's First Name</td>
+						<td><?php _e('Customer\'s First Name', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_last_name}}</strong></td>
-						<td>Customers' Last Name</td>
+						<td><?php _e('Customer\'s Last Name', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_email}}</strong></td>
-						<td>Customer's Email</td>
+						<td><?php _e('Customer\'s Email', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{tracking_number}}</strong></td>
-						<td>Tracking Number (if entered)</td>
+						<td><?php _e('Tracking Number (if entered)', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_billing_address1}}</strong></td>
-						<td>Customer's Billing Address 1</td>
+						<td><?php _e('Customer\'s Billing Address 1', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_billing_address2}}</strong></td>
-						<td>Customer's Billing Address 2</td>
+						<td><?php _e('Customer\'s Billing Address 2', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_billing_city}}</strong></td>
-						<td>Customer's Billing City</td>
+						<td><?php _e('Customer\'s Billing City', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_billing_state}}</strong></td>
-						<td>Customer's Billing State</td>
+						<td><?php _e('Customer\'s Billing State', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_billing_zip}}</strong></td>
-						<td>Customer's Billing Zip</td>
+						<td><?php _e('Customer\'s Billing Zip', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_billing_country}}</strong></td>
-						<td>Customer's Billing Country</td>
+						<td><?php _e('Customer\'s Billing Country', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_shipping_address1}}</strong></td>
-						<td>Customer's Shipping Address 1</td>
+						<td><?php _e('Customer\'s Shipping Address 1', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_shipping_address2}}</strong></td>
-						<td>Customer's Shipping Address 2</td>
+						<td><?php _e('Customer\'s Shipping Address 2', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_shipping_city}}</strong></td>
-						<td>Customer's Shipping City</td>
+						<td><?php _e('Customer\'s Shipping City', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_shipping_state}}</strong></td>
-						<td>Customer's Shipping State</td>
+						<td><?php _e('Customer\'s Shipping City', 'foxypress'); ?>x</td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_shipping_zip}}</strong></td>
-						<td>Customer's Shipping Zip</td>
+						<td><?php _e('Customer\'s Shipping Zip', 'foxypress'); ?></td>
 					</tr>
 					<tr>
 						<td><strong>{{customer_shipping_country}}</strong></td>
-						<td>Customer's Shipping Country</td>
+						<td><?php _e('Customer\'s Shipping Country', 'foxypress'); ?></td>
 					</tr>
             	</table>
         	</div>
@@ -449,16 +449,16 @@ function foxypress_manage_emails_page_load()
 	}else{
 		$action = foxypress_FixGetVar('action');
 		if ($action === 'updated') { 
-			echo("<div class='updated' id='message'>Your email template has been successfully saved!</div>");
+			echo("<div class='updated' id='message'>" . __('Your email template has been successfully saved', 'foxypress') . "!</div>");
 		}else if ($action === 'delete') { 
 			$sql = "delete from  " . $wpdb->prefix . "foxypress_email_templates WHERE email_template_id = '".$_GET['id']."'";
 			$wpdb->query($sql);
-			echo("<div class='updated' id='message'>Your email template has been successfully deleted!</div>");
+			echo("<div class='updated' id='message'>" . __('Your email template has been successfully deleted', 'foxypress') . "!</div>");
 		}
 		?>
 		<div class="wrap">
-	    	<h2><?php _e('Manage Emails'); ?> <a href='<?php bloginfo('url') ?>/wp-admin/edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2">Add New</a></h2>
-	        <div><i>Listed below you will your email templates for use with individual orders</i></div>
+	    	<h2><?php _e('Manage Emails', 'foxypress'); ?> <a href='<?php bloginfo('url') ?>/wp-admin/edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2"><?php _e('Add New', 'foxypress'); ?></a></h2>
+	        <div><i><?php _e('Listed below you will your email templates for use with individual orders', 'foxypress'); ?></i></div>
 	        <?php
 				$Emails= $wpdb->get_results("SELECT * FROM " . $wpdb->prefix ."foxypress_email_templates");
 				if (!empty($Emails)) {
@@ -466,7 +466,7 @@ function foxypress_manage_emails_page_load()
 	         <table class="widefat page fixed">
 				<thead>
 					<tr>
-						<th class="manage-column" scope="col" width="80%">Template Name</th>
+						<th class="manage-column" scope="col" width="80%"><?php _e('Template Name', 'foxypress'); ?></th>
 	                    <th>&nbsp;</th>
 					</tr>
 				</thead>            
@@ -474,7 +474,7 @@ function foxypress_manage_emails_page_load()
 				foreach ($Emails as $e ) {
 					echo("<tr>");
 					echo("<td><a href='" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=manage-emails&id=" . $e->email_template_id."&mode=edit'>" . $e->foxy_email_template_name . "</a></td>");
-					echo("<td><a href='" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=manage-emails&id=" . $e->email_template_id."&action=delete'>Delete</a></td>");
+					echo("<td><a href='" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=manage-emails&id=" . $e->email_template_id."&action=delete'>". __('Delete', 'foxypress') . "</a></td>");
 					echo("</tr>");
 			}
 			echo "</table>";

@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 wp_enqueue_script('jquery-ui-core');
@@ -34,18 +34,18 @@ function foxypress_view_reports_list()
 {
 ?>
 	<div class="wrap">
-    	<h2><?php _e('Reports','reports'); ?></h2><br>
+    	<h2><?php _e('Reports','foxypress'); ?></h2><br>
 		<div class='reports first'>
 
 		</div>
 		<div class='reports second'>
-			<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=1"); ?>">View Daily/Weekly/Monthly Order Totals</a>			
+			<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=1"); ?>"><?php _e('View Daily/Weekly/Monthly Order Totals', 'foxypress'); ?></a>			
 		</div>
 		<div class='reports second'>
-        	<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=2"); ?>">View Orders By Product Code</a>
+        	<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=2"); ?>"><?php _e('View Orders By Product Code', 'foxypress'); ?></a>
 		</div>
 		<div class='reports second'>
-        	<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=3"); ?>">View Coupon Orders By Product Code</a>
+        	<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=3"); ?>"><?php _e('View Coupon Orders By Product Code', 'foxypress'); ?></a>
 		</div>
 	</div>
 <?php
@@ -70,32 +70,32 @@ function foxyprses_view_ordersByCode_report()
         	<form id="frmOrders" name="frmOrders" method="POST">                 
             	<table>
             		<tr>
-                    	<td>Start Date: </td>
+                    	<td><?php _e('v', 'foxypress'); ?>: </td>
                         <td>
                             <input type="text" id="txtStartDate" name="txtStartDate" value="<?php echo(($_POST['txtStartDate'] != "") ? $_POST['txtStartDate'] : date("Y-m-d"))  ?>" /> 
                             <select id="ddlStartHour" name="ddlStartHour">
-                                <option value="1" <?php echo ($_POST['ddlStartHour'] == "1") ? "selected=\"selected\"" : "" ?>>1</option>
-                                <option value="2" <?php echo ($_POST['ddlStartHour'] == "2") ? "selected=\"selected\"" : "" ?>>2</option>
-                                <option value="3" <?php echo ($_POST['ddlStartHour'] == "3") ? "selected=\"selected\"" : "" ?>>3</option>
-                                <option value="4" <?php echo ($_POST['ddlStartHour'] == "4") ? "selected=\"selected\"" : "" ?>>4</option>
-                                <option value="5" <?php echo ($_POST['ddlStartHour'] == "5") ? "selected=\"selected\"" : "" ?>>5</option>
-                                <option value="6" <?php echo ($_POST['ddlStartHour'] == "6") ? "selected=\"selected\"" : "" ?>>6</option>
-                                <option value="7" <?php echo ($_POST['ddlStartHour'] == "7") ? "selected=\"selected\"" : "" ?>>7</option>
-                                <option value="8" <?php echo ($_POST['ddlStartHour'] == "8") ? "selected=\"selected\"" : "" ?>>8</option>
-                                <option value="9" <?php echo ($_POST['ddlStartHour'] == "9") ? "selected=\"selected\"" : "" ?>>9</option>
-                                <option value="10" <?php echo ($_POST['ddlStartHour'] == "10") ? "selected=\"selected\"" : "" ?>>10</option>
-                                <option value="11" <?php echo ($_POST['ddlStartHour'] == "11") ? "selected=\"selected\"" : "" ?>>11</option>
-                                <option value="0" <?php echo ($_POST['ddlStartHour'] == "0") ? "selected=\"selected\"" : "" ?>>12</option>
+                                <option value="1" <?php echo ($_POST['ddlStartHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
+                                <option value="2" <?php echo ($_POST['ddlStartHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
+                                <option value="3" <?php echo ($_POST['ddlStartHour'] == "3") ? "selected=\"selected\"" : "" ?>><?php _e('3', 'foxypress'); ?></option>
+                                <option value="4" <?php echo ($_POST['ddlStartHour'] == "4") ? "selected=\"selected\"" : "" ?>><?php _e('4', 'foxypress'); ?></option>
+                                <option value="5" <?php echo ($_POST['ddlStartHour'] == "5") ? "selected=\"selected\"" : "" ?>><?php _e('5', 'foxypress'); ?></option>
+                                <option value="6" <?php echo ($_POST['ddlStartHour'] == "6") ? "selected=\"selected\"" : "" ?>><?php _e('6', 'foxypress'); ?></option>
+                                <option value="7" <?php echo ($_POST['ddlStartHour'] == "7") ? "selected=\"selected\"" : "" ?>><?php _e('7', 'foxypress'); ?></option>
+                                <option value="8" <?php echo ($_POST['ddlStartHour'] == "8") ? "selected=\"selected\"" : "" ?>><?php _e('8', 'foxypress'); ?></option>
+                                <option value="9" <?php echo ($_POST['ddlStartHour'] == "9") ? "selected=\"selected\"" : "" ?>><?php _e('9', 'foxypress'); ?></option>
+                                <option value="10" <?php echo ($_POST['ddlStartHour'] == "10") ? "selected=\"selected\"" : "" ?>><?php _e('10', 'foxypress'); ?></option>
+                                <option value="11" <?php echo ($_POST['ddlStartHour'] == "11") ? "selected=\"selected\"" : "" ?>><?php _e('11', 'foxypress'); ?></option>
+                                <option value="0" <?php echo ($_POST['ddlStartHour'] == "0") ? "selected=\"selected\"" : "" ?>><?php _e('12', 'foxypress'); ?></option>
                             </select> : 
                             <select id="ddlStartMinute" name="ddlStartMinute">
-                                <option value="00" <?php echo ($_POST['ddlStartMinute'] == "00") ? "selected=\"selected\"" : "" ?>>00</option>
-                                <option value="15" <?php echo ($_POST['ddlStartMinute'] == "15") ? "selected=\"selected\"" : "" ?>>15</option>
-                                <option value="30" <?php echo ($_POST['ddlStartMinute'] == "30") ? "selected=\"selected\"" : "" ?>>30</option>
-                                <option value="45" <?php echo ($_POST['ddlStartMinute'] == "45") ? "selected=\"selected\"" : "" ?>>45</option>
+                                <option value="00" <?php echo ($_POST['ddlStartMinute'] == "00") ? "selected=\"selected\"" : "" ?>><?php _e('00', 'foxypress'); ?></option>
+                                <option value="15" <?php echo ($_POST['ddlStartMinute'] == "15") ? "selected=\"selected\"" : "" ?>><?php _e('15', 'foxypress'); ?></option>
+                                <option value="30" <?php echo ($_POST['ddlStartMinute'] == "30") ? "selected=\"selected\"" : "" ?>><?php _e('30', 'foxypress'); ?></option>
+                                <option value="45" <?php echo ($_POST['ddlStartMinute'] == "45") ? "selected=\"selected\"" : "" ?>><?php _e('45', 'foxypress'); ?></option>
                             </select> 
                             <select id="ddlStartSuffix" name="ddlStartSuffix">
-                                <option value="AM" <?php echo ($_POST['ddlStartSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>>AM</option>
-                                <option value="PM" <?php echo ($_POST['ddlStartSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>>PM</option>
+                                <option value="AM" <?php echo ($_POST['ddlStartSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>><?php _e('AM', 'foxypress'); ?></option>
+                                <option value="PM" <?php echo ($_POST['ddlStartSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>><?php _e('PM', 'foxypress'); ?></option>
                             </select>
 						</td>
 					</tr>
@@ -104,36 +104,37 @@ function foxyprses_view_ordersByCode_report()
                         <td>
                             <input type="text" id="txtEndDate" name="txtEndDate"  value="<?= ($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")  ?>" />  
                             <select id="ddlEndHour" name="ddlEndHour">
-                                <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>>1</option>
-                                <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>>2</option>
-                                <option value="3" <?php echo ($_POST['ddlEndHour'] == "3") ? "selected=\"selected\"" : "" ?>>3</option>
-                                <option value="4" <?php echo ($_POST['ddlEndHour'] == "4") ? "selected=\"selected\"" : "" ?>>4</option>
-                                <option value="5" <?php echo ($_POST['ddlEndHour'] == "5") ? "selected=\"selected\"" : "" ?>>5</option>
-                                <option value="6" <?php echo ($_POST['ddlEndHour'] == "6") ? "selected=\"selected\"" : "" ?>>6</option>
-                                <option value="7" <?php echo ($_POST['ddlEndHour'] == "7") ? "selected=\"selected\"" : "" ?>>7</option>
-                                <option value="8" <?php echo ($_POST['ddlEndHour'] == "8") ? "selected=\"selected\"" : "" ?>>8</option>
-                                <option value="9" <?php echo ($_POST['ddlEndHour'] == "9") ? "selected=\"selected\"" : "" ?>>9</option>
-                                <option value="10" <?php echo ($_POST['ddlEndHour'] == "10") ? "selected=\"selected\"" : "" ?>>10</option>
-                                <option value="11" <?php echo ($_POST['ddlEndHour'] == "11") ? "selected=\"selected\"" : "" ?>>11</option>
-                                <option value="0" <?php echo ($_POST['ddlEndHour'] == "0") ? "selected=\"selected\"" : "" ?>>12</option>
+                                <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
+                                <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
+                                <option value="3" <?php echo ($_POST['ddlEndHour'] == "3") ? "selected=\"selected\"" : "" ?>><?php _e('3', 'foxypress'); ?></option>
+                                <option value="4" <?php echo ($_POST['ddlEndHour'] == "4") ? "selected=\"selected\"" : "" ?>><?php _e('4', 'foxypress'); ?></option>
+                                <option value="5" <?php echo ($_POST['ddlEndHour'] == "5") ? "selected=\"selected\"" : "" ?>><?php _e('5', 'foxypress'); ?></option>
+                                <option value="6" <?php echo ($_POST['ddlEndHour'] == "6") ? "selected=\"selected\"" : "" ?>><?php _e('6', 'foxypress'); ?></option>
+                                <option value="7" <?php echo ($_POST['ddlEndHour'] == "7") ? "selected=\"selected\"" : "" ?>><?php _e('7', 'foxypress'); ?></option>
+                                <option value="8" <?php echo ($_POST['ddlEndHour'] == "8") ? "selected=\"selected\"" : "" ?>><?php _e('8', 'foxypress'); ?></option>
+                                <option value="9" <?php echo ($_POST['ddlEndHour'] == "9") ? "selected=\"selected\"" : "" ?>><?php _e('9', 'foxypress'); ?></option>
+                                <option value="10" <?php echo ($_POST['ddlEndHour'] == "10") ? "selected=\"selected\"" : "" ?>><?php _e('10', 'foxypress'); ?></option>
+                                <option value="11" <?php echo ($_POST['ddlEndHour'] == "11") ? "selected=\"selected\"" : "" ?>><?php _e('11', 'foxypress'); ?></option>
+                                <option value="0" <?php echo ($_POST['ddlEndHour'] == "0") ? "selected=\"selected\"" : "" ?>><?php _e('12', 'foxypress'); ?></option>
                             </select> : 
                             <select id="ddlEndMinute" name="ddlEndMinute">
-                                <option value="00" <?php echo ($_POST['ddlEndMinute'] == "00") ? "selected=\"selected\"" : "" ?>>00</option>
-                                <option value="15" <?php echo ($_POST['ddlEndMinute'] == "15") ? "selected=\"selected\"" : "" ?>>15</option>
-                                <option value="30" <?php echo ($_POST['ddlEndMinute'] == "30") ? "selected=\"selected\"" : "" ?>>30</option>
-                                <option value="45" <?php echo ($_POST['ddlEndMinute'] == "45") ? "selected=\"selected\"" : "" ?>>45</option>
+                                <option value="00" <?php echo ($_POST['ddlEndMinute'] == "00") ? "selected=\"selected\"" : "" ?>><?php _e('00', 'foxypress'); ?></option>
+                                <option value="15" <?php echo ($_POST['ddlEndMinute'] == "15") ? "selected=\"selected\"" : "" ?>><?php _e('15', 'foxypress'); ?></option>
+                                <option value="30" <?php echo ($_POST['ddlEndMinute'] == "30") ? "selected=\"selected\"" : "" ?>><?php _e('30', 'foxypress'); ?></option>
+                                <option value="45" <?php echo ($_POST['ddlEndMinute'] == "45") ? "selected=\"selected\"" : "" ?>><?php _e('45', 'foxypress'); ?></option>
                             </select> 
                             <select id="ddlEndSuffix" name="ddlEndSuffix">
-                                <option value="AM" <?php echo ($_POST['ddlEndSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>>AM</option>
-                                <option value="PM" <?php echo ($_POST['ddlEndSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>>PM</option>                            </select>
+                                <option value="AM" <?php echo ($_POST['ddlEndSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>><?php _e('AM', 'foxypress'); ?></option>
+                                <option value="PM" <?php echo ($_POST['ddlEndSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>><?php _e('PM', 'foxypress'); ?></option>                            
+							</select>
                         </td>
                     </tr>
                     <tr>
-                    	<td>Product Code: </td>
+                    	<td><?php _e('Product Code', 'foxypress'); ?>: </td>
                         <td><input id="txtProductCode" name="txtProductCode" type="text" value="<?php echo($_POST['txtProductCode']);?>" /></td>
                     </tr>
                     <tr>
-                    	<td>Transaction Status: </td>
+                    	<td><?php _e('Transaction Status', 'foxypress'); ?>: </td>
                         <td>
                         	<select name="ddlStatus" id="ddlStatus">
                             	<?php
@@ -151,8 +152,8 @@ function foxyprses_view_ordersByCode_report()
                     </tr>
                     <tr>
                     	<td colspan="2">
-                        	<input type="submit" id="btnSubmit" name="btnSubmit" value="Run Report" /> 
-                            <small><i>(Start and End Dates need to be in yyyy-mm-dd format. ex: <?php echo(date("Y-m-d"))?>)</i></small>
+                        	<input type="submit" id="btnSubmit" name="btnSubmit" value="<?php _e('Run Report', 'foxypress'); ?>" /> 
+                            <small><i><?php _e('(Start and End Dates need to be in yyyy-mm-dd format. ex', 'foxypress'); ?>: <?php echo(date("Y-m-d"))?>)</i></small>
 						</td>
                     </tr>
 				</table>
@@ -220,15 +221,15 @@ function foxyprses_view_ordersByCode_report()
 			}
 			else
 			{
-				$Results = "<tr><td colspan=\"4\">There are currently no transactions</td></tr>";
+				$Results = "<tr><td colspan=\"4\">" . __('There are currently no transactions', 'foxypress') . "</td></tr>";
 			}
 			echo("<table class=\"widefat page fixed\" width=\"50%\" cellpadding=\"3\" cellspacing=\"3\">
 			 		<thead>
                 		<tr>
-							<th class=\"manage-column\" scope=\"col\">Order Number</td>
-							<th class=\"manage-column\" scope=\"col\">Product Code</td>
-							<th class=\"manage-column\" scope=\"col\">Quantity</td>
-							<th class=\"manage-column\" scope=\"col\">Order Date</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Order Number', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Product Code', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Quantity', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Order Date', 'foxypress') . "</td>
 						</tr>
 					</thead>
 					<tbody>
@@ -260,32 +261,32 @@ function foxyprses_view_coupon_ordersByCode_report()
         	<form id="frmOrders" name="frmOrders" method="POST">                 
             	<table>
             		<tr>
-                    	<td>Start Date: </td>
+                    	<td><?php _e('Start Date', 'foxypress'); ?>: </td>
                         <td>
                             <input type="text" id="txtStartDate" name="txtStartDate" value="<?php echo(($_POST['txtStartDate'] != "") ? $_POST['txtStartDate'] : date("Y-m-d"))  ?>" /> 
                             <select id="ddlStartHour" name="ddlStartHour">
-                                <option value="1" <?php echo ($_POST['ddlStartHour'] == "1") ? "selected=\"selected\"" : "" ?>>1</option>
-                                <option value="2" <?php echo ($_POST['ddlStartHour'] == "2") ? "selected=\"selected\"" : "" ?>>2</option>
-                                <option value="3" <?php echo ($_POST['ddlStartHour'] == "3") ? "selected=\"selected\"" : "" ?>>3</option>
-                                <option value="4" <?php echo ($_POST['ddlStartHour'] == "4") ? "selected=\"selected\"" : "" ?>>4</option>
-                                <option value="5" <?php echo ($_POST['ddlStartHour'] == "5") ? "selected=\"selected\"" : "" ?>>5</option>
-                                <option value="6" <?php echo ($_POST['ddlStartHour'] == "6") ? "selected=\"selected\"" : "" ?>>6</option>
-                                <option value="7" <?php echo ($_POST['ddlStartHour'] == "7") ? "selected=\"selected\"" : "" ?>>7</option>
-                                <option value="8" <?php echo ($_POST['ddlStartHour'] == "8") ? "selected=\"selected\"" : "" ?>>8</option>
-                                <option value="9" <?php echo ($_POST['ddlStartHour'] == "9") ? "selected=\"selected\"" : "" ?>>9</option>
-                                <option value="10" <?php echo ($_POST['ddlStartHour'] == "10") ? "selected=\"selected\"" : "" ?>>10</option>
-                                <option value="11" <?php echo ($_POST['ddlStartHour'] == "11") ? "selected=\"selected\"" : "" ?>>11</option>
-                                <option value="0" <?php echo ($_POST['ddlStartHour'] == "0") ? "selected=\"selected\"" : "" ?>>12</option>
+                                <option value="1" <?php echo ($_POST['ddlStartHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
+                                <option value="2" <?php echo ($_POST['ddlStartHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
+                                <option value="3" <?php echo ($_POST['ddlStartHour'] == "3") ? "selected=\"selected\"" : "" ?>><?php _e('3', 'foxypress'); ?></option>
+                                <option value="4" <?php echo ($_POST['ddlStartHour'] == "4") ? "selected=\"selected\"" : "" ?>><?php _e('4', 'foxypress'); ?></option>
+                                <option value="5" <?php echo ($_POST['ddlStartHour'] == "5") ? "selected=\"selected\"" : "" ?>><?php _e('5', 'foxypress'); ?></option>
+                                <option value="6" <?php echo ($_POST['ddlStartHour'] == "6") ? "selected=\"selected\"" : "" ?>><?php _e('6', 'foxypress'); ?></option>
+                                <option value="7" <?php echo ($_POST['ddlStartHour'] == "7") ? "selected=\"selected\"" : "" ?>><?php _e('7', 'foxypress'); ?></option>
+                                <option value="8" <?php echo ($_POST['ddlStartHour'] == "8") ? "selected=\"selected\"" : "" ?>><?php _e('8', 'foxypress'); ?></option>
+                                <option value="9" <?php echo ($_POST['ddlStartHour'] == "9") ? "selected=\"selected\"" : "" ?>><?php _e('9', 'foxypress'); ?></option>
+                                <option value="10" <?php echo ($_POST['ddlStartHour'] == "10") ? "selected=\"selected\"" : "" ?>><?php _e('10', 'foxypress'); ?></option>
+                                <option value="11" <?php echo ($_POST['ddlStartHour'] == "11") ? "selected=\"selected\"" : "" ?>><?php _e('11', 'foxypress'); ?></option>
+                                <option value="0" <?php echo ($_POST['ddlStartHour'] == "0") ? "selected=\"selected\"" : "" ?>><?php _e('12', 'foxypress'); ?></option>
                             </select> : 
                             <select id="ddlStartMinute" name="ddlStartMinute">
-                                <option value="00" <?php echo ($_POST['ddlStartMinute'] == "00") ? "selected=\"selected\"" : "" ?>>00</option>
-                                <option value="15" <?php echo ($_POST['ddlStartMinute'] == "15") ? "selected=\"selected\"" : "" ?>>15</option>
-                                <option value="30" <?php echo ($_POST['ddlStartMinute'] == "30") ? "selected=\"selected\"" : "" ?>>30</option>
-                                <option value="45" <?php echo ($_POST['ddlStartMinute'] == "45") ? "selected=\"selected\"" : "" ?>>45</option>
+                                <option value="00" <?php echo ($_POST['ddlStartMinute'] == "00") ? "selected=\"selected\"" : "" ?>><?php _e('00', 'foxypress'); ?></option>
+                                <option value="15" <?php echo ($_POST['ddlStartMinute'] == "15") ? "selected=\"selected\"" : "" ?>><?php _e('15', 'foxypress'); ?></option>
+                                <option value="30" <?php echo ($_POST['ddlStartMinute'] == "30") ? "selected=\"selected\"" : "" ?>><?php _e('30', 'foxypress'); ?></option>
+                                <option value="45" <?php echo ($_POST['ddlStartMinute'] == "45") ? "selected=\"selected\"" : "" ?>><?php _e('45', 'foxypress'); ?></option>
                             </select> 
                             <select id="ddlStartSuffix" name="ddlStartSuffix">
-                                <option value="AM" <?php echo ($_POST['ddlStartSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>>AM</option>
-                                <option value="PM" <?php echo ($_POST['ddlStartSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>>PM</option>
+                                <option value="AM" <?php echo ($_POST['ddlStartSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>><?php _e('AM', 'foxypress'); ?></option>
+                                <option value="PM" <?php echo ($_POST['ddlStartSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>><?php _e('PM', 'foxypress'); ?></option>
                             </select>
 						</td>
 					</tr>
@@ -294,36 +295,37 @@ function foxyprses_view_coupon_ordersByCode_report()
                         <td>
                             <input type="text" id="txtEndDate" name="txtEndDate"  value="<?= ($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")  ?>" />  
                             <select id="ddlEndHour" name="ddlEndHour">
-                                <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>>1</option>
-                                <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>>2</option>
-                                <option value="3" <?php echo ($_POST['ddlEndHour'] == "3") ? "selected=\"selected\"" : "" ?>>3</option>
-                                <option value="4" <?php echo ($_POST['ddlEndHour'] == "4") ? "selected=\"selected\"" : "" ?>>4</option>
-                                <option value="5" <?php echo ($_POST['ddlEndHour'] == "5") ? "selected=\"selected\"" : "" ?>>5</option>
-                                <option value="6" <?php echo ($_POST['ddlEndHour'] == "6") ? "selected=\"selected\"" : "" ?>>6</option>
-                                <option value="7" <?php echo ($_POST['ddlEndHour'] == "7") ? "selected=\"selected\"" : "" ?>>7</option>
-                                <option value="8" <?php echo ($_POST['ddlEndHour'] == "8") ? "selected=\"selected\"" : "" ?>>8</option>
-                                <option value="9" <?php echo ($_POST['ddlEndHour'] == "9") ? "selected=\"selected\"" : "" ?>>9</option>
-                                <option value="10" <?php echo ($_POST['ddlEndHour'] == "10") ? "selected=\"selected\"" : "" ?>>10</option>
-                                <option value="11" <?php echo ($_POST['ddlEndHour'] == "11") ? "selected=\"selected\"" : "" ?>>11</option>
-                                <option value="0" <?php echo ($_POST['ddlEndHour'] == "0") ? "selected=\"selected\"" : "" ?>>12</option>
+                                <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
+                                <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
+                                <option value="3" <?php echo ($_POST['ddlEndHour'] == "3") ? "selected=\"selected\"" : "" ?>><?php _e('3', 'foxypress'); ?></option>
+                                <option value="4" <?php echo ($_POST['ddlEndHour'] == "4") ? "selected=\"selected\"" : "" ?>><?php _e('4', 'foxypress'); ?></option>
+                                <option value="5" <?php echo ($_POST['ddlEndHour'] == "5") ? "selected=\"selected\"" : "" ?>><?php _e('5', 'foxypress'); ?></option>
+                                <option value="6" <?php echo ($_POST['ddlEndHour'] == "6") ? "selected=\"selected\"" : "" ?>><?php _e('6', 'foxypress'); ?></option>
+                                <option value="7" <?php echo ($_POST['ddlEndHour'] == "7") ? "selected=\"selected\"" : "" ?>><?php _e('7', 'foxypress'); ?></option>
+                                <option value="8" <?php echo ($_POST['ddlEndHour'] == "8") ? "selected=\"selected\"" : "" ?>><?php _e('8', 'foxypress'); ?></option>
+                                <option value="9" <?php echo ($_POST['ddlEndHour'] == "9") ? "selected=\"selected\"" : "" ?>><?php _e('9', 'foxypress'); ?></option>
+                                <option value="10" <?php echo ($_POST['ddlEndHour'] == "10") ? "selected=\"selected\"" : "" ?>><?php _e('10', 'foxypress'); ?></option>
+                                <option value="11" <?php echo ($_POST['ddlEndHour'] == "11") ? "selected=\"selected\"" : "" ?>><?php _e('11', 'foxypress'); ?></option>
+                                <option value="0" <?php echo ($_POST['ddlEndHour'] == "0") ? "selected=\"selected\"" : "" ?>><?php _e('12', 'foxypress'); ?></option>
                             </select> : 
                             <select id="ddlEndMinute" name="ddlEndMinute">
-                                <option value="00" <?php echo ($_POST['ddlEndMinute'] == "00") ? "selected=\"selected\"" : "" ?>>00</option>
-                                <option value="15" <?php echo ($_POST['ddlEndMinute'] == "15") ? "selected=\"selected\"" : "" ?>>15</option>
-                                <option value="30" <?php echo ($_POST['ddlEndMinute'] == "30") ? "selected=\"selected\"" : "" ?>>30</option>
-                                <option value="45" <?php echo ($_POST['ddlEndMinute'] == "45") ? "selected=\"selected\"" : "" ?>>45</option>
+                                <option value="00" <?php echo ($_POST['ddlEndMinute'] == "00") ? "selected=\"selected\"" : "" ?>><?php _e('00', 'foxypress'); ?></option>
+                                <option value="15" <?php echo ($_POST['ddlEndMinute'] == "15") ? "selected=\"selected\"" : "" ?>><?php _e('15', 'foxypress'); ?></option>
+                                <option value="30" <?php echo ($_POST['ddlEndMinute'] == "30") ? "selected=\"selected\"" : "" ?>><?php _e('30', 'foxypress'); ?></option>
+                                <option value="45" <?php echo ($_POST['ddlEndMinute'] == "45") ? "selected=\"selected\"" : "" ?>><?php _e('45', 'foxypress'); ?></option>
                             </select> 
                             <select id="ddlEndSuffix" name="ddlEndSuffix">
-                                <option value="AM" <?php echo ($_POST['ddlEndSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>>AM</option>
-                                <option value="PM" <?php echo ($_POST['ddlEndSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>>PM</option>                            </select>
+                                <option value="AM" <?php echo ($_POST['ddlEndSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>><?php _e('AM', 'foxypress'); ?></option>
+                                <option value="PM" <?php echo ($_POST['ddlEndSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>><?php _e('PM', 'foxypress'); ?></option>                            
+							</select>
                         </td>
                     </tr>
                     <tr>
-                    	<td>Product Code: </td>
+                    	<td><?php _e('Product Code', 'foxypress'); ?>: </td>
                         <td><input id="txtProductCode" name="txtProductCode" type="text" value="<?php echo($_POST['txtProductCode']);?>" /></td>
                     </tr>
                     <tr>
-                    	<td>Transaction Status: </td>
+                    	<td><?php _e('Transaction Status', 'foxypress'); ?>: </td>
                         <td>
                         	<select name="ddlStatus" id="ddlStatus">
                             	<?php
@@ -341,9 +343,9 @@ function foxyprses_view_coupon_ordersByCode_report()
                     </tr>
                     <tr>
                     	<td colspan="2">
-                        	<input type="submit" id="btnSubmit" name="btnSubmit" value="Run Report" />
-                        	<input type="submit" id="export_submit" name="export_submit" value="Export Report" />
-                            <small><i>(Start and End Dates need to be in yyyy-mm-dd format. ex: <?php echo(date("Y-m-d"))?>)</i></small>
+                        	<input type="submit" id="btnSubmit" name="btnSubmit" value="<?php _e('Run Report', 'foxypress'); ?>" />
+                        	<input type="submit" id="export_submit" name="export_submit" value="<?php _e('Export Report', 'foxypress'); ?>" />
+                            <small><i><?php _e('(Start and End Dates need to be in yyyy-mm-dd format. ex', 'foxypress'); ?>: <?php echo(date("Y-m-d"))?>)</i></small>
 						</td>
                     </tr>
 				</table>
@@ -423,17 +425,17 @@ function foxyprses_view_coupon_ordersByCode_report()
 			}
 			else
 			{
-				$Results = "<tr><td colspan=\"4\">There are currently no transactions</td></tr>";
+				$Results = "<tr><td colspan=\"4\">" . __('There are currently no transactions', 'foxypress') . "</td></tr>";
 			}
 			echo("<table class=\"widefat page fixed\" width=\"50%\" cellpadding=\"3\" cellspacing=\"3\">
 			 		<thead>
                 		<tr>
-							<th class=\"manage-column\" scope=\"col\">Order Number</td>
-							<th class=\"manage-column\" scope=\"col\">Product Code</td>
-							<th class=\"manage-column\" scope=\"col\">First Name</td>
-							<th class=\"manage-column\" scope=\"col\">Last Name</td>
-							<th class=\"manage-column\" scope=\"col\">Coupon Code</td>
-							<th class=\"manage-column\" scope=\"col\">Order Date</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Order Number', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Product Code', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('First Name', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Last Name', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Coupon Code', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Order Date', 'foxypress') . "</td>
 						</tr>
 					</thead>
 					<tbody>
@@ -538,11 +540,11 @@ function foxyprses_view_coupon_ordersByCode_report()
 					fwrite($f, "\r\n"); 
 				}
 				fclose($f);
-				echo "<a href=\"" . plugins_url() . "/foxypress/Coupons.csv\" target=\"_blank\">Download Coupon Orders</a> <small><i>(Right Click, Save As)</i></small>";
+				echo "<a href=\"" . plugins_url() . "/foxypress/Coupons.csv\" target=\"_blank\">" . __('Download Coupon Orders</a> <small><i>(Right Click, Save As)</i></small>', 'foxypress') . "";
 			}
 			else
 			{
-				echo "There are currently no transactions";
+				_e("There are currently no transactions", "foxypress");
 			}
 
 		}//end if export		
@@ -622,78 +624,78 @@ function foxypress_view_totals_report()
         	<form id="frmOrders" name="frmOrders" method="POST">                 
             	<table>
             		<tr>
-                    	<td>Start Date: </td>
+                    	<td><?php _e('Start Date', 'foxypress'); ?>: </td>
                         <td>
                             <input type="text" id="txtStartDate" name="txtStartDate" value="<?php echo(($_POST['txtStartDate'] != "") ? $_POST['txtStartDate'] : date("Y-m-d"))  ?>" /> 
                             <select id="ddlStartHour" name="ddlStartHour">
-                                <option value="1" <?php echo ($_POST['ddlStartHour'] == "1") ? "selected=\"selected\"" : "" ?>>1</option>
-                                <option value="2" <?php echo ($_POST['ddlStartHour'] == "2") ? "selected=\"selected\"" : "" ?>>2</option>
-                                <option value="3" <?php echo ($_POST['ddlStartHour'] == "3") ? "selected=\"selected\"" : "" ?>>3</option>
-                                <option value="4" <?php echo ($_POST['ddlStartHour'] == "4") ? "selected=\"selected\"" : "" ?>>4</option>
-                                <option value="5" <?php echo ($_POST['ddlStartHour'] == "5") ? "selected=\"selected\"" : "" ?>>5</option>
-                                <option value="6" <?php echo ($_POST['ddlStartHour'] == "6") ? "selected=\"selected\"" : "" ?>>6</option>
-                                <option value="7" <?php echo ($_POST['ddlStartHour'] == "7") ? "selected=\"selected\"" : "" ?>>7</option>
-                                <option value="8" <?php echo ($_POST['ddlStartHour'] == "8") ? "selected=\"selected\"" : "" ?>>8</option>
-                                <option value="9" <?php echo ($_POST['ddlStartHour'] == "9") ? "selected=\"selected\"" : "" ?>>9</option>
-                                <option value="10" <?php echo ($_POST['ddlStartHour'] == "10") ? "selected=\"selected\"" : "" ?>>10</option>
-                                <option value="11" <?php echo ($_POST['ddlStartHour'] == "11") ? "selected=\"selected\"" : "" ?>>11</option>
-                                <option value="0" <?php echo ($_POST['ddlStartHour'] == "0") ? "selected=\"selected\"" : "" ?>>12</option>
+                                <option value="1" <?php echo ($_POST['ddlStartHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
+                                <option value="2" <?php echo ($_POST['ddlStartHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
+                                <option value="3" <?php echo ($_POST['ddlStartHour'] == "3") ? "selected=\"selected\"" : "" ?>><?php _e('3', 'foxypress'); ?></option>
+                                <option value="4" <?php echo ($_POST['ddlStartHour'] == "4") ? "selected=\"selected\"" : "" ?>><?php _e('4', 'foxypress'); ?></option>
+                                <option value="5" <?php echo ($_POST['ddlStartHour'] == "5") ? "selected=\"selected\"" : "" ?>><?php _e('5', 'foxypress'); ?></option>
+                                <option value="6" <?php echo ($_POST['ddlStartHour'] == "6") ? "selected=\"selected\"" : "" ?>><?php _e('6', 'foxypress'); ?></option>
+                                <option value="7" <?php echo ($_POST['ddlStartHour'] == "7") ? "selected=\"selected\"" : "" ?>><?php _e('7', 'foxypress'); ?></option>
+                                <option value="8" <?php echo ($_POST['ddlStartHour'] == "8") ? "selected=\"selected\"" : "" ?>><?php _e('8', 'foxypress'); ?></option>
+                                <option value="9" <?php echo ($_POST['ddlStartHour'] == "9") ? "selected=\"selected\"" : "" ?>><?php _e('9', 'foxypress'); ?></option>
+                                <option value="10" <?php echo ($_POST['ddlStartHour'] == "10") ? "selected=\"selected\"" : "" ?>><?php _e('10', 'foxypress'); ?></option>
+                                <option value="11" <?php echo ($_POST['ddlStartHour'] == "11") ? "selected=\"selected\"" : "" ?>><?php _e('11', 'foxypress'); ?></option>
+                                <option value="0" <?php echo ($_POST['ddlStartHour'] == "0") ? "selected=\"selected\"" : "" ?>><?php _e('12', 'foxypress'); ?></option>
                             </select> : 
                             <select id="ddlStartMinute" name="ddlStartMinute">
-                                <option value="00" <?php echo ($_POST['ddlStartMinute'] == "00") ? "selected=\"selected\"" : "" ?>>00</option>
-                                <option value="15" <?php echo ($_POST['ddlStartMinute'] == "15") ? "selected=\"selected\"" : "" ?>>15</option>
-                                <option value="30" <?php echo ($_POST['ddlStartMinute'] == "30") ? "selected=\"selected\"" : "" ?>>30</option>
-                                <option value="45" <?php echo ($_POST['ddlStartMinute'] == "45") ? "selected=\"selected\"" : "" ?>>45</option>
+                                <option value="00" <?php echo ($_POST['ddlStartMinute'] == "00") ? "selected=\"selected\"" : "" ?>><?php _e('00', 'foxypress'); ?></option>
+                                <option value="15" <?php echo ($_POST['ddlStartMinute'] == "15") ? "selected=\"selected\"" : "" ?>><?php _e('15', 'foxypress'); ?></option>
+                                <option value="30" <?php echo ($_POST['ddlStartMinute'] == "30") ? "selected=\"selected\"" : "" ?>><?php _e('30', 'foxypress'); ?></option>
+                                <option value="45" <?php echo ($_POST['ddlStartMinute'] == "45") ? "selected=\"selected\"" : "" ?>><?php _e('45', 'foxypress'); ?></option>
                             </select> 
                             <select id="ddlStartSuffix" name="ddlStartSuffix">
-                                <option value="AM" <?php echo ($_POST['ddlStartSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>>AM</option>
-                                <option value="PM" <?php echo ($_POST['ddlStartSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>>PM</option>
+                                <option value="AM" <?php echo ($_POST['ddlStartSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>><?php _e('AM', 'foxypress'); ?></option>
+                                <option value="PM" <?php echo ($_POST['ddlStartSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>><?php _e('PM', 'foxypress'); ?></option>
                             </select>
 						</td>
 					</tr>
                     <tr>
-                    	<td>End Date: </td>
+                    	<td><?php _e('texthere', 'foxypress'); ?>End Date: </td>
                         <td>
                             <input type="text" id="txtEndDate" name="txtEndDate"  value="<?= ($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")  ?>" />  
                             <select id="ddlEndHour" name="ddlEndHour">
-                                <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>>1</option>
-                                <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>>2</option>
-                                <option value="3" <?php echo ($_POST['ddlEndHour'] == "3") ? "selected=\"selected\"" : "" ?>>3</option>
-                                <option value="4" <?php echo ($_POST['ddlEndHour'] == "4") ? "selected=\"selected\"" : "" ?>>4</option>
-                                <option value="5" <?php echo ($_POST['ddlEndHour'] == "5") ? "selected=\"selected\"" : "" ?>>5</option>
-                                <option value="6" <?php echo ($_POST['ddlEndHour'] == "6") ? "selected=\"selected\"" : "" ?>>6</option>
-                                <option value="7" <?php echo ($_POST['ddlEndHour'] == "7") ? "selected=\"selected\"" : "" ?>>7</option>
-                                <option value="8" <?php echo ($_POST['ddlEndHour'] == "8") ? "selected=\"selected\"" : "" ?>>8</option>
-                                <option value="9" <?php echo ($_POST['ddlEndHour'] == "9") ? "selected=\"selected\"" : "" ?>>9</option>
-                                <option value="10" <?php echo ($_POST['ddlEndHour'] == "10") ? "selected=\"selected\"" : "" ?>>10</option>
-                                <option value="11" <?php echo ($_POST['ddlEndHour'] == "11") ? "selected=\"selected\"" : "" ?>>11</option>
-                                <option value="0" <?php echo ($_POST['ddlEndHour'] == "0") ? "selected=\"selected\"" : "" ?>>12</option>
+                                <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
+                                <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
+                                <option value="3" <?php echo ($_POST['ddlEndHour'] == "3") ? "selected=\"selected\"" : "" ?>><?php _e('3', 'foxypress'); ?></option>
+                                <option value="4" <?php echo ($_POST['ddlEndHour'] == "4") ? "selected=\"selected\"" : "" ?>><?php _e('4', 'foxypress'); ?></option>
+                                <option value="5" <?php echo ($_POST['ddlEndHour'] == "5") ? "selected=\"selected\"" : "" ?>><?php _e('5', 'foxypress'); ?></option>
+                                <option value="6" <?php echo ($_POST['ddlEndHour'] == "6") ? "selected=\"selected\"" : "" ?>><?php _e('6', 'foxypress'); ?></option>
+                                <option value="7" <?php echo ($_POST['ddlEndHour'] == "7") ? "selected=\"selected\"" : "" ?>><?php _e('7', 'foxypress'); ?></option>
+                                <option value="8" <?php echo ($_POST['ddlEndHour'] == "8") ? "selected=\"selected\"" : "" ?>><?php _e('8', 'foxypress'); ?></option>
+                                <option value="9" <?php echo ($_POST['ddlEndHour'] == "9") ? "selected=\"selected\"" : "" ?>><?php _e('9', 'foxypress'); ?></option>
+                                <option value="10" <?php echo ($_POST['ddlEndHour'] == "10") ? "selected=\"selected\"" : "" ?>><?php _e('10', 'foxypress'); ?></option>
+                                <option value="11" <?php echo ($_POST['ddlEndHour'] == "11") ? "selected=\"selected\"" : "" ?>><?php _e('11', 'foxypress'); ?></option>
+                                <option value="0" <?php echo ($_POST['ddlEndHour'] == "0") ? "selected=\"selected\"" : "" ?>><?php _e('12', 'foxypress'); ?></option>
                             </select> : 
                             <select id="ddlEndMinute" name="ddlEndMinute">
-                                <option value="00" <?php echo ($_POST['ddlEndMinute'] == "00") ? "selected=\"selected\"" : "" ?>>00</option>
-                                <option value="15" <?php echo ($_POST['ddlEndMinute'] == "15") ? "selected=\"selected\"" : "" ?>>15</option>
-                                <option value="30" <?php echo ($_POST['ddlEndMinute'] == "30") ? "selected=\"selected\"" : "" ?>>30</option>
-                                <option value="45" <?php echo ($_POST['ddlEndMinute'] == "45") ? "selected=\"selected\"" : "" ?>>45</option>
+                                <option value="00" <?php echo ($_POST['ddlEndMinute'] == "00") ? "selected=\"selected\"" : "" ?>><?php _e('00', 'foxypress'); ?></option>
+                                <option value="15" <?php echo ($_POST['ddlEndMinute'] == "15") ? "selected=\"selected\"" : "" ?>><?php _e('15', 'foxypress'); ?></option>
+                                <option value="30" <?php echo ($_POST['ddlEndMinute'] == "30") ? "selected=\"selected\"" : "" ?>><?php _e('30', 'foxypress'); ?></option>
+                                <option value="45" <?php echo ($_POST['ddlEndMinute'] == "45") ? "selected=\"selected\"" : "" ?>><?php _e('45', 'foxypress'); ?></option>
                             </select> 
                             <select id="ddlEndSuffix" name="ddlEndSuffix">
-                                <option value="AM" <?php echo ($_POST['ddlEndSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>>AM</option>
-                                <option value="PM" <?php echo ($_POST['ddlEndSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>>PM</option>                            </select>
+                                <option value="AM" <?php echo ($_POST['ddlEndSuffix'] == "AM") ? "selected=\"selected\"" : "" ?>><?php _e('AM', 'foxypress'); ?></option>
+                                <option value="PM" <?php echo ($_POST['ddlEndSuffix'] == "PM") ? "selected=\"selected\"" : "" ?>><?php _e('PM', 'foxypress'); ?></option>                            </select>
                         </td>
                     </tr>
                     <tr>
-                    	<td>Transaction Type</td>
+                    	<td><?php _e('texthere', 'foxypress'); ?>Transaction Type</td>
                         <td>
                         	<select id="foxy_transaction_type" name="foxy_transaction_type">
-								<option value="" <?php echo ($_POST['foxy_transaction_type'] == "") ? "selected=\"selected\"" : "" ?>>All Transactions</option>
-								<option value="0" <?php echo ($_POST['foxy_transaction_type'] == "0" || !(isset($_POST['btnSubmit']))) ? "selected=\"selected\"" : "" ?>>Live Transactions</option>
-								<option value="1" <?php echo ($_POST['foxy_transaction_type'] == "1") ? "selected=\"selected\"" : "" ?>>Test Transactions</option>
+								<option value="" <?php echo ($_POST['foxy_transaction_type'] == "") ? "selected=\"selected\"" : "" ?>><?php _e('All Transactions', 'foxypress'); ?></option>
+								<option value="0" <?php echo ($_POST['foxy_transaction_type'] == "0" || !(isset($_POST['btnSubmit']))) ? "selected=\"selected\"" : "" ?>><?php _e('Live Transactions', 'foxypress'); ?></option>
+								<option value="1" <?php echo ($_POST['foxy_transaction_type'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('Test Transactions', 'foxypress'); ?></option>
 				 			</select>
                         </td>
                     </tr>
                     <tr>
                     	<td colspan="2">
-                        	<input type="submit" id="btnSubmit" name="btnSubmit" value="Run Report" /> 
-                            <small><i>(Start and End Dates need to be in yyyy-mm-dd format. ex: <?php echo(date("Y-m-d"))?>)</i></small>
+                        	<input type="submit" id="btnSubmit" name="btnSubmit" value="<?php _e('Run Report', 'foxypress'); ?>" /> 
+                            <small><i><?php _e('(Start and End Dates need to be in yyyy-mm-dd format. ex', 'foxypress'); ?>: <?php echo(date("Y-m-d"))?>)</i></small>
 						</td>
                     </tr>
 				</table>
@@ -744,11 +746,11 @@ function foxypress_view_totals_report()
 			echo("<table class=\"widefat page fixed\" width=\"50%\" cellpadding=\"3\" cellspacing=\"3\">
 			 		<thead>
                 		<tr>
-							<th class=\"manage-column\" scope=\"col\">Total Transactions</td>
-							<th class=\"manage-column\" scope=\"col\">Product Total</td>
-							<th class=\"manage-column\" scope=\"col\">Tax Total</td>
-							<th class=\"manage-column\" scope=\"col\">Shipping Total</td>
-							<th class=\"manage-column\" scope=\"col\">Order Total</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Total Transactions', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Product Total', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Tax Total', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Shipping Total', 'foxypress') . "</td>
+							<th class=\"manage-column\" scope=\"col\">" . __('Order Total', 'foxypress') . "</td>
 						</tr>
 					<tr>
 						<td>" . $OrderTotals->TransactionCount . "</td>
@@ -775,13 +777,13 @@ function foxypress_view_totals_report()
 			$CreditCards = $wpdb->get_results($sql);         
 			if(!empty($CreditCards))
 			{
-				echo("<br><div><b>Credit Cards</b></div>");
+				_e("<br><div><b>Credit Cards</b></div>", "foxypress");
 				echo("<table class=\"widefat page fixed\" width=\"50%\" cellpadding=\"3\" cellspacing=\"3\">
 						<thead>
 							<tr>
-								<th class=\"manage-column\" scope=\"col\">Credit Card Type</td>
-								<th class=\"manage-column\" scope=\"col\">Total Transactions</td>
-								<th class=\"manage-column\" scope=\"col\">Total Order Amount</td>
+								<th class=\"manage-column\" scope=\"col\">" . __('Credit Card Type', 'foxypress') . "</td>
+								<th class=\"manage-column\" scope=\"col\">" . __('Total Transactions', 'foxypress') . "</td>
+								<th class=\"manage-column\" scope=\"col\">" . __('Total Order Amount', 'foxypress') . "</td>
 							</tr>
 						</thead>");
 				foreach($CreditCards as $Card)
@@ -797,7 +799,7 @@ function foxypress_view_totals_report()
 		}
 		else
 		{
-			echo("<div>There are currently no transactions for that date range</div>");
+			_e("<div>There are currently no transactions for that date range</div>", "foxypress");
 		}			
 	}	
 	?>

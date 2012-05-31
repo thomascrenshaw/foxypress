@@ -5,7 +5,7 @@ Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscr
 Requires at least: 3.0
 Tested up to: 3.3
 Stable tag: 3.0.1
-FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution.
+FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
 == Description ==
 
@@ -42,6 +42,14 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - MamaDoo Kids - Status Management enhancements
 
 == Changelog ==
+
+= 0.4.2 =
+* Feature: Import/Export now supports images and all product options.
+* Feature: Affiliate Management - administrators can now upload banners for their affiliates. <a href="http://forum.foxy-press.com/kb/affiliate-management/create-and-edit-an-affiliate-banner" target="_blank">Tutorial</a> - These can be shown on the Affiliate stats page through our API. <a href="http://forum.foxy-press.com/kb/api-usage/query-affiliate-banners" target="_blank">Tutorial</a>
+* Feature: Customize your Affiliate Emails for approving a user <a href="http://forum.foxy-press.com/kb/affiliate-management/customize-affiliate-approval-message" target="_blank">Tutorial</a>
+* Upgraded to jQuery 1.6.4
+* BugFix: Fixed some jQuery in affiliate stats page to be more compliant with other jQuery tools.
+* Release notes available <a href="http://www.foxy-press.com/blog/2012/05/31/foxypress-0-4-2/" target="_blank">here</a> 
 
 = 0.4.1.1 =
 * Feature: Modified status change in order management details to be an AJAX call rather than full postback.
@@ -326,7 +334,7 @@ Copy the folder to your WordPress
 2. Go to '*FoxyPress / Manage Settings*' in your WordPress admin.
 3. Enter your FoxyCart domain.
 4. Once activated, FoxyPress will automatically create a Product Detail page for your Category pages.
-5. See installation documentation <a href="http://forum.foxy-press.com/kb/installation-instructions/installation-instructions" target="_blank">here</a>.
+5. See installation documentation <a href="http://www.foxy-press.com/documentation/installation-instructions/" target="_blank">here</a>.
 
 [vimeo http://vimeo.com/21743308]
 

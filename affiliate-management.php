@@ -1,10 +1,230 @@
 <?php
+/**************************************************************************
+FoxyPress provides a complete shopping cart and inventory management tool 
+for use with FoxyCart's e-commerce solution.
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
+**************************************************************************/
+
 $root = dirname(dirname(dirname(dirname(__FILE__))));
 require_once($root.'/wp-config.php');
 require_once($root.'/wp-includes/wp-db.php');
 
 if(!class_exists('WP_List_Table')){
     require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
+
+class Foxypress_affiliate_banners extends WP_List_Table 
+{
+
+	function __construct(){
+        global $status, $page;
+                
+        //Set parent defaults
+        parent::__construct( array(
+            'singular'  => 'banner',
+            'plural'    => 'banners',
+            'ajax'      => false
+        ) );
+    }
+
+	function foxypress_FixGetVar($variable, $default = 'management')
+    {
+        $value = $default;
+        if(isset($_GET[$variable]))
+        {
+            $value = trim($_GET[$variable]);
+            if(get_magic_quotes_gpc())
+            {
+                $value = stripslashes($value);
+            }
+            $value = mysql_real_escape_string($value);
+        }
+        return $value;
+    }
+
+    function foxypress_FixPostVar($variable, $default = '')
+    {
+        $value = $default;
+        if(isset($_POST[$variable]))
+        {
+            $value = trim($_POST[$variable]);
+            $value = mysql_real_escape_string($value);
+        }
+        return $value;
+    }
+
+    // Page Default
+    function column_default($item, $column_name)
+    {
+        switch($column_name){
+            case 'test':
+            default:
+                return print_r($item,true);
+        }
+    }
+
+	/** ************************************************************************
+     * Main page affiliate banner columns
+     * 
+     * @see WP_List_Table::::single_row_columns()
+     * @param array $item A singular item (one full row's worth of data)
+     * @return string Text to be placed inside the column <td>
+     **************************************************************************/
+    
+    function column_management_asset_type($item)
+    {
+        return sprintf('%1$s',
+            /*$1%s*/ $item->foxy_asset_type
+        );
+    }
+
+    function column_management_asset_name($item)
+    {
+        //Build row actions
+        $actions = array(
+            'view_banner' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&banner_id=%s">' . __('Edit Details', 'foxypress') . '</a>',
+				$_REQUEST['page'],'view_banner',$item->id)
+        );
+        
+        //Return the title contents
+        return sprintf('%1$s %2$s',
+            /*$1%s*/ $item->foxy_asset_name,
+            /*$2%s*/ $this->row_actions($actions)
+        );
+    }
+
+    function column_management_asset_image($item)
+    {
+		return '<img src="' . content_url() . '/affiliate_images/' . $item->foxy_asset_file_name . $item->foxy_asset_file_ext . '" style="max-height:32px; max-width:40px;" />';
+        /*return sprintf('%1$s',
+            $item->foxy_asset_file_name . $item->foxy_asset_file_ext
+        );*/
+    }
+
+	function column_management_asset_landing_url($item)
+    {
+        return sprintf('%1$s',
+            /*$1%s*/ $item->foxy_asset_landing_url
+        );
+    }
+		
+	function column_management_asset_delete($item)
+    {
+        return sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&banner_id=%s" onclick="return confirm(\'' . __('Are you sure you want to delete this banner?','foxypress') . '\');">' . __('Delete', 'foxypress') . '</a>',
+			/*$1%s*/ $_REQUEST['page'],'delete_banner',$item->id
+		);
+    }
+
+	function get_columns()
+    {
+        $columns = array(
+                'management_asset_name'		    => __('Asset Name', 'foxypress'),
+                'management_asset_type'         => __('Asset Type', 'foxypress'),
+                'management_asset_image'        => __('Image', 'foxypress'),
+                'management_asset_landing_url'  => __('URL', 'foxypress'),
+				'management_asset_delete'  		=> __('Delete', 'foxypress')
+            );
+
+        return $columns;
+
+    }
+    
+    function get_sortable_columns()
+    {
+        $sortable_columns = array(
+                'management_asset_name'			=> array('management_asset_name',true),     //true means its already sorted
+                'management_asset_type'         => array('management_asset_type',false),
+                'management_asset_landing_url'	=> array('management_asset_landing_url',false)
+            );
+        
+        return $sortable_columns;
+    }
+    
+    function get_bulk_actions() 
+    {
+        $actions = array();
+
+        return $actions;
+    }
+    
+    function process_bulk_action()
+    {
+        //Detect when a bulk action is being triggered...
+        //if( 'delete'===$this->current_action() ) {
+            //wp_die('Items deleted (or they would be if we had items to delete)!');
+        //}
+    }
+    
+    function prepare_items($order_by = '', $order = '')
+    {
+        //How many items per page
+        $per_page = 20;
+        
+        $columns = $this->get_columns();
+        $hidden = array();
+        $sortable = $this->get_sortable_columns();
+        
+        $this->_column_headers = array($columns, $hidden, $sortable);
+        
+        $this->process_bulk_action();
+        
+        global $wpdb;
+
+        if (!$order) {
+			$sort_order = 'ASC';
+		} else {
+			$sort_order = strtoupper($order);
+		}
+		
+		if ($order_by === 'management_asset_name')
+		{
+			$sort_by = 'foxy_asset_name ' . $sort_order;
+		}
+		else if ($order_by === 'management_asset_type')
+		{
+			$sort_by = 'foxy_asset_type ' . $sort_order;
+		}
+		else if ($order_by === 'management_asset_landing_url')
+		{
+			$sort_by = 'foxy_asset_landing_url ' . $sort_order;
+		}
+		else
+		{
+			$sort_by = 'id ASC';
+		}
+		
+		$sql_data = "SELECT *
+			FROM " . $wpdb->base_prefix . "foxypress_affiliate_assets
+			ORDER BY " . $sort_by;
+
+        $data = $wpdb->get_results($sql_data);
+        
+        $current_page = $this->get_pagenum();
+        
+        $total_items = count($data);
+        
+        $data = array_slice($data,(($current_page-1)*$per_page),$per_page);
+        
+        $this->items = $data;
+        
+        $this->set_pagination_args( array(
+            'total_items' => $total_items,                  //WE have to calculate the total number of items
+            'per_page'    => $per_page,                     //WE have to determine how many items to show on a page
+            'total_pages' => ceil($total_items/$per_page)   //WE have to calculate the total number of pages
+        ));
+    }
+
+	function get_affiliate_banner()
+    {
+        global $wpdb;
+        $banner_id = $this->foxypress_FixGetVar('banner_id');
+
+        $data = "SELECT *
+                FROM " . $wpdb->prefix . "foxypress_affiliate_assets
+                WHERE id = " . $banner_id;
+
+        return $wpdb->get_results($data);
+    }
 }
 
 class Foxypress_affiliate_management extends WP_List_Table 
@@ -69,7 +289,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
         //Build row actions
         $actions = array(
-            'view_details' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s">View Details</a>',$_REQUEST['page'],'view_details',$item->id)
+            'view_details' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s">' . __('View Details', 'foxypress') . '</a>',$_REQUEST['page'],'view_details',$item->id)
         );
         
         //Return the title contents
@@ -253,7 +473,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
     function column_pending_affiliates_approve($item)
     {
-        return sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&approve=%s&affiliate_id=%s">Approve</a>',$_REQUEST['page'],'pending_affiliates','true',$item->id);
+        return sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&approve=%s&affiliate_id=%s">' . __('Approve', 'foxypress') . '</a>',$_REQUEST['page'],'pending_affiliates','true',$item->id);
     }
     
     /** ************************************************************************
@@ -269,8 +489,8 @@ class Foxypress_affiliate_management extends WP_List_Table
 
         //Build row actions
         $actions = array(
-            'pay_affiliate' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&order_id=%s">Pay Affiliate</a>',$_REQUEST['page'],'pay_affiliate',$affiliate_id,$item->order_id),
-            'view_order' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=order-management&transaction=%sb=0&mode=detail">View Order Detail</a>',$item->order_id)
+            'pay_affiliate' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&order_id=%s">' . __('Pay Affiliate', 'foxypress') . '</a>',$_REQUEST['page'],'pay_affiliate',$affiliate_id,$item->order_id),
+            'view_order' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=order-management&transaction=%sb=0&mode=detail">' . __('View Order Detail', 'foxypress') . '</a>',$item->order_id)
         );
 
         return sprintf('%1$s %2$s',
@@ -409,47 +629,47 @@ class Foxypress_affiliate_management extends WP_List_Table
         if ($mode === 'management')
         {
             $columns = array(
-                'management_affiliate'          => 'Affiliate',
-                'management_first_name'         => 'First Name',
-                'management_last_name'          => 'Last Name',
-                'management_clicks'             => 'Clicks',
-                'management_total_due'          => 'Total Due',
-                'management_total_commission'   => 'Total Commission',
-                'management_total_transactions' => 'Total Transactions'
+                'management_affiliate'          => __('Affiliate', 'foxypress'),
+                'management_first_name'         => __('First Name', 'foxypress'),
+                'management_last_name'          => __('Last Name', 'foxypress'),
+                'management_clicks'             => __('Clicks', 'foxypress'),
+                'management_total_due'          => __('Total Due', 'foxypress'),
+                'management_total_commission'   => __('Total Commission', 'foxypress'),
+                'management_total_transactions' => __('Total Transactions', 'foxypress')
             );
         }
         else if ($mode === 'pending_affiliates')
         {
             $columns = array(
-                'pending_affiliates_first_name'  => 'First Name',
-                'pending_affiliates_last_name'   => 'Last Name',
-                'pending_affiliates_age'         => 'Age',
-                'pending_affiliates_gender'      => 'Gender',
-                'pending_affiliates_description' => 'Message',
-                'pending_affiliates_approve'     => 'Approve'
+                'pending_affiliates_first_name'  => __('First Name', 'foxypress'),
+                'pending_affiliates_last_name'   => __('Last Name', 'foxypress'),
+                'pending_affiliates_age'         => __('Age', 'foxypress'),
+                'pending_affiliates_gender'      => __('Gender', 'foxypress'),
+                'pending_affiliates_description' => __('Message', 'foxypress'),
+                'pending_affiliates_approve'     => __('Approve', 'foxypress')
             );
         }
         else if ($mode === 'view_details')
         {
             $columns = array(
                 //'cb'                          => '<input type="checkbox" />',
-                'view_details_order_id'         => 'Order ID',
-                'view_details_order_total'      => 'Order Total',
-                'view_details_order_commission' => 'Affiliate Commission',
-                'view_details_order_date'       => 'Order Date',
-                'view_details_order_type'       => 'Order Type'
+                'view_details_order_id'         => __('Order ID', 'foxypress'),
+                'view_details_order_total'      => __('Order Total', 'foxypress'),
+                'view_details_order_commission' => __('Affiliate Commission', 'foxypress'),
+                'view_details_order_date'       => __('Order Date', 'foxypress'),
+                'view_details_order_type'       => __('Order Type', 'foxypress')
             );
         }
         else if ($mode === 'view_past_details')
         {
             $columns = array(
-                'view_past_details_order_id'             => 'Order ID',
-                'view_past_details_order_total'          => 'Order Total',
-                'view_past_details_affiliate_payout'     => 'Affiliate Payout',
-                'view_past_details_order_commission'     => 'Affiliate Commission',
-                'view_past_details_payment_method'       => 'Payment Method',
-                'view_past_details_payment_date'         => 'Payment Date',
-                'view_past_details_order_type'           => 'Order Type'
+                'view_past_details_order_id'             => __('Order ID', 'foxypress'),
+                'view_past_details_order_total'          => __('Order Total', 'foxypress'),
+                'view_past_details_affiliate_payout'     => __('Affiliate Payout', 'foxypress'),
+                'view_past_details_order_commission'     => __('Affiliate Commission', 'foxypress'),
+                'view_past_details_payment_method'       => __('Payment Method', 'foxypress'),
+                'view_past_details_payment_date'         => __('Payment Date', 'foxypress'),
+                'view_past_details_order_type'           => __('Order Type', 'foxypress')
             );
         }
 
@@ -833,7 +1053,12 @@ function foxypress_create_affiliate_table() {
 
     global $wpdb;
 
-    //Create an instance of our package class...
+	//Create an instance of our package class for banners...
+	$fp_banner	  		 = new Foxypress_affiliate_banners();
+    $banner_order_by     = $fp_banner->foxypress_FixGetVar('orderby');
+    $banner_order        = $fp_banner->foxypress_FixGetVar('order');
+
+    //Create an instance of our package class for affiliates...
     $fp_affiliate = new Foxypress_affiliate_management();
     $mode         = $fp_affiliate->foxypress_FixGetVar('mode');
     $order_by     = $fp_affiliate->foxypress_FixGetVar('orderby');
@@ -852,39 +1077,90 @@ function foxypress_create_affiliate_table() {
     if ($mode === 'management' || $mode === 'pending_affiliates'){ 
 
         //Fetch, prepare, sort, and filter our data...
-        $fp_affiliate->prepare_items($mode, $order_by, $order); 
-        $affiliate_counts = $fp_affiliate->get_affiliate_counts(); ?>
+        $fp_banner->prepare_items($banner_order_by, $banner_order); 
+		$fp_affiliate->prepare_items($mode, $order_by, $order); 
+        $affiliate_counts = $fp_affiliate->get_affiliate_counts();
+		
+		$banner_deleted = $fp_affiliate->foxypress_FixGetVar('banner_deleted');
+		if ($banner_deleted === 'true') { ?>
+			<div class="error" id="message">
+				<p><strong><?php _e('Banner Deleted!', 'foxypress'); ?></strong></p>
+			</div>
+		<? }
+
+		$banner_added = $fp_affiliate->foxypress_FixGetVar('banner_added');
+		if ($banner_added === 'true') { ?>
+			<div class="updated" id="message">
+				<p><strong><?php _e('Banner Added!', 'foxypress'); ?></strong></p>
+			</div>
+		<? }
+
+		$banner_updated = $fp_affiliate->foxypress_FixGetVar('banner_updated');
+		if ($banner_updated === 'true') { ?>
+			<div class="updated" id="message">
+				<p><strong><?php _e('Banner Updated!', 'foxypress'); ?></strong></p>
+			</div>
+		<? } ?>
 
         <div class="wrap">
             
             <div id="icon-users" class="icon32"><br/></div>
-            <h2>FoxyPress Affiliates</h2>
+            <h2><?php _e('FoxyPress Affiliate Management', 'foxypress'); ?></h2>
 
-            <?php $updated = $fp_affiliate->foxypress_FixGetVar('updated');
-            if ($updated === 'true') { 
+			<div style="background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;">
+ 				<p><?php _e('Listed below you will find your affiliate banners.', 'foxypress'); ?></p>
+            </div>
 
-                if ($user_detail->$user_payout_type == 1) {
-                    $affiliate_commission = 'Affiliate Commission: ' . $user_detail->$user_payout . '%';
-                } else {
-                    $affiliate_commission = 'Affiliate Commission: $' . $user_detail->$user_payout;
-                }
-                $mail_to = $user_detail->user_email;
-                $mail_subject = 'Affiliate status approved!';
-                $mail_body    = 'You have been approved to be an affiliate. Your affiliate details are below.<br /><br />' . $affiliate_commission . '<br />Affiliate URL: ' . $user_detail->$user_affiliate_url;
+			<!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
+            <form id="affiliate-filter" method="get" style="margin-top: -5px;position:relative;">
+                <!-- For plugins, we also need to ensure that the form posts back to our current page -->
+                <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
+                <!-- Now we can render the completed list table -->
+                <?php echo(sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s" class="add-new-h2" style="position:absolute;left:0px;top:5px;">' . __('Add New Banner', 'foxypress') . '</a>',$_REQUEST['page'],'add_banner')); ?>
+				<?php $fp_banner->display(); ?>
+            </form>
+			
+            <?php 
+				
+				$updated = $fp_affiliate->foxypress_FixGetVar('updated');
+	            				
+				if ($updated === 'true') { 
+	
+	                if ($user_detail->$user_payout_type == 1) {
+	                    $affiliate_commission = 'Affiliate Commission: ' . $user_detail->$user_payout . '%';
+	                } else {
+	                    $affiliate_commission = 'Affiliate Commission: $' . $user_detail->$user_payout;
+	                }
+	                $mail_to = $user_detail->user_email;
+	                $mail_subject = get_option("foxypress_affiliate_approval_email_subject");
+					//replace tokens
+					$mail_subject = str_replace("{{first_name}}", $user_detail->first_name, $mail_subject);
+					$mail_subject = str_replace("{{last_name}}", $user_detail->last_name, $mail_subject);
+					$mail_subject = str_replace("{{email}}", $user_detail->user_email, $mail_subject);
+					$mail_subject = str_replace("{{affiliate_commission}}", $affiliate_commission, $mail_subject);
+					$mail_subject = str_replace("{{affiliate_url}}", $user_detail->$user_affiliate_url, $mail_subject);
 
-                foxypress_Mail($mail_to, $mail_subject, $mail_body); ?>
-
-                <div class="updated" id="message">
-                    <p><strong>Affiliate Approved!</strong></p>
-                </div>
+	                $mail_body    = get_option('foxypress_affiliate_approval_email_body');
+					//replace tokens
+					$mail_body = str_replace("{{first_name}}", $user_detail->first_name, $mail_body);
+					$mail_body = str_replace("{{last_name}}", $user_detail->last_name, $mail_body);
+					$mail_body = str_replace("{{email}}", $user_detail->user_email, $mail_body);
+					$mail_body = str_replace("{{affiliate_commission}}", $affiliate_commission, $mail_body);
+					$mail_body = str_replace("{{affiliate_url}}", $user_detail->$user_affiliate_url, $mail_body);
+	
+	                foxypress_Mail($mail_to, $mail_subject, $mail_body); ?>
+	
+	                <div class="updated" id="message">
+	                    <p><strong><?php _e('Affiliate Approved!', 'foxypress'); ?></strong></p>
+	                </div>
 
             <?php } ?>
             
             <div style="background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;">
                 <?php if ($mode === 'management') { ?>
-                    <p>Listed below you will find your affiliate's current stats.</p>
+                    <p><?php _e('Listed below you will find your affiliate\'s current stats.', 'foxypress'); ?></p>
                 <?php } else { ?>
-                    <p>Listed below you will find your pending affiliates.</p>
+                    <p><?php _e('Listed below you will find your pending affiliates.', 'foxypress'); ?></p>
                 <?php } ?>
             </div>
             
@@ -948,7 +1224,7 @@ function foxypress_create_affiliate_table() {
                             $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&updated=%s&affiliate_id=%s',$_REQUEST['page'],'pending_affiliates','true',$user_id); ?>
 
                             <div class="updated" id="message">
-                                <p><strong>Approving Affiliate...</strong></p>
+                                <p><strong><?php _e('Approving Affiliate...', 'foxypress'); ?></strong></p>
                             </div>
 
                             <script type="text/javascript">window.location.href ='<?php echo $destination_url; ?>';</script>
@@ -956,11 +1232,11 @@ function foxypress_create_affiliate_table() {
                         <?php } else { ?>
                             <div class="error" id="message">
                                 <?php if ($payout_amount_error) { ?>
-                                <p><strong>You must enter a payout.</strong></p>
+                                <p><strong><?php _e('You must enter a payout.', 'foxypress'); ?></strong></p>
                                 <?php } ?>
 
                                 <?php if ($payout_type_error) { ?>
-                                <p><strong>You must select a payout type.</strong></p>
+                                <p><strong><?php _e('You must select a payout type.', 'foxypress'); ?></strong></p>
                                 <?php } ?>
                             </div>
                        <?php }
@@ -969,92 +1245,186 @@ function foxypress_create_affiliate_table() {
                     <form id="affiliate_approve_form" name="affiliate_approve_form" method="POST">
                     <table class="form-table">
                         <tr>
-                            <th><label for="affiliate_payout_type">Affiliate Payout Type</label></th>
+                            <th><label for="affiliate_payout_type"><?php _e('Affiliate Payout Type', 'foxypress'); ?></label></th>
                             <td>
                                 <input type="radio" <?php if ($payout_type == 'percentage') { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="percentage">
-                                <span class="description">Percentage of each order.</span>
+                                <span class="description"><?php _e('Percentage of each order.', 'foxypress'); ?></span>
                             </td>
                         </tr>
                         <tr>
                             <th></th>
                             <td>
                                 <input type="radio" <?php if ($payout_type == 'dollars') { ?>checked="yes" <?php } ?>name="affiliate_payout_type" id="affiliate_payout_type" value="dollars">
-                                <span class="description">Dollar amount of each order.</span>
+                                <span class="description"><?php _e('Dollar amount of each order.', 'foxypress'); ?></span>
                             </td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_payout">Affiliate Payout <span class="description">(required)</span></label></th>
+                            <th><label for="affiliate_payout"><?php _e('Affiliate Payout', 'foxypress'); ?><span class="description">(<?php _e('required', 'foxypress'); ?>)</span></label></th>
                             <td><input type="text" name="affiliate_payout" id="affiliate_payout" value="<?php echo $payout; ?>"> 
-                            <span class="description">How much will this affiliate earn per sale? <b>(Enter 30 for 30% or $30.00)</b></span></td>
+                            <span class="description"><?php _e('How much will this affiliate earn per sale?', 'foxypress'); ?> <b>(<?php _e('Enter 30 for 30% or $30.00', 'foxypress'); ?>)</b></span></td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_referral">Enable Affiliate Referrals</label></th>
-                            <td><input type="checkbox" <?php if ($referral == 'true') { ?>checked="yes" <?php } ?>name="affiliate_referral" id="affiliate_referral" value="true" /> Does this user's link allow for affiliate referrals?</td>
+                            <th><label for="affiliate_referral"><?php _e('Enable Affiliate Referrals', 'foxypress'); ?></label></th>
+                            <td><input type="checkbox" <?php if ($referral == 'true') { ?>checked="yes" <?php } ?>name="affiliate_referral" id="affiliate_referral" value="true" /> <?php _e('Does this user\'s link allow for affiliate referrals?', 'foxypress'); ?></td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_payout_type">Affiliate Referral Payout Type</label></th>
+                            <th><label for="affiliate_payout_type"><?php _e('Affiliate Referral Payout Type', 'foxypress'); ?></label></th>
                             <td>
                                 <input type="radio" <?php if ($referral_payout_type == 'percentage') { ?>checked="yes" <?php } ?>name="affiliate_referral_payout_type" id="affiliate_referral_payout_type" value="percentage">
-                                <span class="description">Percentage of each order.</span>
+                                <span class="description"><?php _e('Percentage of each order.', 'foxypress'); ?></span>
                             </td>
                         </tr>
                         <tr>
                             <th></th>
                             <td>
                                 <input type="radio" <?php if ($referral_payout_type == 'dollars') { ?>checked="yes" <?php } ?>name="affiliate_referral_payout_type" id="affiliate_referral_payout_type" value="dollars">
-                                <span class="description">Dollar amount of each order.</span>
+                                <span class="description"><?php _e('Dollar amount of each order.', 'foxypress'); ?></span>
                             </td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_referral_payout">Affiliate Referral Payout</label></th>
+                            <th><label for="affiliate_referral_payout"><?php _e('Affiliate Referral Payout', 'foxypress'); ?></label></th>
                             <td><input type="text" name="affiliate_referral_payout" id="affiliate_referral_payout" value="<?php echo $referral_payout; ?>"> 
-                            <span class="description">How much will this affiliate earn per referral sale? <b>(Enter 30 for 30% or $30.00)</b></span></td>
+                            <span class="description"><?php _e('How much will this affiliate earn per referral sale?', 'foxypress'); ?> <b>(<?php _e('Enter 30 for 30% or $30.00', 'foxypress'); ?>)</b></span></td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_discount">Enable Affiliate Discount</label></th>
-                            <td><input type="checkbox" <?php if ($discount == 'true') { ?>checked="yes" <?php } ?>name="affiliate_discount" id="affiliate_discount" value="true" /> Does this user's link allow for an additional discount?</td>
+                            <th><label for="affiliate_discount"><?php _e('Enable Affiliate Discount', 'foxypress'); ?></label></th>
+                            <td><input type="checkbox" <?php if ($discount == 'true') { ?>checked="yes" <?php } ?>name="affiliate_discount" id="affiliate_discount" value="true" /> <?php _e('Does this user\'s link allow for an additional discount?', 'foxypress'); ?></td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_payout_type">Affiliate Discount Type</label></th>
+                            <th><label for="affiliate_payout_type"><?php _e('Affiliate Discount Type', 'foxypress'); ?></label></th>
                             <td>
                                 <input type="radio" <?php if ($discount_type == 1) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="percentage">
-                                <span class="description">Percentage off of each order.</span>
+                                <span class="description"><?php _e('Percentage off of each order.', 'foxypress'); ?></span>
                             </td>
                         </tr>
                         <tr>
                             <th></th>
                             <td>
                                 <input type="radio" <?php if ($discount_type == 2) { ?>checked="yes" <?php } ?>name="affiliate_discount_type" id="affiliate_discount_type" value="dollars">
-                                <span class="description">Dollar amount off of each order.</span>
+                                <span class="description"><?php _e('Dollar amount off of each order.', 'foxypress'); ?></span>
                             </td>
                         </tr>
                         <tr>
-                            <th><label for="affiliate_discount_amount">Affiliate Discount Amount</label></th>
+                            <th><label for="affiliate_discount_amount"><?php _e('Affiliate Discount Amount', 'foxypress'); ?></label></th>
                             <td>
                                 <input type="text" name="affiliate_discount_amount" id="affiliate_discount_amount" value="<?php echo $discount_amount; ?>">
-                                <span class="description">How much of a discount will user's receive? <b>(Enter 30 for 30% or $30.00)</b></span>
+                                <span class="description"><?php _e('How much of a discount will user\'s receive?', 'foxypress'); ?> <b>(<?php _e('Enter 30 for 30% or $30.00', 'foxypress'); ?>)</b></span>
                             </td>
                         </tr>
                     </table>
-                    <p class="submit"><input type="submit" value="Approve" class="button-primary" id="affiliate_approve_submit" name="affiliate_approve_submit"></p>
+                    <p class="submit"><input type="submit" value="<?php _e('Approve', 'foxypress'); ?>" class="button-primary" id="affiliate_approve_submit" name="affiliate_approve_submit"></p>
                     </form>
 
             <?php } ?>
             <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
-            <form id="affiliate-filter" method="get">
+            <form id="affiliate-filter" method="get" style="position:relative;">
                 <!-- For plugins, we also need to ensure that the form posts back to our current page -->
                 <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
                 <ul class="subsubsub">
-                    <li class="all"><a class="<?php if ($mode === 'management') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s',$_REQUEST['page'],'management'); ?>">Approved Affiliates <span class="count">(<?php echo $affiliate_counts[0]->total_approved; ?>)</span></a> |</li>
-                    <li class="administrator"><a class="<?php if ($mode === 'pending_affiliates') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s',$_REQUEST['page'],'pending_affiliates'); ?>">Pending Affiliates <span class="count">(<?php echo $affiliate_counts[0]->total_pending; ?>)</span></a></li>
+                    <li class="all"><a class="<?php if ($mode === 'management') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s',$_REQUEST['page'],'management'); ?>"><?php _e('Approved Affiliates', 'foxypress'); ?> <span class="count">(<?php echo $affiliate_counts[0]->total_approved; ?>)</span></a> |</li>
+                    <li class="administrator"><a class="<?php if ($mode === 'pending_affiliates') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s',$_REQUEST['page'],'pending_affiliates'); ?>"><?php _e('Pending Affiliates', 'foxypress'); ?> <span class="count">(<?php echo $affiliate_counts[0]->total_pending; ?>)</span></a></li>
                 </ul>
+				<a href="user-new.php" class="add-new-h2" style="position:absolute;left:0px;top:40px;">Add New Affiliate</a>
                 <!-- Now we can render the completed list table -->
-                <?php $fp_affiliate->display() ?>
+                <?php $fp_affiliate->display(); ?>
             </form>
             
-        </div>
+        </div>			
+    <?php } else if ($mode === 'delete_banner') { 
+		global $wpdb;
+		$banner_id = $fp_banner->foxypress_FixGetVar('banner_id');
+		
+		$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_affiliate_assets WHERE ID = '" . $banner_id . "'";
+		$wpdb->query($sql);
+		
+		$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_deleted=%s',$_REQUEST['page'],'true');
+		_e('Deleting Banner...', 'foxypress');
+        echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+	?>
+	<?php } else if ($mode === 'add_banner' || $mode === 'view_banner') { 
+		global $wpdb;
+		$item = $fp_banner->get_affiliate_banner();
 
-    <?php } else if ($mode === 'view_details' || $mode === 'view_past_details') { 
+		if (isset($_POST['banner_creation_submit'])) { 
+    	
+			$foxy_asset_id				= foxypress_FixPostVar('asset_id');
+	    	$foxy_asset_type			= foxypress_FixPostVar('asset_type');
+	    	$foxy_asset_name     		= foxypress_FixPostVar('asset_name');
+	    	$foxy_asset_file_name 		= foxypress_FixPostVar('affiliate_avatar_name');
+	    	$foxy_asset_file_ext 		= foxypress_FixPostVar('affiliate_avatar_ext');
+	    	$foxy_asset_landing_url		= foxypress_FixPostVar('asset_landing_url');
+	    	
+	    	$error 		   				= false;
+	
+	    	if (empty($foxy_asset_name)) {
+	    		$error = true;
+	    		$asset_name_error = true;
+	    	}
+	
+	    	if (!$error) {
+				if($foxy_asset_id==""){
+					//new asset
+		    		$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_assets (foxy_asset_type, foxy_asset_name, foxy_asset_file_name, foxy_asset_file_ext, foxy_asset_landing_url) values ('" . $foxy_asset_type . "', '" . $foxy_asset_name . "', '" . $foxy_asset_file_name . "', '" . $foxy_asset_file_ext . "', '" . $foxy_asset_landing_url . "')";
+					$wpdb->query($sql);	
+					
+					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_added=%s',$_REQUEST['page'],'true');
+					_e('Adding Banner...', 'foxypress');
+		            echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+				}else{
+					//update asset
+					$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_assets SET foxy_asset_type='" . $foxy_asset_type . "', foxy_asset_name='" . $foxy_asset_name . "', foxy_asset_file_name='" . $foxy_asset_file_name . "', foxy_asset_file_ext='" . $foxy_asset_file_ext . "', foxy_asset_landing_url='" . $foxy_asset_landing_url . "' WHERE id= '" . $foxy_asset_id . "' ";
+					$wpdb->query($sql);
+
+					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_updated=%s',$_REQUEST['page'],'true');
+					_e('Updating Banner...', 'foxypress');
+		            echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+				}
+			}
+		}
+    ?>
+		<div class="wrap">
+            
+            <div id="icon-users" class="icon32"><br/></div>
+            <h2><?php _e('FoxyPress Affiliate Banner Details', 'foxypress'); ?></h2>
+
+			<div style="background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;">
+ 				<p><?php _e('Enter the details of your affiliate banner below. The landing page url can be used to direct a user to a specific page when using this specific banner.', 'foxypress'); ?></p>
+            </div>
+
+			<form id="asset_creation_form" name="asset_creation_form" method="POST">
+			<table class="form-table">
+				<input type="hidden" id="asset_id" name="asset_id" value="<?php echo $item[0]->ID; ?>" />
+				<tr class="<?php if ($asset_name_error) { ?>form-invalid<?php } ?>">
+					<th><label for="asset_name"><?php _e('Asset Name', 'foxypress'); ?> <span class="description">(<?php _e('required', 'foxypress'); ?>)</span></label></th>
+					<td><input class="regular-text" type="text" name="asset_name" id="asset_name" value="<?php echo $item[0]->foxy_asset_name; ?>"><br /></td>
+				</tr>
+				<tr class="<?php if ($asset_type_error) { ?>form-invalid<?php } ?>">
+					<th><label for="asset_type"><?php _e('Asset Type', 'foxypress'); ?> <span class="description">(<?php _e('required', 'foxypress'); ?>)</span></label></th>
+					<td>
+						<select name="asset_type" id="asset_type">
+							<option><?php _e('Select', 'foxypress'); ?></option>
+							<option <?php if ($item[0]->foxy_asset_type == 'Image') { ?>selected<?php } ?> value="Image"><?php _e('Image', 'foxypress'); ?></option>
+						</select>
+					</td>
+				</tr>			
+				<tr class="<?php if ($avatar_error) { ?>form-invalid<?php } ?>">
+					<th><label for="banner_avatar"><?php _e('Banner', 'foxypress'); ?></label></th>
+					<td>
+						<div id="avatar"><?php if ($item[0]->foxy_asset_file_name) { ?><img src="<?php echo content_url(); ?>/affiliate_images/<?php echo $item[0]->foxy_asset_file_name; ?><?php echo $item[0]->foxy_asset_file_ext; ?>" width="96" height="96" alt="" /><?php } ?></div>
+						<input type="file" name="avatar_upload" id="avatar_upload" value="">
+						<input type="hidden" name="affiliate_avatar_name" id="affiliate_avatar_name" value="">
+						<input type="hidden" name="affiliate_avatar_ext" id="affiliate_avatar_ext" value="">
+					</td>
+				</tr>
+				<tr class="<?php if ($asset_landing_url_error) { ?>form-invalid<?php } ?>">
+					<th><label for="asset_landing_page"><?php _e('Landing Page URL', 'foxypress'); ?></label></th>
+					<td><input class="regular-text" type="text" name="asset_landing_url" id="asset_landing_url" value="<?php echo $item[0]->asset_landing_url; ?>"><br /></td>
+				</tr>
+			</table>
+			<p class="submit"><input type="submit" value="<?php _e('Save Banner', 'foxypress'); ?>" class="button-primary" id="banner_creation_submit" name="banner_creation_submit"></p>
+			</form>
+		</div>
+	<?php } else if ($mode === 'view_details' || $mode === 'view_past_details') { 
         
         global $wpdb;
         //Fetch, prepare, sort, and filter our data...
@@ -1083,12 +1453,12 @@ function foxypress_create_affiliate_table() {
         <div class="wrap">
 
             <div id="icon-users" class="icon32"><br/></div>
-            <h2><?php if (!$user_detail->first_name && !$user_detail->last_name) { echo $user_detail->user_nicename; } else { echo $user_detail->first_name . " " . $user_detail->last_name; } ?> :: Affiliate Detail <a class="add-new-h2" href="<?php echo get_admin_url(); ?>user-edit.php?user_id=<?php echo $user_detail->ID; ?>">Edit User</a></h2>
+            <h2><?php if (!$user_detail->first_name && !$user_detail->last_name) { echo $user_detail->user_nicename; } else { echo $user_detail->first_name . " " . $user_detail->last_name; } ?> :: <?php _e('Affiliate Detail', 'foxypress'); ?> <a class="add-new-h2" href="<?php echo get_admin_url(); ?>user-edit.php?user_id=<?php echo $user_detail->ID; ?>"><?php _e('Edit User', 'foxypress'); ?></a></h2>
 
             <?php $updated = $fp_affiliate->foxypress_FixGetVar('updated');
             if ($updated === 'true') { ?>
             <div class="updated" id="message">
-                <p><strong>Payment Submitted Successfully</strong></p>
+                <p><strong><?php _e('Payment Submitted Successfully', 'foxypress'); ?></strong></p>
             </div>
             <?php } ?>
             
@@ -1097,37 +1467,37 @@ function foxypress_create_affiliate_table() {
 				</div>
 				<div class='quickstats second'>
 					<div class='number'><?php echo $order_detail[0]->num_clicks; ?></div>
-					<div class='attribute'>Total Clicks</div>
+					<div class='attribute'><?php _e('Total Clicks', 'foxypress'); ?></div>
 				</div>
                 <?php if ($user_detail->$user_referral == 'true') { ?>
                 <div class='quickstats second'>
                     <div class='number'><?php echo $order_detail[0]->num_referrals; ?></div>
-                    <div class='attribute'>Total Referrals</div>
+                    <div class='attribute'><?php _e('Total Referrals', 'foxypress'); ?></div>
                 </div>
                 <?php } ?>
 				<div class='quickstats second'>
 					<div class='number'><?php echo $order_detail[0]->num_total_orders; ?></div>
-					<div class='attribute'>Total Orders</div>
+					<div class='attribute'><?php _e('Total Orders', 'foxypress'); ?></div>
 				</div>
                 <?php if ($user_detail->$user_referral == 'true') { ?>
                 <div class='quickstats third'>
                     <div class='number'>$<?php if(!$order_detail[0]->total_paid_referral_amount) { echo '0.00'; } else { echo $order_detail[0]->total_paid_referral_amount; } ?></div>
-                    <div class='attribute'>Total Referral Paid Out</div>
+                    <div class='attribute'><?php _e('Total Referral Paid Out', 'foxypress'); ?></div>
                 </div>
                 <?php } ?>
                 <div class='quickstats third'>
                     <div class='number'>$<?php if(!$order_detail[0]->total_paid_amount) { echo '0.00'; } else { echo $order_detail[0]->total_paid_amount; } ?></div>
-                    <div class='attribute'>Total Paid Out</div>
+                    <div class='attribute'><?php _e('Total Paid Out', 'foxypress'); ?></div>
                 </div>
                 <?php if ($user_detail->$user_referral == 'true') { ?>
                 <div class='quickstats third'>
                     <div class='number'>$<?php echo $referral_amount_due; ?></div>
-                    <div class='attribute'>Referral Amount Due</div>
+                    <div class='attribute'><?php _e('Referral Amount Due', 'foxypress'); ?></div>
                 </div>
                 <?php } ?>
 				<div class='quickstats third'>
 					<div class='number'>$<?php echo $amount_due; ?></div>
-					<div class='attribute'>Amount Due</div>
+					<div class='attribute'><?php _e('Amount Due', 'foxypress'); ?></div>
 				</div>
                 <?php if ($user_detail->$user_referral == 'true') { ?>
                 <div class='quickstats last'>
@@ -1136,7 +1506,7 @@ function foxypress_create_affiliate_table() {
                     <?php } else { ?>
                         <div class='number'>$<?php echo $user_detail->$user_referral_payout; ?></div>
                     <?php } ?>
-                    <div class='attribute'>Commission <br />(per referral transaction)</div>
+                    <div class='attribute'><?php _e('Commission', 'foxypress'); ?> <br />(<?php _e('per referral transaction', 'foxypress'); ?>)</div>
                 </div>
                 <?php } ?>
 				<div class='quickstats last'>
@@ -1145,15 +1515,15 @@ function foxypress_create_affiliate_table() {
                     <?php } else { ?>
                     	<div class='number'>$<?php echo $user_detail->$user_payout; ?></div>
                     <?php } ?>
-                    <div class='attribute'>Commission <br />(per transaction)</div>
+                    <div class='attribute'><?php _e('Commission', 'foxypress'); ?> <br />(<?php _e('per transaction', 'foxypress'); ?>)</div>
 				</div>
 				<div class="clearall"></div>
 			</div>
 			<div class="clearall"></div>
 			<div style="background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;">
-				<p><a class="button bold" style="float:right;" href="http://www.foxy-press.com/getting-started/affiliate-management/" target="_blank">Affiliate Documentation</a></p>
+				<p><a class="button bold" style="float:right;" href="http://www.foxy-press.com/getting-started/affiliate-management/" target="_blank"><?php _e('Affiliate Documentation', 'foxypress'); ?></a></p>
 				<p>
-					<b>Affiliate Link: </b><?php echo $user_detail->$user_affiliate_url; ?>
+					<b><?php _e('Affiliate Link', 'foxypress'); ?>: </b><?php echo $user_detail->$user_affiliate_url; ?>
 				</p>
 			</div>
             
@@ -1162,8 +1532,8 @@ function foxypress_create_affiliate_table() {
                 <!-- For plugins, we also need to ensure that the form posts back to our current page -->
                 <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
                 <ul class="subsubsub">
-                    <li class="all"><a class="<?php if ($mode === 'view_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',$_REQUEST['page'],'view_details',$user_detail->ID); ?>">Open Orders <span class="count">(<?php echo $total_unpaid_orders; ?>)</span></a> |</li>
-                    <li class="administrator"><a class="<?php if ($mode === 'view_past_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',$_REQUEST['page'],'view_past_details',$user_detail->ID); ?>">Paid Orders <span class="count">(<?php echo $order_detail[0]->num_paid_orders; ?>)</span></a></li>
+                    <li class="all"><a class="<?php if ($mode === 'view_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',$_REQUEST['page'],'view_details',$user_detail->ID); ?>"><?php _e('Open Orders', 'foxypress'); ?> <span class="count">(<?php echo $total_unpaid_orders; ?>)</span></a> |</li>
+                    <li class="administrator"><a class="<?php if ($mode === 'view_past_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',$_REQUEST['page'],'view_past_details',$user_detail->ID); ?>"><?php _e('Paid Orders', 'foxypress'); ?> <span class="count">(<?php echo $order_detail[0]->num_paid_orders; ?>)</span></a></li>
                 </ul>
                 <!-- Now we can render the completed list table -->
                 <?php $fp_affiliate->display() ?>
@@ -1215,7 +1585,7 @@ function foxypress_create_affiliate_table() {
         <div class="settings_widefat" id="">
         <?php if(isset($_POST['pay_affiliate_submit']))
         { ?>
-            <div class="settings_head settings">Pay Order Commission</div>      
+            <div class="settings_head settings"><?php _e('Pay Order Commission', 'foxypress'); ?></div>      
             <div class="settings_inside">
                 <?php
                 $order_id                  = $fp_affiliate->foxypress_FixPostVar('pay_affiliate_order_id');
@@ -1233,11 +1603,12 @@ function foxypress_create_affiliate_table() {
                 $wpdb->query($sql);
                 
                 $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&updated=true',$_REQUEST['page'],'view_details',$affiliate_id);
-                echo 'Submitting Payment...';
+                _e('Submitting Payment...', 'foxypress');
                 echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>'; ?>
             </div>
         <?php } else { ?>
-            <div class="settings_head settings">
+            			
+			<div class="settings_head settings">
                 Pay Order Commission
             </div>      
             <div class="settings_inside">
@@ -1251,41 +1622,41 @@ function foxypress_create_affiliate_table() {
                 <input type="hidden" id="pay_affiliate_commission_type" name="pay_affiliate_commission_type" value="<?php echo $commission_type; ?>">
                 <table>  
                     <tbody><tr>
-                        <td valign="top" nowrap="" align="right" class="title"><strong>Order ID</strong></td>
+                        <td valign="top" nowrap="" align="right" class="title"><strong><?php _e('Order ID', 'foxypress'); ?></strong></td>
                         <td align="left"><?php echo $order_id; ?></td>
                     </tr>
                     <tr>
-                        <td valign="top" nowrap="" align="right" class="title"><strong>Order Total</strong></td>
+                        <td valign="top" nowrap="" align="right" class="title"><strong><?php _e('Order Total', 'foxypress'); ?></strong></td>
                         <td align="left">$<?php echo $order_detail[0]->foxy_transaction_order_total; ?></td>
                     </tr>
                     <tr>
-                        <td valign="top" nowrap="" align="right" class=="title"><strong>Affiliate</strong></td>
+                        <td valign="top" nowrap="" align="right" class=="title"><strong><?php _e('Affiliate', 'foxypress'); ?></strong></td>
                         <td align="left"><?php echo $user_detail->first_name . " " . $user_detail->last_name; ?></td>
                     </tr>
                     <tr>
-                        <td valign="top" nowrap="" align="right" class=="title"><strong>Affiliate<?php if ($affiliate_referral) { echo ' Referral';} ?> Payout</strong></td>
+                        <td valign="top" nowrap="" align="right" class=="title"><strong><?php _e('Affiliate', 'foxypress'); ?><?php if ($affiliate_referral) { echo ' Referral';} ?> <?php _e('Payout', 'foxypress'); ?></strong></td>
                         <td align="left"><?php echo $affiliate_payout; ?></td>
                     </tr>
                     <tr>
-                        <td valign="top" nowrap="" align="right" class=="title"><strong>Affiliate<?php if ($affiliate_referral) { echo ' Referral';} ?> Commission</strong></td>
+                        <td valign="top" nowrap="" align="right" class=="title"><strong><?php _e('Affiliate', 'foxypress'); ?><?php if ($affiliate_referral) { echo ' Referral';} ?> <?php _e('Commission', 'foxypress'); ?></strong></td>
                         <td align="left">$<?php echo $commission; ?></td>
                     </tr>
                     <tr>
-                        <td valign="top" nowrap="" align="right"><strong>Payment Method</strong></td>
+                        <td valign="top" nowrap="" align="right"><strong><?php _e('Payment Method', 'foxypress'); ?></strong></td>
                         <td align="left">
                             <select id="pay_affiliate_method" name="pay_affiliate_method">
-                                <option selected value="">Please Select</option>
+                                <option selected value=""><?php _e('Please Select', 'foxypress'); ?></option>
                                 <option value="Paypal">Paypal</option>
-                                <option value="Check">Check</option>
+                                <option value="Check"><?php _e('Check', 'foxypress'); ?></option>
                             </select>
                         </td>
                     </tr>
                     <tr>
-                        <td valign="top" nowrap="" align="right" class=="title"><strong>Payment Date</strong></td>
+                        <td valign="top" nowrap="" align="right" class=="title"><strong><?php _e('Payment Date', 'foxypress'); ?></strong></td>
                         <td align="left"><input type="text" size="50" value="" id="pay_affiliate_date" name="pay_affiliate_date"></td>
                     </tr>
                     <tr>
-                        <td colspan="2"><input type="submit" id="pay_affiliate_submit" name="pay_affiliate_submit" class="button bold" value="Submit Payment" /></td>
+                        <td colspan="2"><input type="submit" id="pay_affiliate_submit" name="pay_affiliate_submit" class="button bold" value="<?php _e('Submit Payment', 'foxypress'); ?>" /></td>
                     </tr>                   
                 </tbody></table>
                 </form>

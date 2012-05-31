@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{{ store_name|raw }}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="stylesheet" href="https://{{ store_domain }}/themes/standard/styles.css" type="text/css" media="screen" charset="utf-8" />
+</head>
+<body>
+
+{# BEGIN CART TWIG TEMPLATE #}
+{% if not for_email %}
+<!-- begin cart output -->
+<div id="fc_cart_container"><div id="fc_cart_container_inner">
+{% endif %}
+{% if with_controls %}
+<noscript>
+	<div id="fc_error_noscript" class="fc_error">
+		<h3>{{ lang.cart_warning|raw }}:</h3>
+		<p>{{ lang.cart_no_javascript_message|raw }}</p>
+	</div><!-- #fc_errorNoScript -->
+</noscript>
+<form id="fc_cart_form" action="{{ post_url }}" method="post">
+	<div id="fc_cart_controls_top" class="fc_cart_controls">
+		<input type="hidden" name="cart" value="update" />
+	{% if supports_paypal_express %}
+		<a class="fc_link_nav fc_cart_update fc_cart_update_paypal" href="#" onclick="fc_UpdateCart();return false;">{{ lang.cart_update_cart|raw }}</a>
+	{% else %}
+		<a class="fc_link_nav fc_cart_update" href="#" onclick="fc_UpdateCart();return false;">{{ lang.cart_update_cart|raw }}</a>
+	{% endif %}
+	{% if items|length > 0 %}
+		{% if supports_paypal_express %}
+		<a class="fc_link_nav fc_link_forward fc_cart_checkout_paypal" href="checkout.php?ThisAction=paypal_express&{{ session_name }}={{ session_id }}" target="_top">
+			<img src="{{ paypal_checkout_button_url }}" />
+		</a>
+		<span class="fc_cart_checkout_or">-OR-</span>
+	{% endif %}
+		<a class="fc_link_nav fc_link_forward fc_cart_checkout" href="checkout.php?{{ session_name }}={{ session_id }}" target="_top">{{ lang.cart_checkout|raw }}</a>
+	{% endif %}
+	</div><!-- #fc_cart_controls_top -->
+{% endif %}
+{% if with_controls %}
+	{{ html_messages|raw }}
+{% endif %}
+{% if for_email %}
+	<table id="fc_cart_table" width="100%" style="font-size:12px; text-align:left;" cellspacing="0" cellpadding="5">
+{% else %}
+	<table id="fc_cart_table" cellspacing="0" cellpadding="0">
+{% endif %}
+		<caption>{{ lang.cart_caption|raw }}</caption>
+{% if not for_email %}
+		<thead>
+{% endif %}
+			<tr id="fc_cart_head">
+			{% if has_product_images %}
+				<th{{ css_styles.background }} id="fc_cart_head_image"><span>{{ lang.cart_image|raw }}</span></th>
+			{% endif %}
+				<th{{ css_styles.background }} id="fc_cart_head_item"><span>{{ lang.cart_item|raw }}</span></th>
+				<th{{ css_styles.background }} id="fc_cart_head_quantity"><span>{{ lang.cart_quantity|raw }}</span></th>
+				<th{{ css_styles.background }} id="fc_cart_head_price"><span>{{ lang.cart_price|raw }}</span></th>
+			</tr>
+{% if not for_email %}
+		</thead>
+		<tfoot>
+{% endif %}
+			<tr id="fc_cart_foot_subtotal">
+				<td{{ css_styles.border2_right }} class="fc_col1" colspan="{{ colspan-1 }}" >{{ lang.cart_subtotal|raw }}:</td>
+				<td{{ css_styles.border2 }} class="fc_col2">{{ cart_sub_total }}</td>
+			</tr>
+		{% if has_future_products %}
+			<tr id="fc_cart_foot_subscriptions">
+				<td class="fc_col1" colspan="{{ colspan-1 }}">{{ lang.cart_future_subscriptions|raw }}:</td>
+				<td{{ css_styles.right }} class="fc_col2">{{ future_total_price }}</td>
+			</tr>
+		{% endif %}
+	{% for coupon in coupons %}
+		{% if not coupon.is_applied %}
+			<tr class="fc_cart_foot_discount fc_coupon_unapplied">
+		{% else %}
+			<tr class="fc_cart_foot_discount">
+		{% endif %}
+				<td{{ css_styles.right }} class="fc_col1" colspan="{{ colspan-1 }}">
+					{{ coupon.name }}
+				</td>
+				<td class="fc_col2">
+					<span class="fc_discount">{{ coupon.amount }}</span>
+				{% if with_controls %}
+					<span class="fc_cart_coupon_remove">
+						<a href="{{ post_url }}?cart=remove_coupon&amp;coupon_code_id={{ coupon.id }}&amp;{{ session_name }}={{ session_id }}" class="fc_cart_remove_link" title="{{ lang.cart_remove_coupon|raw }}">[x]</a>
+					</span>
+				{% endif %}
+				</td>
+			</tr>
+	{% endfor %}
+		{% if with_controls and has_eligible_coupons %}
+			<tr id="fc_cart_foot_discount_new">
+				<td{{ css_styles.right }} class="fc_col1" colspan="{{ colspan-1 }}">
+					<a href="#" onclick="fc_AddCoupon(); this.blur(); return false;">{{ lang.cart_add_coupon|raw }}</a>
+				</td>
+				<td class="fc_col2">
+					<input type="text" name="coupon" id="fc_coupon" class="fc_text fc_text_short" value="" style="display:none;" />
+				</td>
+			</tr>
+		{% endif %}
+{% if not with_controls %}
+		{% if show_shipping_tbd %}
+			<tr id="fc_cart_foot_shipping_tbd">
+				<td{{ css_styles.right }} class="fc_col1" colspan="{{ colspan-1 }}">{{ shipping_and_handling_label|raw }}:</td>
+				<td class="fc_col2">{{ lang.checkout_tbd|raw }}</td>
+			</tr>
+		{% endif %}
+		{% if show_shipping_tbd and hide_shipping_row %}
+			<tr id="fc_cart_foot_shipping" style="display: none;">
+		{% else %}
+			<tr id="fc_cart_foot_shipping">
+		{% endif %}
+				<td{{ css_styles.right }} class="fc_col1" colspan="{{ colspan-1 }}">{{ shipping_and_handling_label|raw }}:</td>
+			{% if show_shipping_tbd %}
+				<td class="fc_col2">{{ lang.checkout_tbd|raw }}</td>
+			{% else %}
+				<td class="fc_col2">{{ cart_total_shipping }}</td>
+			{% endif %}
+			</tr>
+	{% if has_future_products %}
+		{% if show_future_shipping_and_handling %}
+			<tr id="fc_cart_foot_future_shipping">
+		{% else %}
+			<tr id="fc_cart_foot_future_shipping" style="display: none;">
+		{% endif %}
+				<td{{ css_styles.right }} class="fc_col1" colspan="{{ colspan-1 }}">{{ lang.cart_future_subscriptions|raw }} {{ shipping_and_handling_label|raw }}:</td>
+				<td class="fc_col2">{{ future_shipping_and_handling }}</td>
+			</tr>
+	{% endif %}
+	{% if has_taxes %}
+		{% for tax in taxes %}
+			{% if tax.show_tax %}
+			<tr id="fc_cart_foot_tax_{{ tax.id }}" class="fc_cart_foot_tax">
+			{% else %}
+			<tr id="fc_cart_foot_tax_{{ tax.id }}" class="fc_cart_foot_tax" style="display: none;">
+			{% endif %}
+				<td{{ css_styles.right }} class="fc_col1" colspan="{{ colspan-1 }}">{{ tax.description|raw }}:</td>
+				<td class="fc_col2">{{ tax.amount }}</td>
+			</tr>
+		{% endfor %}
+		{% if show_tax_tbd %}
+			{% if tax_total <= 0 %}
+				<tr id="fc_cart_foot_tax_tbd">
+			{% else %}
+				<tr id="fc_cart_foot_tax_tbd" style="display: none;">
+			{% endif %}
+					<td class="fc_col1" colspan="{{ colspan-1 }}">{{ lang.checkout_tax|raw }}:</td>
+					<td class="fc_col2">{{ lang.checkout_tbd|raw }}</td>
+				</tr>
+		{% endif %}
+	{% endif %}
+{% endif %}
+			<tr id="fc_cart_foot_total">
+				<td class="fc_col1" colspan="{{ colspan-1 }}">{{ lang.cart_order_total|raw }}:</td>
+				<td class="fc_col2">{{ cart_order_total }}</td>
+			</tr>
+	{% if not for_email %}
+		</tfoot>
+	{% endif %}
+{% for item in items %}
+		{% if item.multiship > 0 %}
+	{% if not for_email %}
+		<tbody class="fc_ship_to">
+	{% endif %}
+			<tr>
+				<th id="fc_shipto_{{ item.multiship }}_cart_row" class="fc_shipto" colspan="{{ colspan }}">
+					{{ lang.cart_shipto|raw }}: {{ item.shipto }}
+				</th>
+			</tr>
+	{% if not for_email %}
+		</tbody>
+	{% endif %}
+		{% endif %}
+	{% if not for_email %}
+		<tbody>
+	{% endif %}
+		{% if item.item_number == items|length %}
+			<tr id="product_{{ item.id }}" class="fc_cart_item fc_cart_item_last">
+		{% else %}
+			<tr id="product_{{ item.id }}" class="fc_cart_item">
+		{% endif %}
+			{% if has_product_images %}
+				<td class="fc_cart_item_image"{{ css_styles.border }}>
+				{% if item.image != '' %}
+				{% if item.url != '' %}
+					<a href="{{ item.url }}" target="_top" alt="{{ item.alt_name }}">
+				{% endif %}
+					<img class="fc_cart_thumbnail" src="{{ item.image }}" />
+				{% if item.url != '' %}
+					</a>
+				{% endif %}
+				{% endif %}
+				</td>
+			{% endif %}
+				<td class="fc_cart_item_details"{{ css_styles.border }}>
+					<span class="fc_cart_item_name">{{ item.name }}</span>
+				{% if item.options|length > 0 or item.code != '' or item.category_code != 'DEFAULT' or item.weight != 0 or item.subscription_frequency != '' %}
+					<ul class="fc_cart_item_options">
+					{% for option in item.options %}
+						<li class="fc_cart_item_option fc_cart_item_{{ option.class }}">
+							<span class="fc_cart_item_option_name">{{ option.name }}</span><span class="fc_cart_item_option_separator">:</span>
+							<span class="fc_cart_item_option_value">{{ option.value }}</span>
+						</li>
+					{% endfor %}
+					{% if item.code != '' %}
+						<li class="fc_cart_item_option fc_cart_item_code">
+						{{ lang.cart_code|raw }}: {{ item.code }}
+						</li>
+					{% endif %}
+					{% if item.category_code != 'DEFAULT' %}
+						<li class="fc_cart_item_option fc_cart_category_code">
+						{{ lang.cart_category|raw }}: {{ item.category_code }}
+						</li>
+					{% endif %}
+					{% if item.weight != 0 %}
+						<li class="fc_cart_item_option fc_cart_item_weight">
+						{{ lang.cart_weight|raw }}: {{ item.weight }} <span class="fc_uom_weight">{{ weight_uom }}</span>
+						</li>
+					{% endif %}
+					{% if item.subscription_frequency != '' %}
+						<li class="fc_cart_item_option fc_cart_item_subscription_details">
+							{{ lang.cart_subscription_details|raw }}
+							<ul>
+								<li class="fc_cart_item_option fc_cart_item_sub_frequency">
+									<span class="fc_cart_item_option_name">{{ lang.cart_frequency|raw }}</span><span class="fc_cart_item_option_separator">:</span> <span class="fc_cart_item_option_value">{{ item.subscription_frequency }}</span>
+								</li>
+								<li class="fc_cart_item_option fc_cart_item_sub_startdate">
+									<span class="fc_cart_item_option_name">{{ lang.cart_start_date|raw }}</span><span class="fc_cart_item_option_separator">:</span> <span class="fc_cart_item_option_value">{{ item.subscription_start_date }}</span>
+								</li>
+								<li class="fc_cart_item_option fc_cart_item_sub_nextdate">
+									<span class="fc_cart_item_option_name">{{ lang.cart_next_date|raw }}</span><span class="fc_cart_item_option_separator">:</span> <span class="fc_cart_item_option_value">{{ item.subscription_next_transaction_date }}</span>
+								</li>
+							{% if item.subscription_end_date != "0000-00-00" %}
+								<li class="fc_cart_item_option fc_cart_item_sub_enddate">
+									<span class="fc_cart_item_option_name">{{ lang.cart_end_date|raw }}</span><span class="fc_cart_item_option_separator">:</span> <span class="fc_cart_item_option_value">{{ item.subscription_end_date }}</span>
+								</li>
+							{% endif %}
+							</ul>
+						</li>
+					{% endif %}
+					</ul>
+				{% endif %}
+				{% if with_controls %}
+					<span class="fc_cart_remove_left">
+						<a href="#" onclick="fc_RemoveItem({{ item.item_number }}); return false;" class="fc_cart_remove_link" title="{{ lang.cart_remove_item|raw }}">[x]</a>
+					</span>
+					<input type="hidden" id="id{{ item.item_number }}" name="id{{ item.item_number }}" value="{{ item.id }}" />
+				{% endif %}
+				</td>
+				<td class="fc_cart_item_quantity"{{ css_styles.border }}>
+				{% if with_controls %}
+					<input class="fc_cart_item_quantity fc_text fc_text_short" type="text" id="quantity{{ item.item_number }}" name="quantity{{ item.item_number }}" value="{{ item.quantity }}" />
+					<span class="fc_cart_remove_center">
+						<a href="#" onclick="fc_RemoveItem({{ item.item_number }}); return false;" class="fc_cart_remove_link" title="{{ lang.cart_remove_item|raw }}">[x]</a>
+					</span>
+				{% else %}
+					{{ item.quantity }}
+				{% endif %}
+				</td>
+				<td class="fc_cart_item_price"{{ css_styles.border }}>
+					<span class="fc_cart_item_price_total">{{ item.price_total }}</span>
+					{% if item.quantity > 1 %}
+					<span class="fc_cart_item_price_each"> ({{ item.price_each }} {{ lang.cart_each|raw }})</span>
+					{% endif %}
+				{% if with_controls %}
+					<span class="fc_cart_remove_right">
+						<a href="#" onclick="fc_RemoveItem({{ item.item_number }}); return false;" class="fc_cart_remove_link" title="{{ lang.cart_remove_item|raw }}">[x]</a>
+					</span>
+				{% endif %}
+				</td>
+			</tr>
+	{% if not for_email %}
+		</tbody>
+	{% endif %}
+{% endfor %}
+{% if items|length == 0 %}
+	{% if not for_email %}
+		<tbody>
+	{% endif %}
+			<tr class="fc_cart_item">
+				<td colspan="{{ colspan }}" id="fc_empty_cart">{{ lang.cart_empty|raw }}</td>
+			</tr>
+	{% if not for_email %}
+		</tbody>
+	{% endif %}
+{% endif %}
+	</table>
+{% if with_controls %}
+	<div id="fc_cart_controls_bottom" class="fc_cart_controls">
+		<input type="hidden" name="cart" value="update" />
+		<input type="hidden" name="item_count" value="{{ items|length }}" />
+		<input type="hidden" name="{{ session_name }}" value="{{ session_id }}" />
+		{# note: this is a duplication of the cart controls above, but trying to create a block caused errors #}
+		<input type="hidden" name="cart" value="update" />
+	{% if supports_paypal_express %}
+		<a class="fc_link_nav fc_cart_update fc_cart_update_paypal" href="#" onclick="fc_UpdateCart();return false;">{{ lang.cart_update_cart|raw }}</a>
+	{% else %}
+		<a class="fc_link_nav fc_cart_update" href="#" onclick="fc_UpdateCart();return false;">{{ lang.cart_update_cart|raw }}</a>
+	{% endif %}
+	{% if items|length > 0 %}
+		{% if supports_paypal_express %}
+		<a class="fc_link_nav fc_link_forward fc_cart_checkout_paypal" href="checkout.php?ThisAction=paypal_express&{{ session_name }}={{ session_id }}" target="_top">
+			<img src="{{ paypal_checkout_button_url }}" />
+		</a>
+		<span class="fc_cart_checkout_or">-OR-</span>
+	{% endif %}
+		<a class="fc_link_nav fc_link_forward fc_cart_checkout" href="checkout.php?{{ session_name }}={{ session_id }}" target="_top">{{ lang.cart_checkout|raw }}</a>
+	{% endif %}
+	</div><!-- #fc_cart_controls_bottom -->
+</form>
+{% endif %}
+{% if not for_email %}</div></div><!-- #fc_cart_container_inner, #fc_cart_container -->
+<!-- end cart output -->
+{% endif %}{# END CART TWIG TEMPLATE #}
+
+</body>
+</html>

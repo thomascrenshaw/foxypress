@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 session_start();
@@ -36,18 +36,18 @@ function wpt_portfolio_icons() {
 function foxypress_create_custom_post_type()
 {
 	$labels = array(
-		'name' => 'Products',
-		'singular_name' => 'Product',
-		'add_new' => __('Add New Product'),
-		'add_new_item' => __('Add New Product'),
-		'all_items' => __('Manage Products'),
-		'edit_item' => __('Edit Product'),
-		'new_item' => __('New Product'),
-		'view_item' => __('View Product'),
-		'menu_name' => __('FoxyPress'),
-		'not_found' =>  __('No Products Found'),
-		'not_found_in_trash' => __('No Products Found in Trash'), 
-		'search_items' => __('Search Products'),
+		'name' => __('Products', 'foxypress'),
+		'singular_name' => __('Product', 'foxypress'),
+		'add_new' => __('Add New Product', 'foxypress'),
+		'add_new_item' => __('Add New Product', 'foxypress'),
+		'all_items' => __('Manage Products', 'foxypress'),
+		'edit_item' => __('Edit Product', 'foxypress'),
+		'new_item' => __('New Product', 'foxypress'),
+		'view_item' => __('View Product', 'foxypress'),
+		'menu_name' => __('FoxyPress', 'foxypress'),
+		'not_found' =>  __('No Products Found', 'foxypress'),
+		'not_found_in_trash' => __('No Products Found in Trash', 'foxypress'), 
+		'search_items' => __('Search Products', 'foxypress'),
 		'parent_item_colon' => '',
 		'menu_icon' => plugins_url() . '/img/icon_foxypress.png'
 	);
@@ -59,7 +59,7 @@ function foxypress_create_custom_post_type()
 	}	
 	register_post_type(FOXYPRESS_CUSTOM_POST_TYPE, array(
 		'labels' => $labels,
-		'description' => 'FoxyPress Products',
+		'description' => __('FoxyPress Products', 'foxypress'),
 		'public' => true,
 		'show_ui' => true,
 		'capability_type' => 'page',
@@ -109,14 +109,14 @@ function foxypress_product_sortable_columns_orderby( $vars ) {
 function add_new_foxypress_product_columns($cols) 
 {
 	$new_columns['cb'] = '<input type="checkbox" />';
-	$new_columns['id'] = __('ID');
-	$new_columns['title'] = __('Product Title');
-	$new_columns['description'] = __('Description');
-	$new_columns['productcode'] = __('Code');	
-	$new_columns['price'] = __('Price');
-	$new_columns['qty'] = __('Qty');
-	$new_columns['productimage'] = __('Image');	
-	$new_columns['date'] = __('Date');		
+	$new_columns['id'] = __('ID', 'foxypress');
+	$new_columns['title'] = __('Product Title', 'foxypress');
+	$new_columns['description'] = __('Description', 'foxypress');
+	$new_columns['productcode'] = __('Code', 'foxypress');	
+	$new_columns['price'] = __('Price', 'foxypress');
+	$new_columns['qty'] = __('Qty', 'foxypress');
+	$new_columns['productimage'] = __('Image', 'foxypress');	
+	$new_columns['date'] = __('Date', 'foxypress');		
 	return $new_columns;
 }
 
@@ -139,9 +139,9 @@ function manage_custom_columns($column_name, $id)
 		case 'qty':
 			$qty = get_post_meta($id, "_quantity", true);
 			if($qty!=""){
-				echo ($qty ? $qty : 'sold out');			
+				echo ($qty ? $qty : __('sold out', 'foxypress'));			
 			}else{
-				echo ($qty ? $qty : 'not set');
+				echo ($qty ? $qty : __('not set', 'foxypress'));
 			}
 			break;
 		case 'price':
@@ -187,15 +187,15 @@ function foxypress_updated_messages($messages)
 {
 	global $post, $post_ID;
 	$messages[FOXYPRESS_CUSTOM_POST_TYPE] = array(
-		1 => 'Product updated. <a href="'.esc_url(get_permalink($post_ID)).'">View product</a>',
+		1 => __('Product updated.', 'foxypress') . ' <a href="'.esc_url(get_permalink($post_ID)).'">' . __('View product', 'foxypress') . '</a>',
 		2 => __('Custom field updated.'),
 		3 => __('Custom field deleted.'),
 		4 => __('Product updated.'),
-		6 => 'Product published. <a href="' . esc_url(get_permalink($post_ID)) . '">View product</a>',
+		6 => 'Product published. <a href="' . esc_url(get_permalink($post_ID)) . '">' . __('View product', 'foxypress') . '</a>',
 		7 => __('Product saved.'),
-		8 => 'Product submitted. <a target="_blank" href="'.esc_url(add_query_arg('preview', 'true', get_permalink($post_ID))).'">Preview product</a>',
-		9 => 'Product scheduled for: <strong>'.date_i18n( __('M j, Y @ G:i'), strtotime($post->post_date)).'</strong>. <a target="_blank" href="'.esc_url(get_permalink($post_ID)).'">Preview product</a>',
-		10 => 'Product draft updated. <a target="_blank" href="'.esc_url(add_query_arg( 'preview', 'true', get_permalink($post_ID))).'">Preview product</a>'
+		8 => 'Product submitted. <a target="_blank" href="'.esc_url(add_query_arg('preview', 'true', get_permalink($post_ID))).'">' . __('Preview product', 'foxypress') . '</a>',
+		9 => 'Product scheduled for: <strong>'.date_i18n( __('M j, Y @ G:i'), strtotime($post->post_date)).'</strong>. <a target="_blank" href="'.esc_url(get_permalink($post_ID)).'">' . __('Preview product', 'foxypress') . '</a>',
+		10 => 'Product draft updated. <a target="_blank" href="'.esc_url(add_query_arg( 'preview', 'true', get_permalink($post_ID))).'">' . __('Preview product', 'foxypress') . '</a>'
 	);
 	return $messages;
 }
@@ -274,7 +274,7 @@ function foxypress_product_categories_setup()
 				var fields = jQuery("input[name='foxy_categories[]']").serializeArray(); 
 				if(fields.length == 0)
 				{
-					alert('Please choose at least one category');	
+					alert(__('Please choose at least one category', 'foxypress'));	
 					jQuery("img[id='ajax-loading']").hide();
 					return false;
 				}
@@ -308,10 +308,10 @@ function foxypress_product_digital_download_setup()
 	}
 ?>         
 	<div id="inventory_downloadable_upload" <?php echo(($fp_has_downloadable) ? " style=\"display:none;\"" : "") ?>>            
-    	<p>Making your product into a digital download is simple, just fill out the form below.  Once you've filled out the information below and provided a downloadable, your product will be marked as a downloadable product and will send your users an email with their download link.</p>
-        <div class="foxypress_download_field">Digital Download Name</div>
+    	<p><?php _e('Making your product into a digital download is simple, just fill out the form below.  Once you\'ve filled out the information below and provided a downloadable, your product will be marked as a downloadable product and will send your users an email with their download link.', 'foxypress'); ?></p>
+        <div class="foxypress_download_field"><?php _e('Digital Download Name', 'foxypress'); ?></div>
 		<div><input type="text" name="inv_downloadable_name" id="inv_downloadable_name" value="my_download" /></div>
-        <div class="foxypress_download_field">Max Downloads allowed  (if you need to override the main setting)</div>
+        <div class="foxypress_download_field"><?php _e('Max Downloads allowed  (if you need to override the main setting)', 'foxypress'); ?></div>
         <div><input type="text" name="inv_downloadable_max_downloads" id="inv_downloadable_max_downloads" value="" /></div>
         <div class="foxypress_download_field"><input type="file" name="inv_downloadable" id="inv_downloadable"> </div>
     </div>
@@ -437,7 +437,7 @@ function foxypress_product_images_setup()
 	if(!empty($images) && count($images) > 0)
 	{
 	?>
-	<div class="subhead">Current Product Images</div>
+	<div class="subhead"><?php _e('Current Product Images', 'foxypress'); ?></div>
 	<div id="inventory_images"><ul><?php echo($current_images) ?></ul></div>
 	<div style="clear:both;"></div>
     <script type="text/javascript" language="javascript">
@@ -482,30 +482,30 @@ function foxypress_product_details_setup()
 	$_quantity_max = get_post_meta($post->ID,'_quantity_max',TRUE);	
 ?>
 	<div class="foxypress_field_control">
-		<label for="_price"><?php _e('Item Price'); ?></label>
+		<label for="_price"><?php _e('Item Price', 'foxypress'); ?></label>
 		<input type="text" name="_price" id="_price" value="<?php echo $_price; ?>"  style="width: 90px; float: left;" />
 	</div>
 	<div class="foxypress_field_control">
-		<label for="_code"><?php _e('Item Code'); ?></label>
+		<label for="_code"><?php _e('Item Code', 'foxypress'); ?></label>
 		<input type="text" name="_code" id="_code" value="<?php echo $_code; ?>" />
 	</div>
 	<div class="foxypress_field_control">
-		<label for="_weight1"><?php _e('Weight'); ?></label>
+		<label for="_weight1"><?php _e('Weight', 'foxypress'); ?></label>
 		<input type="text" name="_weight1" id="_weight1" value="<?php echo $_weight; ?>" />
 		<span style="float: left; margin: 9px 0 0 5px; width: 34px;">lbs</span>
 		<input type="text" name="_weight2" id="_weight2" value="<?php echo $_weight2; ?>" />
 		<span style="float: left; margin: 9px 0 0 5px;">oz</span>
 	</div>
     <div class="foxypress_field_control">
-		<label for="_code"><?php _e('Quantity'); ?></label>
+		<label for="_code"><?php _e('Quantity', 'foxypress'); ?></label>
 		<input type="text" name="_quantity" id="_quantity" value="<?php echo $_quantity; ?>" />
 	</div>
     <div class="foxypress_field_control">
-		<label for="_quantity_min"><?php _e('Qty Settings'); ?></label>
+		<label for="_quantity_min"><?php _e('Qty Settings', 'foxypress'); ?></label>
 		<input type="text" name="_quantity_min" id="_quantity_min" value="<?php echo $_quantity_min; ?>" style="width: 30px; float: left;"  />
-        <span style="float: left; margin: 9px 0 0 5px; width: 34px;">min</span>		
+        <span style="float: left; margin: 9px 0 0 5px; width: 34px;"><?php _e('min', 'foxypress'); ?></span>		
 		<input type="text" name="_quantity_max" id="_quantity_max" value="<?php echo $_quantity_max; ?>" style="width: 30px; float: left;"  />
-		<span style="float: left; margin: 9px 0 0 5px; width: 34px;">max</span>	
+		<span style="float: left; margin: 9px 0 0 5px; width: 34px;"><?php _e('max', 'foxypress'); ?></span>	
 	</div>
     <div style="clear:both"></div>
     <input type="hidden" name="products_meta_noncename" value="<?php echo(wp_create_nonce(__FILE__)); ?>" />
@@ -534,81 +534,81 @@ function foxypress_extra_product_details_setup()
 	$_item_email_active = get_post_meta($post->ID, '_item_email_active', TRUE);
 	$_item_email_template = get_post_meta($post->ID, '_item_email_template', TRUE);
 ?>
-	<h4><?php _e('Current Time: ');
+	<h4><?php _e('Current Time: ', 'foxypress');
 		echo date('m-d-y h:m:s', current_time('mysql')); ?></h4>
-	<h4><?php _e('Sale'); ?></h4>
+	<h4><?php _e('Sale', 'foxypress'); ?></h4>
 	<div class="foxypress_field_control">
-		<label for="_saleprice"><?php _e('Sale Price'); ?></label>
+		<label for="_saleprice"><?php _e('Sale Price', 'foxypress'); ?></label>
 		<input type="text" name="_saleprice" id="_saleprice" value="<?php echo $_saleprice; ?>" style="width: 87px; float: left;" />
 	</div>
 	<div class="foxypress_field_control">
-		<label for="_salestartdate"><?php _e('Start Date'); ?></label>
+		<label for="_salestartdate"><?php _e('Start Date', 'foxypress'); ?></label>
 		<input type="text" id="_salestartdate" name="_salestartdate" value="<?php echo $_salestartdate; ?>" style="width: 87px; float: left;" />
 		<span style="float: left; margin: 9px 0 0 5px;">yyyy-mm-dd</span>
 	</div>
 	<div class="foxypress_field_control">
-		<label for="_saleenddate"><?php _e('End Date'); ?></label>
+		<label for="_saleenddate"><?php _e('End Date', 'foxypress'); ?></label>
 		<input type="text" id="_saleenddate" name="_saleenddate" value="<?php echo $_saleenddate; ?>" style="width: 87px; float: left;" />
 		<span style="float: left; margin: 9px 0 0 5px;">yyyy-mm-dd</span>
 	</div>
 	<div style="clear: both;"></div>
-	<h4><?php _e('Discounts'); ?> <a href="http://wiki.foxycart.com/v/0.7.1/coupons_and_discounts" target="_blank">(<?php _e('reference'); ?>)</a></h4>
+	<h4><?php _e('Discounts', 'foxypress'); ?> <a href="http://wiki.foxycart.com/v/0.7.1/coupons_and_discounts" target="_blank">(<?php _e('reference', 'foxypress'); ?>)</a></h4>
 	<div class="foxypress_field_control discount_fields">
-		<label for="_discount_quantity_amount"><?php _e('Quantity $'); ?></label>
+		<label for="_discount_quantity_amount"><?php _e('Quantity $', 'foxypress'); ?></label>
 		<input type="text" name="_discount_quantity_amount" id="_discount_quantity_amount" value="<?php echo $_discount_quantity_amount; ?>" />
 		<div style="clear:both;"></div>
 	</div>
 	<div class="foxypress_field_control discount_fields">
-		<label for="_discount_quantity_percentage"><?php _e('Quantity %'); ?></label>
+		<label for="_discount_quantity_percentage"><?php _e('Quantity %', 'foxypress'); ?></label>
 		<input type="text" name="_discount_quantity_percentage" id="_discount_quantity_percentage" value="<?php echo $_discount_quantity_percentage; ?>" />
 		<div style="clear:both;"></div>
 	</div>
 	<div class="foxypress_field_control discount_fields">
-		<label for="_discount_price_amount"><?php _e('Price $'); ?></label>
+		<label for="_discount_price_amount"><?php _e('Price $', 'foxypress'); ?></label>
 		<input type="text" name="_discount_price_amount" id="_discount_price_amount" value="<?php echo $_discount_price_amount; ?>" />
 		<div style="clear:both;"></div>
 	</div>
 	<div class="foxypress_field_control discount_fields">
-		<label for="_discount_price_percentage"><?php _e('Price %'); ?></label>
+		<label for="_discount_price_percentage"><?php _e('Price %', 'foxypress'); ?></label>
 		<input type="text" name="_discount_price_percentage" id="_discount_price_percentage" value="<?php echo $_discount_price_percentage; ?>" />
 		<div style="clear:both;"></div>
 	</div>
     <div style="clear:both;"></div>
-    <h4><?php _e('Subscription Attributes'); ?> <a href="http://wiki.foxycart.com/v/0.7.1/cheat_sheet#subscription_product_options" target="_blank">(<?php _e('reference'); ?>)</a></h4>
+    <h4><?php _e('Subscription Attributes'); ?> <a href="http://wiki.foxycart.com/v/0.7.1/cheat_sheet#subscription_product_options" target="_blank">(<?php _e('reference', 'foxypress'); ?>)</a></h4>
 	<div id="foxypress_subscription_attributes">
 		<div class="foxypress_field_control">
-			<label for="_sub_frequency"><?php _e('Frequency'); ?></label>
+			<label for="_sub_frequency"><?php _e('Frequency', 'foxypress'); ?></label>
 			<input type="text" name="_sub_frequency" id="_sub_frequency" value="<?php echo $_sub_frequency; ?>" />
 			<span>60d, 2w, 1m, 1y, .5m</span>
 		</div>
 		<div class="foxypress_field_control">
-			<label for="_sub_startdate"><?php _e('Start Date'); ?></label>
+			<label for="_sub_startdate"><?php _e('Start Date', 'foxypress'); ?></label>
 			<input type="text" id="_sub_startdate" name="_sub_startdate" value="<?php echo $_sub_startdate; ?>" />
 			<span>YYYYMMDD or D</span>
 		</div>
 		<div class="foxypress_field_control">
-			<label for="_sub_enddate"><?php _e('End Date'); ?></label>
+			<label for="_sub_enddate"><?php _e('End Date', 'foxypress'); ?></label>
 			<input type="text" id="_sub_enddate" name="_sub_enddate" value="<?php echo $_sub_enddate; ?>" />
 			<span>YYYYMMDD or D</span>
 		</div>
 		<div style="clear: both;"></div>
 	</div>
 	<div style="clear:both;"></div>
-    <h4><?php _e('Item Availability'); ?></h4>
+    <h4><?php _e('Item Availability', 'foxypress'); ?></h4>
     <div class="foxypress_field_control">
-		<label for="_item_start_date"><?php _e('Start Date'); ?></label>
+		<label for="_item_start_date"><?php _e('Start Date', 'foxypress'); ?></label>
 		<input type="text" name="_item_start_date" id="_item_start_date" value="<?php echo $_item_start_date; ?>" style="width: 87px; float: left;" />
         <span style="float: left; margin: 9px 0 0 5px;">yyyy-mm-dd</span>
         <div style="clear: both;"></div>
 	</div>
     <div class="foxypress_field_control">
-		<label for="_item_end_date"><?php _e('End Date'); ?></label>
+		<label for="_item_end_date"><?php _e('End Date', 'foxypress'); ?></label>
 		<input type="text" name="_item_end_date" id="_item_end_date" value="<?php echo $_item_end_date; ?>" style="width: 87px; float: left;" />
         <span style="float: left; margin: 9px 0 0 5px;">yyyy-mm-dd</span>
         <div style="clear: both;"></div>
 	</div>
     <div class="foxypress_field_control">
-		<label for="_item_active"><?php _e('Active'); ?></label>
+		<label for="_item_active"><?php _e('Active', 'foxypress'); ?></label>
 		<select name="_item_active" id="_item_active">
         	<option value="1" <?php if($_item_active == "1") {echo("selected=\"selected\"");} ?>>Yes</option>
             <option value="0" <?php if($_item_active == "0") {echo("selected=\"selected\"");} ?>>No</option>
@@ -616,9 +616,9 @@ function foxypress_extra_product_details_setup()
         <div style="clear: both;"></div>
 	</div>
     <div style="clear: both;"></div>
-    <h4><?php _e('Item Email'); ?></h4>
+    <h4><?php _e('Item Email', 'foxypress'); ?></h4>
     <div class="foxypress_field_control">
-		<label for="_item_email_active"><?php _e('Active'); ?></label>
+		<label for="_item_email_active"><?php _e('Active', 'foxypress'); ?></label>
 		<select name="_item_email_active" id="_item_email_active">
 			<option value=""> -- </option>
         	<option value="1" <?php if($_item_email_active == "1") {echo("selected=\"selected\"");} ?>>Yes</option>
@@ -627,7 +627,7 @@ function foxypress_extra_product_details_setup()
         <div style="clear: both;"></div>
 	</div>
 	<div class="foxypress_field_control">
-		<label for="_item_email_template"><?php _e('Template'); ?></label>
+		<label for="_item_email_template"><?php _e('Template', 'foxypress'); ?></label>
 		<select name="_item_email_template" id="_item_email_template">
 			<option value=""> -- </option>
 			<?php 
@@ -669,22 +669,22 @@ function foxypress_product_deal_setup()
 		<label for="_item_deal_active"><?php _e('Active Deal'); ?></label>
 		<select name="_item_deal_active" id="_item_deal_active">
 			<option value=""> -- </option>
-        	<option value="1" <?php if($_item_deal_active == "1") {echo("selected=\"selected\"");} ?>>Yes</option>
-            <option value="0" <?php if($_item_deal_active == "0") {echo("selected=\"selected\"");} ?>>No</option>
+        	<option value="1" <?php if($_item_deal_active == "1") {echo("selected=\"selected\"");} ?>><?php _e('Yes', 'foxypress'); ?></option>
+            <option value="0" <?php if($_item_deal_active == "0") {echo("selected=\"selected\"");} ?>><?php _e('No', 'foxypress'); ?></option>
         </select>
 	</div>
 	<div class="foxypress_field_control">
 		<label for="_item_deal_code_type"><?php _e('Code Type'); ?></label>
 		<select name="_item_deal_code_type" id="_item_deal_code_type">
 			<option value=""> -- </option>
-			<option value="none" <?php if($_item_deal_code_type == "none") {echo("selected=\"selected\"");} ?>>None</option>
-        	<option value="static" <?php if($_item_deal_code_type == "static") {echo("selected=\"selected\"");} ?>>Static</option>
-            <option value="random" <?php if($_item_deal_code_type == "random") {echo("selected=\"selected\"");} ?>>Random</option>
+			<option value="none" <?php if($_item_deal_code_type == "none") {echo("selected=\"selected\"");} ?>><?php _e('None', 'foxypress'); ?></option>
+        	<option value="static" <?php if($_item_deal_code_type == "static") {echo("selected=\"selected\"");} ?>><?php _e('Static', 'foxypress'); ?></option>
+            <option value="random" <?php if($_item_deal_code_type == "random") {echo("selected=\"selected\"");} ?>><?php _e('Random', 'foxypress'); ?></option>
         </select>
         <div style="clear: both;"></div>
 	</div>
 	<div class="foxypress_field_control discount_fields">
-		<label for="_item_deal_static_code"><?php _e('Static Code'); ?></label>
+		<label for="_item_deal_static_code"><?php _e('Static Code', 'foxypress'); ?></label>
 		<input type="text" name="_item_deal_static_code" id="_item_deal_static_code" value="<?php echo $_item_deal_static_code; ?>" />
 		<div style="clear:both;"></div>
 	</div>
@@ -899,55 +899,56 @@ function foxypress_product_options_setup()
 		});
 		
 	</script>
-	<h4>New Product Option</h4>
-	<p>Below you can add options to your product.  These are useful for allowing various sizes or colors, or additional weights and prices for a product.  Setting a quantity available for an option level is possible, but remember to set a code for the option or it will not take affect.  Also, when re-ordering options, make sure you click save options, not the blue "update" button.  Read more on product options <a href="http://www.foxy-press.com/getting-started/managing-inventory/" target="_blank">here</a>.</p>	<table class="product_options" cellpadding="5" cellspacing="5">
+	<h4><?php _e('New Product Option', 'foxypress'); ?></h4>
+	<p><?php _e('Below you can add options to your product.  These are useful for allowing various sizes or colors, or additional weights and prices for a product.  Setting a quantity available for an option level is possible, but remember to set a code for the option or it will not take affect.  Also, when re-ordering options, make sure you click save options, not the blue "update" button.  Read more on product options ', 'foxypress'); ?><a href="http://www.foxy-press.com/getting-started/managing-inventory/" target="_blank"><?php _e('here', 'foxypress'); ?></a>.</p>	
+	<table class="product_options" cellpadding="5" cellspacing="5">
         <tr>
-            <td class="field_name">Name</td>
+            <td class="field_name"><?php _e('Name', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_option_name" name="foxy_option_name" /></td>
             <td></td>
-            <td class="field_name">Extra Weight</td>
+            <td class="field_name"><?php _e('Extra Weight', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_option_extra_weight" name="foxy_option_extra_weight" />lb(s)</td>
             <td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                    <span>Enter negative numbers if you need to subtract from the default weight.</span></a>
+                    <span><?php _e('Enter negative numbers if you need to subtract from the default weight.', 'foxypress'); ?></span></a>
                 </div>
             </td>
         </tr>
         <tr>
-            <td class="field_name">Value</td>
+            <td class="field_name"><?php _e('Value', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_option_value" name="foxy_option_value" /></td>
             <td></td>
-            <td class="field_name">Extra Price</td>
+            <td class="field_name"><?php _e('Extra Price', 'foxypress'); ?></td>
             <td><?php echo(foxypress_GetCurrencySymbol()); ?><input type="text" id="foxy_option_extra_price" name="foxy_option_extra_price" /></td>
             <td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                    <span>Enter negative numbers if you need to subtract from the default price.</span></a>
+                    <span><?php _e('Enter negative numbers if you need to subtract from the default price.', 'foxypress'); ?></span></a>
                 </div>
             </td>
         </tr>
         <tr>
-            <td class="field_name">Option Group</td>
+            <td class="field_name"><?php _e('Option Group', 'foxypress'); ?></td>
             <td><select name="foxy_option_group" id="foxy_option_group"><?php echo($groups_selection_list) ?></select></td>
             <td></td>
-            <td class="field_name">Unique Code</td>
+            <td class="field_name"><?php _e('Unique Code', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_option_code" name="foxy_option_code" /></td>
             <td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                    <span>If your product code differs for different options, enter the correct code here. Currently option level quantities only work correctly for 1 option group per item.</span></a>
+                    <span><?php _e('If your product code differs for different options, enter the correct code here. Currently option level quantities only work correctly for 1 option group per item.', 'foxypress'); ?></span></a>
                 </div>
             </td>
         </tr>
         <tr>
         	<td colspan="3">&nbsp;</td>
-            <td class="field_name">Quantity</td>
+            <td class="field_name"><?php _e('Quantity', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_option_quantity" name="foxy_option_quantity" /></td>
             <td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                    <span>Use this field if you have a unique product code and would like to keep track of inventory at the option specific level.</span></a>
+                    <span><?php _e('Use this field if you have a unique product code and would like to keep track of inventory at the option specific level.', 'foxypress'); ?></span></a>
                 </div>
             </td>            
         </tr>
@@ -955,7 +956,7 @@ function foxypress_product_options_setup()
             <td colspan="6"><input type="submit" id="foxy_option_save" name="foxy_option_save" value="<?php _e('Save'); ?> &raquo;"  class="button bold"  /></td>
         </tr>
     </table>
-    <h4>Current Options</h4>
+    <h4><?php _e('Current Options', 'foxypress'); ?></h4>
     <div class="demo">
 		<ul id="sortable">
         
@@ -981,38 +982,38 @@ function foxypress_product_options_setup()
 	                <?php
 						echo("<table class=\"product_options\" cellpadding=\"5\" cellspacing=\"5\" class=\"\">
 								<tr>
-									<td class=\"field_name\">Name</td>
+									<td class=\"field_name\">" . __('Name', 'foxypress') . "</td>
 									<td><input type=\"text\" name=\"foxy_option_text_" . $row . "\" id=\"foxy_option_text_" . $row . "\" value=\"" . $foxyopt->option_text . "\" size=\"15\"></td>
-									<td class=\"field_name\">Extra Price</td>
+									<td class=\"field_name\">" . __('Extra Price', 'foxypress') . "</td>
 									<td>" . foxypress_GetCurrencySymbol() . "<input type=\"text\" name=\"foxy_option_extra_price_" . $row . "\" id=\"foxy_option_extra_price_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_price, 2) . "\" size=\"10\"></td>
 								</tr>
 								<tr>
-									<td class=\"field_name\">Value</td>
+									<td class=\"field_name\">" . __('Value', 'foxypress') . "</td>
 									<td><input type=\"text\" name=\"foxy_option_value_" . $row . "\" id=\"foxy_option_value_" . $row . "\" value=\"" . $foxyopt->option_value . "\" size=\"15\"></td>
-									<td class=\"field_name\">Extra Weight</td>
+									<td class=\"field_name\">" . __('Extra Weight', 'foxypress') . "</td>
 									<td nowrap><input type=\"text\" name=\"foxy_option_extra_weight_" . $row . "\" id=\"foxy_option_extra_weight_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_weight, 2) . "\" size=\"5\">lb(s)</td>
 								</tr>
 								<tr>
-									<td class=\"field_name\">Option Group</td>
+									<td class=\"field_name\">" . __('Option Group', 'foxypress') . "</td>
 									<td><select id=\"foxy_option_group_" . $row . "\" name=\"foxy_option_group_" . $row . "\">" . foxypress_BuildInventoryOptionGroupList($groups, $foxyopt->option_group_id) . "</select></td>
-									<td class=\"field_name\">Code</td>
+									<td class=\"field_name\">" . __('Code', 'foxypress') . "</td>
 									<td><input type=\"text\" name=\"foxy_option_code_" . $row . "\" id=\"foxy_option_code_" . $row . "\" value=\"" . $foxyopt->option_code . "\" size=\"10\"></td>
 								</tr>
-									<td class=\"field_name\">Active</td>
+									<td class=\"field_name\">" . __('Active', 'foxypress') . "</td>
 									<td>
 										<select id=\"foxy_option_active_" . $row . "\" name=\"foxy_option_active_" . $row . "\">
-											<option value=\"1\" " . (($foxyopt->option_active == "1") ? "selected=\"selected\"" : "") . ">Yes</option>
-											<option value=\"0\" " . (($foxyopt->option_active == "0") ? "selected=\"selected\"" : "") . ">No</option>											
+											<option value=\"1\" " . (($foxyopt->option_active == "1") ? "selected=\"selected\"" : "") . ">" . __('Yes', 'foxypress') . "</option>
+											<option value=\"0\" " . (($foxyopt->option_active == "0") ? "selected=\"selected\"" : "") . ">" . __('No', 'foxypress') . "</option>											
 										</select>
 									</td>
-									<td class=\"field_name\">Quantity</td>
+									<td class=\"field_name\">" . __('Quantity', 'foxypress') . "</td>
 									<td>
 										<input type=\"text\" id=\"foxy_option_quantity_" . $row . "\" name=\"foxy_option_quantity_" . $row . "\" value=\"" . $foxyopt->option_quantity . "\" size=\"5\" />
 									</td>
 								 </tr>
 							</table>
 							<input type=\"hidden\" name=\"hdn_foxy_option_id_" . $row . "\" id=\"hdn_foxy_option_id_" . $row . "\" value=\"" . $foxyopt->option_id . "\" />
-							<a class=\"button bold\" href=\"" . foxypress_GetCurrentPageURL(true) . "&deleteoption=true&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\"  onclick=\"return confirm('Are you sure you want to delete this option?');\">Delete Option</a>");
+							<a class=\"button bold\" href=\"" . foxypress_GetCurrentPageURL(true) . "&deleteoption=true&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\"  onclick=\"return confirm('" . __('Are you sure you want to delete this option?', 'foxypress') . "');\">" . __('Delete Option', 'foxypress') . "</a>");
                 		$row++;
 					?>
             	</div>
@@ -1031,7 +1032,7 @@ function foxypress_product_options_setup()
     
     
     <br />
-    <input type="submit" id="foxy_options_update" name="foxy_options_update" value="<?php _e('Save Options'); ?> &raquo;"  class="button bold" />
+    <input type="submit" id="foxy_options_update" name="foxy_options_update" value="<?php _e('Save Options', 'foxypress'); ?> &raquo;"  class="button bold" />
     <input type="hidden" id="hdn_foxy_options_order" name="hdn_foxy_options_order" value="<?php echo($current_option_order) ?>" />
     <input type="hidden" id="hdn_foxy_options_count" name="hdn_foxy_options_count" value="<?php echo($row-1); ?>" />
 <?php
@@ -1041,7 +1042,7 @@ function foxypress_product_options_setup()
 		_e("<div>
 				You do not have any option groups set up yet. In order to add a new option for this inventory item you must
 				add a <a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups\">new option group</a>.
-		   </div>");	
+		   </div>", "foxypress");	
 	}
 }
 
@@ -1058,27 +1059,27 @@ function foxypress_product_attributes_setup()
 {
 	global $wpdb, $post;
 ?>
-	<h4>New Product Attribute</h4>
-	<p>Product attributes are fantastic for using in conjunction with developing custom functionality, or adding additional information to your product that you'd like to see in order management.</p>
+	<h4><?php _e('New Product Attribute', 'foxypress'); ?></h4>
+	<p><?php _e('Product attributes are fantastic for using in conjunction with developing custom functionality, or adding additional information to your product that you\'d like to see in order management.', 'foxypress'); ?></p>
 	<table cellpadding="5" cellspacing="5">
         <tr>
-            <td>Attribute Name</td>
+            <td><?php _e('Attribute Name', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_attribute_name" name="foxy_attribute_name" /></td>
         </tr>
         <tr>
-            <td>Attribute Value</td>
+            <td><?php _e('Attribute Value', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_attribute_value" name="foxy_attribute_value" /></td>
         </tr>
         <tr>
             <td colspan="2"><input type="submit" id="foxy_attribute_save" name="foxy_attribute_save" value="<?php _e('Save'); ?> &raquo;"  class="button bold"  /></td>
         </tr>
     </table>
-    <h4>Current Product Attributes</h4>
+    <h4><?php _e('Current Product Attributes', 'foxypress'); ?></h4>
     <table class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">
             <thead>
                 <tr>
-                    <th class="manage-column" scope="col">Attribute Name</th>
-                    <th class="manage-column" scope="col">Attribute Value</th>
+                    <th class="manage-column" scope="col"><?php _e('Attribute Name', 'foxypress'); ?></th>
+                    <th class="manage-column" scope="col"><?php _e('Attribute Value', 'foxypress'); ?></th>
                     <th class="manage-column" scope="col">&nbsp;</th>
                 </tr>
             </thead>
@@ -1098,7 +1099,7 @@ function foxypress_product_attributes_setup()
             }
             else
             {
-                echo("<tr><td colspan=\"3\">There are currently no attributes for this inventory item</td></tr>");
+                echo("<tr><td colspan=\"3\">" . __('There are currently no attributes for this inventory item', 'foxypress') . "</td></tr>");
             }
         ?>
         </table>

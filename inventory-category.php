@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 $plugin_dir = basename(dirname(__FILE__));
@@ -158,9 +158,9 @@ function foxypress_inventory_category_sort()
 					echo("<table id=\"foxypress_inventory_category_order\" class=\"widefat page fixed\" width=\"50%\" cellpadding=\"3\" cellspacing=\"3\">
 							<thead>
 								<tr>
-									<th class=\"manage-column\" scope=\"col\">Sort</th>
-									<th class=\"manage-column\" scope=\"col\">Item Code</th>
-									<th class=\"manage-column\" scope=\"col\">Item Name</th>
+									<th class=\"manage-column\" scope=\"col\">" . __('Sort', 'foxypress') . "</th>
+									<th class=\"manage-column\" scope=\"col\">" . __('Item Code', 'foxypress') . "</th>
+									<th class=\"manage-column\" scope=\"col\">" . __('Item Name', 'foxypress') . "</th>
 								</tr>
 							</thead>
 							<tbody>");
@@ -178,7 +178,7 @@ function foxypress_inventory_category_sort()
 					?>
                     <br />
 					<form id="foxy_order_items" name="foxy_order_items" method="POST">
-						<input type="submit" id="foxy_order_items_save" name="foxy_order_items_save" value="<?php _e('Update Order'); ?> &raquo;"  class="button bold" />
+						<input type="submit" id="foxy_order_items_save" name="foxy_order_items_save" value="<?php _e('Update Order', 'foxypress'); ?> &raquo;"  class="button bold" />
 						<input type="hidden" id="hdn_foxy_items_order" name="hdn_foxy_items_order" value="<?php echo($current_item_order) ?>" />
 					</form>
                     <?php
@@ -203,12 +203,12 @@ function foxypress_inventory_category_view_categories()
         <form name="foxypress_add_category" id="foxypress_add_category" class="wrap" method="post">
             <div id="linkadvanceddiv" class="postbox">
                 <div style="float: left; width: 98%; clear: both;" class="inside">
-                	<p>When creating your categories, please know that you need to match them with your FoxyCart.com categories. <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182&url=https://admin.foxycart.com/admin.php?ThisAction=ManageProductCategories" target="_blank">Click here</a> to view our FoxyCart.com category list. </p>
+                	<p><?php _e('When creating your categories, please know that you need to match them with your FoxyCart.com categories', 'foxypress'); ?>. <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182&url=https://admin.foxycart.com/admin.php?ThisAction=ManageProductCategories" target="_blank"><?php _e('Click here', 'foxypress'); ?></a> <?php _e('to view our FoxyCart.com category list', 'foxypress'); ?>. </p>
                     <table cellspacing="5" cellpadding="5">
                         <tr>
                             <td><legend><?php _e('New Category Name','inventory'); ?>:</legend></td>
                             <td><input type="text" name="foxypress_new_category" class="input" size="30" maxlength="30" value="" /></td>
-                            <td><input type="submit" name="foxypress_new_category_save" id="foxypress_new_category_save" class="button bold" value="<?php _e('Save','inventory'); ?> &raquo;" /></td>
+                            <td><input type="submit" name="foxypress_new_category_save" id="foxypress_new_category_save" class="button bold" value="<?php _e('Save','foxypress'); ?> &raquo;" /></td>
                         </tr>
                     </table>
                 </div>
@@ -237,11 +237,11 @@ function foxypress_inventory_category_view_categories()
          <table class="widefat page fixed" width="50%" cellpadding="3" cellspacing="3">
            <thead>
              <tr>
-               <th class="manage-column" scope="col"><?php _e('ID','inventory') ?></th>
-               <th class="manage-column" scope="col"><?php _e('Category Name','inventory') ?></th>
-               <th class="manage-column" scope="col"><?php _e('Category Image','inventory') ?></th>
-               <th class="manage-column" scope="col"><?php _e('Sort','inventory') ?></th>
-               <th class="manage-column" scope="col"><?php _e('Delete','inventory') ?></th>
+               <th class="manage-column" scope="col"><?php _e('ID','foxypress') ?></th>
+               <th class="manage-column" scope="col"><?php _e('Category Name','foxypress') ?></th>
+               <th class="manage-column" scope="col"><?php _e('Category Image','foxypress') ?></th>
+               <th class="manage-column" scope="col"><?php _e('Sort','foxypress') ?></th>
+               <th class="manage-column" scope="col"><?php _e('Delete','foxypress') ?></th>
              </tr>
            </thead>
            <?php
@@ -259,7 +259,7 @@ function foxypress_inventory_category_view_categories()
 									<form id=\"foxy_cat_edit\" name=\"foxy_cat_edit\" method=\"post\">
 										<input type=\"text\" name=\"foxy_cat_name\" id=\"foxy_cat_name\" value=\"" . stripslashes($category->category_name) . "\" />
 										<input type=\"hidden\" name=\"foxy_cat_id\" id=\"foxy_cat_id\" value=\"$category->category_id\" />
-										<input type=\"submit\" id=\"foxy_cat_save\" name=\"foxy_cat_save\" value=\"save\" />
+										<input type=\"submit\" id=\"foxy_cat_save\" name=\"foxy_cat_save\" value=\"" . __('save', 'foxypress') . "\" />
 									</form>
 								</td>";
 					  }
@@ -267,7 +267,7 @@ function foxypress_inventory_category_view_categories()
 					  if($category->category_image != "")
 					  {
 						  $ImageOutput = "<div>
-						  					<a href=" . INVENTORY_IMAGE_DIR . '/' . stripslashes($category->category_image) . " target=\"blank\">View Image</a> &nbsp;
+						  					<a href=" . INVENTORY_IMAGE_DIR . '/' . stripslashes($category->category_image) . " target=\"blank\">" . __('View Image', 'foxypress') . "</a> &nbsp;
 											<a href=\"" . foxypress_GetCurrentPageURL(true) . "&mode=delete_image&category_id=" . $category->category_id . "\"><img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"\" /></a>
 										  </div>";
 					  }
@@ -276,22 +276,22 @@ function foxypress_inventory_category_view_categories()
 						   $ImageOutput = "<form enctype=\"multipart/form-data\" method=\"post\" id=\"foxy_cat_image_form\" name=\"foxy_cat_image_form\">
 						   					<input type=\"file\" name=\"fp_cat_image\" id=\"fp_cat_image\" />
 											<input type=\"hidden\" name=\"hdn_category_id\" id=\"hdn_category_id\" value=\"" . $category->category_id . "\" />
-											<input type=\"submit\" id=\"foxy_cat_image_submit\" name=\"foxy_cat_image_submit\" value=\"Save\">
+											<input type=\"submit\" id=\"foxy_cat_image_submit\" name=\"foxy_cat_image_submit\" value=\"" . __('Save', 'foxypress') . "\">
 										   </form>";
 					  }
 					  echo("<td>" . $ImageOutput . "</td>
 					  		<td>
-					  			<a href=\"" . foxypress_GetCurrentPageURL(true) . "&view=sort&categoryid=" . $category->category_id . "\">Sort Inventory Items</a>
+					  			<a href=\"" . foxypress_GetCurrentPageURL(true) . "&view=sort&categoryid=" . $category->category_id . "\">" . __('Sort Inventory Items', 'foxypress') . "</a>
 							</td>");
 					  if ($category->category_id == 1)
 					  {
-							echo "<td>" . __("N/A","inventory") . "</td>";
+							echo "<td>" . __("N/A","foxypress") . "</td>";
 					  }
 					  else
 					  {
 							echo "<td>
-									<a href=\"" . foxypress_GetCurrentPageURL(true) . "&mode=delete&category_id=" . $category->category_id . "\" class=\"delete\" onclick=\"return confirm('" . __('Are you sure you want to delete this category?','inventory') . "');\">" .
-						__("Delete","inventory") . "</a>
+									<a href=\"" . foxypress_GetCurrentPageURL(true) . "&mode=delete&category_id=" . $category->category_id . "\" class=\"delete\" onclick=\"return confirm('" . __('Are you sure you want to delete this category?','foxypress') . "');\">" .
+						__("Delete","foxypress") . "</a>
 								  </td>";
 					  }
 					  echo "</tr>";
@@ -302,12 +302,12 @@ function foxypress_inventory_category_view_categories()
 		if($drRows->RowCount > $limit)
 		{
 			$Pagination = foxypress_GetPagination($pageNumber, $drRows->RowCount, $limit, $targetpage, 'fp_pn');
-			echo ("<Br>" . $Pagination);
+			echo ("<br />" . $Pagination);
 		}
     }
     else
     {
-        echo '<p>There are currently no categories</p>';
+        _e("<p>There are currently no categories</p>");
     }
     echo '</div>'; //end wrap
 }

@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 /***************************************************************************************************/
@@ -846,6 +846,26 @@ function foxypress_GetTransactionDetails($transaction)
 	{
 		return null;
 	}
+}
+
+function foxypress_GetBanner($banner_id)
+{
+	global $wpdb;
+
+	$data = "SELECT *
+				FROM " . $wpdb->prefix . "foxypress_affiliate_assets
+				WHERE id = " . $banner_id;
+
+    return $wpdb->get_results($data);
+}
+
+function foxypress_GetBanners()
+{
+	global $wpdb;
+
+	$data = "SELECT * FROM " . $wpdb->prefix . "foxypress_affiliate_assets";
+
+    return $wpdb->get_results($data);
 }
 
 function foxypress_IsAffiliate($user_id)

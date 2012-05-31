@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2011 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 $plugin_dir = basename(dirname(__FILE__));
@@ -91,7 +91,7 @@ function foxypress_subscriptions_edit($sub_token)
 	{
 		$sub_token_url = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/cart?sub_token=" . $foxyXMLResponse->subscription->sub_token;		
 		$output = "<div style=\"padding: 10px;\">
-					<i>For help with subscriptions visit FoxyCart's <a href=\"http://wiki.foxycart.com/v/0.7.1/products/subscriptions\" target=\"_blank\">documentation</a> or <a href=\"http://wiki.foxycart.com/v/0.7.1/cheat_sheet#subscription_product_options\" target=\"_blank\">cheat sheet</a></i>
+					<i>" . __('For help with subscriptions visit FoxyCart\'s', 'foxypress') . "<a href=\"http://wiki.foxycart.com/v/0.7.1/products/subscriptions\" target=\"_blank\">" . __('documentation', 'foxypress') . "</a> " . __('or', 'foxypress') . "<a href=\"http://wiki.foxycart.com/v/0.7.1/cheat_sheet#subscription_product_options\" target=\"_blank\">" . __('cheat sheet', 'foxypress') . "</a></i>
 					</div>
 					<form method=\"post\">
 						<div class=\"postbox\">
@@ -101,49 +101,49 @@ function foxypress_subscriptions_edit($sub_token)
 									<td><input type=\"text\" value=\"" . $foxyXMLResponse->subscription->sub_token . "\" name=\"foxypress_sub_subtoken\" id=\"foxypress_sub_subtoken\" size=\"100\" readonly /></td>
 								</tr>
 								<tr>
-									<td>Start Date</td>
+									<td>" . __('Start Date', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $foxyXMLResponse->subscription->start_date . "\" name=\"foxypress_sub_startdate\" id=\"foxypress_sub_startdate\" /> <small><i>(yyyy-mm-dd format. ex: " . date("Y-m-d") . ")</i></small></td>
 								</tr>
 								<tr>
-									<td>Next Date</td>
+									<td>" . __('Next Date', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $foxyXMLResponse->subscription->next_transaction_date . "\" name=\"foxypress_sub_nextdate\" id=\"foxypress_sub_nextdate\" /> <small><i>(yyyy-mm-dd format. ex: " . date("Y-m-d") . ")</i></small></td>
 								</tr>
 								<tr>
-									<td>End Date</td>
+									<td>" . __('End Date', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $foxyXMLResponse->subscription->end_date . "\" name=\"foxypress_sub_enddate\" id=\"foxypress_sub_enddate\" /> <small><i>(yyyy-mm-dd format. ex: " . date("Y-m-d") . ")</i></small></td>
 								</tr>
 								<tr>
-									<td>Frequency</td>
+									<td>" . __('Frequency', 'foxypress') . "</td>
 									<td><input type=\"text\" value=\"" . $foxyXMLResponse->subscription->frequency . "\" name=\"foxypress_sub_frequency\" id=\"foxypress_sub_frequency\" /></td>
 								</tr>
 								<tr>
-									<td>Past Due Amount &nbsp; &nbsp;</td>
+									<td>" . __('Past Due Amount', 'foxypress') . " &nbsp; &nbsp;</td>
 									<td><input type=\"text\" value=\"" . $foxyXMLResponse->subscription->past_due_amount . "\" name=\"foxypress_sub_pastdue\" id=\"foxypress_sub_pastdue\" /></td>
 								</tr>
 								<tr>
-									<td>Active</td>
+									<td>" . __('Active', 'foxypress') . "</td>
 									<td>
 										<select name=\"foxypress_sub_active\" id=\"foxypress_sub_active\">
-											<option value=\"1\" " . (($foxyXMLResponse->subscription->is_active == "1") ? "selected=\"selected\"" : "") . ">Yes</option>
-											<option value=\"0\" " . (($foxyXMLResponse->subscription->is_active == "0") ? "selected=\"selected\"" : "") . ">No</option>
+											<option value=\"1\" " . (($foxyXMLResponse->subscription->is_active == "1") ? "selected=\"selected\"" : "") . ">" . __('Yes', 'foxypress') . "</option>
+											<option value=\"0\" " . (($foxyXMLResponse->subscription->is_active == "0") ? "selected=\"selected\"" : "") . ">" . __('No', 'foxypress') . "</option>
 										</select>
 									</td>
 								</tr>
 								<tr>
-									<td colspan=\"2\"><a href=\"" . $sub_token_url . "&sub_cancel=true&cart=checkout\">Cancel Subscription</a> &nbsp; <a href=\"" . $sub_token_url . "&cart=checkout\">Modify Subscription</a></td>
+									<td colspan=\"2\"><a href=\"" . $sub_token_url . "&sub_cancel=true&cart=checkout\">" . __('Cancel Subscription', 'foxypress') . "</a> &nbsp; <a href=\"" . $sub_token_url . "&cart=checkout\">" . __('Modify Subscription', 'foxypress') . "</a></td>
 								</tr>
 						   </table>
 					   </div>
-					   <input type=\"submit\" value=\"Save Changes\" name=\"foxypress_btnSubscriptionSave\" id=\"foxypress_btnSubscriptionSave\" class=\"button-primary\" />
+					   <input type=\"submit\" value=\"" . __('Save Changes', 'foxypress') . "\" name=\"foxypress_btnSubscriptionSave\" id=\"foxypress_btnSubscriptionSave\" class=\"button-primary\" />
   				</form>";
 	}
 	else
 	{
-		$output = "Invalid Subscription";
+		$output = __('Invalid Subscription', 'foxypress');
 	}
 	
 	echo("<div class=\"wrap\">
-	    	<h2>Subscriptions</h2>	
+	    	<h2>" . __('Subscriptions', 'foxypress') . "</h2>	
 			<div>$output</div>
 		  </div>");
 }	
@@ -213,72 +213,72 @@ function foxypress_subscriptions_list()
 					<div class=\"postbox\">
 						<table style=\"padding: 10px;\">
 							<tr>
-								<td>Active</td>
+								<td>" . __('Active', 'foxypress') . "</td>
 								<td>
 									<select name=\"is_active_filter\" id=\"is_active_filter\">
-										<option value=\"1\" " . (($foxyData["is_active_filter"] == "1") ? "selected=\"selected\"" : "" ) . ">Active</option>
-										<option value=\"0\" " . (($foxyData["is_active_filter"] == "0") ? "selected=\"selected\"" : "" ) . ">Inactive</option>
-										<option value=\"\" " . (($foxyData["is_active_filter"] == "") ? "selected=\"selected\"" : "" ) . ">Both</option>
+										<option value=\"1\" " . (($foxyData["is_active_filter"] == "1") ? "selected=\"selected\"" : "" ) . ">" . __('Active', 'foxypress') . "</option>
+										<option value=\"0\" " . (($foxyData["is_active_filter"] == "0") ? "selected=\"selected\"" : "" ) . ">" . __('Inactive', 'foxypress') . "</option>
+										<option value=\"\" " . (($foxyData["is_active_filter"] == "") ? "selected=\"selected\"" : "" ) . ">" . __('Both', 'foxypress') . "</option>
 									</select>
 								</td>
-								<td>Past Due Status</td>
+								<td>" . __('Past Due Status', 'foxypress') . "</td>
 								<td>
 									<select name=\"past_due_amount_filter\" id=\"past_due_amount_filter\">
-										<option value=\"\" " . (($foxyData["past_due_amount_filter"] == "") ? "selected=\"selected\"" : "" ) . ">Show All</option>
-										<option value=\"1\" " . (($foxyData["past_due_amount_filter"] == "1") ? "selected=\"selected\"" : "" ) . ">Show Past Due Only</option>
+										<option value=\"\" " . (($foxyData["past_due_amount_filter"] == "") ? "selected=\"selected\"" : "" ) . ">" . __('Show All', 'foxypress') . "</option>
+										<option value=\"1\" " . (($foxyData["past_due_amount_filter"] == "1") ? "selected=\"selected\"" : "" ) . ">" . __('Show Past Due Only', 'foxypress') . "</option>
 									</select>
 								</td>
 							</tr>
 							<tr>
-								<td>Start Date</td>
+								<td>" . __('Start Date', 'foxypress') . "</td>
 								<td>
 									<input type=\"text\" name=\"start_date_filter_begin\" id=\"start_date_filter_begin\" value=\"" . $foxyData["start_date_filter_begin"] . "\" /> to
 									<input type=\"text\" name=\"start_date_filter_end\" id=\"start_date_filter_end\" value=\"" . $foxyData["start_date_filter_end"] . "\" />
 								</td>							
-								<td>Third Party ID</td>
+								<td>" . __('Third Party ID', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"third_party_id_filter\" id=\"third_party_id_filter\" value=\"" . $foxyData["third_party_id_filter"] . "\" /></td>
 							</tr>
 							<tr>
-								<td>Next Transaction Date</td>
+								<td>" . __('Next Transaction Date', 'foxypress') . "</td>
 								<td>
 									<input type=\"text\" name=\"next_transaction_date_filter_begin\" id=\"next_transaction_date_filter_begin\" value=\"" . $foxyData["next_transaction_date_filter_begin"] . "\" /> to
 									<input type=\"text\" name=\"next_transaction_date_filter_end\" id=\"next_transaction_date_filter_end\" value=\"" . $foxyData["next_transaction_date_filter_end"] . "\" /> &nbsp; &nbsp;
 								</td>							
-								<td>Customer ID</td>
+								<td>" . __('Customer ID', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"customer_id_filter\" id=\"customer_id_filter\" value=\"" . $foxyData["customer_id_filter"] . "\" /></td>
 							</tr>
 							<tr>
-								<td>End Date</td>
+								<td>" . __('End Date', 'foxypress') . "</td>
 								<td>
 									<input type=\"text\" name=\"end_date_filter_begin\" id=\"end_date_filter_begin\" value=\"" . $foxyData["end_date_filter_begin"] . "\" /> to
 									<input type=\"text\" name=\"end_date_filter_end\" id=\"end_date_filter_end\" value=\"" . $foxyData["end_date_filter_end"] . "\" />
 								</td>							
-								<td>Customer Email</td>
+								<td>" . __('Customer Email', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"customer_email_filter\" id=\"customer_email_filter\" value=\"" . $foxyData["customer_email_filter"] . "\" /></td>
 							</tr>
 							<tr>
-								<td>Product Code</td>
+								<td>" . __('Product Code', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"product_code_filter\" id=\"product_code_filter\" value=\"" . $foxyData["product_code_filter"] . "\" /></td>
-								<td>Customer First Name</td>
+								<td>" . __('Customer First Name', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"customer_first_name_filter\" id=\"customer_first_name_filter\" value=\"" . $foxyData["customer_first_name_filter"] . "\" /></td>
 							</tr>						
 							
 							<tr>
-								<td>Product Name</td>
+								<td>" . __('Product Name', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"product_name_filter\" id=\"product_name_filter\" value=\"" . $foxyData["product_name_filter"] . "\" /></td>
-								<td>Customer Last Name</td>
+								<td>" . __('Customer Last Name', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"customer_last_name_filter\" id=\"customer_last_name_filter\" value=\"" . $foxyData["customer_last_name_filter"] . "\" /></td>
 							</tr>
 							<tr>							
-								<td>Product Option Name</td>
+								<td>" . __('Product Option Name', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"product_option_name_filter\" id=\"product_option_name_filter\" value=\"" . $foxyData["product_option_name_filter"] . "\" /></td>
-								<td>Last Transaction ID</td>
+								<td>" . __('Last Transaction ID', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"last_transaction_id_filter\" id=\"last_transaction_id_filter\" value=\"" . $foxyData["last_transaction_id_filter"] . "\" /></td>
 							</tr>
 							<tr>
-								<td>Product Option Value</td>
+								<td>" . __('Product Option Value', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"product_option_value_filter\" id=\"product_option_value_filter\" value=\"" . $foxyData["product_option_value_filter"] . "\" /></td>
-								<td>Frequency</td>
+								<td>" . __('Frequency', 'foxypress') . "</td>
 								<td><input type=\"text\" name=\"frequency_filter\" id=\"frequency_filter\" value=\"" . $foxyData["frequency_filter"] . "\" /></td>							
 							</tr>
 					   </table>
@@ -288,14 +288,14 @@ function foxypress_subscriptions_list()
 				<table class=\"widefat page fixed\" cellpadding=\"3\" cellspacing=\"3\" style=\"clear: both; width: 100%; margin-bottom: 15px;\">
 					<thead>
 						<tr>
-							<th class=\"manage-column\" scope=\"col\">Customer</th>
-							<th class=\"manage-column\" scope=\"col\">Start Date</th>
-							<th class=\"manage-column\" scope=\"col\">Next Date</th>
-							<th class=\"manage-column\" scope=\"col\">End Date</th>
-							<th class=\"manage-column\" scope=\"col\">Past Due</th>
-							<th class=\"manage-column\" scope=\"col\">Frequency</th>
-							<th class=\"manage-column\" scope=\"col\">Price</th>
-							<th class=\"manage-column\" scope=\"col\">Edit</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Customer', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Start Date', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Next Date', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('End Date', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Past Due', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Frequency', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Price', 'foxypress') . "</th>
+							<th class=\"manage-column\" scope=\"col\">" . __('Edit', 'foxypress') . "</th>
 						</tr>
 					</thead>
 					<tbody>";
@@ -351,7 +351,7 @@ function foxypress_subscriptions_list()
 						 "	<td>" . foxypress_FormatCurrency($subscription->past_due_amount) . "</td>" .
 						 "	<td>" . $subscription->frequency . "</td>" . 
 						 "	<td>" . $product_price . "</td>" .						 
-						 "	<td><a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=subscriptions&sub_token=" . $sub_token . $blogqs . "\">Edit</a></td>" . 
+						 "	<td><a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=subscriptions&sub_token=" . $sub_token . $blogqs . "\">" . __('Edit', 'foxypress') . "</a></td>" . 
 						 "</tr>";
 		}
 		$output .= "</tbody>
@@ -369,12 +369,12 @@ function foxypress_subscriptions_list()
 				$targetpage .= "?";
 			}
 			$Pagination = foxypress_GetPagination($PageStart + 1, $Total_Transactions, $foxyData["entries_per_page"], $targetpage, 'fp_pn');
-			$output .= "<Br />" . $Pagination;
+			$output .= "<br />" . $Pagination;
 		}
 	}
 	else
 	{
-		$output .= "<tr><td colspan=\"8\">There are currently no subscriptions</td></tr>";
+		$output .= "<tr><td colspan=\"8\">" . __('There are currently no subscriptions', 'foxypress') . "</td></tr>";
 	}
 	
 	echo("<div class=\"wrap\">
