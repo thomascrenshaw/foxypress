@@ -43,6 +43,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.2 =
+* BugFix: Fixed Uploadify Security Issue that was brought to our attention. Locked down uploadable types to just images.
+
 = 0.4.2.1 =
 * BugFix: Fixed IE8 issue found in order management when changing statuses.  If you use IE8 or lower and you changed statuses on orders since the last release of 0.4.1.1, you might need to search for those orders and fix the transaction status. Contact us if you need additional help.
 

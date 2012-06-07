@@ -89,27 +89,35 @@ if (!empty($_FILES)) {
    $file_type = preg_replace("/^(.+?);.*$/", "\\1", $_FILES['Filedata']['type']);
    $file_type = strtolower($file_type);
    $targetFile =  str_replace('//','/',$path) . $newf_name;
-   move_uploaded_file($file_temp,$targetFile);
 
-   //Resize the file
-   image_resize($targetFile, '48', '48', true, 'small');
-   image_resize($targetFile, '96', '96', true, 'large');
+   //Validate File Extension
+   $fileTypes = array('.jpg','.jpeg','.gif','.png');
 
-   // Remove file extension from new file name
-   $parts = explode('.', $newf_name);
-   $final_image_name = array_shift($parts);
+   if (in_array($file_ext,$fileTypes)) {
+      move_uploaded_file($file_temp,$targetFile);
 
-   $filearray = array();
-   $filearray['raw_file_name'] = $final_image_name;
-   $filearray['file_name'] = $newf_name;
-   $filearray['real_name'] = $real_name;
-   $filearray['file_ext'] = $file_ext;
-   $filearray['file_size'] = $file_size;
-   $filearray['file_path'] = $targetFile;
-   $filearray['file_temp'] = $file_temp;
+      //Resize the file
+      image_resize($targetFile, '48', '48', true, 'small');
+      image_resize($targetFile, '96', '96', true, 'large');
 
-   $json_array = json_encode($filearray);
-   echo $json_array;
+      // Remove file extension from new file name
+      $parts = explode('.', $newf_name);
+      $final_image_name = array_shift($parts);
+
+      $filearray = array();
+      $filearray['raw_file_name'] = $final_image_name;
+      $filearray['file_name'] = $newf_name;
+      $filearray['real_name'] = $real_name;
+      $filearray['file_ext'] = $file_ext;
+      $filearray['file_size'] = $file_size;
+      $filearray['file_path'] = $targetFile;
+      $filearray['file_temp'] = $file_temp;
+
+      $json_array = json_encode($filearray);
+      echo $json_array;
+   } else {
+      echo "1";
+   }
 }else{
 	echo "1";
 }
