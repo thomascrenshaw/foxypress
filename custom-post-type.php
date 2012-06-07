@@ -291,7 +291,11 @@ function foxypress_product_categories_setup()
 
 function foxypress_product_digital_download_setup()
 {
-	global $post, $wpdb;
+	global $post, $wpdb, $user;
+	$user = wp_get_current_user();
+	$uid = (int) $user->ID;
+
+	$ajax_nonce = wp_create_nonce("foxy-download");
 	$fp_current_downloadables = "";
 	$fp_has_downloadable = false;
 	$fp_ajax_url = plugins_url() . "/foxypress/ajax.php";
@@ -330,9 +334,9 @@ function foxypress_product_digital_download_setup()
 				'queueSizeLimit': 1,
 				'fileTypeDesc': 'Downloadables',
 				'multi': false,
-				'postData' : { 'inventory_id' : '<?php echo($post->ID) ?>', 'prefix' : '<?php echo($wpdb->prefix . "foxypress_inventory_downloadables") ?>', 'downloadablename' :  jQuery('#inv_downloadable_name').val(), 'downloadablemaxdownloads' : jQuery('#inv_downloadable_max_downloads').val() },
+				'postData' : { 'uid' : '<?php echo($uid); ?>', 'security' : '<?php echo($ajax_nonce); ?>', 'inventory_id' : '<?php echo($post->ID) ?>', 'prefix' : '<?php echo($wpdb->prefix . "foxypress_inventory_downloadables") ?>', 'downloadablename' :  jQuery('#inv_downloadable_name').val(), 'downloadablemaxdownloads' : jQuery('#inv_downloadable_max_downloads').val() },
 				'onDialogOpen' : function() {
-								jQuery('#inv_downloadable').uploadifySettings('postData', { 'inventory_id' : '<?php echo($post->ID) ?>', 'prefix' : '<?php echo($wpdb->prefix . "foxypress_inventory_downloadables") ?>', 'downloadablename' :  jQuery('#inv_downloadable_name').val(), 'downloadablemaxdownloads' : jQuery('#inv_downloadable_max_downloads').val() });
+								jQuery('#inv_downloadable').uploadifySettings('postData', { 'uid' : '<?php echo($uid); ?>', 'security' : '<?php echo($ajax_nonce); ?>', 'inventory_id' : '<?php echo($post->ID) ?>', 'prefix' : '<?php echo($wpdb->prefix . "foxypress_inventory_downloadables") ?>', 'downloadablename' :  jQuery('#inv_downloadable_name').val(), 'downloadablemaxdownloads' : jQuery('#inv_downloadable_max_downloads').val() });
 							},
 				'checkExisting' : false,
 				'fileSizeLimit' : 16384000,
@@ -707,11 +711,12 @@ function foxypress_product_meta_save($post_id)
 		$optionextraweight = foxypress_FixPostVar('foxy_option_extra_weight', '0'); 
 		$optioncode = foxypress_FixPostVar('foxy_option_code', ''); 
 		$optionquantity = foxypress_FixPostVar('foxy_option_quantity', '');
+		$optionimage = foxypress_FixPostVar('foxy_option_image');
 		
 		if($optionname != "" && $optionvalue != "" && $optiongroupid != "")
 		{
 			//insert new option
-			$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '" . $optionextraweight . "', '" . $optioncode . "', " . (($optionquantity == "") ? "NULL" : "'" . $optionquantity . "'") . ", '1')");
+			$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active, option_image) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '" . $optionextraweight . "', '" . $optioncode . "', " . (($optionquantity == "") ? "NULL" : "'" . $optionquantity . "'") . ", '1', '" . $optionimage . "')");
 		}
 		//NOTE: currently unique product option codes only work per 1 group per item, so if they try entering in unique codes for mulitple
 		//option groups we need ot wipe them out.
@@ -741,7 +746,8 @@ function foxypress_product_meta_save($post_id)
 					$optionextraweight = foxypress_FixPostVar('foxy_option_extra_weight_' . $i);
 					$optionCode = foxypress_FixPostVar('foxy_option_code_' . $i, '');
 					$optionActive = foxypress_FixPostVar('foxy_option_active_' . $i);
-					$optionQuantity = foxypress_FixPostVar('foxy_option_quantity_' . $i, '');				
+					$optionQuantity = foxypress_FixPostVar('foxy_option_quantity_' . $i, '');
+					$optionImage = foxypress_FixPostVar('foxy_option_image_' . $i, '');				
 					$wpdb->query("update " . $wpdb->prefix . "foxypress_inventory_options" . " 
 								  set option_group_id = '" . $optiongroupid . "'
 									  ,option_text = '" . $optionname . "'
@@ -749,7 +755,8 @@ function foxypress_product_meta_save($post_id)
 									  ,option_extra_price = '" . $optionextraprice . "'
 									  ,option_extra_weight = '" . $optionextraweight . "'
 									  ,option_code = '" . $optionCode. "'
-									  ,option_quantity = " . (($optionQuantity == "") ? "NULL" : "'" . $optionQuantity . "'") . " 	
+									  ,option_quantity = " . (($optionQuantity == "") ? "NULL" : "'" . $optionQuantity . "'") . "
+									  ,option_image = '" . $optionImage . "' 	
 									  ,option_active = '" . $optionActive. "'								  						  
 								  where option_id='" . $optionID . "'");
 				}
@@ -895,8 +902,26 @@ function foxypress_product_options_setup()
 				}
 			);
 			//jQuery( "#sortable" ).disableSelection();
-			jQuery("span.expand").toggler({speed: "slow"});	
-		});
+			jQuery("span.expand").toggler({speed: "slow"});
+
+			//Option Image Upload
+			jQuery('.add_option_image').click(function() {
+				parentID = jQuery(this).closest('td').attr('id');
+				console.log(parentID);
+				uploadID = jQuery(this).prev('input');
+    			tb_show('', 'media-upload.php?type=image&amp;TB_iframe=1&amp;width=640&amp;height=536');
+    			return false;
+    		});
+
+    		window.send_to_editor = function(html) {
+    			imgurl = jQuery('img',html).attr('src');
+    			uploadID.val(imgurl); /*assign the value to the input*/
+    			console.log('Editor: ' + parentID);
+    			jQuery('#' + parentID + ' .option_image_preview').html('<img src="' + imgurl + '">');
+    			tb_remove();
+			};
+
+			});
 		
 	</script>
 	<h4><?php _e('New Product Option', 'foxypress'); ?></h4>
@@ -942,7 +967,7 @@ function foxypress_product_options_setup()
             </td>
         </tr>
         <tr>
-        	<td colspan="3">&nbsp;</td>
+            <td colspan="3">&nbsp;</td>
             <td class="field_name"><?php _e('Quantity', 'foxypress'); ?></td>
             <td><input type="text" id="foxy_option_quantity" name="foxy_option_quantity" /></td>
             <td>
@@ -951,6 +976,16 @@ function foxypress_product_options_setup()
                     <span><?php _e('Use this field if you have a unique product code and would like to keep track of inventory at the option specific level.', 'foxypress'); ?></span></a>
                 </div>
             </td>            
+        </tr>
+        <tr>
+        	<td class="field_name"><?php _e('Option Image', 'foxypress'); ?></td>
+            <td id="0">
+            	<input type="hidden" id="foxy_option_image" name="foxy_option_image" />
+            	<a title="Add an Image" class="thickbox add_option_image" href="#">Upload</a><br /><br />
+            	<div class="option_image_preview" style="max-width: 150px; max-height: 150px; overflow: hidden; border: 4px solid #c4c4c4;"></div>
+            </td>
+            <td></td>
+            <td colspan="3"></td>
         </tr>
         <tr>
             <td colspan="6"><input type="submit" id="foxy_option_save" name="foxy_option_save" value="<?php _e('Save'); ?> &raquo;"  class="button bold"  /></td>
@@ -999,6 +1034,7 @@ function foxypress_product_options_setup()
 									<td class=\"field_name\">" . __('Code', 'foxypress') . "</td>
 									<td><input type=\"text\" name=\"foxy_option_code_" . $row . "\" id=\"foxy_option_code_" . $row . "\" value=\"" . $foxyopt->option_code . "\" size=\"10\"></td>
 								</tr>
+								<tr>
 									<td class=\"field_name\">" . __('Active', 'foxypress') . "</td>
 									<td>
 										<select id=\"foxy_option_active_" . $row . "\" name=\"foxy_option_active_" . $row . "\">
@@ -1010,7 +1046,16 @@ function foxypress_product_options_setup()
 									<td>
 										<input type=\"text\" id=\"foxy_option_quantity_" . $row . "\" name=\"foxy_option_quantity_" . $row . "\" value=\"" . $foxyopt->option_quantity . "\" size=\"5\" />
 									</td>
-								 </tr>
+								</tr>
+								<tr>
+									<td class=\"field_name\">" . __('Option Image', 'foxypress') . "</td>
+									<td id=\"" . $row . "\">
+										<input type=\"hidden\" id=\"foxy_option_image_" . $row . "\" name=\"foxy_option_image_" . $row . "\" value=\"" . $foxyopt->option_image . "\" />
+										<a title=\"Add an Image\" class=\"thickbox add_option_image\" href=\"#\">Upload</a><br /><br />
+            							<div class=\"option_image_preview\" style=\"max-width: 150px; max-height: 150px; overflow: hidden; border: 4px solid #c4c4c4; position: relative; margin: 0;\">" . (($foxyopt->option_image) ? "<img src=\"" . $foxyopt->option_image . "\">" : "") . "</div>
+            						</td>
+            						<td colspan=\"2\">&nbsp;</td>
+            					</tr>
 							</table>
 							<input type=\"hidden\" name=\"hdn_foxy_option_id_" . $row . "\" id=\"hdn_foxy_option_id_" . $row . "\" value=\"" . $foxyopt->option_id . "\" />
 							<a class=\"button bold\" href=\"" . foxypress_GetCurrentPageURL(true) . "&deleteoption=true&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\"  onclick=\"return confirm('" . __('Are you sure you want to delete this option?', 'foxypress') . "');\">" . __('Delete Option', 'foxypress') . "</a>");

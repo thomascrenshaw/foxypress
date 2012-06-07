@@ -45,7 +45,7 @@ Thanks and enjoy this plugin!
 
 register_activation_hook( __FILE__ , 'foxypress_activate');
 register_uninstall_hook( __FILE__ , 'foxypress_deactivate');
-global $foxypress_url;
+global $foxypress_url, $user;
 $foxypress_url = get_option('foxycart_storeurl');
 
 //init
@@ -333,7 +333,12 @@ function foxypress_affiliate_profile_fields($user)
 	<?php }
 }
 
-function affiliate_profile_enqueue() { ?>
+function affiliate_profile_enqueue() {
+	global $user;
+	$user = wp_get_current_user();
+	$uid = (int) $user->ID;
+	$ajax_nonce = wp_create_nonce("foxy-download");
+?>
 	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
 	<script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" language="javascript" src="<?php echo plugins_url(); ?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
@@ -350,7 +355,7 @@ function affiliate_profile_enqueue() { ?>
 				'fileTypeExts'  : '*.gif;*.jpg;*.jpeg;*.png',
 				'method'        : 'post',
 				'queueSizeLimit': 1,
-				'postData'      : {},
+				'postData'      : {'uid' : '<?php echo($uid); ?>', 'security' : '<?php echo($ajax_nonce); ?>'},
 				'progressData'  : 'all',
 				'multi'			: false,
 				'auto'			: true,
@@ -369,7 +374,12 @@ function affiliate_profile_enqueue() { ?>
 	</script>
 <?php }
 
-function client_affiliate_profile_enqueue() { ?>
+function client_affiliate_profile_enqueue() {
+	global $user;
+	$user = wp_get_current_user();
+	$uid = (int) $user->ID;
+	$ajax_nonce = wp_create_nonce("foxy-download");
+?>
 	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
 	<script type="text/javascript" language="javascript" src="<?php echo plugins_url(); ?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
 	<script type="text/javascript" language="javascript">
@@ -385,7 +395,7 @@ function client_affiliate_profile_enqueue() { ?>
 				'fileTypeExts'  : '*.gif;*.jpg;*.jpeg;*.png',
 				'method'        : 'post',
 				'queueSizeLimit': 1,
-				'postData'      : {},
+				'postData'      : {'uid' : '<?php echo($uid); ?>', 'security' : '<?php echo($ajax_nonce); ?>'},
 				'progressData'  : 'all',
 				'multi'			: false,
 				'auto'			: true,
@@ -1683,6 +1693,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 			$soldOutList = array();
 			$listItems = "";
 			$jsData = "";
+			$image_js = false;
 			$groupName = "";
 			$soldOutItems = "";
 			$initialMaxValue = "";
@@ -1722,11 +1733,20 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 						{
 							$extraattribute .= ($extraattribute == "") ? "c:" . $option->option_code : "|c:" . $option->option_code;
 						}
+						if(!empty($option->option_image))
+						{
+							$opt_image = $option->option_image;
+							$image_js = true;
+						}
+						else
+						{
+							$opt_image = INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE;
+						}
 						if($extraattribute != "")
 						{
 							$extraattribute = "{" . $extraattribute . "}";
 						}
-						$listItems  .= "<option value=\"" . htmlspecialchars(stripslashes($option->option_value)) . $extraattribute . "\">" . htmlspecialchars(stripslashes($option->option_text)) . $extraattributefriendly . "</option>";
+						$listItems  .= "<option rel=\"" . $opt_image . "\" value=\"" . htmlspecialchars(stripslashes($option->option_value)) . $extraattribute . "\">" . htmlspecialchars(stripslashes($option->option_text)) . $extraattributefriendly . "</option>";
 						if($option->option_code != "")
 						{
 							if($HasCartValidation)
@@ -1792,7 +1812,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 				$JsToAdd = "";
 				if(count($optionGroups) == 1 && $jsData != "")
 				{
-					$JsToAdd = "onchange=\"foxypress_modify_max('" . $formid . "', '" . $jsData . "', this.value, " . $defaultMaxQty . ", '');\"";
+					$JsToAdd = "foxypress_modify_max('" . $formid . "', '" . $jsData . "', this.value, " . $defaultMaxQty . ", '');";
 					$SetDefaultJS = "<script type=\"text/javascript\" language=\"javascript\">
 										jQuery(document).ready(function() {
 											var maxfield" . $formid . " = jQuery(\"#" . $formid . "\").find('input[name^=quantity_max]');
@@ -1806,9 +1826,13 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 										"});
 									 </script>";
 				}
+				if ($image_js == true)
+				{
+					$JsToAdd = "foxypress_change_option_image(this);";
+				}
 				$MasterList .= "<div class=\"foxypress_item_options\">" .
 									 stripslashes($groupName) . ":
-									<select name=\"" . stripslashes($groupName) . "\" " . $JsToAdd . ">"
+									<select name=\"" . stripslashes($groupName) . "\" onchange=\"" . $JsToAdd . "\">"
 										. $listItems .
 									"</select>" .
 									$SetDefaultJS .
@@ -2660,6 +2684,15 @@ function foxypress_ImportFoxypressScripts()
 				}
 			}
 
+			function foxypress_change_option_image(select_id)
+			{
+				var img = jQuery(select_id).find('option:selected').attr('rel');
+				if (img != "")
+				{
+					jQuery('div.productimage').html('<img src="' + img + '" id="foxypress_main_item_image" class="foxypress_main_item_image" />');
+				}
+			}
+
 			/*function foxypress_modify_max(formid, data, selectedvalue, defaultmax)
 			{
 				var options = data.split(",");
@@ -3383,6 +3416,9 @@ function foxypress_Installation_HandleTableAlterations()
 	//add option quantity
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_quantity INT(11) NULL AFTER option_code";
 	$wpdb->query($sql);
+	//add option image
+	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_options ADD option_image VARCHAR(255) NULL AFTER option_order";
+	$wpdb->query($sql);
 
 
 	///////////////////////////////////////////////////////////////////////////
@@ -3611,7 +3647,8 @@ function foxypress_Installation_CreateInventoryOptionsTable()
 				option_code VARCHAR(30) NULL,
 				option_quantity INT(11) NULL,
 				option_active TINYINT NOT NULL DEFAULT '1',
-				option_order INT DEFAULT '99'
+				option_order INT DEFAULT '99',
+				option_image VARCHAR(255) NULL
 		   ) ";
 	$wpdb->query($sql);
 }
