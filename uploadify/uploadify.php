@@ -23,20 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-require_once('../../../../wp-includes/wp-db.php');	
-require_once('../../../../wp-config.php');
 
-global $wpdb, $user;
-
-$uid=$_REQUEST['uid'];
-if($uid !=''){
-	wp_set_current_user($uid);
-}else{
-	die("Security check - must be logged in.");
+if ( ! defined( 'ABSPATH' ) ){
+	die( 'Direct access not permitted.' );
 }
-
-$nonce=$_REQUEST['security'];
-if (!wp_verify_nonce( $nonce, 'foxy-download' )) die("Security check");
 
 function set_filename($path, $filename, $file_ext, $encrypt_name = TRUE)
 {

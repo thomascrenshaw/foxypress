@@ -5,22 +5,14 @@ for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
-require_once('../../../wp-includes/wp-db.php');	
-require_once('../../../wp-config.php');	
-global $wpdb, $user;
-
-$uid=$_REQUEST['uid'];
-if($uid !=''){
-	wp_set_current_user($uid);
-}else{
-	die("Security check - must be logged in.");
+if ( ! defined( 'ABSPATH' ) ){
+	die( 'Direct access not permitted.' );
 }
 
-$nonce=$_REQUEST['security'];
-if (!wp_verify_nonce( $nonce, 'foxy-download' )) die("Security check");
+global $wpdb;
 
 if (!empty($_FILES)) {
-	$inventory_id = $_POST['inventory_id'];
+	$inventory_id = intval( $_POST['inventory_id'] );
 	$downloadabletable = $_POST['prefix'];
 	$downloadablename = $_POST['downloadablename'];
 	$downloadablemaxdownloads = $_POST['downloadablemaxdownloads'];

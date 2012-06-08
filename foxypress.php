@@ -45,7 +45,7 @@ Thanks and enjoy this plugin!
 
 register_activation_hook( __FILE__ , 'foxypress_activate');
 register_uninstall_hook( __FILE__ , 'foxypress_deactivate');
-global $foxypress_url, $user;
+global $foxypress_url;
 $foxypress_url = get_option('foxycart_storeurl');
 
 //init
@@ -57,6 +57,13 @@ add_action('admin_print_styles', 'foxypress_admin_css');
 add_action('admin_print_footer_scripts', 'foxypress_admin_js');
 add_action('admin_init', 'foxypress_RunUpdates');
 add_action('init', 'foxypress_FlushRewrites');
+
+// Set up AJAX actions
+add_action('wp_ajax_foxypress_upload', 'foxypress_ajax_upload');
+add_action('wp_ajax_nopriv_foxypress_upload', 'foxypress_ajax_upload');
+add_action('wp_ajax_foxypress_download', 'foxypress_ajax_documenthandler');
+add_action('wp_ajax_nopriv_foxypress_download', 'foxypress_ajax_documenthandler');
+
 if ( !empty ( $foxypress_url ) ){
 	add_action('init', 'foxypress_addbuttons');
 	add_action('wp_head', 'foxypress_ImportFoxypressScripts' );
@@ -148,6 +155,44 @@ if ( !empty ( $foxypress_url ) ){
 if(get_option("foxycart_show_dashboard_widget") == "1")
 {
 	add_action('wp_dashboard_setup', 'foxypress_DashboardSetup');
+}
+
+function foxypress_ajax_upload() {
+	// Since flash requests don't pass cookies
+	if ( ! is_user_logged_in() && isset( $_REQUEST['auth_cookie'] ) ) {
+		$user_id = wp_validate_auth_cookie( $_REQUEST['auth_cookie'], 'logged_in' );
+		if ( $user_id ){
+			wp_set_current_user( $user_id );
+		}
+	}
+
+	check_ajax_referer( 'foxy-upload', 'security' );
+
+	if ( current_user_can( 'upload_files' ) ) {
+		include dirname( __FILE__ ) . '/uploadify/uploadify.php';
+	}else{
+		die( 'Not permitted.' );
+	}
+	die();
+}
+
+function foxypress_ajax_documenthandler() {
+	// Since flash requests don't pass cookies
+	if ( ! is_user_logged_in() && isset( $_REQUEST['auth_cookie'] ) ) {
+		$user_id = wp_validate_auth_cookie( $_REQUEST['auth_cookie'], 'logged_in' );
+		if ( $user_id ) {
+			wp_set_current_user( $user_id );
+		}
+	}
+
+	check_ajax_referer( 'foxy-download', 'security' );
+
+	if ( current_user_can( 'upload_files' ) ) {
+		include dirname( __FILE__ ) . '/documenthandler.php';
+	}else{
+		die( 'Not permitted.' );
+	}
+	die();
 }
 
 function foxypress_localization()
@@ -333,20 +378,17 @@ function foxypress_affiliate_profile_fields($user)
 	<?php }
 }
 
-function affiliate_profile_enqueue() {
-	global $user;
-	$user = wp_get_current_user();
-	$uid = (int) $user->ID;
-	$ajax_nonce = wp_create_nonce("foxy-download");
+function affiliate_profile_enqueue() { 
+	$ajax_nonce = wp_create_nonce("foxy-upload");
 ?>
-	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />	
 	<script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" language="javascript" src="<?php echo plugins_url(); ?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
 	<script type="text/javascript" language="javascript">
 		jQuery(document).ready(function() {
 			$("#avatar_upload").uploadify({
 				'swf'			: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.swf',
-				'uploader'		: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.php',
+				'uploader'		: ajaxurl,
 				'cancelImage'	: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify-cancel.png',
 				'createFolder'  : true,
 				'checkExisting' : false,
@@ -355,7 +397,7 @@ function affiliate_profile_enqueue() {
 				'fileTypeExts'  : '*.gif;*.jpg;*.jpeg;*.png',
 				'method'        : 'post',
 				'queueSizeLimit': 1,
-				'postData'      : {'uid' : '<?php echo($uid); ?>', 'security' : '<?php echo($ajax_nonce); ?>'},
+				'postData'      : {'action' : 'foxypress_upload', 'auth_cookie' : '<?php echo $_COOKIE[LOGGED_IN_COOKIE]; ?>', 'security' : '<?php echo($ajax_nonce); ?>'},
 				'progressData'  : 'all',
 				'multi'			: false,
 				'auto'			: true,
@@ -374,11 +416,8 @@ function affiliate_profile_enqueue() {
 	</script>
 <?php }
 
-function client_affiliate_profile_enqueue() {
-	global $user;
-	$user = wp_get_current_user();
-	$uid = (int) $user->ID;
-	$ajax_nonce = wp_create_nonce("foxy-download");
+function client_affiliate_profile_enqueue() { 
+	$ajax_nonce = wp_create_nonce("foxy-upload");
 ?>
 	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
 	<script type="text/javascript" language="javascript" src="<?php echo plugins_url(); ?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
@@ -386,7 +425,7 @@ function client_affiliate_profile_enqueue() {
 		jQuery(document).ready(function() {
 			$("#avatar_upload").uploadify({
 				'swf'			: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.swf',
-				'uploader'		: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.php',
+				'uploader'		: ajaxurl,
 				'cancelImage'	: '<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify-cancel.png',
 				'createFolder'  : true,
 				'checkExisting' : false,
@@ -395,7 +434,7 @@ function client_affiliate_profile_enqueue() {
 				'fileTypeExts'  : '*.gif;*.jpg;*.jpeg;*.png',
 				'method'        : 'post',
 				'queueSizeLimit': 1,
-				'postData'      : {'uid' : '<?php echo($uid); ?>', 'security' : '<?php echo($ajax_nonce); ?>'},
+				'postData'      : {'action' : 'foxypress_upload', 'auth_cookie' : '<?php echo $_COOKIE[LOGGED_IN_COOKIE]; ?>', 'security' : '<?php echo($ajax_nonce); ?>'},
 				'progressData'  : 'all',
 				'multi'			: false,
 				'auto'			: true,

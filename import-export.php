@@ -427,24 +427,7 @@ function foxypress_GetImportExportCategories()
 function import_export_page_load()
 {
 	global $error;
-	
-	//for($i=0; $i <= 50; $i++)
-	//{
-		$url = "http://www.thenerdmachine.com/wp-content/uploads/2011/10/fp_m134w9oz7s_1.jpg";
-		$img = file_get_contents($url);		
 		
-		if($img)
-		{
-			//echo("true <Br>");	
-		}
-		else
-		{
-			//echo("false <br>");	
-		}
-	//}
-	
-	//exit;
-	
 	?>
 	<div class="wrap">
 		<div id="" class="settings_widefat">
