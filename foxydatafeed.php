@@ -90,12 +90,14 @@ else
 					$BillingState 	  = $transaction->customer_state;
 					$BillingZip   	  = $transaction->customer_postal_code;
 					$BillingCountry   = $transaction->customer_country;
+					$BillingCompany   = $transaction->customer_company;
 					$ShippingAddress  = $transaction->customer_address1;
 					$ShippingAddress2 = $transaction->customer_address2;
 					$ShippingCity 	  = $transaction->customer_city;
 					$ShippingState 	  = $transaction->customer_state;
 					$ShippingZip   	  = $transaction->customer_postal_code;
 					$ShippingCountry  = $transaction->customer_country;
+					$ShippingCompany  = $transaction->customer_company;
 				}
 				else
 				{
@@ -105,12 +107,14 @@ else
 					$BillingState 	  = $transaction->customer_state;
 					$BillingZip   	  = $transaction->customer_postal_code;
 					$BillingCountry   = $transaction->customer_country;
+					$BillingCompany   = $transaction->customer_company;
 					$ShippingAddress  = $transaction->shipping_address1;
 					$ShippingAddress2 = $transaction->shipping_address2;
 					$ShippingCity 	  = $transaction->shipping_city;
 					$ShippingState 	  = $transaction->shipping_state;
 					$ShippingZip   	  = $transaction->shipping_postal_code;
 					$ShippingCountry  = $transaction->shipping_country;
+					$ShippingCompany  = $transaction->shipping_company;
 				}
 				$x++;
 			}
@@ -156,11 +160,13 @@ else
 				  ", foxy_transaction_billing_state = '" . mysql_escape_string($BillingState) . "'" .
 				  ", foxy_transaction_billing_zip = '" . mysql_escape_string($BillingZip) . "'" .
 				  ", foxy_transaction_billing_country = '" . mysql_escape_string($BillingCountry) . "'" .
+				  ", foxy_transaction_billing_company = '" . mysql_escape_string($BillingCompany) . "'" .
 				  ", foxy_transaction_shipping_address1 = '" . mysql_escape_string($ShippingAddress) . "'" .
-				  ", foxy_transaction_shipping_address2 = '" . mysql_escape_string($tShippingAddress2) . "'" .
+				  ", foxy_transaction_shipping_address2 = '" . mysql_escape_string($ShippingAddress2) . "'" .
 				  ", foxy_transaction_shipping_city = '" . mysql_escape_string($ShippingCity) . "'" .
 				  ", foxy_transaction_shipping_state = '" . mysql_escape_string($ShippingState) . "'" .
 				  ", foxy_transaction_shipping_zip = '" . mysql_escape_string($ShippingZip) . "'" .
+				  ", foxy_transaction_shipping_company = '" . mysql_escape_string($ShippingCompany) . "'" .
 				  ", foxy_transaction_shipping_country = '" . mysql_escape_string($ShippingCountry) . "'";
 
 			$wpdb->query($sql);

@@ -4,9 +4,13 @@ FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
+	$root = dirname(dirname(dirname(dirname(__FILE__))));
+	require_once($root.'/wp-config.php');
+	require_once($root.'/wp-includes/wp-db.php');
 
 	/** Load WordPress Administration Bootstrap */
-	require_once('../../../wp-admin/admin.php');
+	require_once( ABSPATH . 'wp-admin/admin.php' );
+
 	// Enable the ability for the inventory to be loaded from pages
 	add_filter('the_content','inventory_insert');
 	$ShowSearchResults = false;
@@ -270,7 +274,7 @@ function SearchResults($searchitems)
 					$price = foxypress_GetActualPrice(get_post_meta($item->ID, "_price", true), get_post_meta($item->ID, "_saleprice", true), get_post_meta($item->ID, "_salestartdate", true), get_post_meta($item->ID, "_saleenddate", true));
                 ?>
                     <tr class="<?php echo $class; ?>">
-                        <td><input type="button" name="select" value="Select" onclick="InsertItem('<?=stripslashes($item->ID)?>');" /></td>
+                        <td><input type="button" name="select" value="Select" onclick="InsertItem('<?php echo(stripslashes($item->ID)); ?>');" /></td>
                         <td><img src="<?php echo($src); ?>" width="35px" /></td>
                         <td><label for="inventory_code" class="inventory-label"><?php echo get_post_meta($item->ID, "_code", true); ?></label></td>
                         <td><label for="inventory_name"><?php echo stripslashes($item->post_title); ?></label></td>
@@ -285,7 +289,7 @@ function SearchResults($searchitems)
   	{
 		?>
 		<div class="centertext"><?php _e("There are no items matching your search",'foxypress')  ?></div>
-        <div class="centertext"><a href="<?=foxypress_GetCurrentPageURL()?>"><?php _e('Full Inventory List', 'foxypress'); ?></a></div>
+        <div class="centertext"><a href="<?php echo(foxypress_GetCurrentPageURL()); ?>"><?php _e('Full Inventory List', 'foxypress'); ?></a></div>
     <?
   }
 }
@@ -363,7 +367,7 @@ function ShowInventory()
 					$price = foxypress_GetActualPrice(get_post_meta($item->ID, "_price", true), get_post_meta($item->ID, "_saleprice", true), get_post_meta($item->ID, "_salestartdate", true), get_post_meta($item->ID, "_saleenddate", true));
                 ?>
                     <tr class="<?php echo $class; ?>">
-                        <td><input type="button" name="select" value="Select" onclick="InsertItem('<?=stripslashes($item->ID)?>');" /></td>
+                        <td><input type="button" name="select" value="Select" onclick="InsertItem('<?php echo(stripslashes($item->ID)); ?>');" /></td>
                         <td><img src="<?php echo($src); ?>" width="35px" /></td>
                         <td><label for="inventory_code" class="inventory-label"><?php echo get_post_meta($item->ID, "_code", true); ?></label></td>
                         <td><label for="inventory_name"><?php echo stripslashes($item->post_title); ?></label></td>

@@ -8,13 +8,13 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 $plugin_dir = basename(dirname(__FILE__));
 load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_dir);
 add_action('admin_init', 'foxypress_inventory_category_postback');
-wp_enqueue_script('jquery-ui-core');
-wp_enqueue_script('jquery-ui-sortable');
-
 
 function foxypress_inventory_category_postback()
 {
 	global $wpdb;
+	wp_enqueue_script('jquery-ui-core');
+	wp_enqueue_script('jquery-ui-sortable');
+	
 	$PageName = foxypress_FixGetVar("page");
 	if($PageName == "inventory-category")
 	{
@@ -23,7 +23,7 @@ function foxypress_inventory_category_postback()
 		{
 			$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_inventory_categories SET category_name='" . foxypress_FixPostVar('foxypress_new_category') . "'";
 			$wpdb->query($sql);
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
 		}
 		else if(isset($_POST['foxy_cat_save'])) //updating
 		{
@@ -31,7 +31,7 @@ function foxypress_inventory_category_postback()
 			$Category_ID = foxypress_FixPostVar('foxy_cat_id');
 			$sql = "UPDATE " . $wpdb->prefix . "foxypress_inventory_categories SET category_name='" . $Category_Name . "' WHERE category_id=" . $Category_ID;
 			$wpdb->query($sql);
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
 		}
 		else if($mode == "delete" &&  foxypress_FixGetVar('category_id') != "") //deleting
 		{
@@ -62,7 +62,7 @@ function foxypress_inventory_category_postback()
 			//delete  from inventory to categories
 			$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_to_category WHERE category_id=" . $category_id;
 			$wpdb->query($sql);
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE. "&page=inventory-category");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE. "&page=inventory-category");
 		}
 		else if(isset($_POST['foxy_order_items_save']))
 		{
@@ -74,7 +74,7 @@ function foxypress_inventory_category_postback()
 				$wpdb->query("UPDATE " . $wpdb->prefix . "foxypress_inventory_to_category SET sort_order = '$counter' WHERE itc_id='" . $itc_id . "'");
 				$counter++;
 			}
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category&view=sort&categoryid=" . $categoryID);
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category&view=sort&categoryid=" . $categoryID);
 		}
 		else if(isset($_POST['foxy_cat_image_submit']))
 		{
@@ -94,7 +94,7 @@ function foxypress_inventory_category_postback()
 					$wpdb->query($imgquery);
 				}
 			}
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
 		}
 		else if($mode == "delete_image" && foxypress_FixGetVar('category_id') != "")
 		{
@@ -106,7 +106,7 @@ function foxypress_inventory_category_postback()
 				foxypress_DeleteItem($directory . $data->category_image);
 				$wpdb->query("UPDATE " . $wpdb->prefix . "foxypress_inventory_categories SET category_image = NULL where category_id = '" . mysql_escape_string($category_id) . "'");
 			}
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
 		}
 	}
 }
@@ -134,11 +134,9 @@ function foxypress_inventory_category_sort()
 	 <script type="text/javascript">
 		jQuery(document).ready(function() {
 			//sorting
-		  jQuery( "#foxypress_inventory_category_order tbody" ).sortable(
-				{
-					update: function(event, ui) { jQuery('#hdn_foxy_items_order').val(jQuery( "#foxypress_inventory_category_order tbody" ).sortable("toArray")); }
-				}
-			);
+		  	jQuery( "#foxypress_inventory_category_order tbody" ).sortable({
+				update: function(event, ui) { jQuery('#hdn_foxy_items_order').val(jQuery( "#foxypress_inventory_category_order tbody" ).sortable("toArray")); }
+			});
 		});
 	</script>
 	<div class="wrap">
@@ -158,8 +156,9 @@ function foxypress_inventory_category_sort()
 					echo("<table id=\"foxypress_inventory_category_order\" class=\"widefat page fixed\" width=\"50%\" cellpadding=\"3\" cellspacing=\"3\">
 							<thead>
 								<tr>
-									<th class=\"manage-column\" scope=\"col\">" . __('Sort', 'foxypress') . "</th>
-									<th class=\"manage-column\" scope=\"col\">" . __('Item Code', 'foxypress') . "</th>
+									<th class=\"manage-column\" scope=\"col\" width=\"50px\">" . __('Sort', 'foxypress') . "</th>
+									<th class=\"manage-column\" scope=\"col\" width=\"75px\">" . __('Item Image', 'foxypress') . "</th>
+									<th class=\"manage-column\" scope=\"col\" width=\"100px\">" . __('Item Code', 'foxypress') . "</th>
 									<th class=\"manage-column\" scope=\"col\">" . __('Item Name', 'foxypress') . "</th>
 								</tr>
 							</thead>
@@ -167,8 +166,20 @@ function foxypress_inventory_category_sort()
 					foreach($items as $i)
 					{
 						$current_item_order .= ($current_item_order == "") ? $i->itc_id : "," . $i->itc_id;
+						$featuredImageID = (has_post_thumbnail($i->ID) ? get_post_thumbnail_id($i->ID) : 0);
+						$imageNumber = 0;
+						$src = "";
+						$attachments = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $i->ID, 'order' => 'ASC','orderby' => 'menu_order'));
+						foreach ($attachments as $attachment) 
+						{
+							$thumbnailSRC = wp_get_attachment_image_src($attachment->ID, "thumbnail");
+							if ($featuredImageID == $attachment->ID || ($featuredImageID == 0 && $imageNumber == 0)) $src = $thumbnailSRC[0];
+							$imageNumber++;
+						}
+						if (!$src) $src = INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE;	
 						echo("<tr id=\"" . $i->itc_id . "\">
 								<td style=\"cursor:pointer;\"><img src=\"" . plugins_url() . "/foxypress/img/sort.png\" style=\"padding-top:3px;\" /></td>
+								<td><img src='" . $src . "' style='max-height:32px; max-width:40px;' /></td>
 								<td>" .  get_post_meta($i->ID, "_code", true) . "&nbsp;&nbsp;</td>
 								<td>" . $i->post_title . "</td>
 							  </tr>");
@@ -220,7 +231,7 @@ function foxypress_inventory_category_view_categories()
 
 	//set up paging
 	$limit = 10;
-	$targetpage = foxypress_GetCurrentPageURL();
+	$targetpage = get_admin_url() . "edit.php?post_type=foxypress_product&page=inventory-category";
 	$targetpage = foxypress_RemoveQSValue($targetpage, "fp_pn");
 	$pos = strrpos($targetpage, "?");
 	if ($pos === false) {
@@ -268,7 +279,7 @@ function foxypress_inventory_category_view_categories()
 					  {
 						  $ImageOutput = "<div>
 						  					<a href=" . INVENTORY_IMAGE_DIR . '/' . stripslashes($category->category_image) . " target=\"blank\">" . __('View Image', 'foxypress') . "</a> &nbsp;
-											<a href=\"" . foxypress_GetCurrentPageURL(true) . "&mode=delete_image&category_id=" . $category->category_id . "\"><img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"\" /></a>
+											<a href=\"" . get_admin_url() . "edit.php?post_type=foxypress_product&page=inventory-category&mode=delete_image&category_id=" . $category->category_id . "\"><img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"\" /></a>
 										  </div>";
 					  }
 					  else
@@ -281,7 +292,7 @@ function foxypress_inventory_category_view_categories()
 					  }
 					  echo("<td>" . $ImageOutput . "</td>
 					  		<td>
-					  			<a href=\"" . foxypress_GetCurrentPageURL(true) . "&view=sort&categoryid=" . $category->category_id . "\">" . __('Sort Inventory Items', 'foxypress') . "</a>
+					  			<a href=\"" . get_admin_url() . "edit.php?post_type=foxypress_product&page=inventory-category&view=sort&categoryid=" . $category->category_id . "\">" . __('Sort Inventory Items', 'foxypress') . "</a>
 							</td>");
 					  if ($category->category_id == 1)
 					  {
@@ -290,7 +301,7 @@ function foxypress_inventory_category_view_categories()
 					  else
 					  {
 							echo "<td>
-									<a href=\"" . foxypress_GetCurrentPageURL(true) . "&mode=delete&category_id=" . $category->category_id . "\" class=\"delete\" onclick=\"return confirm('" . __('Are you sure you want to delete this category?','foxypress') . "');\">" .
+									<a href=\"" . get_admin_url() . "edit.php?post_type=foxypress_product&page=inventory-category&mode=delete&category_id=" . $category->category_id . "\" class=\"delete\" onclick=\"return confirm('" . __('Are you sure you want to delete this category?','foxypress') . "');\">" .
 						__("Delete","foxypress") . "</a>
 								  </td>";
 					  }

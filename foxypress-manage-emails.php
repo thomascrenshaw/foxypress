@@ -36,7 +36,7 @@ function foxypress_manage_emails_page_load()
 		$me = $wpdb->get_row("SELECT * from " . $wpdb->prefix ."foxypress_email_templates 	WHERE email_template_id='".$_GET[id]."'");
 	?>
 	        <div class="wrap">
-	    		<h2><?php _e('Manage Emails', 'foxypress'); ?> <a href='<?php bloginfo('url') ?>/wp-admin/edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2"><?php _e('Add New', 'foxypress'); ?></a></h2>
+	    		<h2><?php _e('Manage Emails', 'foxypress'); ?> <a href='<?php echo(admin_url()); ?>edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2"><?php _e('Add New', 'foxypress'); ?></a></h2>
 	        	<table cellpadding="10" style="float:left; width:650px">
 	        		<tr>
 	        			<td width="180"><?php _e('Template ID', 'foxypress'); ?></td><td><?php _e($_GET['id']); ?></td>
@@ -457,7 +457,7 @@ function foxypress_manage_emails_page_load()
 		}
 		?>
 		<div class="wrap">
-	    	<h2><?php _e('Manage Emails', 'foxypress'); ?> <a href='<?php bloginfo('url') ?>/wp-admin/edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2"><?php _e('Add New', 'foxypress'); ?></a></h2>
+	    	<h2><?php _e('Manage Emails', 'foxypress'); ?> <a href='<?php echo(admin_url()); ?>edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2"><?php _e('Add New', 'foxypress'); ?></a></h2>
 	        <div><i><?php _e('Listed below you will your email templates for use with individual orders', 'foxypress'); ?></i></div>
 	        <?php
 				$Emails= $wpdb->get_results("SELECT * FROM " . $wpdb->prefix ."foxypress_email_templates");
@@ -473,8 +473,8 @@ function foxypress_manage_emails_page_load()
 	        <?php
 				foreach ($Emails as $e ) {
 					echo("<tr>");
-					echo("<td><a href='" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=manage-emails&id=" . $e->email_template_id."&mode=edit'>" . $e->foxy_email_template_name . "</a></td>");
-					echo("<td><a href='" . $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=manage-emails&id=" . $e->email_template_id."&action=delete'>". __('Delete', 'foxypress') . "</a></td>");
+					echo("<td><a href='" . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=manage-emails&id=" . $e->email_template_id."&mode=edit'>" . $e->foxy_email_template_name . "</a></td>");
+					echo("<td><a href='" . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=manage-emails&id=" . $e->email_template_id."&action=delete'>". __('Delete', 'foxypress') . "</a></td>");
 					echo("</tr>");
 			}
 			echo "</table>";

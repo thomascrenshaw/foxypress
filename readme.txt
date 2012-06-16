@@ -43,6 +43,19 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.3 =
+* Feature: Product Options now support images - we recommend reading release notes
+* Feature: Support for Beta users of FoxyCart 1.0
+* Feature: Template caching now supports FoxyCart 1.0 TWIG standard templates
+* Feature: Localization Support - English language file is now in your /languages subfolder if you'd like to contribute!
+* Feature: Language files available for German, Russian, and Ukrainian.
+* Feature: Added company field for billing and shipping address to order management edits and packing slips.
+* Feature: Added item image to "Sort Category Items" page.
+* Bugfix: Order management images were pulling incorrectly if you didn't have a featured image.
+* Cleanup: Made the UI of the "product options" area a bit cleaner.
+* Cleanup: Did some code cleanup on different areas for compatibility on lower PHP versions and subfolder installations.
+* Release notes available <a href="http://www.foxy-press.com/blog/2012/06/16/foxypress-0-4-2-3/" target="_blank">here</a> 
+
 = 0.4.2.2 =
 * BugFix: Fixed Uploadify Security Issue that was brought to our attention. Locked down uploadable types to just images.
 
@@ -350,9 +363,9 @@ Copy the folder to your WordPress
 
 Yes, you do. Please signup for a FoxyCart account <a href="http://affiliate.foxycart.com/idevaffiliate.php?id=182" target="_blank">here</a>.
 
-**Where can I get help or view tutorials on how to use the plugin?**
+**Where do I submit requests for new features or any comments I have?**
 
-Go to the <a href="http://forum.foxy-press.com/home" target="_blank">FoxyPress Forum</a> to submit your question/comment/feature request.
+Go to the <a href="http://www.foxy-press.com/forum" target="_blank">FoxyPress Forum</a> to submit your question/comment/feature request.
 
 View a full list of questions on our <a href="http://www.foxy-press.com/frequently-asked-questions/" target="_blank">site</a>.
 

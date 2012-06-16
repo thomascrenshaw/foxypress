@@ -112,7 +112,8 @@ function foxypress_GetProduct($inventory_id)
 								   ,"code" => $opt->option_code
 								   ,"quantity" => $opt->option_quantity
 								   ,"active" => $opt->option_active
-								   ,"order" => $opt->option_order);
+								   ,"order" => $opt->option_order
+								   ,"image" => $opt->option_image);
 			}
 		}
 		$product['options'] = $options;

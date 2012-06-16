@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.2.2
+Version: 0.4.2.3
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -126,7 +126,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.2");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.3");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 if ( !empty ( $foxypress_url ) ){
 
@@ -378,10 +378,10 @@ function foxypress_affiliate_profile_fields($user)
 	<?php }
 }
 
-function affiliate_profile_enqueue() { 
+function affiliate_profile_enqueue() {
 	$ajax_nonce = wp_create_nonce("foxy-upload");
 ?>
-	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />	
+	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
 	<script type="text/javascript" language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 	<script type="text/javascript" language="javascript" src="<?php echo plugins_url(); ?>/foxypress/uploadify/jquery.uploadify.min.js"></script>
 	<script type="text/javascript" language="javascript">
@@ -416,7 +416,7 @@ function affiliate_profile_enqueue() {
 	</script>
 <?php }
 
-function client_affiliate_profile_enqueue() { 
+function client_affiliate_profile_enqueue() {
 	$ajax_nonce = wp_create_nonce("foxy-upload");
 ?>
 	<link href="<?php echo plugins_url(); ?>/foxypress/uploadify/uploadify.css" type="text/css" rel="stylesheet" />
@@ -579,7 +579,6 @@ function foxypress_FlushRewrites()
 
 function foxypress_admin_css()
 {
-
 	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() .  "/foxypress/css/smoothness/jquery-ui-1.8.17.custom.css\">");
 	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css\">");
 }
@@ -974,7 +973,9 @@ function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=
 function foxypress_GetMainInventoryImage($inventory_id)
 {
 	global $wpdb, $post;
+
 	$featuredImageID = (has_post_thumbnail($inventory_id)) ? get_post_thumbnail_id($inventory_id) : 0;
+
 	if($featuredImageID != 0)
 	{
 		$featuredSrc = wp_get_attachment_image_src($featuredImageID, "full");
@@ -982,7 +983,8 @@ function foxypress_GetMainInventoryImage($inventory_id)
 	}
 	else
 	{
-		$current_images = get_posts(array('numberposts' => 1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
+		$current_images = $wpdb->get_results("SELECT * FROM  " . $wpdb->prefix . "posts WHERE  post_parent = " . $inventory_id . " AND post_type='attachment' ORDER BY menu_order ASC LIMIT 0,1");
+		//$current_images = get_posts(array('numberposts' => 1, 'post_type' => 'attachment', 'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order'));
 		if(!empty($current_images))
 		{
 			foreach ($current_images as $img)
@@ -1871,7 +1873,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 				}
 				$MasterList .= "<div class=\"foxypress_item_options\">" .
 									 stripslashes($groupName) . ":
-									<select name=\"" . stripslashes($groupName) . "\" onchange=\"" . $JsToAdd . "\">"
+									<select name=\"" . stripslashes($groupName) . "\" onchange=\"" . $JsToAdd . "\"><option rel='" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "' value=''>--Select--</option>"
 										. $listItems .
 									"</select>" .
 									$SetDefaultJS .
@@ -2688,6 +2690,32 @@ function foxypress_ImportFoxypressScripts()
 
 			jQuery(document).ready(function() {
 				jQuery("a[rel='colorbox']").colorbox();
+
+				jQuery('#foxypress-errors').hide();
+				var curProdID = jQuery('[name=inventory_id]').val();
+				jQuery('#foxypress_' + curProdID).submit(function(event) {
+					event.preventDefault();
+					var error = false;
+
+					jQuery('#foxypress-errors').html('');
+					jQuery('.foxycart select').each(function() {
+						if (jQuery(this).val() == '') {
+							error = true;
+							var selectName = jQuery(this).attr('name');
+							jQuery(this).addClass('select-error');
+							jQuery('#foxypress-errors').append('Please select a ' + selectName + ' option.<br />')
+						}
+					});
+
+					if (error == false) {
+						jQuery('.foxycart').submit();
+					} else {
+						jQuery('#foxypress-errors').show();
+					}
+
+					return false;
+				});
+
 			});
 
 			function foxypress_modify_max(formid, data, selectedvalue, defaultmax)
@@ -2731,7 +2759,7 @@ function foxypress_ImportFoxypressScripts()
 					jQuery('div.productimage').html('<img src="' + img + '" id="foxypress_main_item_image" class="foxypress_main_item_image" />');
 				}
 			}
-
+			
 			/*function foxypress_modify_max(formid, data, selectedvalue, defaultmax)
 			{
 				var options = data.split(",");
@@ -3439,6 +3467,12 @@ function foxypress_Installation_HandleTableAlterations()
 	//add affiliate id
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_rmanumber VARCHAR(100) NULL AFTER foxy_transaction_trackingnumber;";
 	$wpdb->query($sql);
+	//add shipping address company
+	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_billing_company VARCHAR(100) NULL AFTER foxy_transaction_rmanumber;";
+	$wpdb->query($sql);
+	//add billing address company
+	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_transaction ADD foxy_transaction_shipping_company VARCHAR(100) NULL AFTER foxy_transaction_billing_country;";
+	$wpdb->query($sql);
 
 	///////////////////////////////////////////////////////////////////////////
 	//foxypress_iventory_options
@@ -3614,12 +3648,14 @@ function foxypress_Installation_CreateTransactionTable()
 			foxy_transaction_email VARCHAR(50) NULL,
 			foxy_transaction_trackingnumber VARCHAR(100) NULL,
 			foxy_transaction_rmanumber VARCHAR(100) NULL,
+			foxy_transaction_billing_company VARCHAR(100) NULL,
 			foxy_transaction_billing_address1 VARCHAR(50) NULL,
 			foxy_transaction_billing_address2 VARCHAR(50) NULL,
 			foxy_transaction_billing_city VARCHAR(50) NULL,
 			foxy_transaction_billing_state VARCHAR(2) NULL,
 			foxy_transaction_billing_zip VARCHAR(10) NULL,
 			foxy_transaction_billing_country VARCHAR(50) NULL,
+			foxy_transaction_shipping_company VARCHAR(100) NULL,
 			foxy_transaction_shipping_address1 VARCHAR(50) NULL,
 			foxy_transaction_shipping_address2 VARCHAR(50) NULL,
 			foxy_transaction_shipping_city VARCHAR(50) NULL,

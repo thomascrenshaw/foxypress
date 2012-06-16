@@ -23,7 +23,7 @@ function inventory_option_groups_postback()
 				//insert new option group
 				$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_option_group" . " (option_group_name) values ('" . $group_name . "')");
 			}
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups");
 		}
 		else if(isset($_POST['foxypress_edit_option_save']))
 		{
@@ -34,7 +34,7 @@ function inventory_option_groups_postback()
 				//insert new option group
 				$wpdb->query("update " . $wpdb->prefix . "foxypress_inventory_option_group" . " set option_group_name ='" . $group_name . "' where option_group_id='" . $group_id . "'");
 			}
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE. "&page=inventory-option-groups");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE. "&page=inventory-option-groups");
 		}
 		else if($action == "deleteoptiongroup")
 		{
@@ -46,7 +46,7 @@ function inventory_option_groups_postback()
 				//delete options related to option group
 				$wpdb->query("delete from " . $wpdb->prefix . "foxypress_inventory_options" . " where option_group_id = '" . $option_group_id . "'");
 			}
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups");
 		}
 	}
 }
@@ -88,7 +88,7 @@ function foxypress_inventory_option_groups_page_load() {
             <?php				
 				//set up paging				
 				$limit = 10;
-				$targetpage = foxypress_GetCurrentPageURL();
+				$targetpage = get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups";
 				$targetpage = foxypress_RemoveQSValue($targetpage, "fp_pn");
 				$pos = strrpos($targetpage, "?");
 				if ($pos === false) { 
@@ -112,7 +112,7 @@ function foxypress_inventory_option_groups_page_load() {
 										<input type=\"submit\" id=\"foxypress_edit_option_save\" name=\"foxypress_edit_option_save\" value=\"" . __('Save', 'foxypress') . "\" />
 									</form>
 								</td>
-                                <td><a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups&action=deleteoptiongroup&optiongroupid=" . $group->option_group_id . "\" class=\"delete\" onclick=\"return confirm('" . __('Are you sure you want to delete this option group? All of the options related to this option group will be deleted.', 'foxypress') . "');\">Delete</td>
+                                <td><a href=\"" . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups&action=deleteoptiongroup&optiongroupid=" . $group->option_group_id . "\" class=\"delete\" onclick=\"return confirm('" . __('Are you sure you want to delete this option group? All of the options related to this option group will be deleted.', 'foxypress') . "');\">Delete</td>
                              </tr>");
                     }
                 }		

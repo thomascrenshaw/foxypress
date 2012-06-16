@@ -39,13 +39,13 @@ function foxypress_view_reports_list()
 
 		</div>
 		<div class='reports second'>
-			<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=1"); ?>"><?php _e('View Daily/Weekly/Monthly Order Totals', 'foxypress'); ?></a>			
+			<a href="<?php echo(get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=1"); ?>"><?php _e('View Daily/Weekly/Monthly Order Totals', 'foxypress'); ?></a>			
 		</div>
 		<div class='reports second'>
-        	<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=2"); ?>"><?php _e('View Orders By Product Code', 'foxypress'); ?></a>
+        	<a href="<?php echo(get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=2"); ?>"><?php _e('View Orders By Product Code', 'foxypress'); ?></a>
 		</div>
 		<div class='reports second'>
-        	<a href="<?php echo(foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=3"); ?>"><?php _e('View Coupon Orders By Product Code', 'foxypress'); ?></a>
+        	<a href="<?php echo(get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=reports&report=3"); ?>"><?php _e('View Coupon Orders By Product Code', 'foxypress'); ?></a>
 		</div>
 	</div>
 <?php
@@ -55,8 +55,6 @@ function foxyprses_view_ordersByCode_report()
 {
 	global $wpdb;
 	?>
-    <link rel="stylesheet" href="<?php echo(plugins_url())?>/foxypress/css/smoothness/jquery-ui-1.8.11.custom.css"> 
-    <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/jquery-ui-1.8.11.custom.min.js"></script>
     <script> 
 		jQuery(function() {
 			jQuery("#txtStartDate").datepicker({ dateFormat: 'yy-mm-dd' });
@@ -70,7 +68,7 @@ function foxyprses_view_ordersByCode_report()
         	<form id="frmOrders" name="frmOrders" method="POST">                 
             	<table>
             		<tr>
-                    	<td><?php _e('v', 'foxypress'); ?>: </td>
+                    	<td><?php _e('Start Date', 'foxypress'); ?>: </td>
                         <td>
                             <input type="text" id="txtStartDate" name="txtStartDate" value="<?php echo(($_POST['txtStartDate'] != "") ? $_POST['txtStartDate'] : date("Y-m-d"))  ?>" /> 
                             <select id="ddlStartHour" name="ddlStartHour">
@@ -100,9 +98,9 @@ function foxyprses_view_ordersByCode_report()
 						</td>
 					</tr>
                     <tr>
-                    	<td>End Date: </td>
+                    	<td><?php _e('End Date', 'foxypress'); ?>: </td>
                         <td>
-                            <input type="text" id="txtEndDate" name="txtEndDate"  value="<?= ($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")  ?>" />  
+                            <input type="text" id="txtEndDate" name="txtEndDate"  value="<?php echo(($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")); ?>" />  
                             <select id="ddlEndHour" name="ddlEndHour">
                                 <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
                                 <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
@@ -246,8 +244,6 @@ function foxyprses_view_coupon_ordersByCode_report()
 {
 	global $wpdb;
 	?>
-    <link rel="stylesheet" href="<?php echo(plugins_url())?>/foxypress/css/smoothness/jquery-ui-1.8.11.custom.css"> 
-    <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/jquery-ui-1.8.11.custom.min.js"></script>
     <script> 
 		jQuery(function() {
 			jQuery("#txtStartDate").datepicker({ dateFormat: 'yy-mm-dd' });
@@ -291,9 +287,9 @@ function foxyprses_view_coupon_ordersByCode_report()
 						</td>
 					</tr>
                     <tr>
-                    	<td>End Date: </td>
+                    	<td><?php _e('End Date', 'foxypress'); ?>: </td>
                         <td>
-                            <input type="text" id="txtEndDate" name="txtEndDate"  value="<?= ($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")  ?>" />  
+                            <input type="text" id="txtEndDate" name="txtEndDate"  value="<?php echo(($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")); ?>" />  
                             <select id="ddlEndHour" name="ddlEndHour">
                                 <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
                                 <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
@@ -609,8 +605,6 @@ function foxypress_view_totals_report()
 {
 	global $wpdb;
 	?>
-    <link rel="stylesheet" href="<?php echo(plugins_url())?>/foxypress/css/smoothness/jquery-ui-1.8.11.custom.css"> 
-    <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/jquery-ui-1.8.11.custom.min.js"></script>
     <script> 
 		jQuery(function() {
 			jQuery("#txtStartDate").datepicker({ dateFormat: 'yy-mm-dd' });
@@ -654,9 +648,9 @@ function foxypress_view_totals_report()
 						</td>
 					</tr>
                     <tr>
-                    	<td><?php _e('texthere', 'foxypress'); ?>End Date: </td>
+                    	<td><?php _e('End Date', 'foxypress'); ?>: </td>
                         <td>
-                            <input type="text" id="txtEndDate" name="txtEndDate"  value="<?= ($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")  ?>" />  
+                            <input type="text" id="txtEndDate" name="txtEndDate"  value="<?php echo(($_POST['txtEndDate'] != "") ? $_POST['txtEndDate'] : date("Y-m-d")); ?>" />  
                             <select id="ddlEndHour" name="ddlEndHour">
                                 <option value="1" <?php echo ($_POST['ddlEndHour'] == "1") ? "selected=\"selected\"" : "" ?>><?php _e('1', 'foxypress'); ?></option>
                                 <option value="2" <?php echo ($_POST['ddlEndHour'] == "2") ? "selected=\"selected\"" : "" ?>><?php _e('2', 'foxypress'); ?></option>
@@ -683,7 +677,7 @@ function foxypress_view_totals_report()
                         </td>
                     </tr>
                     <tr>
-                    	<td><?php _e('texthere', 'foxypress'); ?>Transaction Type</td>
+                    	<td><?php _e('Transaction Type', 'foxypress'); ?></td>
                         <td>
                         	<select id="foxy_transaction_type" name="foxy_transaction_type">
 								<option value="" <?php echo ($_POST['foxy_transaction_type'] == "") ? "selected=\"selected\"" : "" ?>><?php _e('All Transactions', 'foxypress'); ?></option>

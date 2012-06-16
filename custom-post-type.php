@@ -30,6 +30,7 @@ function wpt_portfolio_icons() {
 				background: url(<?php echo(plugins_url()) ?>/foxypress/img/icon_foxypress_white.png) no-repeat 6px 6px !important;
 	        }
 	    #icon-edit.icon32-posts-foxypress_product {background: url(<?php echo(plugins_url()) ?>/foxypress/img/icon_foxypress_32.png) no-repeat;}
+	    .option_image_preview img{max-width: 150px;}
     </style>
 <?php }
 
@@ -194,7 +195,7 @@ function foxypress_updated_messages($messages)
 		6 => 'Product published. <a href="' . esc_url(get_permalink($post_ID)) . '">' . __('View product', 'foxypress') . '</a>',
 		7 => __('Product saved.'),
 		8 => 'Product submitted. <a target="_blank" href="'.esc_url(add_query_arg('preview', 'true', get_permalink($post_ID))).'">' . __('Preview product', 'foxypress') . '</a>',
-		9 => 'Product scheduled for: <strong>'.date_i18n( __('M j, Y @ G:i'), strtotime($post->post_date)).'</strong>. <a target="_blank" href="'.esc_url(get_permalink($post_ID)).'">' . __('Preview product', 'foxypress') . '</a>',
+		9 => 'Product scheduled for: <strong>'.date_i18n( __(), strtotime($post->post_date)).'</strong>. <a target="_blank" href="'.esc_url(get_permalink($post_ID)).'">' . __('Preview product', 'foxypress') . '</a>',
 		10 => 'Product draft updated. <a target="_blank" href="'.esc_url(add_query_arg( 'preview', 'true', get_permalink($post_ID))).'">' . __('Preview product', 'foxypress') . '</a>'
 	);
 	return $messages;
@@ -709,12 +710,12 @@ function foxypress_product_meta_save($post_id)
 		$optionextraweight = foxypress_FixPostVar('foxy_option_extra_weight', '0'); 
 		$optioncode = foxypress_FixPostVar('foxy_option_code', ''); 
 		$optionquantity = foxypress_FixPostVar('foxy_option_quantity', '');
-		//$optionimage = foxypress_FixPostVar('foxy_option_image');
+		$optionimage = foxypress_FixPostVar('foxy_option_image');
 		
 		if($optionname != "" && $optionvalue != "" && $optiongroupid != "")
 		{
 			//insert new option
-			$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '" . $optionextraweight . "', '" . $optioncode . "', " . (($optionquantity == "") ? "NULL" : "'" . $optionquantity . "'") . ", '1')");
+			$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active, option_image) values ('" . $inventory_id . "', '" . $optiongroupid . "', '" . $optionname . "', '" . $optionvalue . "', '" . $optionextraprice . "', '" . $optionextraweight . "', '" . $optioncode . "', " . (($optionquantity == "") ? "NULL" : "'" . $optionquantity . "'") . ", '1', '" . $optionimage . "')");
 		}
 		//NOTE: currently unique product option codes only work per 1 group per item, so if they try entering in unique codes for mulitple
 		//option groups we need ot wipe them out.
@@ -745,7 +746,7 @@ function foxypress_product_meta_save($post_id)
 					$optionCode = foxypress_FixPostVar('foxy_option_code_' . $i, '');
 					$optionActive = foxypress_FixPostVar('foxy_option_active_' . $i);
 					$optionQuantity = foxypress_FixPostVar('foxy_option_quantity_' . $i, '');
-					//$optionImage = foxypress_FixPostVar('foxy_option_image_' . $i, '');				
+					$optionImage = foxypress_FixPostVar('foxy_option_image_' . $i, '');				
 					$wpdb->query("update " . $wpdb->prefix . "foxypress_inventory_options" . " 
 								  set option_group_id = '" . $optiongroupid . "'
 									  ,option_text = '" . $optionname . "'
@@ -754,9 +755,10 @@ function foxypress_product_meta_save($post_id)
 									  ,option_extra_weight = '" . $optionextraweight . "'
 									  ,option_code = '" . $optionCode. "'
 									  ,option_quantity = " . (($optionQuantity == "") ? "NULL" : "'" . $optionQuantity . "'") . "
+									  ,option_image = '" . $optionImage . "'
 									 ,option_active = '" . $optionActive. "'								  						  
 								  where option_id='" . $optionID . "'");
-				} //,option_image = '" . $optionImage . "' 
+				}
 				
 				//NOTE: currently unique product option codes only work per 1 group per item, so if they try entering in unique codes for mulitple
 				//option groups we need ot wipe them out.
@@ -902,21 +904,21 @@ function foxypress_product_options_setup()
 			jQuery("span.expand").toggler({speed: "slow"});
 
 			//Option Image Upload
-			//jQuery('.add_option_image').click(function() {
-			//	parentID = jQuery(this).closest('td').attr('id');
-			//	console.log(parentID);
-			//	uploadID = jQuery(this).prev('input');
-    		//	tb_show('', 'media-upload.php?type=image&amp;TB_iframe=1&amp;width=640&amp;height=536');
-    		//	return false;
-    		//});
+			jQuery('.add_option_image').click(function() {
+				parentID = jQuery(this).closest('td').attr('id');
+				console.log(parentID);
+				uploadID = jQuery(this).prev('input');
+    			tb_show('', 'media-upload.php?type=image&amp;TB_iframe=1&amp;width=640&amp;height=536');
+    			return false;
+    		});
 
-    		//window.send_to_editor = function(html) {
-    		//	imgurl = jQuery('img',html).attr('src');
-    		//	uploadID.val(imgurl); /*assign the value to the input*/
-    		//	console.log('Editor: ' + parentID);
-    		//	jQuery('#' + parentID + ' .option_image_preview').html('<img src="' + imgurl + '">');
-    		//	tb_remove();
-			//};
+    		window.send_to_editor = function(html) {
+    			imgurl = jQuery('img',html).attr('src');
+    			uploadID.val(imgurl); /*assign the value to the input*/
+    			console.log('Editor: ' + parentID);
+    			jQuery('#' + parentID + ' .option_image_preview').html('<img src="' + imgurl + '">');
+    			tb_remove();
+			};
 
 			});
 		
@@ -924,25 +926,59 @@ function foxypress_product_options_setup()
 	<h4><?php _e('New Product Option', 'foxypress'); ?></h4>
 	<p><?php _e('Below you can add options to your product.  These are useful for allowing various sizes or colors, or additional weights and prices for a product.  Setting a quantity available for an option level is possible, but remember to set a code for the option or it will not take affect.  Also, when re-ordering options, make sure you click save options, not the blue "update" button.  Read more on product options ', 'foxypress'); ?><a href="http://www.foxy-press.com/getting-started/managing-inventory/" target="_blank"><?php _e('here', 'foxypress'); ?></a>.</p>	
 	<table class="product_options" cellpadding="5" cellspacing="5">
-        <tr>
-            <td class="field_name"><?php _e('Name', 'foxypress'); ?></td>
-            <td><input type="text" id="foxy_option_name" name="foxy_option_name" /></td>
-            <td></td>
-            <td class="field_name"><?php _e('Extra Weight', 'foxypress'); ?></td>
-            <td><input type="text" id="foxy_option_extra_weight" name="foxy_option_extra_weight" />lb(s)</td>
+		<tr>
+			<td><input type="text" id="foxy_option_name" name="foxy_option_name" style="min-width:150px;" /></td>
+			<td class="field_name"><?php _e('Name', 'foxypress'); ?></td>
+			<td>
+                <div id="inventory-help">
+                    <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                    <span><?php _e('Enter the name of your product option.', 'foxypress'); ?></span></a>
+                </div>
+            </td>
+		</tr>
+		<tr>
+			<td><input type="text" id="foxy_option_value" name="foxy_option_value" style="min-width:150px;" /></td>
+			<td class="field_name"><?php _e('Value', 'foxypress'); ?></td>
+			<td>
+                <div id="inventory-help">
+                    <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                    <span><?php _e('Enter the value of your product option.', 'foxypress'); ?></span></a>
+                </div>
+            </td>
+		</tr>
+		<tr>
+			<td><select name="foxy_option_group" id="foxy_option_group" style="min-width:150px;"><?php echo($groups_selection_list) ?></select></td>
+			<td class="field_name"><?php _e('Option Group', 'foxypress'); ?></td>
             <td>
+                <div id="inventory-help">
+                    <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                    <span><?php _e('Select the group that this option will be a part of.', 'foxypress'); ?></span></a>
+                </div>
+            </td>
+		</tr>
+		<tr>
+			<td><input type="text" id="foxy_option_code" name="foxy_option_code" style="min-width:150px;" /></td>
+			<td class="field_name"><?php _e('Unique Code', 'foxypress'); ?></td>
+            <td>
+                <div id="inventory-help">
+                    <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
+                    <span><?php _e('If your product code differs for different options, enter the correct code here. Currently option level quantities only work correctly for 1 option group per item.', 'foxypress'); ?></span></a>
+                </div>
+            </td>
+		</tr>
+		<tr>
+			<td><input type="text" id="foxy_option_extra_weight" name="foxy_option_extra_weight" style="min-width:150px;" /> lb(s)</td>
+			<td class="field_name"><?php _e('Extra Weight', 'foxypress'); ?></td>
+			<td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                     <span><?php _e('Enter negative numbers if you need to subtract from the default weight.', 'foxypress'); ?></span></a>
                 </div>
             </td>
-        </tr>
+		</tr>
         <tr>
-            <td class="field_name"><?php _e('Value', 'foxypress'); ?></td>
-            <td><input type="text" id="foxy_option_value" name="foxy_option_value" /></td>
-            <td></td>
+            <td><?php echo(foxypress_GetCurrencySymbol()); ?><input type="text" id="foxy_option_extra_price" name="foxy_option_extra_price" style="min-width:150px;" /></td>
             <td class="field_name"><?php _e('Extra Price', 'foxypress'); ?></td>
-            <td><?php echo(foxypress_GetCurrencySymbol()); ?><input type="text" id="foxy_option_extra_price" name="foxy_option_extra_price" /></td>
             <td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
@@ -951,45 +987,32 @@ function foxypress_product_options_setup()
             </td>
         </tr>
         <tr>
-            <td class="field_name"><?php _e('Option Group', 'foxypress'); ?></td>
-            <td><select name="foxy_option_group" id="foxy_option_group"><?php echo($groups_selection_list) ?></select></td>
-            <td></td>
-            <td class="field_name"><?php _e('Unique Code', 'foxypress'); ?></td>
-            <td><input type="text" id="foxy_option_code" name="foxy_option_code" /></td>
-            <td>
-                <div id="inventory-help">
-                    <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                    <span><?php _e('If your product code differs for different options, enter the correct code here. Currently option level quantities only work correctly for 1 option group per item.', 'foxypress'); ?></span></a>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">&nbsp;</td>
+            <td><input type="text" id="foxy_option_quantity" name="foxy_option_quantity" style="min-width:150px;" /></td>
             <td class="field_name"><?php _e('Quantity', 'foxypress'); ?></td>
-            <td><input type="text" id="foxy_option_quantity" name="foxy_option_quantity" /></td>
             <td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
                     <span><?php _e('Use this field if you have a unique product code and would like to keep track of inventory at the option specific level.', 'foxypress'); ?></span></a>
                 </div>
-            </td>            
+            </td>
         </tr>
-        <!--<tr>
-        	<td class="field_name"><?php _e('Option Image', 'foxypress'); ?></td>
-            <td id="0">
+        <tr>
+        	<td id="0">
             	<input type="hidden" id="foxy_option_image" name="foxy_option_image" />
             	<a title="Add an Image" class="thickbox add_option_image" href="#">Upload</a><br /><br />
             	<div class="option_image_preview" style="max-width: 150px; max-height: 150px; overflow: hidden; border: 4px solid #c4c4c4;"></div>
             </td>
-            <td></td>
-            <td colspan="3"></td>
-        </tr>-->
+            <td class="field_name"><?php _e('Option Image', 'foxypress'); ?></td>
+        </tr>
         <tr>
-            <td colspan="6"><input type="submit" id="foxy_option_save" name="foxy_option_save" value="<?php _e('Save'); ?> &raquo;"  class="button bold"  /></td>
+            <td colspan="3"><input type="submit" id="foxy_option_save" name="foxy_option_save" value="<?php _e('Save'); ?> &raquo;"  class="button bold"  /></td>
         </tr>
     </table>
     <h4><?php _e('Current Options', 'foxypress'); ?></h4>
     <div class="demo">
+		<style>
+			#sortable li {font-size: 12px!important;}
+		</style>
 		<ul id="sortable">
         
         <?php
@@ -1011,51 +1034,56 @@ function foxypress_product_options_setup()
 				<div class="ui-icon ui-icon-arrowthick-2-n-s"></div>
 				<span class="expand"><?php echo($foxyopt->option_text . " - " . $foxyopt->option_value);?></span>
 				<div class="collapse">
-	                <?php
-						echo("<table class=\"product_options\" cellpadding=\"5\" cellspacing=\"5\" class=\"\">
-								<tr>
-									<td class=\"field_name\">" . __('Name', 'foxypress') . "</td>
-									<td><input type=\"text\" name=\"foxy_option_text_" . $row . "\" id=\"foxy_option_text_" . $row . "\" value=\"" . $foxyopt->option_text . "\" size=\"15\"></td>
-									<td class=\"field_name\">" . __('Extra Price', 'foxypress') . "</td>
-									<td>" . foxypress_GetCurrencySymbol() . "<input type=\"text\" name=\"foxy_option_extra_price_" . $row . "\" id=\"foxy_option_extra_price_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_price, 2) . "\" size=\"10\"></td>
-								</tr>
-								<tr>
-									<td class=\"field_name\">" . __('Value', 'foxypress') . "</td>
-									<td><input type=\"text\" name=\"foxy_option_value_" . $row . "\" id=\"foxy_option_value_" . $row . "\" value=\"" . $foxyopt->option_value . "\" size=\"15\"></td>
-									<td class=\"field_name\">" . __('Extra Weight', 'foxypress') . "</td>
-									<td nowrap><input type=\"text\" name=\"foxy_option_extra_weight_" . $row . "\" id=\"foxy_option_extra_weight_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_weight, 2) . "\" size=\"5\">lb(s)</td>
-								</tr>
-								<tr>
-									<td class=\"field_name\">" . __('Option Group', 'foxypress') . "</td>
-									<td><select id=\"foxy_option_group_" . $row . "\" name=\"foxy_option_group_" . $row . "\">" . foxypress_BuildInventoryOptionGroupList($groups, $foxyopt->option_group_id) . "</select></td>
-									<td class=\"field_name\">" . __('Code', 'foxypress') . "</td>
-									<td><input type=\"text\" name=\"foxy_option_code_" . $row . "\" id=\"foxy_option_code_" . $row . "\" value=\"" . $foxyopt->option_code . "\" size=\"10\"></td>
-								</tr>
-								<tr>
-									<td class=\"field_name\">" . __('Active', 'foxypress') . "</td>
-									<td>
-										<select id=\"foxy_option_active_" . $row . "\" name=\"foxy_option_active_" . $row . "\">
-											<option value=\"1\" " . (($foxyopt->option_active == "1") ? "selected=\"selected\"" : "") . ">" . __('Yes', 'foxypress') . "</option>
-											<option value=\"0\" " . (($foxyopt->option_active == "0") ? "selected=\"selected\"" : "") . ">" . __('No', 'foxypress') . "</option>											
-										</select>
-									</td>
-									<td class=\"field_name\">" . __('Quantity', 'foxypress') . "</td>
-									<td>
-										<input type=\"text\" id=\"foxy_option_quantity_" . $row . "\" name=\"foxy_option_quantity_" . $row . "\" value=\"" . $foxyopt->option_quantity . "\" size=\"5\" />
-									</td>" .
-								//</tr>
-								//<tr>
-								//	<td class=\"field_name\">" . __('Option Image', 'foxypress') . "</td>
-								//	<td id=\"" . $row . "\">
-								//		<input type=\"hidden\" id=\"foxy_option_image_" . $row . "\" name=\"foxy_option_image_" . $row . "\" value=\"" . $foxyopt->option_image . "\" />
-								//		<a title=\"Add an Image\" class=\"thickbox add_option_image\" href=\"#\">Upload</a><br /><br />
-            					//		<div class=\"option_image_preview\" style=\"max-width: 150px; max-height: 150px; overflow: hidden; border: 4px solid #c4c4c4; position: relative; margin: 0;\">" . (($foxyopt->option_image) ? "<img src=\"" . $foxyopt->option_image . "\">" : "") . "</div>
-            					//	</td>
-            					//	<td colspan=\"2\">&nbsp;</td>
-            					"</tr>
-							</table>
-							<input type=\"hidden\" name=\"hdn_foxy_option_id_" . $row . "\" id=\"hdn_foxy_option_id_" . $row . "\" value=\"" . $foxyopt->option_id . "\" />
-							<a class=\"button bold\" href=\"" . foxypress_GetCurrentPageURL(true) . "&deleteoption=true&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\"  onclick=\"return confirm('" . __('Are you sure you want to delete this option?', 'foxypress') . "');\">" . __('Delete Option', 'foxypress') . "</a>");
+				<?php
+					echo("<table class=\"product_options\" cellpadding=\"5\" cellspacing=\"5\" class=\"\">
+						<tr>
+							<td><input type=\"text\" name=\"foxy_option_text_" . $row . "\" id=\"foxy_option_text_" . $row . "\" value=\"" . $foxyopt->option_text . "\" style=\"min-width:150px;\"></td>
+							<td class=\"field_name\">" . __('Name', 'foxypress') . "</td>
+						</tr>
+						<tr>
+							<td><input type=\"text\" name=\"foxy_option_value_" . $row . "\" id=\"foxy_option_value_" . $row . "\" value=\"" . $foxyopt->option_value . "\" style=\"min-width:150px;\"></td>
+							<td class=\"field_name\">" . __('Value', 'foxypress') . "</td>
+						</tr>
+						<tr>
+							<td><select id=\"foxy_option_group_" . $row . "\" name=\"foxy_option_group_" . $row . "\" style=\"min-width:150px;\">" . foxypress_BuildInventoryOptionGroupList($groups, $foxyopt->option_group_id) . "</select></td>
+							<td class=\"field_name\">" . __('Option Group', 'foxypress') . "</td>
+						</tr>
+						<tr>
+							<td><input type=\"text\" name=\"foxy_option_code_" . $row . "\" id=\"foxy_option_code_" . $row . "\" value=\"" . $foxyopt->option_code . "\" style=\"min-width:150px;\"></td>
+							<td class=\"field_name\">" . __('Unique Code', 'foxypress') . "</td>
+						</tr>
+						<tr>
+							<td><input type=\"text\" name=\"foxy_option_extra_weight_" . $row . "\" id=\"foxy_option_extra_weight_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_weight, 2) . "\" style=\"min-width:150px;\"> lb(s)</td>
+							<td class=\"field_name\">" . __('Extra Weight', 'foxypress') . "</td>
+						</tr>
+						<tr>
+						    <td>" . foxypress_GetCurrencySymbol() . "<input type=\"text\" name=\"foxy_option_extra_price_" . $row . "\" id=\"foxy_option_extra_price_" . $row . "\" value=\"" . number_format($foxyopt->option_extra_price, 2) . "\" style=\"min-width:150px;\"></td>
+						    <td class=\"field_name\">" . __('Extra Price', 'foxypress') . "</td>
+						</tr>
+						<tr>
+						    <td><input type=\"text\" id=\"foxy_option_quantity_" . $row . "\" name=\"foxy_option_quantity_" . $row . "\" value=\"" . $foxyopt->option_quantity . "\" style=\"min-width:150px;\" /></td>
+						    <td class=\"field_name\">" . __('Quantity', 'foxypress') . "</td>
+						</tr>
+						<tr>
+							<td id=\"" . $row . "\">
+								<input type=\"hidden\" id=\"foxy_option_image_" . $row . "\" name=\"foxy_option_image_" . $row . "\" value=\"" . $foxyopt->option_image . "\" style=\"min-width:150px;\" />
+								<a title=\"Add an Image\" class=\"thickbox add_option_image\" href=\"#\">Upload</a><br /><br />
+								<div class=\"option_image_preview\" style=\"max-width: 150px; max-height: 150px; overflow: hidden; border: 4px solid #c4c4c4; position: relative; margin: 0;\">" . (($foxyopt->option_image) ? "<img src=\"" . $foxyopt->option_image . "\">" : "") . "</div>
+							</td>
+						    <td class=\"field_name\">" . __('Option Image', 'foxypress') . "</td>
+						</tr>
+						<tr>
+							<td>
+								<select id=\"foxy_option_active_" . $row . "\" name=\"foxy_option_active_" . $row . "\">
+									<option value=\"1\" " . (($foxyopt->option_active == "1") ? "selected=\"selected\"" : "") . ">" . __('Yes', 'foxypress') . "</option>
+									<option value=\"0\" " . (($foxyopt->option_active == "0") ? "selected=\"selected\"" : "") . ">" . __('No', 'foxypress') . "</option>											
+								</select>
+							</td>
+							<td class=\"field_name\">" . __('Active', 'foxypress') . "</td>
+						</tr>
+		                </table>
+						<input type=\"hidden\" name=\"hdn_foxy_option_id_" . $row . "\" id=\"hdn_foxy_option_id_" . $row . "\" value=\"" . $foxyopt->option_id . "\" />
+						<a class=\"button bold\" href=\"" . get_admin_url() . "post.php?post=" . $post->ID . "&message=4&action=edit&deleteoption=true&inventory_id=" . $inventory_id . "&optionid=" . $foxyopt->option_id . "\"  onclick=\"return confirm('" . __('Are you sure you want to delete this option?', 'foxypress') . "');\">" . __('Delete Option', 'foxypress') . "</a>");							
                 		$row++;
 					?>
             	</div>
@@ -1083,7 +1111,7 @@ function foxypress_product_options_setup()
 	{
 		_e("<div>
 				You do not have any option groups set up yet. In order to add a new option for this inventory item you must
-				add a <a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups\">new option group</a>.
+				add a <a href=\"" . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-option-groups\">new option group</a>.
 		   </div>", "foxypress");	
 	}
 }
@@ -1135,7 +1163,7 @@ function foxypress_product_attributes_setup()
                     echo("<tr>
                             <td>" . stripslashes($foxyatt->attribute_text) . "</td>
                             <td>" . stripslashes($foxyatt->attribute_value) . "</td>
-                            <td><a href=\"" . foxypress_GetCurrentPageURL(true) . "&deleteattribute=true&inventory_id=" . $post->ID . "&attributeid=" . $foxyatt->attribute_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to delete this attribute?');\"><img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"Delete\" class=\"noBorder\" /></td>
+                            <td><a href=\"" . get_admin_url() . "post.php?post=" . $post->ID . "&message=4&action=edit&deleteattribute=true&inventory_id=" . $post->ID . "&attributeid=" . $foxyatt->attribute_id . "\" class=\"delete\" onclick=\"return confirm('Are you sure you want to delete this attribute?');\"><img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"Delete\" class=\"noBorder\" /></td>
                          </tr>");
                 }
             }

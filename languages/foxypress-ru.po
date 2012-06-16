@@ -1,0 +1,2950 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: FoxyPress\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-06-12 17:23-0600\n"
+"PO-Revision-Date: 2012-06-16 18:11-0600\n"
+"Last-Translator: Adam Woloszyn <admin@foxy-press.com>\n"
+"Language-Team: WebMovement, LLC <admin@foxy-press.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: C:\\Users\\QuadCore\\Desktop\\foxypress\n"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:85
+msgid "Edit Details"
+msgstr "Изменить сведения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:113
+msgid "Are you sure you want to delete this banner?"
+msgstr "Вы действительно хотите удалить этот баннер?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:113
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:125
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:477
+msgid "Delete"
+msgstr "Удалить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:121
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1398
+msgid "Asset Name"
+msgstr "Название товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:122
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1402
+msgid "Asset Type"
+msgstr "Тип товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:123
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1406
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:118
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:251
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:344
+msgid "Image"
+msgstr "Изображение"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:124
+msgid "URL"
+msgstr "URL"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:292
+msgid "View Details"
+msgstr "Показать подробнее"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:476
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:649
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1315
+msgid "Approve"
+msgstr "Утвердить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:492
+msgid "Pay Affiliate"
+msgstr "Партнерская оплата"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:493
+msgid "View Order Detail"
+msgstr "Просмотр деталей заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:632
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1633
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1637
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1641
+msgid "Affiliate"
+msgstr "Партнер"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:633
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:644
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:100
+msgid "First Name"
+msgstr "Имя"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:634
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:645
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:104
+msgid "Last Name"
+msgstr "Фамилия"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:635
+msgid "Clicks"
+msgstr "Нажатия"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:636
+msgid "Total Due"
+msgstr "Всего к оплате"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:637
+msgid "Total Commission"
+msgstr "Общая комиссия"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:638
+msgid "Total Transactions"
+msgstr "Все проведенные операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:646
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:121
+msgid "Age"
+msgstr "Возраст"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:647
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:125
+msgid "Gender"
+msgstr "Пол"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:648
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:135
+msgid "Message"
+msgstr "Сообщение"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:656
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:666
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1625
+msgid "Order ID"
+msgstr "Номер заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:657
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:667
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1629
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:98
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:246
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:375
+msgid "Order Total"
+msgstr "Все заказы"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:658
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:669
+msgid "Affiliate Commission"
+msgstr "Партнерское вознаграждение"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:659
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:82
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:230
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:359
+msgid "Order Date"
+msgstr "Дата заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:660
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:672
+msgid "Order Type"
+msgstr "Тип заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:668
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1262
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:317
+msgid "Affiliate Payout"
+msgstr "Партнерские выплаты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:670
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1645
+msgid "Payment Method"
+msgstr "Способ оплаты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:671
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1655
+msgid "Payment Date"
+msgstr "Дата платежа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1087
+msgid "Banner Deleted!"
+msgstr "Баннер удален!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1094
+msgid "Banner Added!"
+msgstr "Баннер добавлен!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1101
+msgid "Banner Updated!"
+msgstr "Баннер обновлен!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1108
+msgid "FoxyPress Affiliate Management"
+msgstr "Партнерское управления FoxyPress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1111
+msgid "Listed below you will find your affiliate banners."
+msgstr "Ниже вы найдете баннеры партнеров."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1119
+msgid "Add New Banner"
+msgstr "Добавить новый баннер"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1154
+msgid "Affiliate Approved!"
+msgstr "Утвержден партнерами!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1161
+msgid "Listed below you will find your affiliate's current stats."
+msgstr "Ниже Вы найдете актуальную статистику вашего партнера."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1163
+msgid "Listed below you will find your pending affiliates."
+msgstr "Ниже вы найдете ожидающих партнеров."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1227
+msgid "Approving Affiliate..."
+msgstr "Утверждение партнеров ..."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1235
+msgid "You must enter a payout."
+msgstr "Вы должны ввести выплаты."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1239
+msgid "You must select a payout type."
+msgstr "Вы должны выбрать тип выплат."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1248
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:303
+msgid "Affiliate Payout Type"
+msgstr "Тип партнерских выплат"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1251
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1274
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:306
+msgid "Percentage of each order."
+msgstr "Доля с каждого заказа."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1258
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1281
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:313
+msgid "Dollar amount of each order."
+msgstr "Сумма в долларах с каждого заказа."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1262
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1398
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1402
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:100
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:104
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:117
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:121
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:125
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:135
+msgid "required"
+msgstr "Обязательный"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1264
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:320
+msgid "How much will this affiliate earn per sale?"
+msgstr "Сколько сможет заработать партнер на продажах?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1264
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1287
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1311
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:320
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:345
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:370
+#, php-format
+msgid "Enter 30 for 30% or $30.00"
+msgstr "Введите 30 for 30% or $30.00"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1267
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:324
+msgid "Enable Affiliate Referrals"
+msgstr "Разрешить партнерские направление"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1268
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:325
+msgid "Does this user's link allow for affiliate referrals?"
+msgstr "Разрешена ли эта ссылка для партнерских направлений?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1271
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:328
+msgid "Affiliate Referral Payout Type"
+msgstr "Типы партнерских направленных выплат"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1285
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:342
+msgid "Affiliate Referral Payout"
+msgstr "Партнерские направленные выплаты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1287
+msgid "How much will this affiliate earn per referral sale?"
+msgstr "Сколько этот партнер может заработать на партнерских продажах?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1290
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:349
+msgid "Enable Affiliate Discount"
+msgstr "Активация скидки партнерам"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1291
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:350
+msgid "Does this user's link allow for an additional discount?"
+msgstr "Ссылки пользователей дают дополнительную скидку?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1294
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:353
+msgid "Affiliate Discount Type"
+msgstr "Тип скидки для партнеров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1297
+msgid "Percentage off of each order."
+msgstr "Процент от каждого заказа."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1304
+msgid "Dollar amount off of each order."
+msgstr "Сумма в долларах с каждого заказа."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1308
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:367
+msgid "Affiliate Discount Amount"
+msgstr "Сумма скидки для партнеров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1311
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:370
+msgid "How much of a discount will user's receive?"
+msgstr "Какую скидку получат пользователи?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1324
+msgid "Approved Affiliates"
+msgstr "Утвержденые партнеры"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1325
+msgid "Pending Affiliates"
+msgstr "Ожидание партнеров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1341
+msgid "Deleting Banner..."
+msgstr "Удаление баннера..."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1371
+msgid "Adding Banner..."
+msgstr "Баннер добавляется..."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1379
+msgid "Updating Banner..."
+msgstr "Обновление баннера ..."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1388
+msgid "FoxyPress Affiliate Banner Details"
+msgstr "Подробности баннера партнера FoxyPress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1391
+msgid "Enter the details of your affiliate banner below. The landing page url can be used to direct a user to a specific page when using this specific banner."
+msgstr "Введите информацию о баннере партнера ниже. URL целевой страницы можно использовать, чтобы направить пользователя на определенную страницу, используя этот конкретный баннер."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1405
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:128
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:250
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:343
+msgid "Select"
+msgstr "Выбрать"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1411
+msgid "Banner"
+msgstr "Баннер"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1420
+msgid "Landing Page URL"
+msgstr "URL целевой страницы"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1424
+msgid "Save Banner"
+msgstr "Сохранить баннер"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1456
+msgid "Affiliate Detail"
+msgstr "Подробнее о партнере"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1456
+msgid "Edit User"
+msgstr "Редактировать пользователя"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1461
+msgid "Payment Submitted Successfully"
+msgstr "Оплату успешно отправлено"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1470
+msgid "Total Clicks"
+msgstr "Нажатия"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1475
+msgid "Total Referrals"
+msgstr "Все рекомендации"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1480
+msgid "Total Orders"
+msgstr "Всего заказов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1485
+msgid "Total Referral Paid Out"
+msgstr "Все рекомендации оплачено"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1490
+msgid "Total Paid Out"
+msgstr "Всего выплачено"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1495
+msgid "Referral Amount Due"
+msgstr "Сумма к оплате рекомендаций"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1500
+msgid "Amount Due"
+msgstr "Сумма к оплате"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1509
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1518
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1641
+msgid "Commission"
+msgstr "Комиссия"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1509
+msgid "per referral transaction"
+msgstr "Направленные операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1518
+msgid "per transaction"
+msgstr "Текущие операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1524
+msgid "Affiliate Documentation"
+msgstr "Документация для партнеров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1526
+msgid "Affiliate Link"
+msgstr "Ссылка на партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1535
+msgid "Open Orders"
+msgstr "Открытые заказы"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1536
+msgid "Paid Orders"
+msgstr "Оплаченные заказы"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1588
+msgid "Pay Order Commission"
+msgstr "Порядок уплаты комиссии"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1606
+msgid "Submitting Payment..."
+msgstr "Отправка платежей ..."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1637
+msgid "Payout"
+msgstr "Выплата"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1648
+msgid "Please Select"
+msgstr "Пожалуйста сделайте выбор"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1650
+msgid "Check"
+msgstr "Проверка"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-management.php:1659
+msgid "Submit Payment"
+msgstr "Отправить платеж"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:14
+msgid "FoxyPress Affiliate Sign Up"
+msgstr "Регистрация партнеров FoxyPress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:76
+msgid "Affiliate Request Sent Successfully."
+msgstr "Партнерский запрос успешно отправлено."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:84
+msgid "Affiliate Request Currently Pending."
+msgstr "Партнерский запрос в настоящее время рассматривается."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:108
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:273
+msgid "Avatar"
+msgstr "Аватар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:117
+msgid "Your Facebook Page"
+msgstr "Ваша страница на Facebook"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:129
+msgid "Male"
+msgstr "Мужской"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:130
+msgid "Female"
+msgstr "Женский"
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:137
+msgid "Tell us about yourself."
+msgstr "Расскажите нам о себе."
+
+#: C:\Users\QuadCore\Desktop\foxypress/affiliate-signup.php:141
+msgid "Send Request"
+msgstr "Отправить запрос"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:39
+msgid "Products"
+msgstr "Продукция"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:40
+msgid "Product"
+msgstr "Продукт"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:41
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:42
+msgid "Add New Product"
+msgstr "Добавить новый товар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:43
+msgid "Manage Products"
+msgstr "Управление товарами"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:44
+msgid "Edit Product"
+msgstr "Редактировать товар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:45
+msgid "New Product"
+msgstr "Новый товар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:46
+msgid "View Product"
+msgstr "Просмотр товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:47
+msgid "FoxyPress"
+msgstr "FoxyPress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:48
+msgid "No Products Found"
+msgstr "Товары не найдены"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:49
+msgid "No Products Found in Trash"
+msgstr "В корзине товаров не найдено"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:50
+msgid "Search Products"
+msgstr "Поиск товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:62
+msgid "FoxyPress Products"
+msgstr "FoxyPress продукты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:112
+msgid "ID"
+msgstr "ID"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:113
+msgid "Product Title"
+msgstr "Названае продукта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:114
+msgid "Description"
+msgstr "Описание"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:115
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1032
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:252
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:345
+msgid "Code"
+msgstr "Код"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:116
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:254
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:347
+msgid "Price"
+msgstr "Цена"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:117
+msgid "Qty"
+msgstr "Количество"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:119
+msgid "Date"
+msgstr "Дата"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:142
+msgid "sold out"
+msgstr "Продано"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:144
+msgid "not set"
+msgstr "не установленно"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:190
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:193
+msgid "Product updated."
+msgstr "Обновление продукта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:190
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:194
+msgid "View product"
+msgstr "Подробнее"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:191
+msgid "Custom field updated."
+msgstr "Поля пользователей обновлены"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:192
+msgid "Custom field deleted."
+msgstr "Поля пользователей удалены"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:195
+msgid "Product saved."
+msgstr "Сохраненные продукты."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:196
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:197
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:198
+msgid "Preview product"
+msgstr "Просмотр продуктов."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:313
+msgid "Making your product into a digital download is simple, just fill out the form below.  Once you've filled out the information below and provided a downloadable, your product will be marked as a downloadable product and will send your users an email with their download link."
+msgstr "Создать продукт в электронном виде просто, просто заполните форму ниже. После того как вы заполнили информацию ниже и загрузили его, ваш продукт будет обозначен как загружен и будет отправлен вашим пользователям по электронной почте ссылку для загрузки."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:314
+msgid "Digital Download Name"
+msgstr "Название цифровой зазагрузки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:316
+msgid "Max Downloads allowed  (if you need to override the main setting)"
+msgstr "Максимальные загрузки разрешены (если вам нужно отменить основные настройки)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:442
+msgid "Current Product Images"
+msgstr "Текущее изображенние продукта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:487
+msgid "Item Price"
+msgstr "Цена"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:491
+msgid "Item Code"
+msgstr "Код товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:495
+msgid "Weight"
+msgstr "Вес"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:502
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:969
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1043
+msgid "Quantity"
+msgstr "Количество"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:506
+msgid "Qty Settings"
+msgstr "Количество параметров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:508
+msgid "min"
+msgstr "Минимум"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:510
+msgid "max"
+msgstr "Максимум"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:539
+msgid "Current Time: "
+msgstr "Текущее время:"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:541
+msgid "Sale"
+msgstr "Распродажа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:543
+msgid "Sale Price"
+msgstr "Пониженная цена"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:547
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:587
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:601
+msgid "Start Date"
+msgstr "Дата начала"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:552
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:592
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:607
+msgid "End Date"
+msgstr "Дата окончания"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:557
+msgid "Discounts"
+msgstr "Скидки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:557
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:579
+msgid "reference"
+msgstr "Ссылка"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:559
+msgid "Quantity $"
+msgstr "Количество $"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:564
+msgid "Quantity %"
+msgstr "Количество %"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:569
+msgid "Price $"
+msgstr "Цена $"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:574
+msgid "Price %"
+msgstr "Цена %"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:579
+msgid "Subscription Attributes"
+msgstr "Атребути підписки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:582
+msgid "Frequency"
+msgstr "Частота"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:599
+msgid "Item Availability"
+msgstr "Наявність товару"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:613
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:623
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1036
+msgid "Active"
+msgstr "Активный"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:621
+msgid "Item Email"
+msgstr "Электронная почта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:632
+msgid "Template"
+msgstr "Шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:671
+msgid "Active Deal"
+msgstr "Активные операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:674
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1039
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:207
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:223
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:514
+msgid "Yes"
+msgstr "Да"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:675
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1040
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:206
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:222
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:515
+msgid "No"
+msgstr "Нет"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:679
+msgid "Code Type"
+msgstr "Введите код"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:682
+msgid "None"
+msgstr "Ни один"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:683
+msgid "Static"
+msgstr "Статический"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:684
+msgid "Random"
+msgstr "Случайный"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:689
+msgid "Static Code"
+msgstr "Неизменный код"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:925
+msgid "New Product Option"
+msgstr "Новые параметры продукта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:926
+msgid "Below you can add options to your product.  These are useful for allowing various sizes or colors, or additional weights and prices for a product.  Setting a quantity available for an option level is possible, but remember to set a code for the option or it will not take affect.  Also, when re-ordering options, make sure you click save options, not the blue \"update\" button.  Read more on product options "
+msgstr "Ниже вы можете добавить параметры вашему продукту. Они позволяют использовать различные размеры и цвета, или дополнительный вес и цену для продукта. Настройка количества доступных параметров уровней возможно, но не забудьте установить код параметра потому что они не вступят в силу."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:926
+msgid "here"
+msgstr "здесь"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:929
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1018
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:253
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:346
+msgid "Name"
+msgstr "Имя"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:932
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1026
+msgid "Extra Weight"
+msgstr "Максимальный вес"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:937
+msgid "Enter negative numbers if you need to subtract from the default weight."
+msgstr "Введите отрицательные числа если вам нужно отнять от установленного веса."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:942
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1024
+msgid "Value"
+msgstr "Значение"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:945
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1020
+msgid "Extra Price"
+msgstr "Максимальная цена"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:950
+msgid "Enter negative numbers if you need to subtract from the default price."
+msgstr "Введите отрицательные числа если вам нужно отнять от установленной цены."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:955
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1030
+msgid "Option Group"
+msgstr "Групы параметров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:958
+msgid "Unique Code"
+msgstr "Уникальный код"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:963
+msgid "If your product code differs for different options, enter the correct code here. Currently option level quantities only work correctly for 1 option group per item."
+msgstr "Если ваш код продукта отличается какими-то свойствами, введите правильный здесь. Текущее количества вариантов сейчас количество вариантов только на уровне работают правильно на 1 варианте группы по каждому пункту."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:974
+msgid "Use this field if you have a unique product code and would like to keep track of inventory at the option specific level."
+msgstr "Используйте это поле, если у вас есть уникальный код продукта и хотели бы отслеживать реестр на выбранном определенном уровне."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:979
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1049
+msgid "Option Image"
+msgstr "Параметр изображения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:989
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1117
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:69
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:217
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:346
+msgid "Save"
+msgstr "Сохранить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:992
+msgid "Current Options"
+msgstr "Текущие параметры"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1059
+msgid "Are you sure you want to delete this option?"
+msgstr "Вы действительно хотите удалить этот вариант?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1059
+msgid "Delete Option"
+msgstr "Удалить параметр"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1078
+msgid "Save Options"
+msgstr "Сохранить настройки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1085
+msgid ""
+"<div>\n"
+"\t\t\t\tYou do not have any option groups set up yet. In order to add a new option for this inventory item you must\n"
+"\t\t\t\tadd a <a href=\""
+msgstr ""
+"<div>\n"
+"\t\t\t\tУ вас нет еще ни одной созданной группы параметров. Для того чтобы заказать новый параметр этого товара, вы должны\n"
+"\t\t\t\tadd a <a href=\""
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1105
+msgid "New Product Attribute"
+msgstr "Новый атрибут продукта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1106
+msgid "Product attributes are fantastic for using in conjunction with developing custom functionality, or adding additional information to your product that you'd like to see in order management."
+msgstr "Свойства товара есть фантастические для использования в сочетании с расширением функций пользователя или добавлением дополнительной информации о вашем продукте, который вы хотели бы видеть в целях управления."
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1109
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1124
+msgid "Attribute Name"
+msgstr "Имя атрибута"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1113
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1125
+msgid "Attribute Value"
+msgstr "Значение атрибута"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1120
+msgid "Current Product Attributes"
+msgstr "Текущий атрибут продукта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/custom-post-type.php:1145
+msgid "There are currently no attributes for this inventory item"
+msgstr "В настоящее время нет признаков для описания этого товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:63
+msgid "FoxyPress Plugin"
+msgstr "FoxyPress плагин"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:189
+msgid "Show Items From"
+msgstr "Показать элементы з"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:203
+msgid "Show Add To Cart"
+msgstr "Покажите пополнение корзины"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:212
+msgid "Items Per Page"
+msgstr "Элементов на странице"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:216
+msgid "Items Per Row"
+msgstr "Элеметов в ряду"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:219
+msgid "Show More Detail Link"
+msgstr "Показать более подробно ссылку"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:228
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:299
+msgid "Go"
+msgstr "Идти"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:243
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:246
+msgid "texthere"
+msgstr "текст здесь"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:287
+msgid "There are no items matching your search"
+msgstr "Нет никакого сочетания товаров которое вы ищете"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:288
+msgid "Full Inventory List"
+msgstr "Полный список товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:298
+msgid "Search Inventory"
+msgstr "Поиск товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:336
+msgid "Add Item From Inventory"
+msgstr "Добавить форму реестра продуктов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/dialog.php:388
+msgid "There are no inventory items in the database!"
+msgstr "Там нет реестра продуктов в базе данных"
+
+#: C:\Users\QuadCore\Desktop\foxypress/download.php:96
+msgid "Sorry, this download is no longer valid, you have reached maximum number of downloads"
+msgstr "Извините, эта загрузка больше не действительна, вы достигли максимального количества загрузок"
+
+#: C:\Users\QuadCore\Desktop\foxypress/download.php:104
+#: C:\Users\QuadCore\Desktop\foxypress/download.php:112
+msgid "Invalid Download ID"
+msgstr "Неправильный номер загрузки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:30
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:452
+msgid "Your email template has been successfully saved"
+msgstr "Шаблон электронной почты успешно сохранен."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:32
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:185
+msgid "Your email template name and subject cannot be blank"
+msgstr "Адрес электронной почты имя шаблона и тема не может быть пустым"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:39
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:191
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:322
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:460
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:212
+msgid "Manage Emails"
+msgstr "Управление электронной почтой"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:39
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:460
+msgid "Add New"
+msgstr "Додать"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:42
+msgid "Template ID"
+msgstr "Номер шаблона"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:47
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:195
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:327
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:469
+msgid "Template Name"
+msgstr "Название шаблона"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:51
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:199
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:330
+msgid "Subject"
+msgstr "Тема"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:55
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:203
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:333
+msgid "From Email"
+msgstr "Из электронной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:59
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:207
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:336
+msgid "Content"
+msgstr "Контент"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:74
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:222
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:351
+msgid "You can use the following legend to populate the email body"
+msgstr "Вы можете использовать следующие обозначения чтобы заполнить основную часть электронной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:78
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:226
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:355
+msgid "ID of Order"
+msgstr "Номер заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:86
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:234
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:363
+msgid "Order Product Total"
+msgstr "Все заказы продукта"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:90
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:238
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:367
+msgid "Order Tax Total"
+msgstr "Общая стоимость заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:94
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:242
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:371
+msgid "Order Shipping Total"
+msgstr "Общая сумма доставки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:102
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:250
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:379
+msgid "Credit Card Type Used"
+msgstr "Тип используемой кредитной карты "
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:106
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:254
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:383
+msgid "Customer's First Name"
+msgstr "Имя клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:110
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:258
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:387
+msgid "Customer's Last Name"
+msgstr "Фамилия клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:114
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:262
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:391
+msgid "Customer's Email"
+msgstr "Электронный адрес клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:118
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:266
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:395
+msgid "Tracking Number (if entered)"
+msgstr "Номер отслеживания (если введен)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:122
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:270
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:399
+msgid "Customer's Billing Address 1"
+msgstr "Адрес потребителя на которую выставляются счета 1"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:126
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:274
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:403
+msgid "Customer's Billing Address 2"
+msgstr "Адрес потребителя на которую выставляются счета 2"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:130
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:278
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:407
+msgid "Customer's Billing City"
+msgstr "Город потребителя которому выставлен счет"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:134
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:282
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:411
+msgid "Customer's Billing State"
+msgstr "Штат потребителя которому выставлен счет"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:138
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:286
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:415
+msgid "Customer's Billing Zip"
+msgstr "Индекс клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:142
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:290
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:419
+msgid "Customer's Billing Country"
+msgstr "Страна потребителя которому выставлен счет"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:146
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:294
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:423
+msgid "Customer's Shipping Address 1"
+msgstr "Адрес доставки 1"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:150
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:298
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:427
+msgid "Customer's Shipping Address 2"
+msgstr "Адрес доставки 2"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:154
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:158
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:302
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:306
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:431
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:435
+msgid "Customer's Shipping City"
+msgstr "Город потребителя получающий товар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:162
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:310
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:439
+msgid "Customer's Shipping Zip"
+msgstr "Индекс потребителя получающий товар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:166
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:314
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:443
+msgid "Customer's Shipping Country"
+msgstr "Страна потребителя получающий товар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:456
+msgid "Your email template has been successfully deleted"
+msgstr "Ваш электронный шаблон был успешно удален"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-manage-emails.php:461
+msgid "Listed below you will your email templates for use with individual orders"
+msgstr "Ниже вы будете использовать шаблоны электронной почты для индивидуальных заказов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:106
+msgid "The FoxyPress Plugin was created to provide users a way to harness the easy to use e-commerce functionality of FoxyCart along with the power of the WordPress Content Management System."
+msgstr "FoxyPress Plugin был создан чтобы предоставлять пользователям возможность зарабатывать легко используя возможности электронной коммерции FoxyCart вместе с мощностями WordPress Content Management System."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:107
+msgid "View some of our resources below."
+msgstr "Просмотрите некоторые из наших ресурсов ниже."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:108
+msgid "Facebook Fan Page"
+msgstr "Страница поклонников Facebook"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:109
+msgid "FoxyPress FAQ"
+msgstr "FoxyPress FAQ"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:110
+msgid "Knowledge Base"
+msgstr "База знаний"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:111
+msgid "FoxyPress Forum/Discussions"
+msgstr "FoxyPress Форум/Обсуждение"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:112
+msgid "Need a FoxyCart account?"
+msgstr "Нужен аккаунт FoxyCart?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:117
+msgid "Main Settings"
+msgstr "Основные установки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:122
+msgid "FoxyCart Store Subdomain URL"
+msgstr "URL субдомена магазина FoxyCart"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:126
+msgid "*A store url is required in order to use Foxypress."
+msgstr "* URL магазина указывается в заказе используя Foxypress."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:127
+msgid "ex. if your store url is foxypress.foxycart.com, enter just 'foxypress'"
+msgstr "Например. Если адрес вашего магазина является foxypress.foxycart.com, введите 'foxypress '"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:131
+msgid "FoxyCart API Key"
+msgstr "FoxyCart API ключ"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:154
+msgid "*Please copy this into your FoxyCart settings for your Datafeed/API Key"
+msgstr "* Пожалуйста, скопируйте его в настройки FoxyCart для вашего Datafeed/API Key"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:158
+msgid "FoxyCart Store Version"
+msgstr "Версия магазина FoxyCart "
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:169
+msgid "Currency Locale Code"
+msgstr "Код валюты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:175
+msgid "Attention, you are using Windows which does not support internationalization. You will be limited to $"
+msgstr "Внимание, вы используете Windows, который не поддерживает интернационализацию. Вы будете ограничены до $"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:179
+msgid ""
+"If you would like to use something other than $ for your currency, enter your locale code. <br />\n"
+"                                 <a href=\"http://www.roseindia.net/tutorials/I18N/locales-list.shtml\" target=\"_blank\">View the full list of\n"
+"                                 locale codes.</a><br />\n"
+"                                 You must also change your locale setting in FoxyCart by going to Templates -> Language and updating \"store locale\""
+msgstr ""
+"Если вы хотели бы использовать что-то другое, чем $ для вашей валюты, введите местный код.<br />\n"
+"                                 <a href=\"http://www.roseindia.net/tutorials/I18N/locales-list.shtml\" target=\"_blank\">Посмотреть полный список\n"
+"                                 местных кодов.</a><br />\n"
+"                                 Кроме того, необходимо изменить настройки языка в FoxyCart выбрав Шаблоны-> Язык и обновления\"store locale\""
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:192
+msgid "Advanced Options"
+msgstr "Дополнительно"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:197
+msgid "Include jQuery"
+msgstr "Включають jQuery"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:200
+msgid "*We will automatically include a reference to jQuery"
+msgstr "* Мы автоматически включили ссылку в jQuery"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:204
+msgid "Include Default Style Sheet"
+msgstr "Содержат стили по умолчанию"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:207
+msgid "*We will automatically include a reference to the default FoxyPress stylesheet"
+msgstr "* Мы автоматически включили ссылки в таблицу стилей FoxyPress по умолчанию"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:211
+msgid "Item Image Mode"
+msgstr "Режим изображения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:217
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:520
+msgid "Neither"
+msgstr "Ни один"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:218
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:519
+msgid "Use Colorbox"
+msgstr "Используйте Colorbox"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:220
+msgid "*If you choose neither, Foxypress will swap the main image with the thumbnail clicked."
+msgstr "* Если вы не выберете один из них Foxypress изменит главный вид с помощью контрольного нажатия."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:224
+msgid "Max Downloads"
+msgstr "Максимальные загрузки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:227
+msgid "*Sets the maximum number of downloads allowed for a downloadable product."
+msgstr "* Установить максимальное количество загрузок для загрузочного продукта."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:228
+msgid "You can specify this at a global level here and also at a product level."
+msgstr "Вы можете установить это на общем уровне а также на продуктовом уровне"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:232
+msgid "Quantity Alert Level"
+msgstr "Количество аварийных уровней"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:235
+msgid "*You will be notified via email when the quantity of an item goes below this threshold."
+msgstr "* Вы можете быть проинформированы через email когда количество ваших товаров будет ниже этого порога."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:236
+msgid "You can set this to 0 or blank if you do not want any notifications."
+msgstr "Мы можем установить его на 0 или вообще оставить пустым если не хотите никаких сообщений."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:240
+msgid "Keep Products On Uninstall"
+msgstr "Деинсталлировать сохраненные продукты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:243
+msgid "*We will not delete your products on deletion of FoxyPress if this is checked."
+msgstr "* Мы не удалим ваши товары при помощи FoxyPress удаления если они проверены."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:252
+msgid "Store Options"
+msgstr "Параметры магазина"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:257
+msgid "Enable Third Party Products"
+msgstr "Разрешить сторонние продукты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:260
+msgid "*Allow third party products."
+msgstr "* Разрешить сторонние продукты."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:261
+msgid "Select to suppress error messages when not using FoxyPress products."
+msgstr "Выберите запрет сообщений об ошибках когда вы не используете продукты FoxyPress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:265
+msgid "Enable User Status"
+msgstr "Разрешить статус пользователя"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:268
+msgid "*Allows user portal page to be activated"
+msgstr "* Разрешить пользователю страницы портала быть активированным"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:273
+msgid "Enable Cart Validation"
+msgstr "Включить проверку корзины"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:276
+msgid "*If you want to take advantage of cart validation, you must enable the cart validation feature in the FoxyCart admin panel under Store->Advanced."
+msgstr "* Если вы хотите воспользоваться возможностью проверки вашей карты вы должны включить возможность проверки карты в административной панели FoxyCart под Store->Advanced."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:280
+msgid "Enable Multi-Ship"
+msgstr "Разрешить Multi-Ship"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:283
+msgid "*Allows customers to ship to multiple addresses"
+msgstr "Позволяет клиентам отправлять по нескольким адресам"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:287
+msgid "Enable SSO"
+msgstr "Разрешить SSO"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:291
+msgid "*Enables Single Sign On. FoxyPress can automatically sync your WordPress and FoxyCart users."
+msgstr "* Включение Single Sign On. FoxyPress может автоматически синхронизировать пользователей WordPress и FoxyCart."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:292
+msgid "<p>If you want to take advantage of this feature, copy the SSO Endpoint URL below and enable the Single Sign On feature in the FoxyCart admin panel. Also, be sure to set the 'Customer Password Hash Type' to phpass, portable mode and 'Customer Password Hash Config' to 8 </p>"
+msgstr "<p>Если вы хотите воспользоваться этой возможностью скопируйте ниже SSO Endpoint URL и сделайте возможность Single Sign On в административной панели FoxyCart. Также удостоверьтесь что 'Customer Password Hash Type ' установится в phpass в портативном режиме и 'Customer Password Hash Config' установится в 8</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:296
+msgid "SSO Endpoint"
+msgstr "Конечная точка SSO"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:299
+msgid "<p>*FoxyPress can automatically sync your WordPress and FoxyCart users. If you want to take advantage of this feature, copy this url and enable the Single Sign On feature in the FoxyCart admin panel and above in the FoxyPress Settings. Also, be sure to set the 'Customer Password Hash Type' to phpass, portable mode and 'Customer Password Hash Config' to 8</p>"
+msgstr "<p>*FoxyPress может автоматически синхронизироать ваших WordPress и FoxyCart пользователей. Если вы хотите воспользоваться этой возможностью скопируйте этот адрес и сделайте возможность Single Sign On в административной панели FoxyCart выше параметров FoxyPress. Также удостоверьтесь что  'Customer Password Hash Type 'установится в phpass в портативном режиме и 'Customer Password Hash Config 'установится в 8</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:303
+msgid "Product Feed"
+msgstr "Новости о товаре"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:306
+msgid "*RSS Feed of your Products compatible with Google Products"
+msgstr "* RSS лента для ваших продуктов совместима с продуктами Google"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:310
+msgid "DataFeed"
+msgstr "Канал данных"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:313
+msgid "*If you are using digital downloads, use this URL as your data feed url in FoxyCart."
+msgstr "* Если вы используете цифровые загрузки, используйте этот адрес как адрес канала данных в FoxyCart."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:317
+msgid "Additional DataFeed(s)"
+msgstr "Дополнительные каналы данных"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:320
+msgid "*If you have additional datafeeds that need to be hit, enter the full url for your datafeed"
+msgstr "*Если вы имеете дополнительные каналы данных, которые должны быть размещены на странице введите полный адрес вашего канала данных"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:321
+msgid "Separate multiple datafeeds with a comma"
+msgstr "Отделяйте сложные каналы данных запятой"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:324
+msgid "Show Dashboard Widget"
+msgstr "Показать панель виджетов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:327
+msgid "*Shows/Hides the FoxyPress dashboard widget"
+msgstr "* Показать / Скрыть панель виджетов FoxyPress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:332
+msgid "Main Site"
+msgstr "Главный сайт"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:336
+msgid "*If you mark this as your main site, you will be able to see orders from all of your sub-sites"
+msgstr "* Если вы выбрали этот сайт основным, вы сможете увидеть заказы от всех ваших суб-сайтов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:346
+msgid "Packing Slip Wizard Settings"
+msgstr "Мастер настройки упаковочных листов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:351
+msgid "Header Image"
+msgstr "Заголовок изображения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:354
+msgid "*If you would like a custom header image on your packing slip, use the media library to upload an image and set the url here"
+msgstr "* Если вы хотите пользовательское изображение заголовка на упаковочном листе, используйте медиа-библиотеку, чтобы загрузить изображение и установить URL здесь"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:358
+msgid "Default Footer Message"
+msgstr "Сообщения в нижнем колонтитуле по умолчанию"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:361
+msgid "*A custom message can be generated for the footer of packing slips.  Set a default here so you don't have to type it each time if you'd prefer"
+msgstr "* Сообщение потребителю может быть создано в нижнем колонтитуле упаковочного листа. Установите параметры по умолчанию здесь и тогда вам не нужно вводить его каждый раз, когда вам нужно"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:370
+msgid "Custom Instructions"
+msgstr "Пользовательские инструкции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:375
+msgid "Item Out Of Stock Message"
+msgstr "Товар отсутствует"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:378
+msgid "*Foxypress will show this message instead of the default out of stock message"
+msgstr "* Foxypress покажет вам это сообщение вместо стандартного но отсутствующего письма"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:382
+msgid "Item Unavailable/Inactive Message"
+msgstr "Товар недоступен / Сообщения неактивные"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:385
+msgid "*Foxypress will show this message instead of the default unavailable message"
+msgstr "* Foxypress покажет вам это сообщение вместо стандартного сообщения которое недоступно"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:394
+msgid "Affiliate Management Email Settings"
+msgstr "Управление настройками электронной почты партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:397
+msgid "<p>When you approve an affiliate, an email will be sent to them.  You can customize aspects of that email with the following legend, simliar to our email templates.</p>"
+msgstr "<p>Когда вы утвердите партнеров им будет отправлено электронное письмо. Вы можете настроить этот email с помощью следующих условных обозначений похожих к шаблонам нашей электронной почты</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:400
+msgid "Approval Subject"
+msgstr "Утверждение темы"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:403
+msgid "*This will be in the subject of your approval email"
+msgstr "* Здесь будет тема входящей почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:407
+msgid "Approval Email Body"
+msgstr "Основная часть входящей почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:410
+msgid "*This will be in the body of your approval email"
+msgstr "* Это будет в основной части входящей почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:420
+msgid "Affiliate First Name"
+msgstr "Имя партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:424
+msgid "Affiliate Last Name"
+msgstr "Фамилия партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:428
+msgid "Affiliate Email"
+msgstr "Email партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:432
+msgid "Affiliate Commission Details"
+msgstr "Детали партнерского вознаграждения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:436
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:374
+msgid "Affiliate URL"
+msgstr "URL партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:444
+msgid "SMTP Mail Settings"
+msgstr "НАстройка SMTP-почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:447
+msgid "<p>Should you need to configure SMTP settings for secure mail through your webhost, we've allowed you to define these values below.  Keep in mind that these settings are only for mail going out of FoxyPress <i>(order management)</i>.  It will not change your overall WordPress mail() functionality.</p>"
+msgstr "<p> Если вам необходимо настроить SMTP настройки для безопасной почты через веб-хостинг, мы позволили вам определить эти значения ниже. Имейте в виду, что эти параметры только для сообщений, выходящих FoxyPress <i> (управление заказами) </i>. Это не изменит функциональность вашей общей почты WordPress ().</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:450
+msgid "SMTP Host"
+msgstr "SMTP хост"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:453
+msgid "*your smtp host here"
+msgstr "* Ваш SMTP-хост здесь"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:457
+msgid "Secure Port (optional)"
+msgstr "Безопасный порт (опционально)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:460
+msgid "*465"
+msgstr "*465"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:464
+msgid "Email Username"
+msgstr "Имя пользователя электронной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:467
+msgid "*your full email here"
+msgstr "* Ваш полный электронный адрес здесь"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:471
+msgid "Email Password"
+msgstr "Пароль электронной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:474
+msgid "*your email password here"
+msgstr "* пароль электронной почты здесь"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:481
+msgid "Save Changes"
+msgstr "Сохранить изменения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:488
+msgid "Step 1"
+msgstr "Шаг 1"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:489
+msgid "Step 2"
+msgstr "Шаг 2"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:490
+msgid "Step 3"
+msgstr "Шаг 3"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:496
+msgid "<p>Thanks for installing FoxyPress! Lets get a few things taken care of quickly to get you on your way to selling!</p>"
+msgstr "<p>Спасибо, что установили FoxyPress! Давайте сделаем несколько вещей, которые помогут ускорить ваши продажи</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:497
+msgid "<p>What is your FoxyCart Store Domain?</p>"
+msgstr "<p>Какой домен вашего магазина FoxyCart?</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:499
+msgid "<i>ex. if your store url is foxypress.foxycart.com, enter just 'foxypress'.</i>"
+msgstr "<i>ex. если адрес вашего магазина foxypress.foxycart.com, введите просто 'foxypress'.</i>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:500
+msgid "<p>What version is your FoxyCart store?</p>"
+msgstr "<p>Какая версия вашего магазина FoxyCart?</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:512
+msgid "<p>Need a reference to jQuery?  You can change this later if you want.</p>"
+msgstr "<p>Нужно ссылки на JQuery? Вы можете изменить это позже, если вы хотите.</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:517
+msgid "<p>By default, FoxyPress comes loaded with the ability to choose different ways to display your photos.  Which will you choose?</p>"
+msgstr "<p>По умолчанию FoxyPress поставляется с возможностью выбора различных способов отображения фотографий. Какой из них вы выберете?</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:529
+msgid "Save Settings"
+msgstr "Сохранить настройки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:531
+msgid "<p>That is all! We have additional settings available, but these are the core things you should have setup before doing anything else.</p>"
+msgstr "<p>Вот и все! У нас есть дополнительные настройки, доступные, но эти основные вещи, которые вы должны установить и настроить, прежде чем делать что-либо еще.</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:532
+msgid "<p>Now lets get Foxy!</p>"
+msgstr "<p>Тепер давайте Foxy!</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:535
+msgid "<p>Please make sure you enter information into all of the fields on this wizard before continuing.</p>"
+msgstr "<p>Пожалуйста, убедитесь, что вы ввели информацию во все поля этого мастера, прежде чем продолжить.</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:536
+msgid "<p>You are missing:</p>"
+msgstr "<p>У вас не хватает:</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-settings.php:537
+msgid "Store Domain"
+msgstr "Магазин доменов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:24
+msgid "You need to switch to the 0.7.2 version of FoxyCart to use this functionality."
+msgstr "Вам нужно перейти на версию FoxyCart 0.7.2 и использовать эту функциональность."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:30
+msgid "FoxyCart Template Management"
+msgstr "Управление шаблонами FoxyCart"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:32
+msgid "With FoxyCart's additional API methods in 0.7.2 and above, you are now able to control your templates from within FoxyPress!"
+msgstr "С помощью дополнительных методов API в FoxyCart 0.7.2, Вы теперь в состоянии контролировать свои шаблоны в FoxyPress!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:38
+msgid "Cart<br /> Template"
+msgstr "Корзина<br/> Шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:39
+msgid "Checkout<br /> Template"
+msgstr "Проверить <br /> Шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:40
+msgid "Receipt<br /> Template"
+msgstr "Получить<br /> Шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:41
+msgid "Email<br /> Template"
+msgstr "Email<br /> Шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:42
+msgid "HTML Email<br /> Template"
+msgstr "HTML Email<br /> Шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:51
+msgid "<br /><br /><i>Cart template caching is courtesy of FoxyCart and their API.</i>"
+msgstr "<br /><br /><i>Кэширование корзины шаблонов в FoxyCart и иx API.</i>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:75
+msgid "Great job! You have successfully cached your cart template into FoxyCart!"
+msgstr "Отличная работа! Вы успешно кэшировали корзину шаблонов в FoxyCart!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:103
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:131
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:161
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:190
+msgid "Great job! You have successfully cached your checkout template into FoxyCart!"
+msgstr "Отличная работа! Вы успешно кэшировали шаблон подтверждения в FoxyCart!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:224
+msgid "Cart Template"
+msgstr "Корзина шаблонов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:225
+msgid "Enter the URL of your remote cart template then click the \"cache your url\" button to have your template parsed, cached and saved."
+msgstr "Введите URL удаленной корзины шаблона и нажмите кнопку \"cache your url \", чтобы Ваш шаблон обрабатывался, кэшировать и сохранить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:226
+msgid "Your Cart template url"
+msgstr "url-адрес корзины шаблонов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:228
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:267
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:306
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:343
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:381
+msgid "Use a Default template"
+msgstr "Использование шаблона по умолчанию"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:228
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:267
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:306
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:343
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:381
+msgid "this will use a file located on your server that contains the default FoxyCart template contents"
+msgstr "это будет использоваться файл, расположенный на сервере, который содержит по умолчанию содержание шаблона FoxyCart"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:230
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:269
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:308
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:346
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:349
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:384
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:387
+msgid "FoxyCart Standard"
+msgstr "Стандартный FoxyCart"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:231
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:270
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:309
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:347
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:385
+msgid "FoxyCart Standard with Twig"
+msgstr "Стандартный FoxyCart c Twig"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:233
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:272
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:311
+msgid "FoxyCart Text"
+msgstr "Текст FoxyCart"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:234
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:273
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:312
+msgid "FoxyCart Text with Twig"
+msgstr "Текст FoxyCart c Twig"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:237
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:276
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:315
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:353
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:391
+msgid "Cache Your Template"
+msgstr "Кэшировать шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:263
+msgid "Checkout Template"
+msgstr "Проверка шаблона"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:264
+msgid "Enter the URL of your remote checkout template then click the \"cache your url\" button to have your template parsed, cached and saved."
+msgstr "Введите URL подтверждения удаленного шаблона и нажмите кнопку \"cache your url \", чтобы Ваш шаблон обрабатывался, кэшировать и сохранить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:265
+msgid "Your Checkout template url"
+msgstr "Адрес подтверждения шаблона "
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:302
+msgid "Receipt Template"
+msgstr "Получить шаблон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:303
+msgid "Enter the URL of your remote receipt template then click the \"cache your url\" button to have your template parsed, cached and saved."
+msgstr "Введите URL  удаленного шаблона получения и нажмите кнопку \"cache your url \", чтобы Ваш шаблон обрабатывался, кэшировать и сохранить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:304
+msgid "Your Receipt template url"
+msgstr "Ваш url адрес получения шаблонов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:337
+msgid "Email Template"
+msgstr "Шаблоны електронной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:338
+msgid "Enter the URL of your remote text email template then click the \"cache your url\" button to have your template parsed, cached and saved"
+msgstr "Введите url-адрес удаленного текста шаблона электронной почты нажмите кнопку \"cache your url \", чтобы Ваш шаблон обрабатывался, кэшировать и сохранить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:339
+msgid "Your Text Email template url"
+msgstr "Ваш текст шаблона электронной почты URl"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:341
+msgid "Your Text Email Subject"
+msgstr "Ваш текст темы  Email "
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:341
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:379
+msgid "To turn off receipt emails, leave this field blank and receipt emails will not be sent"
+msgstr "Чтобы отключить отчет о доставке электронной почты, оставьте это поле пустым и  отчет о доставке  электронной почты не будет отправлено"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:375
+msgid "HTML Email Template"
+msgstr "HTML шаблон электонной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:376
+msgid "Enter the URL of your remote HTML email template then click the \"cache your url\" button to have your template parsed, cached and saved"
+msgstr "Введите адрес удаленного HTML шаблона электронной почты нажмите кнопку \"cache your url\", чтобы Ваш шаблон обрабатывался, кэшировать и сохранить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:377
+msgid "Your HTML Email template url"
+msgstr "Ваш URL HTML шаблон электронной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress-templates.php:379
+msgid "Your HTML Email Subject"
+msgstr "Ваша тема электронной почты HTML"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:210
+msgid "Manage Option Groups"
+msgstr "Управление группами параметров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:211
+msgid "Manage Categories"
+msgstr "Управление категориями"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:213
+msgid "Order Management"
+msgstr "Управление заказами"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:214
+msgid "Status Management"
+msgstr "Статус управления"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:215
+msgid "Affiliate Management"
+msgstr "Партнерское управления"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:216
+msgid "Reports"
+msgstr "Отчеты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:217
+msgid "Subscriptions"
+msgstr "Подписки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:218
+msgid "Templates"
+msgstr "Шаблоны"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:219
+msgid "Import/Export"
+msgstr "Импорт/Экспорт"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:223
+msgid "Affiliate Sign Up"
+msgstr "Регистрация партнеров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:226
+msgid "Settings"
+msgstr "Настройки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:266
+msgid "FoxyPress Affiliate Information"
+msgstr "Информация для партнера FoxyPress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:269
+msgid "Enable Affiliate"
+msgstr "Разблокировать партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:270
+msgid "Is this an affiliate user?"
+msgstr "Этот пользователь партнер?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:282
+msgid "Affiliate Facebook Page"
+msgstr "Страница Facebook партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:285
+msgid "Affiliate's Facebook Page."
+msgstr "Страница Facebook партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:289
+msgid "Affiliate Age"
+msgstr "Возраст партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:292
+msgid "Affiliate's age."
+msgstr "Возраст партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:296
+msgid "Affiliate Gender"
+msgstr "Пол партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:299
+msgid "Affiliate's gender."
+msgstr "Пол партнера"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:331
+msgid "Percentage of each order"
+msgstr "Процент с каждого заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:338
+msgid "Dollar amount of each order"
+msgstr "Сумма в долларах с каждого заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:345
+msgid "How much will this affiliate earn per sale of their referrals?"
+msgstr "Сколько заработает партнер по продаже своих рефералов?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:356
+msgid "Percentage off of each order"
+msgstr "Процент от каждого заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:363
+msgid "Dollar amount off of each order"
+msgstr "Сумма в долларах от каждого заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:614
+msgid "Order History"
+msgstr "История заказов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:616
+msgid "1 Day"
+msgstr "1 День"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:617
+msgid "7 Days"
+msgstr "7 Дней"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:618
+msgid "30 Days"
+msgstr "30 Дней"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:619
+msgid "Overall"
+msgstr "Общий"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:621
+msgid "Product Summary"
+msgstr "Общее количество товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:633
+msgid "FoxyPress Statistics"
+msgstr "FoxyPress статистика"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:761
+msgid "Search"
+msgstr "Поиск"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2458
+msgid "Warning! NOT an image file! File not uploaded."
+msgstr "Внимание! Нет файла изображения! Файл не загружен."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2499
+msgid "The file is too big. (php.ini)"
+msgstr "Файл слишком велик. (php.ini)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2502
+msgid "The file is too big. (form)"
+msgstr "Файл слишком велик. (Форма)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2505
+msgid "Only part of the file was uploaded"
+msgstr "Файл загружен частично"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2508
+msgid "No file was uploaded"
+msgstr "Файл не был загружен"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2511
+msgid "Missing a temporary folder."
+msgstr "Отсутствует во временной папке."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2514
+msgid "Failed to write file to disk"
+msgstr "Не удалось записать файл на диск"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2517
+msgid "File upload stopped by extension"
+msgstr "Загрузка файла отсрочено"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:2520
+msgid "Unknown error ("
+msgstr "Неизвестная ошибка ("
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:4077
+msgid "A widget that will display the FoxyCart cart as a dropdown or in your website's sidebar."
+msgstr "Виджет, который будет отражать FoxyCart корзину будет выпадающий или в боковой панели вашего сайта."
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:4083
+msgid "FoxyPress Mini-Cart"
+msgstr "FoxyPress Mini-Cart"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:4244
+msgid "Your Cart"
+msgstr "Ваша корзина"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:4244
+msgid "0"
+msgstr "0"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:4247
+msgid "Title:"
+msgstr "Заголовок:"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:4252
+msgid "Hide Cart with 0 Items"
+msgstr "Скрыть корзину с 0 товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/foxypress.php:4256
+msgid "Drop Down Display"
+msgstr "Показать выпадающим"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:435
+msgid "Import Inventory"
+msgstr "Импорт товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:438
+msgid "We recommend reading the import instructions before selecting a file to upload.  When you are ready, simply browse to the file and click import."
+msgstr "Мы рекомендуем прочитать инструкции импорта, прежде чем выбрать файл для загрузки. Когда вы будете готовы, просто перейдите к файлу и щелкните Импорт."
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:441
+msgid "Import"
+msgstr "Импорт"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:454
+msgid "Export Inventory"
+msgstr "Экспорт товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:457
+msgid "Click the button below to export an excel document of your inventory"
+msgstr "Нажмите на кнопку ниже, чтобы экспортировать документ Excel с вашего каталога"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:459
+msgid "Export"
+msgstr "Экспорт"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:472
+msgid "Import Notes - read before importing"
+msgstr "Импорт заметок - читать перед импортом"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:478
+msgid "Column Order"
+msgstr "Порядок столбцов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:481
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:163
+msgid "Item Name"
+msgstr "Название товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:482
+msgid "Item Description"
+msgstr "Описание товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:483
+msgid "Item Category"
+msgstr "Категория"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:485
+msgid "Item Sale Price"
+msgstr "Сниженная цена"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:486
+msgid "Item Sale Start Date"
+msgstr "Дата начала скидок"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:487
+msgid "Item Sale End Date"
+msgstr "Дата окончания скидок"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:488
+msgid "Item Weight"
+msgstr "Вес"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:489
+msgid "Item Quantity"
+msgstr "Количество"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:490
+msgid "Item Quantity Min"
+msgstr "Минимальное количество"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:491
+msgid "Item Quantity Max"
+msgstr "Максимальное количество"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:492
+msgid "Item Options"
+msgstr "Параметры"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:493
+msgid "Item Attributes"
+msgstr "Атрибуты элемента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:494
+msgid "Item Discount Quantity Amount"
+msgstr "Сумма скидки за количество товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:495
+msgid "Item Discount Quantity Percentage"
+msgstr "Процент скидки за количество товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:496
+msgid "Item Discount Price Amount"
+msgstr "Сумма скидки от цены товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:497
+msgid "Item Discount Price Percentage"
+msgstr "Процент скидки от цены товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:498
+msgid "Subscription Frequency"
+msgstr "Частота подписки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:499
+msgid "Subscription Start Date"
+msgstr "Дата начала подписки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:500
+msgid "Subscription End Date"
+msgstr "Дата окончания подписки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:501
+msgid "Item Start Date"
+msgstr "Дата начала"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:502
+msgid "Item End Date"
+msgstr "Дата окончания"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:503
+msgid "Item Active"
+msgstr "Активный"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:510
+msgid "Formatting Notes"
+msgstr "Фарматировать заметки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:512
+msgid "Categories must match exactly with categories that you have created in foxypress. If there are multiple categories for an item you can split them up by using \"|\" (without quotes)"
+msgstr "Категории должны в точности совпадать с категориями, которые вы создали в foxypress. Если есть несколько категорий для элемента, вы может разделить их с помощью \"|\" (без кавычек)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:513
+msgid "<b>Example:</b> General|Shirts|Fun Items"
+msgstr "<b>Пример:</b> Общий | Рубашки | Веселые товары"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:515
+msgid "Price does not need to have a currency symbol"
+msgstr "Цена не должна иметь символ валюты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:516
+msgid "Options will be in this format: Option Group Name|Option Name|Option Value|Option Extra Price|Option Extra Weight|Option Code|Option Quantity|Active|Sort Order"
+msgstr "Параметры будут в следующем формате: Название групп параметров | Наименование параметра | Значение параметра | Дополнительные параметры цены | Дополнительные параметры веса | Код параметра | Параметры количества | Активные | Сортировка"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:518
+msgid "Active can be either 1(true) or 0(false)"
+msgstr "Активным может быть или 1(истина) или 0(ложь)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:519
+msgid "Option Group Name must match exactly with option groups that you have created in foxypress"
+msgstr "Название группы параметров должны в точности совпадать с параметромы групп, которые вы создали в foxypress"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:520
+msgid "Multiple options can be imported by using \"~~\" (without quotes) between sets"
+msgstr "Несколько параметров могут быть импортированы с помощью \"~~\" (без кавычек) между наборами"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:521
+msgid "<b>Example:</b> Color|Red|red|0.00|0|mycode|100|1|5~~Color|Blue|blue|0.00|0|mycode|100|1|6"
+msgstr "<b>Приклад:</b> Color|Red|red|0.00|0|mycode|100|1|5~~Color|Blue|blue|0.00|0|mycode|100|1|6"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:527
+msgid "Attributes will be in this format: Attribute Name|Attribute Value"
+msgstr "Атрибуты будут в следующем формате: Имя атрибута|Значение атрибута"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:529
+msgid "Multiple attributes can be imported by using \"~~\" (without quotes) between sets"
+msgstr "Несколько атрибутов могут быть импортированы с помощью \"~~\" (без кавычек) между наборами"
+
+#: C:\Users\QuadCore\Desktop\foxypress/import-export.php:530
+msgid "<b>Example:</b> MyAttributeName|MyValue~~AnotheName|AnotherValue"
+msgstr "<b>Example:</b> MyAttributeName|MyValue~~AnotheName|AnotherValue"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:145
+msgid "Sort Category Items"
+msgstr "Сортировать список товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:161
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:243
+msgid "Sort"
+msgstr "Сортировать"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:181
+msgid "Update Order"
+msgstr "Обновить заказ"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:206
+msgid "When creating your categories, please know that you need to match them with your FoxyCart.com categories"
+msgstr "При создании категорий, пожалуйста, знайте, что вам нужно сопоставить их с категориями FoxyCart.com "
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:206
+msgid "Click here"
+msgstr "Нажмите сюда"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:206
+msgid "to view our FoxyCart.com category list"
+msgstr "FoxyCart.com для просмотра нашего списка категорий"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:209
+msgid "New Category Name"
+msgstr "Имя новой категории"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:241
+msgid "Category Name"
+msgstr "Имя категории"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:242
+msgid "Category Image"
+msgstr "Категория изображения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:262
+msgid "save"
+msgstr "сохранить"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:270
+msgid "View Image"
+msgstr "Просмотр изображения"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:284
+msgid "Sort Inventory Items"
+msgstr "Сортировка товаров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:288
+msgid "N/A"
+msgstr "Недоступный"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:293
+msgid "Are you sure you want to delete this category?"
+msgstr "Вы уверены, что хотите удалить эту категорию?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-category.php:310
+msgid "<p>There are currently no categories</p>"
+msgstr "<p>В настоящее время нет категорий</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-option-groups.php:61
+msgid "To create a list of options you must first create an option group. Example: \"Color\" or \"Size\"."
+msgstr "Чтобы создать список параметров, вы должны сначала создать группу параметров. Пример: \"Цвет\" или \"размер\"."
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-option-groups.php:62
+msgid "These option groups can be used for options on any item."
+msgstr "Эти группы параметров могут быть использованы для параметров любого товара."
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-option-groups.php:71
+msgid "New Option Group"
+msgstr "Новая група параметров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-option-groups.php:84
+msgid "Option Group Name"
+msgstr "Название груп параметров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-option-groups.php:115
+msgid "Are you sure you want to delete this option group? All of the options related to this option group will be deleted."
+msgstr "Вы действительно хотите удалить эту групу параметров? Все параметры, связанные с этой групой параметров будут удалены."
+
+#: C:\Users\QuadCore\Desktop\foxypress/inventory-option-groups.php:121
+msgid "There are currently no option groups"
+msgstr "В настоящее время нет груп параметров"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:181
+msgid "<h3>View Orders</h3>"
+msgstr "<h3>Просмотр заказов</h3>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:185
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:244
+msgid "Order Status"
+msgstr "Статус заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:186
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:245
+msgid "Status Quantity"
+msgstr "Общее количество"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:239
+msgid "<h3><a href=\"javascript:ToggleSubSiteOrder("
+msgstr "<h3><a href=\"javascript:ToggleSubSiteOrder("
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:275
+msgid "<h3>Sync Transactions </h3>"
+msgstr "<h3>Синхронизировать все операции </h3>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:276
+msgid "Please click the button below to sync your latest transactions from FoxyCart."
+msgstr "Пожалуйста, нажмите на кнопку, чтобы синхронизировать ваши последние операции з FoxyCart."
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:279
+msgid "Sync Latest Transactions"
+msgstr "Синхронизация последней операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:280
+msgid "Sync All Transactions"
+msgstr "Синхронизировать все операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:282
+msgid "Last Synchronized"
+msgstr "Последняя синхронизация"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:302
+msgid "<h3>View your "
+msgstr "<h3>Просмотр"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:302
+msgid " orders:</h3>"
+msgstr "заказы:</h3>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:307
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:689
+msgid "All Transactions"
+msgstr "Все операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:308
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:690
+msgid "Live Transactions"
+msgstr "Текущие операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:309
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:691
+msgid "Test Transactions"
+msgstr "Тестовые операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:329
+msgid "Bulk Actions"
+msgstr "Массовые действия"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:330
+msgid "Print Packing Slip(s)"
+msgstr "Печатать упаковочный лист(ы)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:336
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1230
+msgid "Transaction ID"
+msgstr "Номер операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:337
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1231
+msgid "Date of Order"
+msgstr "Дата операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:339
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:460
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:472
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1233
+msgid "Email"
+msgstr "Email"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:340
+msgid "Packing Slip"
+msgstr "Упаковочный лист"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:341
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1234
+msgid "Tracking"
+msgstr "Отслеживание"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:361
+msgid "<tr><td colspan=\"4\">There are currently no orders with this transaction status</td></tr>"
+msgstr "<tr><td colspan=\"4\">В настоящее время нет заказов с этим статусом операции</td></tr>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:427
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:564
+msgid "Transaction Details"
+msgstr "Информация о проведенной операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:435
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:302
+msgid "Status"
+msgstr "Статус"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:443
+msgid "Tracking Number"
+msgstr "Номер почтового отправления"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:447
+msgid "RMA Number"
+msgstr "Номер RMA"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:458
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:465
+msgid "Customer Details"
+msgstr "Реквизиты клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:458
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:487
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:495
+msgid "(edit)"
+msgstr "(редактировать)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:461
+msgid "Phone"
+msgstr "Телефон"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:465
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:515
+msgid "(cancel)"
+msgstr "(конець)"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:476
+msgid "Save Customer Information"
+msgstr "Сохранение информации о клиентах"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:487
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:515
+msgid "Billing Address"
+msgstr "Адрес на которую выставляются счета"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:495
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:536
+msgid "Shipping Address"
+msgstr "Адрес доставки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:518
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:539
+msgid "Address 1"
+msgstr "Адрес 1"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:522
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:543
+msgid "Address 2"
+msgstr "Адрес 2"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:526
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:547
+msgid "City, State, Zip"
+msgstr "Город, Штат, Индекс"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:555
+msgid "Save Address Information"
+msgstr "Сохранить адрес"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:602
+msgid "Downloadable Link"
+msgstr "Ссылка на загрузку"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:642
+msgid "<div><b>Hidden Fields</b></div>"
+msgstr "<div><b>Скрытые поля</b></div>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:644
+msgid "<br>"
+msgstr "<br>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:647
+msgid "<div><b>Transaction Totals</b></div><div>Product Total: "
+msgstr "<div><b>Результаты операций</b></div><div>Все продукты: "
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:655
+msgid "<div><h3>Notes</h3></div>"
+msgstr "<div><h3>Заметки</h3></div>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:659
+msgid "Note"
+msgstr "Заметка"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:660
+msgid "Posted By"
+msgstr "Автор"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:688
+msgid "<h3>New Note</h3>"
+msgstr "<h3>Новая заметка</h3>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:692
+msgid "Add Note"
+msgstr "Добавить заметку"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:697
+msgid "<h3>Send Email</h3>"
+msgstr "<h3>Отправить Email</h3>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:701
+msgid "You do not have any email templates defined.  Add one <a href='"
+msgstr "Вы вообще не имеете определенных шаблонов электронной почты. Добавьте один<a href='"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:706
+msgid "Select Template"
+msgstr "Выбор шаблона"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:728
+msgid "Send Email"
+msgstr "Отправить Email"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:735
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:903
+msgid "Invalid Transaction ID"
+msgstr "Неверный номер операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:774
+msgid "<h3>Create a Partial Packing slip</h3>"
+msgstr "<h3>Создать частичный упаковочный лист</h3>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:775
+msgid "<p>Below is a wizard that will guide you through creating a packing slip.  You may not want to include all of your items, for a partial order perhaps, so feel free to modify your slip and preview it until it looks correct.</p>"
+msgstr "<p>Ниже есть мастер который покажет тебе как создать упаковочный лист. Если вы не хотите прилагать все ваши товары и только сделать частичный заказ, вы можете легко изменить ваше письмо и корректировать его до тех пор пока он не будет верным</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:787
+msgid "You've chosen to create a packing slip for"
+msgstr "Вы создали упаковочный лист для"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:788
+msgid "Please choose which products you'd like to include on this packing slip, then click the next arrow below."
+msgstr "Пожалуйста, укажите, какие продукты вы хотите включить в этот упаковочный лист, нажмите следующую стрелку ниже."
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:796
+msgid "Now that you've selected your products, please enter your custom message that will appear on the packing slip."
+msgstr "Теперь, когда вы выбрали вашу продукцию, пожалуйста, введите пользовательское сообщение, которое появится на упаковочном листе."
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:797
+msgid "Message/Notes"
+msgstr "Сообщения / Заметки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:803
+msgid "All of your information has been collected and now you may preview your packing slip.  If something looks wrong, feel free to go backwards through the wizard and modify it."
+msgstr "Вся Ваша информация была собрана, и теперь вы можете просмотреть свой список доставок. Если что-то выглядит не так, не стесняйтесь идти в обратном направлении с помощью мастера и изменить его."
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:805
+msgid "Everything look ok?"
+msgstr "Все выглядит нормально?"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:807
+msgid "Print Packing Slip"
+msgstr "Печать упаковочного листа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:964
+msgid "Your email message has been successfully sent!"
+msgstr "Ваше сообщение успешно отправлено!"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:980
+msgid "<h3>Preview Your Packing Slip</h3>"
+msgstr "<h3>Предварительный просмотр упаковочного листа</h3>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:981
+msgid "<p>This is what your packing slip will look like:</p>"
+msgstr "<p>Так будет выглядеть ваш упаковочный лист:</p>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1136
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:229
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:433
+msgid "Order Number"
+msgstr "Номер для заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1163
+msgid "<div class='shipped_via'>Shipped via: "
+msgstr "<div class='shipped_via'>Доставка по:"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1170
+msgid "SKU"
+msgstr "Учет"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1171
+msgid "QTY"
+msgstr "Количество"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1172
+msgid "PRODUCT"
+msgstr "ПРОДУКТ"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1199
+msgid "Invalid search term, please try again. You can search by First Name, Last Name, or Transaction ID."
+msgstr "Неверное значение поиска, пожалуйста попробуйте еще раз. Вы можете осуществлять поиск по имени, фамилии или ID операции."
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1254
+msgid "<tr><td colspan=\"4\">Your search did not return any results, please try again</td></tr>"
+msgstr "<tr><td colspan=\"4\">Ваш поиск не дал результатов, пожалуйста попробуйте еще раз</td></tr>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1304
+msgid "Search by First Name, Last Name, or Transaction ID"
+msgstr "Поиск по имени, фамилии или ID операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1403
+msgid "Synchronization Complete"
+msgstr "Полная синхронизация"
+
+#: C:\Users\QuadCore\Desktop\foxypress/order-management.php:1403
+msgid "Refresh Page"
+msgstr "Обновить страницу"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:42
+msgid "View Daily/Weekly/Monthly Order Totals"
+msgstr "Просмотр Ежедневно / Еженедельно / Ежемесячно итоги"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:45
+msgid "View Orders By Product Code"
+msgstr "Просмотр заказа по коду товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:48
+msgid "View Coupon Orders By Product Code"
+msgstr "Просмотр бланка заказа по коду товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:77
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:107
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:268
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:298
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:631
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:661
+msgid "1"
+msgstr "1"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:78
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:108
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:269
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:299
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:632
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:662
+msgid "2"
+msgstr "2"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:79
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:109
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:270
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:300
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:633
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:663
+msgid "3"
+msgstr "3"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:80
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:110
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:271
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:301
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:634
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:664
+msgid "4"
+msgstr "4"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:81
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:111
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:272
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:302
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:635
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:665
+msgid "5"
+msgstr "5"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:82
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:112
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:273
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:303
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:636
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:666
+msgid "6"
+msgstr "6"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:83
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:113
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:274
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:304
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:637
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:667
+msgid "7"
+msgstr "7"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:84
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:114
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:275
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:305
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:638
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:668
+msgid "8"
+msgstr "8"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:85
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:115
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:276
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:306
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:639
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:669
+msgid "9"
+msgstr "9"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:86
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:116
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:277
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:307
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:640
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:670
+msgid "10"
+msgstr "10"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:87
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:117
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:278
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:308
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:641
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:671
+msgid "11"
+msgstr "11"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:88
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:118
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:279
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:309
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:642
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:672
+msgid "12"
+msgstr "12"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:91
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:121
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:282
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:312
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:645
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:675
+msgid "00"
+msgstr "00"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:92
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:122
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:283
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:313
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:646
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:676
+msgid "15"
+msgstr "15"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:93
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:123
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:284
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:314
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:647
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:677
+msgid "30"
+msgstr "30"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:94
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:124
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:285
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:315
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:648
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:678
+msgid "45"
+msgstr "45"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:97
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:127
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:288
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:318
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:651
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:681
+msgid "AM"
+msgstr "AM"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:98
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:128
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:289
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:319
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:652
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:682
+msgid "PM"
+msgstr "PM"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:133
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:230
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:324
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:434
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:260
+msgid "Product Code"
+msgstr "Код товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:137
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:328
+msgid "Transaction Status"
+msgstr "Статус проведенной операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:155
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:346
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:697
+msgid "Run Report"
+msgstr "Отправка отчета"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:156
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:348
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:698
+msgid "(Start and End Dates need to be in yyyy-mm-dd format. ex"
+msgstr "(Начало и конец даты должны быть в формате гггг-мм-дд. Пример"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:224
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:428
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:547
+msgid "There are currently no transactions"
+msgstr "Нету проведеных операций"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:347
+msgid "Export Report"
+msgstr "Экспорт отчета"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:437
+msgid "Coupon Code"
+msgstr "Код бланка заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:543
+msgid "Download Coupon Orders</a> <small><i>(Right Click, Save As)</i></small>"
+msgstr "Загрузить бланк заказа</a> <small><i>(Правый щелчек, сохранить как)</i></small>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:686
+msgid "Transaction Type"
+msgstr "Тип операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:750
+msgid "Product Total"
+msgstr "Все продукты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:751
+msgid "Tax Total"
+msgstr "Сумма налога"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:752
+msgid "Shipping Total"
+msgstr "Общая сумма доставки"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:780
+msgid "<br><div><b>Credit Cards</b></div>"
+msgstr "<br><div><b>Кредитные карты</b></div>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:784
+msgid "Credit Card Type"
+msgstr "Тип кредитной карты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:786
+msgid "Total Order Amount"
+msgstr "Общая сумма заказа"
+
+#: C:\Users\QuadCore\Desktop\foxypress/reports.php:802
+msgid "<div>There are currently no transactions for that date range</div>"
+msgstr "<div>Для этого диапазона дат нет операций</div>"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:90
+msgid "Status ID"
+msgstr "Статус ID"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:94
+msgid "Status Description"
+msgstr "Описание"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:99
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:303
+msgid "Email Customer"
+msgstr "Электронная почта клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:103
+msgid "Email Subject"
+msgstr "Тема электронного письма"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:107
+msgid "Email Body"
+msgstr "Основная часть электронной почты"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:141
+msgid "Product Item listing"
+msgstr "Список продуктов"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:161
+msgid "Discount Codes and Amounts Used"
+msgstr "Коды скидок и сумма использования"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:209
+msgid "Customer's Shipping First Name"
+msgstr "Имя клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:213
+msgid "Customer's Shipping Last Name"
+msgstr "Фамилия клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:229
+msgid "Customer's Shipping State"
+msgstr "Штат клиента получающего товар"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:277
+msgid "Are you sure you want to delete this status? Any transaction tied to this status will be set back to Uncategorized."
+msgstr "Вы действительно хотите удалить этот статус? Любая операция связана с этим статусом будет отослана обратно в общий каталог."
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:289
+msgid "New Status"
+msgstr "Новый статус"
+
+#: C:\Users\QuadCore\Desktop\foxypress/status-management.php:304
+msgid "Include Tracking"
+msgstr "Включить отслеживание"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:94
+msgid "For help with subscriptions visit FoxyCart's"
+msgstr "Для получения справки по подписке зайдите в FoxyCart "
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:94
+msgid "documentation"
+msgstr "документация"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:94
+msgid "or"
+msgstr "или"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:94
+msgid "cheat sheet"
+msgstr "Памятка"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:108
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:293
+msgid "Next Date"
+msgstr "Следующая дата"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:120
+msgid "Past Due Amount"
+msgstr "Просроченная сумма"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:133
+msgid "Cancel Subscription"
+msgstr "Завершить подписку"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:133
+msgid "Modify Subscription"
+msgstr "Изменить подписку"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:142
+msgid "Invalid Subscription"
+msgstr "Неправильная подписка"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:220
+msgid "Inactive"
+msgstr "Пасивный"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:221
+msgid "Both"
+msgstr "Другой"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:224
+msgid "Past Due Status"
+msgstr "Просрочен"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:227
+msgid "Show All"
+msgstr "Показать все"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:228
+msgid "Show Past Due Only"
+msgstr "Показыть только просроченый"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:238
+msgid "Third Party ID"
+msgstr "ID третьей стороны"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:242
+msgid "Next Transaction Date"
+msgstr "Следующий номер операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:247
+msgid "Customer ID"
+msgstr "Номер клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:256
+msgid "Customer Email"
+msgstr "Электронный адрес клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:262
+msgid "Customer First Name"
+msgstr "Имя клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:267
+msgid "Product Name"
+msgstr "Название товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:269
+msgid "Customer Last Name"
+msgstr "Фамилия клиента"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:273
+msgid "Product Option Name"
+msgstr "Выбор товара"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:275
+msgid "Last Transaction ID"
+msgstr "Последний номер операции"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:279
+msgid "Product Option Value"
+msgstr "Значение подукту"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:291
+msgid "Customer"
+msgstr "Клиент"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:295
+msgid "Past Due"
+msgstr "Просроченый"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:298
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:354
+msgid "Edit"
+msgstr "Редактировать"
+
+#: C:\Users\QuadCore\Desktop\foxypress/subscriptions.php:377
+msgid "There are currently no subscriptions"
+msgstr "Сейчас нет подписки"
+
+#~ msgid "M j, Y @ G:i"
+#~ msgstr "M j, Y @ G:i"
+
+#~ msgid "v"
+#~ msgstr "v"

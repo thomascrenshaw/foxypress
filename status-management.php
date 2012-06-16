@@ -25,7 +25,7 @@ function status_management_postback()
 				$sql = "insert into " . $wpdb->prefix . "foxypress_transaction_status(foxy_transaction_status_description) values ('$NewDescription')";
 				$wpdb->query($sql);
 			}
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management");
 		}
 		
 		if($Action == "delete" && $StatusID != "" && $StatusID != "1")
@@ -36,7 +36,7 @@ function status_management_postback()
 			//update transactions in limbo to unprocessed
 			$sql = "update " . $wpdb->prefix ."foxypress_transaction SET foxy_transaction_status = '1' WHERE foxy_transaction_status = '$StatusID'";
 			$wpdb->query($sql);
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management");
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management");
 		}
 	}
 }
@@ -268,13 +268,13 @@ function GetStatuses()
 		{
 			$Statuses .= "<tr>
 							<td> 
-								<a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management&action=edit&status=" . $ts->foxy_transaction_status . "\">" . stripslashes($ts->foxy_transaction_status_description) . "</a>
+								<a href=\"" . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management&action=edit&status=" . $ts->foxy_transaction_status . "\">" . stripslashes($ts->foxy_transaction_status_description) . "</a>
 							</td>
 							<td>" . ($ts->foxy_transaction_status_email_flag == "1" ? "Y" : "N") . "</td>
 							<td>" . ($ts->foxy_transaction_status_email_tracking == "1" ? "Y" : "N") . "</td>
 							<td> " .
 								(( $ts->foxy_transaction_status != "1" ) ? 
-								"<a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management&action=delete&status=" . $ts->foxy_transaction_status . "\" onclick=\"return confirm('" . __('Are you sure you want to delete this status? Any transaction tied to this status will be set back to Uncategorized.', 'foxypress') . "')\">" . __('Delete', 'foxypress') . "</a>"
+								"<a href=\"" . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=status-management&action=delete&status=" . $ts->foxy_transaction_status . "\" onclick=\"return confirm('" . __('Are you sure you want to delete this status? Any transaction tied to this status will be set back to Uncategorized.', 'foxypress') . "')\">" . __('Delete', 'foxypress') . "</a>"
 								: "") . 
 						"   </td>
 						</tr>";

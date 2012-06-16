@@ -233,7 +233,7 @@ function import_export_postback()
 					} //end if Product_Data_Set
 				}
 				fclose($file);
-				$error = "Successfully Uploaded. <a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "\">View Inventory</a>";
+				$error = "Successfully Uploaded. <a href=\"" . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "\">View Inventory</a>";
 			}//end if uploaded
 			else 
 			{

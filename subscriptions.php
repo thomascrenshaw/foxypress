@@ -38,7 +38,7 @@ function foxypress_subscriptions_postback()
 			$foxyData["is_active"] = $is_active;
 			$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
 			$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);		
-			header("location: " . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=subscriptions&sub_token=" . $sub_token);
+			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=subscriptions&sub_token=" . $sub_token);
 		}
 	}
 }
@@ -351,7 +351,7 @@ function foxypress_subscriptions_list()
 						 "	<td>" . foxypress_FormatCurrency($subscription->past_due_amount) . "</td>" .
 						 "	<td>" . $subscription->frequency . "</td>" . 
 						 "	<td>" . $product_price . "</td>" .						 
-						 "	<td><a href=\"" . foxypress_GetCurrentPageURL(false) . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=subscriptions&sub_token=" . $sub_token . $blogqs . "\">" . __('Edit', 'foxypress') . "</a></td>" . 
+						 "	<td><a href=\"" . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=subscriptions&sub_token=" . $sub_token . $blogqs . "\">" . __('Edit', 'foxypress') . "</a></td>" . 
 						 "</tr>";
 		}
 		$output .= "</tbody>
@@ -362,7 +362,7 @@ function foxypress_subscriptions_list()
 		$Pagination_End = (int)$foxyXMLResponse->statistics->pagination_end;		
 		if($Total_Transactions > $Pagination_End) //foxy only lets us grab 300 at a time, if we have more, recurse.
 		{
-			$targetpage = foxypress_GetCurrentPageURL();
+			$targetpage = get_admin_url() . "edit.php?post_type=foxypress_product&page=subscriptions";
 			$targetpage = foxypress_RemoveQSValue($targetpage, "fp_pn");
 			$pos = strrpos($targetpage, "?");
 			if ($pos === false) {
