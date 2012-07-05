@@ -43,6 +43,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.4 =
+* Bugfix: Localization method had an error in one file causing a warning.
+
 = 0.4.2.3 =
 * Feature: Product Options now support images - we recommend reading release notes
 * Feature: Support for Beta users of FoxyCart 1.0
