@@ -33,6 +33,7 @@ function foxypress_settings_postback()
         update_option("foxypress_user_portal", foxypress_FixPostVar('foxypress_user_portal'));
 		update_option("foxycart_hmac", foxypress_FixPostVar('foxycart_hmac'));
 		update_option("foxycart_enable_multiship", foxypress_FixPostVar('foxycart_enable_multiship'));
+		update_option("foxycart_enable_sso", foxypress_FixPostVar('foxycart_enable_sso'));
 		update_option("foxycart_show_dashboard_widget", foxypress_FixPostVar('foxycart_show_dashboard_widget'));
 		update_option("foxypress_max_downloads", foxypress_FixPostVar('foxypress_max_downloads'));
 		update_option("foxypress_qty_alert", foxypress_FixPostVar('foxypress_qty_alert'));
@@ -70,19 +71,6 @@ function foxypress_settings_postback()
 					}
 					switch_to_blog($OriginalBlog);
 				}
-			}
-			$enable_sso = foxypress_FixPostVar('foxycart_enable_sso');
-			if($enable_sso != foxypress_FixPostVar("foxycart_enable_sso_previous"))
-			{
-				//this needs to be updated in all the db's
-				update_option("foxycart_enable_sso", $enable_sso);
-				$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs WHERE blog_id != '" . $wpdb->blogid . "'"));
-				foreach ($blogids as $blog_id)
-				{
-					switch_to_blog($blog_id);
-					update_option("foxycart_enable_sso", $enable_sso);
-				}
-				switch_to_blog($OriginalBlog);
 			}
 		}
 
@@ -197,14 +185,14 @@ function foxypress_settings_page_load()
                 <tr valign="top">
                     <td align="right" valign="top" nowrap  class="title"><?php _e('Include jQuery', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxycart_include_jquery" value="1" <?php echo(((get_option('foxycart_include_jquery') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxycart_include_jquery" value="1" <?php echo(((get_option('foxycart_include_jquery') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*We will automatically include a reference to jQuery', 'foxypress'); ?>
                     </td>
                 </tr>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap  class="title"><?php _e('Include Default Style Sheet', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxypress_include_default_stylesheet" value="1" <?php echo(((get_option('foxypress_include_default_stylesheet') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxypress_include_default_stylesheet" value="1" <?php echo(((get_option('foxypress_include_default_stylesheet') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*We will automatically include a reference to the default FoxyPress stylesheet', 'foxypress'); ?>
                     </td>
                 </tr>
@@ -240,7 +228,7 @@ function foxypress_settings_page_load()
                 <tr valign="top">
                     <td align="right" valign="top" nowrap><?php _e('Keep Products On Uninstall', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxypress_uninstall_keep_products" value="1" <?php echo(((get_option('foxypress_uninstall_keep_products') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxypress_uninstall_keep_products" value="1" <?php echo(((get_option('foxypress_uninstall_keep_products') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*We will not delete your products on deletion of FoxyPress if this is checked.', 'foxypress'); ?>
                     </td>
                 </tr>
@@ -257,7 +245,7 @@ function foxypress_settings_page_load()
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title"><?php _e('Enable Third Party Products', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxypress_third_party_products" value="1" <?php echo(((get_option('foxypress_third_party_products') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxypress_third_party_products" value="1" <?php echo(((get_option('foxypress_third_party_products') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*Allow third party products.', 'foxypress'); ?> <br />
                         <p><?php _e('Select to suppress error messages when not using FoxyPress products.', 'foxypress'); ?></p>
                     </td>
@@ -265,7 +253,7 @@ function foxypress_settings_page_load()
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title"><?php _e('Enable User Status', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxypress_user_portal" value="1" <?php echo(((get_option('foxypress_user_portal') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxypress_user_portal" value="1" <?php echo(((get_option('foxypress_user_portal') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*Allows user portal page to be activated', 'foxypress'); ?>. <br />
                         <?php esc_html('<p>Default usage allows for the portal to live at /user but may be changed in wp-config.php. See the <a href="http://www.foxy-press.com/getting-started/helper-functions-api/" target="_blank">API</a> and <a href="http://www.foxy-press.com/getting-started/wp-config-options/" target="_blank">CONFIG</a> documentation for this functionality.</p>', 'foxypress'); ?>
                     </td>
@@ -273,14 +261,14 @@ function foxypress_settings_page_load()
             	<tr valign="top">
                     <td align="right" valign="top" nowrap class="title"><?php _e('Enable Cart Validation', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxycart_hmac" value="1" <?php echo(((get_option('foxycart_hmac') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxycart_hmac" value="1" <?php echo(((get_option('foxycart_hmac') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*If you want to take advantage of cart validation, you must enable the cart validation feature in the FoxyCart admin panel under Store->Advanced.', 'foxypress'); ?>
                     </td>
                 </tr>
                 <tr valign="top">
                     <td align="right" valign="top" nowrap class="title"><?php _e('Enable Multi-Ship', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxycart_enable_multiship" value="1" <?php echo(((get_option('foxycart_enable_multiship') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxycart_enable_multiship" value="1" <?php echo(((get_option('foxycart_enable_multiship') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*Allows customers to ship to multiple addresses', 'foxypress'); ?>
                     </td>
                 </tr>
@@ -288,7 +276,7 @@ function foxypress_settings_page_load()
                     <td align="right" valign="top" nowrap><?php _e('Enable SSO', 'foxypress'); ?></td>
                     <td align="left">
 	                    <input type="hidden" name="foxycart_enable_sso_previous" value="<?php echo(get_option('foxycart_enable_sso')); ?>" />
-	                    <input type="checkbox" name="foxycart_enable_sso" value="1" <?php echo(((get_option('foxycart_enable_sso') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+	                    <input type="checkbox" name="foxycart_enable_sso" value="1" <?php echo(((get_option('foxycart_enable_sso') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*Enables Single Sign On. FoxyPress can automatically sync your WordPress and FoxyCart users.', 'foxypress'); ?> <br />
 	                    <?php _e('<p>If you want to take advantage of this feature, copy the SSO Endpoint URL below and enable the Single Sign On feature in the FoxyCart admin panel. Also, be sure to set the \'Customer Password Hash Type\' to phpass, portable mode and \'Customer Password Hash Config\' to 8 </p>', 'foxypress'); ?>
                     </td>
@@ -324,7 +312,7 @@ function foxypress_settings_page_load()
                 <tr valign="top">
                     <td align="right" valign="top" nowrap><?php _e('Show Dashboard Widget', 'foxypress'); ?></td>
                     <td align="left">
-                        <input type="checkbox" name="foxycart_show_dashboard_widget" value="1" <?php echo(((get_option('foxycart_show_dashboard_widget') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxycart_show_dashboard_widget" value="1" <?php echo(((get_option('foxycart_show_dashboard_widget') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*Shows/Hides the FoxyPress dashboard widget', 'foxypress'); ?>
                     </td>
                 </tr>
@@ -333,11 +321,11 @@ function foxypress_settings_page_load()
                     <td align="right" valign="top" nowrap><?php _e('Main Site', 'foxypress'); ?></td>
                     <td align="left">
                         <input type="hidden" name="foxypress_main_blog_previous" value="<?php echo(get_option('foxypress_main_blog')); ?>" />
-                        <input type="checkbox" name="foxypress_main_blog" value="1" <?php echo(((get_option('foxypress_main_blog') == "1") ? "checked=\"checked\"" : "")) ?> /> 
+                        <input type="checkbox" name="foxypress_main_blog" value="1" <?php echo(((get_option('foxypress_main_blog') == "1") ? "checked=\"checked\"" : "")) ?> />
 						<?php _e('*If you mark this as your main site, you will be able to see orders from all of your sub-sites', 'foxypress'); ?>.
                     </td>
                 </tr>
-                <? } ?>
+                <?php } ?>
             </table>
         </div>
     </div>
@@ -389,7 +377,7 @@ function foxypress_settings_page_load()
             </table>
         </div>
     </div>
-	
+
 	<div id="" class="settings_widefat">
         <div class="settings_head custom">
             <?php _e('Affiliate Management Email Settings', 'foxypress'); ?>
@@ -415,7 +403,7 @@ function foxypress_settings_page_load()
                     </td>
                 </tr>
             </table>
-			<table style="margin:10px 0; display:block;">	
+			<table style="margin:10px 0; display:block;">
 				<tr>
 					<td width="200"><strong>{{first_name}}</strong></td>
 					<td><?php _e('Affiliate First Name', 'foxypress'); ?></td>

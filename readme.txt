@@ -43,6 +43,12 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.5 =
+* Bugfix: FoxyCart 1.0 support includes were not including correctly. This has been resolved.
+* Bugfix: PHP short tags were still present in a few files. This has been resolved.
+* Bugfix: wp_enqueue_script() error has been resolved. WP 3.3 compatibiliy issue. This has been resolved.
+* Bugfix: FoxyPress settings page was not saving the single sign on option. This has been resolved.
+
 = 0.4.2.4 =
 * Bugfix: Localization method had an error in one file causing a warning.
 

@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.2.4
+Version: 0.4.2.5
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -126,8 +126,9 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.4");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.5");
 define('FOXYPRESS_PATH', dirname(__FILE__));
+define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
 
 	include_once('foxypress-helpers.php');
@@ -470,19 +471,21 @@ function foxypress_save_affiliate_profile_fields($user_id) {
 			}
 		}
 
-		$affiliate_avatar_name     		= $_POST['affiliate_avatar_name'];
-		$affiliate_avatar_ext      		= $_POST['affiliate_avatar_ext'];
-		$affiliate_facebook_page   		= $_POST['affiliate_facebook_page'];
-		$affiliate_age 			   		= $_POST['affiliate_age'];
-		$affiliate_gender 		   		= $_POST['affiliate_gender'];
-		$affiliate_payout_type 	   		= $_POST['affiliate_payout_type'];
-		$affiliate_payout 		   		= $_POST['affiliate_payout'];
-		$affiliate_referral 			= $_POST['affiliate_referral'];
-		$affiliate_referral_payout_type = $_POST['affiliate_referral_payout_type'];
-		$affiliate_referral_payout 		= $_POST['affiliate_referral_payout'];
-		$affiliate_discount        		= $_POST['affiliate_discount'];
-		$affiliate_discount_type   		= $_POST['affiliate_discount_type'];
-		$affiliate_discount_amount 		= $_POST['affiliate_discount_amount'];
+		if(isset($_POST['affiliate_avatar_name'])){$affiliate_avatar_name = $_POST['affiliate_avatar_name'];}else{$affiliate_avatar_name="";};
+		if(isset($_POST['affiliate_avatar_ext'])){$affiliate_avatar_ext = $_POST['affiliate_avatar_ext'];}else{$affiliate_avatar_ext="";};
+		if(isset($_POST['affiliate_facebook_page'])){$affiliate_facebook_page = $_POST['affiliate_facebook_page'];}else{$affiliate_facebook_page="";};
+		if(isset($_POST['affiliate_age'])){$affiliate_age = $_POST['affiliate_age'];}else{$affiliate_age="";};
+		if(isset($_POST['affiliate_gender'])){$affiliate_gender = $_POST['affiliate_gender'];}else{$affiliate_gender="";};
+		if(isset($_POST['affiliate_payout_type'])){$affiliate_payout_type = $_POST['affiliate_payout_type'];}else{$affiliate_payout_type="";};
+		if(isset($_POST['affiliate_payout'])){$affiliate_payout = $_POST['affiliate_payout'];}else{$affiliate_payout="";};
+		if(isset($_POST['affiliate_referral'])){$affiliate_referral = $_POST['affiliate_referral'];}else{$affiliate_referral="";};
+		if(isset($_POST['affiliate_referral_payout_type'])){$affiliate_referral_payout_type = $_POST['affiliate_referral_payout_type'];}else{$affiliate_referral_payout_type="";};
+		if(isset($_POST['affiliate_referral_payout'])){$affiliate_referral_payout = $_POST['affiliate_referral_payout'];}else{$affiliate_referral_payout="";};
+		if(isset($_POST['affiliate_referral_payout'])){$affiliate_referral_payout = $_POST['affiliate_referral_payout'];}else{$affiliate_referral_payout="";};
+		if(isset($_POST['affiliate_discount'])){$affiliate_discount = $_POST['affiliate_discount'];}else{$affiliate_discount="";};
+		if(isset($_POST['affiliate_discount_type'])){$affiliate_discount_type = $_POST['affiliate_discount_type'];}else{$affiliate_discount_type="";};
+		if(isset($_POST['affiliate_discount_amount'])){$affiliate_discount_amount = $_POST['affiliate_discount_amount'];}else{$affiliate_discount_amount="";};
+		if(isset($_POST['affiliate_discount_amount'])){$affiliate_discount_amount = $_POST['affiliate_discount_amount'];}else{$affiliate_discount_amount="";};
 
 		if ($affiliate_payout_type == 'percentage') {
 			$affiliate_payout_type = 1;
@@ -1181,7 +1184,8 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 							: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
 		}
 		$ImageOutput = "<div class=\"foxypress_item_image" . $CssSuffix . "\">" . $ImageOutput . $ItemThumbs . "</div>";
-
+		if(isset($_SESSION['affiliate_id'])){$affiliate_id=$_SESSION['affiliate_id'];}else{$affiliate_id="";}
+		$CssSuffix="";
 		//show item
 		$Output = "<div class=\"foxy_item_wrapper" . $CssSuffix . "\">
 				   		<div class=\"foxypress_item_content_wrapper" . $CssSuffix . "\">
@@ -1200,7 +1204,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 								<input type=\"hidden\" name=\"weight\" value=\"" . foxypress_GetActualWeight($_weight, $_weight2) . "\" />
 								<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
 								<input type=\"hidden\" name=\"h:blog_id\" value=\"" . $wpdb->blogid . "\" />
-								<input type=\"hidden\" name=\"h:affiliate_id\" value=\"" . $_SESSION['affiliate_id'] . "\" />"
+								<input type=\"hidden\" name=\"h:affiliate_id\" value=\"" . $affiliate_id . "\" />"
 								 .
 									( ($_item_deal_active == "1" && $_item_deal_code_type == "static")
 										? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . $_item_deal_static_code . "\" />"
@@ -1415,6 +1419,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	$ItemOptions = foxypress_BuildOptionList($item->ID, "foxypress_form", $_quantity_max);
 
 	$ItemImages = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
+	$ItemThumbs="";
 	if(!empty($ItemImages) && count($ItemImages) > 1)
 	{
 		$ItemThumbs = "<ul class=\"foxypress_item_image_thumbs_detail\">";
@@ -1481,13 +1486,15 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	}
 	$ImageOutput = "<div class=\"foxypress_item_image_detail\">" . $ImageOutput . $ItemThumbs . "</div>";
 	//show item
+	if(isset($_SESSION['affiliate_id'])){$affiliate_id=$_SESSION['affiliate_id'];}else{$affiliate_id="";}
+	$CssSuffix="";
 	$Output = "<div class=\"foxypress_detail\">
 				<div class=\"foxy_item_wrapper_detail\">
 					<form action=\"https://" . $foxypress_url . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\" id=\"foxypress_form\">"
 						.
 							( (!$showQuantityField)
 								? "<input type=\"hidden\" name=\"quantity\" value=\"1\" />"
-								: ""
+								: "" 
 							)
 						.
 						"<input type=\"hidden\" name=\"name\" value=\"" . stripslashes($item->post_title) . "\" />
@@ -1498,7 +1505,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 						<input type=\"hidden\" name=\"weight\" value=\"" . foxypress_GetActualWeight($_weight, $_weight2) . "\" />
 						<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
 						<input type=\"hidden\" name=\"h:blog_id\" value=\"" . $wpdb->blogid . "\" />
-						<input type=\"hidden\" name=\"h:affiliate_id\" value=\"" . $_SESSION['affiliate_id'] . "\" />"
+						<input type=\"hidden\" name=\"h:affiliate_id\" value=\"" . $affiliate_id . "\" />"
 						 .
 							( ($_item_deal_active == "1" && $_item_deal_code_type == "static")
 								? "<input type=\"hidden\" name=\"coupon_code\" value=\"" . $_item_deal_static_code . "\" />"
@@ -1612,8 +1619,18 @@ function foxypress_GetActualWeight($_weight1, $_weight2)
 
 function foxypress_GetActualPrice($price, $saleprice, $startdate, $enddate)
 {
-	$affiliate_discount_type = $_SESSION['affiliate_discount_type'];
-	$affiliate_discount_amount = $_SESSION['affiliate_discount_amount'];
+	if(isset($_SESSION['affiliate_discount_type']))
+	{
+		$affiliate_discount_type = $_SESSION['affiliate_discount_type'];
+	}else{
+		$affiliate_discount_type = "";
+	}
+	if(isset($_SESSION['affiliate_discount_amount']))
+	{
+		$affiliate_discount_amount = $_SESSION['affiliate_discount_amount'];
+	}else{
+		$affiliate_discount_amount = "";
+	}
 	$ActualPrice = $price;
 	if($saleprice != "" && $saleprice > 0)
 	{
@@ -1731,6 +1748,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 		foreach($optionGroups as $optionGroup)
 		{
 			//get options
+			$HashedName="";
 			$soldOutList = array();
 			$listItems = "";
 			$jsData = "";
@@ -2568,18 +2586,18 @@ function foxypress_GetFoxyPressIncludes()
 	$includejq = get_option('foxycart_include_jquery');
 	$enablemuliship = get_option('foxycart_enable_multiship');
 	$scripts = "";
-	if($version == "1.0.0")
+	if($version == "1.0")
 	{
 		$scripts = "<!-- BEGIN FOXYCART FILES -->"
-					.
-					(
-						($includejq)
-							? "<script type=\"text/javascript\" src=\"//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js\"></script>"
-							: ""
-					)
-					.
-					"<script src=\"//cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
-					<link rel=\"stylesheet\" href=\"//cdn.foxycart.com/static/scripts/colorbox/1.3.19/style1_fc/colorbox.css\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
+							.
+							(
+								($includejq)
+									? "<script type=\"text/javascript\" src=\"//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js\"></script>"
+									: ""
+							)
+							.
+							"<script src=\"//cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
+							<link rel=\"stylesheet\" href=\"//cdn.foxycart.com/static/scripts/colorbox/1.3.19/style1_fc/colorbox.css?ver=1\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
 					<!-- END FOXYCART FILES -->";
 	}
 	else if($version == "0.7.2")

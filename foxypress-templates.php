@@ -23,7 +23,7 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 		<div class="error" id="message">
         	<p><strong><?php _e('You need to switch to the 0.7.2 version of FoxyCart to use this functionality.', 'foxypress'); ?></strong></p>
         </div>
-	<?
+	<?php
 		}
 	?>
 		<div class="wrap">
@@ -31,22 +31,22 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 			<p>
 				<?php _e('With FoxyCart\'s additional API methods in 0.7.2 and above, you are now able to control your templates from within FoxyPress!', 'foxypress'); ?>
 			</p>	
-			<?
+			<?php
 				if($isSupported){
 			?>
 				<div>
-					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=cart" class="template_selection <? if($PageAction=="cart"){echo"selected";} ?>"><div class="template_contents"><?php _e("Cart<br /> Template", "foxypress"); ?></div></a>
-					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=checkout" class="template_selection <? if($PageAction=="checkout"){echo"selected";} ?>"><div class="template_contents"><?php _e('Checkout<br /> Template', 'foxypress'); ?></div></a>
-					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=receipt" class="template_selection <? if($PageAction=="receipt"){echo"selected";} ?>"><div class="template_contents"><?php _e('Receipt<br /> Template', 'foxypress'); ?></div></a>
-					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=email" class="template_selection <? if($PageAction=="email"){echo"selected";} ?>"><div class="template_contents"><?php _e('Email<br /> Template', 'foxypress'); ?></div></a>
-					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=htmlemail" class="template_selection <? if($PageAction=="htmlemail"){echo"selected";} ?>"><div class="template_contents"><?php _e('HTML Email<br /> Template', 'foxypress'); ?></div></a>
+					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=cart" class="template_selection <?php if($PageAction=="cart"){echo"selected";} ?>"><div class="template_contents"><?php _e("Cart<br /> Template", "foxypress"); ?></div></a>
+					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=checkout" class="template_selection <?php if($PageAction=="checkout"){echo"selected";} ?>"><div class="template_contents"><?php _e('Checkout<br /> Template', 'foxypress'); ?></div></a>
+					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=receipt" class="template_selection <?php if($PageAction=="receipt"){echo"selected";} ?>"><div class="template_contents"><?php _e('Receipt<br /> Template', 'foxypress'); ?></div></a>
+					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=email" class="template_selection <?php if($PageAction=="email"){echo"selected";} ?>"><div class="template_contents"><?php _e('Email<br /> Template', 'foxypress'); ?></div></a>
+					<a href="<?php echo($Page_URL); ?>?post_type=<?php echo(FOXYPRESS_CUSTOM_POST_TYPE) ?>&page=<?php echo($PageName); ?>&action=htmlemail" class="template_selection <?php if($PageAction=="htmlemail"){echo"selected";} ?>"><div class="template_contents"><?php _e('HTML Email<br /> Template', 'foxypress'); ?></div></a>
 				</div>
-			<?
+			<?php
 				}
 			?>
 			<div class="clearall"></div>		
 		</div>
-	<?
+	<?php
 		template_postback();
 		_e("<br /><br /><i>Cart template caching is courtesy of FoxyCart and their API.</i>", "foxypress");
 	}
@@ -74,13 +74,13 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<div class="updated" id="message">
 	                    <p><strong><?php _e('Great job! You have successfully cached your cart template into FoxyCart!', 'foxypress'); ?></strong></p>
 	                </div>
-				<? }
+				<?php }
 			}else{
 				$message=$foxyXMLResponse->messages[0]->message; ?>
 				<div class="error" id="message">
                     <p><strong><?php echo($message);?></strong></p>
                 </div>
-			<?}
+			<?php }
 		}else if(isset($_POST['foxypress_btnTemplateSaveCheckout'])){			
 			//$is_active = foxypress_FixPostVar('foxypress_sub_active');
 			$templateType= "checkout";
@@ -102,13 +102,13 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<div class="updated" id="message">
 	                    <p><strong><?php _e('Great job! You have successfully cached your checkout template into FoxyCart!', 'foxypress'); ?></strong></p>
 	                </div>
-				<? }
+				<?php }
 			}else{
 				$message=$foxyXMLResponse->messages[0]->message; ?>
 				<div class="error" id="message">
                     <p><strong><?php echo($message); ?></strong></p>
                 </div>
-			<?}
+			<?php }
 		}else if(isset($_POST['foxypress_btnTemplateSaveReceipt'])){			
 			//$is_active = foxypress_FixPostVar('foxypress_sub_active');
 			$templateType= "receipt";
@@ -130,13 +130,13 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<div class="updated" id="message">
 	                    <p><strong><?php _e('Great job! You have successfully cached your checkout template into FoxyCart!', 'foxypress'); ?></strong></p>
 	                </div>
-				<? }
+				<?php }
 			}else{
 				$message=$foxyXMLResponse->messages[0]->message; ?>
 				<div class="error" id="message">
                     <p><strong><?php echo($message); ?></strong></p>
                 </div>
-			<?}
+			<?php }
 		}else if(isset($_POST['foxypress_btnTemplateSaveTextEmail'])){			
 			//$is_active = foxypress_FixPostVar('foxypress_sub_active');
 			$templateType= "email";
@@ -160,13 +160,13 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<div class="updated" id="message">
 	                    <p><strong><?php _e('Great job! You have successfully cached your checkout template into FoxyCart!', 'foxypress'); ?></strong></p>
 	                </div>
-				<? }
+				<?php }
 			}else{
 				$message=$foxyXMLResponse->messages[0]->message; ?>
 				<div class="error" id="message">
                     <p><strong><?php echo($message); ?></strong></p>
                 </div>
-			<?}
+			<?php }
 		}else if(isset($_POST['foxypress_btnTemplateSaveHTMLEmail'])){			
 			//$is_active = foxypress_FixPostVar('foxypress_sub_active');
 			$templateType= "html_email";
@@ -189,13 +189,13 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<div class="updated" id="message">
 	                    <p><strong><?php _e('Great job! You have successfully cached your checkout template into FoxyCart!', 'foxypress'); ?></strong></p>
 	                </div>
-				<? }
+				<?php }
 			}else{
 				$message=$foxyXMLResponse->messages[0]->message; ?>
 				<div class="error" id="message">
                     <p><strong><?php echo($message); ?></strong></p>
                 </div>
-			<?}
+			<?php }
 		}
 		$PageAction = foxypress_FixGetVar("action");
 		$isTwigSupported=true;
@@ -227,18 +227,18 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<br /><img class="template_separator" src="<?php echo(plugins_url())?>/foxypress/img/or.png" />
 					<p><?php _e('Use a Default template', 'foxypress'); ?>: <i>(<?php _e('this will use a file located on your server that contains the default FoxyCart template contents', 'foxypress'); ?>)</i></p>
 
-					<p><input type="radio" id="grpCartTemplate_Standard" name="grpCartTemplate" value="standard" <? if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Standard.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
-					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCartTemplate_Standard_Twig" name="grpCartTemplate" value="standard_twig" <? if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p><?php } ?>
+					<p><input type="radio" id="grpCartTemplate_Standard" name="grpCartTemplate" value="standard" <?php if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Standard.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
+					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCartTemplate_Standard_Twig" name="grpCartTemplate" value="standard_twig" <?php if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p><?php } ?>
 
-					<p><input type="radio" id="grpCartTemplate_Text" name="grpCartTemplate" value="text" <? if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Text.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Text"><?php _e('FoxyCart Text', 'foxypress'); ?></label></p>
-					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCartTemplate_Text_Twig" name="grpCartTemplate" value="text_twig" <? if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Text_Twig.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Text_Twig"><?php _e('FoxyCart Text with Twig', 'foxypress'); ?></label></p> <?php } ?>
+					<p><input type="radio" id="grpCartTemplate_Text" name="grpCartTemplate" value="text" <?php if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Text.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Text"><?php _e('FoxyCart Text', 'foxypress'); ?></label></p>
+					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCartTemplate_Text_Twig" name="grpCartTemplate" value="text_twig" <?php if(strpos(get_option("foxypress_cart_cached_template_url"),"foxy_Cart_Text_Twig.html")!==false){echo("checked");}?> /> <label for="grpCartTemplate_Text_Twig"><?php _e('FoxyCart Text with Twig', 'foxypress'); ?></label></p> <?php } ?>
 
 					<div class="clearall"></div>
 					<input type="submit" class="button bold" id="foxypress_btnTemplateSaveCart" name="foxypress_btnTemplateSaveCart" value="<?php _e('Cache Your Template', 'foxypress'); ?>" />
 				</div>
 			</form>
 			<div class="clearall"></div>
-		<?
+		<?php
 		}else if($PageAction == "checkout")
 		{
 		?>
@@ -266,18 +266,18 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<br /><img class="template_separator" src="<?php echo(plugins_url())?>/foxypress/img/or.png" />
 					<p><?php _e('Use a Default template', 'foxypress'); ?>: <i>(<?php _e('this will use a file located on your server that contains the default FoxyCart template contents', 'foxypress'); ?>)</i></p>
 					
-					<p><input type="radio" id="grpCheckoutTemplate_Standard" name="grpCheckoutTemplate" value="standard" <? if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Standard.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
-					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCheckoutTemplate_Standard_Twig" name="grpCheckoutTemplate" value="standard_twig" <? if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p><?php } ?>
+					<p><input type="radio" id="grpCheckoutTemplate_Standard" name="grpCheckoutTemplate" value="standard" <?php if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Standard.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
+					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCheckoutTemplate_Standard_Twig" name="grpCheckoutTemplate" value="standard_twig" <?php if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p><?php } ?>
 
-					<p><input type="radio" id="grpCheckoutTemplate_Text" name="grpCheckoutTemplate" value="text" <? if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Text.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Text"><?php _e('FoxyCart Text', 'foxypress'); ?></label></p>
-					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCheckoutTemplate_Text_Twig" name="grpCheckoutTemplate" value="text_twig" <? if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Text_Twig.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Text_Twig"><?php _e('FoxyCart Text with Twig', 'foxypress'); ?></label></p> <?php } ?>
+					<p><input type="radio" id="grpCheckoutTemplate_Text" name="grpCheckoutTemplate" value="text" <?php if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Text.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Text"><?php _e('FoxyCart Text', 'foxypress'); ?></label></p>
+					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpCheckoutTemplate_Text_Twig" name="grpCheckoutTemplate" value="text_twig" <?php if(strpos(get_option("foxypress_checkout_cached_template_url"),"foxy_Checkout_Text_Twig.html")!==false){echo("checked");}?> /> <label for="grpCheckoutTemplate_Text_Twig"><?php _e('FoxyCart Text with Twig', 'foxypress'); ?></label></p> <?php } ?>
 
 					<div class="clearall"></div>
 					<input type="submit" class="button bold" id="foxypress_btnTemplateSaveCheckout" name="foxypress_btnTemplateSaveCheckout" value="<?php _e('Cache Your Template', 'foxypress'); ?>" />
 				</div>
 			</form>
 			<div class="clearall"></div>
-		<?
+		<?php
 		}else if($PageAction == "receipt")
 		{
 		?>
@@ -305,18 +305,18 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<br /><img class="template_separator" src="<?php echo(plugins_url())?>/foxypress/img/or.png" />
 					<p><?php _e('Use a Default template', 'foxypress'); ?>: <i>(<?php _e('this will use a file located on your server that contains the default FoxyCart template contents', 'foxypress'); ?>)</i></p>
 					
-					<p><input type="radio" id="grpReceiptTemplate_Standard" name="grpReceiptTemplate" value="standard" <? if(strpos(get_option("foxypress_receipt_cached_template_url"),"foxy_Receipt_Standard.html")!==false){echo("checked");}?> /> <label for="grpReceiptTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
-					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpReceiptTemplate_Standard_Twig" name="grpReceiptTemplate" value="standard_twig" <? if(strpos(get_option("foxypress_receipt_cached_template_url"),"foxy_Receipt_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpReceiptTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p><?php } ?>
+					<p><input type="radio" id="grpReceiptTemplate_Standard" name="grpReceiptTemplate" value="standard" <?php if(strpos(get_option("foxypress_receipt_cached_template_url"),"foxy_Receipt_Standard.html")!==false){echo("checked");}?> /> <label for="grpReceiptTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
+					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpReceiptTemplate_Standard_Twig" name="grpReceiptTemplate" value="standard_twig" <?php if(strpos(get_option("foxypress_receipt_cached_template_url"),"foxy_Receipt_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpReceiptTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p><?php } ?>
 
 					<p><input type="radio" id="grpReceiptTemplate_Text" name="grpReceiptTemplate" value="text" <? if(strpos(get_option("foxypress_receipt_cached_template_url"),"foxy_Receipt_Text.html")!==false){echo("checked");}?> /> <label for="grpReceiptTemplate_Text"><?php _e('FoxyCart Text', 'foxypress'); ?></label></p>
-					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpReceiptTemplate_Text_Twig" name="grpReceiptTemplate" value="text_twig" <? if(strpos(get_option("foxypress_receipt_cached_template_url"),"foxy_Receipt_Text_Twig.html")!==false){echo("checked");}?> /> <label for="grpReceiptTemplate_Text_Twig"><?php _e('FoxyCart Text with Twig', 'foxypress'); ?></label></p> <?php } ?>
+					<?php if($isTwigSupported){ ?><p><input type="radio" id="grpReceiptTemplate_Text_Twig" name="grpReceiptTemplate" value="text_twig" <?php if(strpos(get_option("foxypress_receipt_cached_template_url"),"foxy_Receipt_Text_Twig.html")!==false){echo("checked");}?> /> <label for="grpReceiptTemplate_Text_Twig"><?php _e('FoxyCart Text with Twig', 'foxypress'); ?></label></p> <?php } ?>
 
 					<div class="clearall"></div>
 					<input type="submit" class="button bold" id="foxypress_btnTemplateSaveReceipt" name="foxypress_btnTemplateSaveReceipt" value="<?php _e('Cache Your Template', 'foxypress'); ?>" />
 				</div>
 			</form>
 			<div class="clearall"></div>
-		<?
+		<?php
 		}else if($PageAction == "email")
 		{
 		?>
@@ -343,10 +343,10 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<p><?php _e('Use a Default template', 'foxypress'); ?>: <i>(<?php _e('this will use a file located on your server that contains the default FoxyCart template contents', 'foxypress'); ?>)</i></p>
 					
 					<?php if($isTwigSupported){ ?>
-						<p><input type="radio" id="grpTextEmailTemplate_Standard" name="grpTextEmailTemplate" value="standard" <? if(strpos(get_option("foxypress_text_email_cached_template_url"),"foxy_Email_Text_Standard.html")!==false){echo("checked");}?> /> <label for="grpTextEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
+						<p><input type="radio" id="grpTextEmailTemplate_Standard" name="grpTextEmailTemplate" value="standard" <?php if(strpos(get_option("foxypress_text_email_cached_template_url"),"foxy_Email_Text_Standard.html")!==false){echo("checked");}?> /> <label for="grpTextEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
 						<p><input type="radio" id="grpTextEmailTemplate_Standard_Twig" name="grpTextEmailTemplate" value="standard_twig" <? if(strpos(get_option("foxypress_text_email_cached_template_url"),"foxy_Email_Text_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpTextEmailTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p>
 					<?php }else{ ?>
-						<p><input type="radio" id="grpTextEmailTemplate_Standard" name="grpTextEmailTemplate" value="standard" <? if(strpos(get_option("foxypress_text_email_cached_template_url"),"foxy_Email_Text_Standard.html")!==false){echo("checked");}?> /> <label for="grpTextEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label> </p>					
+						<p><input type="radio" id="grpTextEmailTemplate_Standard" name="grpTextEmailTemplate" value="standard" <?php if(strpos(get_option("foxypress_text_email_cached_template_url"),"foxy_Email_Text_Standard.html")!==false){echo("checked");}?> /> <label for="grpTextEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label> </p>					
 					<?php } ?>
 
 					<div class="clearall"></div>
@@ -354,7 +354,7 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 				</div>
 			</form>
 			<div class="clearall"></div>
-		<?
+		<?php
 		}else if($PageAction == "htmlemail")
 		{
 		?>
@@ -381,10 +381,10 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 					<p><?php _e('Use a Default template', 'foxypress'); ?>: <i>(<?php _e('this will use a file located on your server that contains the default FoxyCart template contents', 'foxypress'); ?>)</i></p>
 					
 					<?php if($isTwigSupported){ ?>
-						<p><input type="radio" id="grpHTMLEmailTemplate_Standard" name="grpHTMLEmailTemplate" value="standard" <? if(strpos(get_option("foxypress_html_email_cached_template_url"),"foxy_Email_HTML_Standard.html")!==false){echo("checked");}?> /> <label for="grpHTMLEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
-						<p><input type="radio" id="grpHTMLEmailTemplate_Standard_Twig" name="grpHTMLEmailTemplate" value="standard_twig" <? if(strpos(get_option("foxypress_html_email_cached_template_url"),"foxy_Email_HTML_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpHTMLEmailTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p>
+						<p><input type="radio" id="grpHTMLEmailTemplate_Standard" name="grpHTMLEmailTemplate" value="standard" <?php if(strpos(get_option("foxypress_html_email_cached_template_url"),"foxy_Email_HTML_Standard.html")!==false){echo("checked");}?> /> <label for="grpHTMLEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label></p>
+						<p><input type="radio" id="grpHTMLEmailTemplate_Standard_Twig" name="grpHTMLEmailTemplate" value="standard_twig" <?php if(strpos(get_option("foxypress_html_email_cached_template_url"),"foxy_Email_HTML_Standard_Twig.html")!==false){echo("checked");}?> /> <label for="grpHTMLEmailTemplate_Standard_Twig"><?php _e('FoxyCart Standard with Twig', 'foxypress'); ?></label></p>
 					<?php }else{ ?>
-						<p><input type="radio" id="grpHTMLEmailTemplate_Standard" name="grpHTMLEmailTemplate" value="standard" <? if(strpos(get_option("foxypress_html_email_cached_template_url"),"foxy_Email_HTML_Standard.html")!==false){echo("checked");}?> /> <label for="grpHTMLEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label> </p>					
+						<p><input type="radio" id="grpHTMLEmailTemplate_Standard" name="grpHTMLEmailTemplate" value="standard" <?php if(strpos(get_option("foxypress_html_email_cached_template_url"),"foxy_Email_HTML_Standard.html")!==false){echo("checked");}?> /> <label for="grpHTMLEmailTemplate_Standard"><?php _e('FoxyCart Standard', 'foxypress'); ?></label> </p>					
 					<?php } ?>
 
 					<div class="clearall"></div>
@@ -392,7 +392,7 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 				</div>
 			</form>
 			<div class="clearall"></div>
-		<?
+		<?php
 		}
 	}
 ?>

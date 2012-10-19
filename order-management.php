@@ -30,6 +30,7 @@ function order_management_postback()
 		//save note
 		if(isset($_POST['foxy_om_note_submit']))
 		{
+			$switched_blog = false;
 			if(foxypress_IsMultiSite() && foxypress_IsMainBlog())
 			{
 				if($wpdb->blogid != $BlogID)
@@ -48,6 +49,7 @@ function order_management_postback()
 		//delete note
 		else if($Page_Action == "deletenote" && foxypress_FixGetVar("note", "") != "")
 		{
+			$switched_blog = false;
 			if(foxypress_IsMultiSite() && foxypress_IsMainBlog())
 			{
 				if($wpdb->blogid != $BlogID)
@@ -290,6 +292,7 @@ function order_management_page_load()
 		}
 		else
 		{
+			$switched_blog = false;
 			if(foxypress_IsMultiSite() && foxypress_IsMainBlog())
 			{
 				if ( $BlogID != "0" && $BlogID != $wpdb->blogid )

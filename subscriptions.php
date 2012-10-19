@@ -169,6 +169,7 @@ function foxypress_subscriptions_list()
 	$output = "";
 	$FoxyCart_Version = get_option('foxycart_storeversion');
 	$PageStart = foxypress_FixGetVar("fp_pn");
+			
 	if($PageStart == "")
 	{
 		$PageStart = foxypress_GetPaginationStart();	
@@ -179,6 +180,26 @@ function foxypress_subscriptions_list()
 	$foxyData["api_action"] = "subscription_list";
 	$foxyData["pagination_start"] = $PageStart;
 	$foxyData["entries_per_page"] = "30";	
+	$foxyData["is_active_filter"] = "";
+	$foxyData["frequency_filter"] = "";
+	$foxyData["past_due_amount_filter"] = "";
+	$foxyData["start_date_filter_begin"] = "";
+	$foxyData["start_date_filter_end"] = "";
+	$foxyData["next_transaction_date_filter_begin"] = "";
+	$foxyData["next_transaction_date_filter_end"] = "";
+	$foxyData["end_date_filter_begin"] = "";
+	$foxyData["end_date_filter_end"] = "";
+	$foxyData["third_party_id_filter"] = "";	
+	$foxyData["last_transaction_id_filter"] = "";
+	$foxyData["customer_id_filter"] = "";
+	$foxyData["customer_email_filter"] = "";
+	$foxyData["customer_first_name_filter"] = "";
+	$foxyData["customer_last_name_filter"] = "";
+	$foxyData["product_code_filter"] = "";
+	$foxyData["product_name_filter"] = "";
+	$foxyData["product_option_name_filter"] = "";
+	$foxyData["product_option_value_filter"] = "";
+	
 	if(foxypress_IsMultiSite() && !foxypress_IsMainBlog())
 	{
 		$foxyData["custom_field_name_filter"] = "blog_id";		

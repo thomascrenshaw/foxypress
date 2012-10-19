@@ -15,7 +15,7 @@ function foxypress_manage_emails_page_load()
 {
 	global $wpdb;
 	
-	if($_GET['mode']=='edit')
+	if(isset($_GET['mode']) && $_GET['mode']=='edit')
 	{
 		if(isset($_POST['foxy_em_save']))
 		{
@@ -168,7 +168,7 @@ function foxypress_manage_emails_page_load()
 	            	</table>
 	        	</div>
 	        <?php
-		}else if($_GET['mode']=='new'){
+		}else if(isset($_GET['mode']) && $_GET['mode']=='new'){
 			if(isset($_POST['foxy_em_save'])){
 				$subject=$_POST['subject'];
 				$templatename = $_POST['templatename'];

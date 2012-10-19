@@ -345,7 +345,11 @@ class Foxypress_affiliate_management extends WP_List_Table
         if ($user_detail->$user_referral_payout_type == 1) {
             $referral_amount_due = $user_detail->$user_referral_payout / 100 * $order_detail[0]->total_unpaid_referral_amount;
         } else {
-            $referral_amount_due = $user_detail->$user_referral_payout * $order_detail[0]->num_unpaid_referral_orders;
+            if(isset($order_detail[0]->num_unpaid_referral_orders)){
+				$referral_amount_due = $user_detail->$user_referral_payout * $order_detail[0]->num_unpaid_referral_orders;
+			}else{
+				$referral_amount_due = $user_detail->$user_referral_payout * 0;
+			}			
         }
         $referral_amount_due = number_format($referral_amount_due, 2, '.', ',');
 
@@ -401,11 +405,15 @@ class Foxypress_affiliate_management extends WP_List_Table
             $unpaid_commission = $item->affiliate_payout * $item->num_unpaid_orders;
         }
         $total_commission  = $unpaid_commission + $item->total_commission;
-            
-                    
-        return sprintf('$%1$s',
-            /*$1%s*/ number_format($total_commission + $total_referral_commission, 2, '.', ',')
-        );
+		if(isset($total_referral_commission)){
+			return sprintf('$%1$s',
+				/*$1%s*/ number_format($total_commission + $total_referral_commission, 2, '.', ',')
+			);
+		}else{
+			return sprintf('$%1$s',
+				/*$1%s*/ number_format($total_commission, 2, '.', ',')
+			);
+		}        
     }
 
     function column_management_total_transactions($item)
@@ -804,7 +812,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             }
 
             $ids = implode(',', $ids);
-
+			if($ids==""){$ids="''";}
             $sql_data = "SELECT u.id, u.user_nicename,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'first_name' AND user_id = u.id) AS first_name,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'last_name' AND user_id = u.id) AS last_name,
@@ -834,7 +842,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             }
 
             $pending_ids = implode(',', $pending_ids);
-
+			if($pending_ids==""){$pending_ids="''";}
             $sql_data = "SELECT u.id, u.user_nicename,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'first_name' AND user_id = u.id) AS first_name,
                         (SELECT meta_value FROM " . $wpdb->base_prefix . "usermeta WHERE meta_key = 'last_name' AND user_id = u.id) AS last_name,
@@ -1086,21 +1094,21 @@ function foxypress_create_affiliate_table() {
 			<div class="error" id="message">
 				<p><strong><?php _e('Banner Deleted!', 'foxypress'); ?></strong></p>
 			</div>
-		<? }
+		<?php }
 
 		$banner_added = $fp_affiliate->foxypress_FixGetVar('banner_added');
 		if ($banner_added === 'true') { ?>
 			<div class="updated" id="message">
 				<p><strong><?php _e('Banner Added!', 'foxypress'); ?></strong></p>
 			</div>
-		<? }
+		<?php }
 
 		$banner_updated = $fp_affiliate->foxypress_FixGetVar('banner_updated');
 		if ($banner_updated === 'true') { ?>
 			<div class="updated" id="message">
 				<p><strong><?php _e('Banner Updated!', 'foxypress'); ?></strong></p>
 			</div>
-		<? } ?>
+		<?php } ?>
 
         <div class="wrap">
             
@@ -1166,10 +1174,17 @@ function foxypress_create_affiliate_table() {
             
             <?php $approve = $fp_affiliate->foxypress_FixGetVar('approve');
                 if ($approve === 'true') {
-                
+					$payout_type          = "";
+					$payout               = "";
+					$referral             = "";
+					$referral_payout_type = "";
+					$referral_payout      = "";
+					$discount             = "";
+					$discount_type        = "";
+					$discount_amount      = "";
                     $user_id = $fp_affiliate->foxypress_FixGetVar('affiliate_id');
                     if (isset($_POST['affiliate_approve_submit'])) {
-                        $payout_type          = $fp_affiliate->foxypress_FixPostVar('affiliate_payout_type');
+						$payout_type          = $fp_affiliate->foxypress_FixPostVar('affiliate_payout_type');
                         $payout               = $fp_affiliate->foxypress_FixPostVar('affiliate_payout');
                         $referral             = $fp_affiliate->foxypress_FixPostVar('affiliate_referral');
                         $referral_payout_type = $fp_affiliate->foxypress_FixPostVar('affiliate_referral_payout_type');
@@ -1663,6 +1678,5 @@ function foxypress_create_affiliate_table() {
             </div>
         <?php } ?>
         </div>
-    <?php }
-    
+    <?php }    
 }

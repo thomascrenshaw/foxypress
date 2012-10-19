@@ -163,6 +163,7 @@ function foxypress_inventory_category_sort()
 								</tr>
 							</thead>
 							<tbody>");
+					$current_item_order="";
 					foreach($items as $i)
 					{
 						$current_item_order .= ($current_item_order == "") ? $i->itc_id : "," . $i->itc_id;

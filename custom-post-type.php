@@ -15,8 +15,6 @@ add_filter( 'request', 'foxypress_product_sortable_columns_orderby' );
 add_filter('post_updated_messages', 'foxypress_updated_messages');
 add_action('admin_init', 'foxypress_product_meta_init');
 add_action('before_delete_post', 'foxypress_delete_product');
-wp_enqueue_script('jquery-ui-core');
-wp_enqueue_script('jquery-ui-sortable');
 add_action( 'admin_head', 'wpt_portfolio_icons' );
 
 function wpt_portfolio_icons() {
@@ -36,6 +34,8 @@ function wpt_portfolio_icons() {
 
 function foxypress_create_custom_post_type()
 {
+	wp_enqueue_script('jquery-ui-core');
+	wp_enqueue_script('jquery-ui-sortable');
 	$labels = array(
 		'name' => __('Products', 'foxypress'),
 		'singular_name' => __('Product', 'foxypress'),
@@ -537,8 +537,12 @@ function foxypress_extra_product_details_setup()
 	$_item_email_active = get_post_meta($post->ID, '_item_email_active', TRUE);
 	$_item_email_template = get_post_meta($post->ID, '_item_email_template', TRUE);
 ?>
-	<h4><?php _e('Current Time: ', 'foxypress');
-		echo date('m-d-y h:m:s', current_time('mysql')); ?></h4>
+	<h4>
+		<?php 
+			_e('Current Time: ', 'foxypress');
+			echo date('m-d-y h:m:s', current_time('mysql')); 
+		?>
+	</h4>
 	<h4><?php _e('Sale', 'foxypress'); ?></h4>
 	<div class="foxypress_field_control">
 		<label for="_saleprice"><?php _e('Sale Price', 'foxypress'); ?></label>
