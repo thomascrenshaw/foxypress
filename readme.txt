@@ -43,6 +43,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.6 =
+* Security Fix: Multiple Security fixes based on findings from Waraxe. Read full post here: http://www.foxy-press.com/blog/2012/10/31/foxypress-0-4-2-6/
+
 = 0.4.2.5 =
 * Bugfix: FoxyCart 1.0 support includes were not including correctly. This has been resolved.
 * Bugfix: PHP short tags were still present in a few files. This has been resolved.

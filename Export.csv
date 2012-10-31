@@ -1,8 +1,0 @@
-"Item Code","Item Name","Item Description","Item Category","Item Price","Item Sale Price","Item Sale Start Date","Item Sale End Date","Item Weight","Item Quantity","Item Quantity Min","Item Quantity Max","Item Options","Item Attributes","Item Discount Quantity Amount","Item Discount Quantity Percentage","Item Discount Price Amount","Item Discount Price Percentage","Subscription Frequency","Subscription Start Date","Subscription End Date","Item Start Date","Item End Date","Item Active","Item Images"
-Test1234,Test,"This is a test with the new lines
-
-Lets see if we get some
-
-Maybe this time
-
-Yep I dosdaf dfsdfasd fasdf asdf",Chairs,500.00,0.00,,,1,0,0,0,"Color|Option 1 Test|Option 1 Value|5.00|5.00|123abc|5|1|1~~Color|Option 2 Test|Option 2 Value|20.00|10.00|456xyz|7|1|2",att1|att1val~~att2|att2val,5,10,15,20,,,,"2012-05-01 00:00:00","2012-05-31 00:00:00",1,http://testforeric.com.php5-24.dfw1-2.websitetestlink.com/wp-content/uploads/2011/10/fp_7g7zk0l3rg_5.jpg|http://testforeric.com.php5-24.dfw1-2.websitetestlink.com/wp-content/uploads/2011/10/fp_h2dn689xq_5.png|http://testforeric.com.php5-24.dfw1-2.websitetestlink.com/wp-content/uploads/2011/10/fp_a8hefacod_5.jpg

@@ -333,7 +333,12 @@ function foxypress_product_digital_download_setup()
 				'queueSizeLimit': 1,
 				'fileTypeDesc': 'Downloadables',
 				'multi': false,
-				'postData' : { 'action' : 'foxypress_download', 'auth_cookie' : '<?php echo $_COOKIE[LOGGED_IN_COOKIE]; ?>', 'security' : '<?php echo($ajax_nonce); ?>', 'inventory_id' : '<?php echo($post->ID) ?>', 'prefix' : '<?php echo($wpdb->prefix . "foxypress_inventory_downloadables") ?>', 'downloadablename' :  jQuery('#inv_downloadable_name').val(), 'downloadablemaxdownloads' : jQuery('#inv_downloadable_max_downloads').val() },
+				'postData' : { 'action' : 'foxypress_download', 
+								'auth_cookie' : '<?php echo $_COOKIE[LOGGED_IN_COOKIE]; ?>', 
+								'security' : '<?php echo($ajax_nonce); ?>', 
+								'inventory_id' : '<?php echo($post->ID) ?>',  
+								'downloadablename' :  jQuery('#inv_downloadable_name').val(), 
+								'downloadablemaxdownloads' : jQuery('#inv_downloadable_max_downloads').val() },
 				'onDialogOpen' : function() {
 								jQuery('#inv_downloadable').uploadifySettings('postData', { 'action' : 'foxypress_download', 'auth_cookie' : '<?php echo $_COOKIE[LOGGED_IN_COOKIE]; ?>', 'security' : '<?php echo($ajax_nonce); ?>', 'inventory_id' : '<?php echo($post->ID) ?>', 'prefix' : '<?php echo($wpdb->prefix . "foxypress_inventory_downloadables") ?>', 'downloadablename' :  jQuery('#inv_downloadable_name').val(), 'downloadablemaxdownloads' : jQuery('#inv_downloadable_max_downloads').val() });
 							},

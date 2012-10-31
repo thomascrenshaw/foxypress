@@ -218,6 +218,9 @@ class Foxypress_affiliate_banners extends WP_List_Table
     {
         global $wpdb;
         $banner_id = $this->foxypress_FixGetVar('banner_id');
+        if(!is_numeric($banner_id)){
+	        $banner_id=0;
+        }
 
         $data = "SELECT *
                 FROM " . $wpdb->prefix . "foxypress_affiliate_assets
@@ -950,6 +953,12 @@ class Foxypress_affiliate_management extends WP_List_Table
 
             $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
 
+            if(!is_numeric($affiliate_id)){
+				$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&action=error',$_REQUEST['page'],'affiliate-management');
+				echo 'Invalid Affiliate ID...';
+				echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+			}	
+				
             $sql_data = "SELECT *
                         FROM " . $wpdb->prefix . "foxypress_affiliate_payments
                         WHERE foxy_affiliate_id = " . $affiliate_id . " 
@@ -1065,12 +1074,18 @@ function foxypress_create_affiliate_table() {
 	$fp_banner	  		 = new Foxypress_affiliate_banners();
     $banner_order_by     = $fp_banner->foxypress_FixGetVar('orderby');
     $banner_order        = $fp_banner->foxypress_FixGetVar('order');
+    if($banner_order != "ASC" || $banner_order != "DESC"){
+    	$banner_order = "ASC";
+    }  
 
     //Create an instance of our package class for affiliates...
     $fp_affiliate = new Foxypress_affiliate_management();
     $mode         = $fp_affiliate->foxypress_FixGetVar('mode');
     $order_by     = $fp_affiliate->foxypress_FixGetVar('orderby');
     $order        = $fp_affiliate->foxypress_FixGetVar('order');
+    if($order != "ASC" || $order != "DESC"){
+    	$order = "ASC";
+    }    
 
     //Get user data object
     $user_detail  = $fp_affiliate->get_affiliate_user_details();
@@ -1359,7 +1374,11 @@ function foxypress_create_affiliate_table() {
 	<?php } else if ($mode === 'add_banner' || $mode === 'view_banner') { 
 		global $wpdb;
 		$item = $fp_banner->get_affiliate_banner();
-
+		if(empty($item)){
+			$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&action=error',$_REQUEST['page'],'affiliate-management');
+			echo 'Invalid Affiliate Banner ID...';
+			echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+		}
 		if (isset($_POST['banner_creation_submit'])) { 
     	
 			$foxy_asset_id				= foxypress_FixPostVar('asset_id');

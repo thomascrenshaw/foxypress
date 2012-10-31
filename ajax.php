@@ -4,11 +4,15 @@
 	for use with FoxyCart's e-commerce solution.
 	Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 	**************************************************************************/
-	session_start();
+	
 	$root = dirname(dirname(dirname(dirname(__FILE__))));
 	require_once($root.'/wp-config.php');
 	require_once($root.'/wp-includes/wp-db.php');	
+	
 	global $wpdb;	
+	if ( ! defined( 'ABSPATH' ) ){
+		die( 'Direct access not permitted.' );
+	}
 	//global vars
 	$mode = foxypress_FixGetVar('m');	
 	header('Content-type: application/json'); 	

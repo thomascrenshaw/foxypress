@@ -29,7 +29,7 @@ function foxypress_inventory_category_postback()
 		{
 			$Category_Name = foxypress_FixPostVar('foxy_cat_name');
 			$Category_ID = foxypress_FixPostVar('foxy_cat_id');
-			$sql = "UPDATE " . $wpdb->prefix . "foxypress_inventory_categories SET category_name='" . $Category_Name . "' WHERE category_id=" . $Category_ID;
+			$sql = "UPDATE " . $wpdb->prefix . "foxypress_inventory_categories SET category_name='" . $Category_Name . "' WHERE category_id='" . $Category_ID . "'";
 			$wpdb->query($sql);
 			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
 		}
@@ -38,7 +38,7 @@ function foxypress_inventory_category_postback()
 			$category_id = foxypress_FixGetVar('category_id');
 			//before we delete, we need to default items to the general category unless they are already apart of that category
 			$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_inventory_to_category (inventory_id, category_id)
-					SELECT i.inventory_id, '1'
+					SELECT itc.inventory_id, '1'
 					FROM " . $wpdb->prefix . "posts as i
 					INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as itc on i.ID = itc.inventory_id
 							AND itc.category_id = '" . foxypress_FixGetVar('category_id') . "'
@@ -56,11 +56,11 @@ function foxypress_inventory_category_postback()
 			}
 
 			//delete from categories
-			$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_categories WHERE category_id=" . $category_id;
+			$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_categories WHERE category_id='" . $category_id . "'";
 			$wpdb->query($sql);
 
 			//delete  from inventory to categories
-			$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_to_category WHERE category_id=" . $category_id;
+			$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_to_category WHERE category_id='" . $category_id . "'";
 			$wpdb->query($sql);
 			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE. "&page=inventory-category");
 		}
