@@ -12,12 +12,12 @@ add_action('admin_init', 'order_management_postback');
 function order_management_postback()
 {
 	global $wpdb;
-	$PageName = foxypress_FixGetVar("page");
+	$PageName = filter(foxypress_FixGetVar("page"));
 	if($PageName == "order-management")
 	{
-		$TransactionID = foxypress_FixGetVar('transaction');
-		$Page_Action = foxypress_FixGetVar("action", "");
-		$BlogID = foxypress_FixGetVar("b", "");
+		$TransactionID = filter(foxypress_FixGetVar('transaction'));
+		$Page_Action = filter(foxypress_FixGetVar("action", ""));
+		$BlogID = filter(foxypress_FixGetVar("b", ""));
 		$switched_blog = false;
 		//security check
 		if(foxypress_IsMultiSite())
@@ -47,7 +47,7 @@ function order_management_postback()
 			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&transaction=" . $TransactionID. "&mode=detail&b=" .$BlogID);
 		}
 		//delete note
-		else if($Page_Action == "deletenote" && foxypress_FixGetVar("note", "") != "")
+		else if($Page_Action == "deletenote" && filter(foxypress_FixGetVar("note", "")) != "")
 		{
 			$switched_blog = false;
 			if(foxypress_IsMultiSite() && foxypress_IsMainBlog())
@@ -58,7 +58,7 @@ function order_management_postback()
 					switch_to_blog($BlogID);
 				}
 			}
-			$NoteID = foxypress_FixGetVar("note", "");
+			$NoteID = filter(foxypress_FixGetVar("note", ""));
 			$sql = "delete from  " . $wpdb->prefix . "foxypress_transaction_note WHERE foxy_transaction_id = '$TransactionID' and foxy_transaction_note_id='$NoteID'";
 			$wpdb->query($sql);
 			if($switched_blog) { restore_current_blog(); }
@@ -141,7 +141,7 @@ function order_management_postback()
 		else if(isset($_POST['foxy_om_email_template_submit']))
 		{
 			$templateChosen = foxypress_FixPostVar("foxy_om_ddl_email_template");
-			$TransactionID = foxypress_FixGetVar("transaction", "");
+			$TransactionID = filter(foxypress_FixGetVar("transaction", ""));
 			foxypress_SendEmailTemplate($templateChosen, $TransactionID);
 		}
 	}
@@ -152,10 +152,10 @@ function order_management_page_load()
 	//modes - list, detail, search
 	global $wpdb;
 	//check the post first, if we have nothing check the query string, if nothing is there just default to list view
-	$Page_Mode = (foxypress_FixPostVar("foxy_om_mode", "") != "") ? foxypress_FixPostVar("foxy_om_mode", "") : foxypress_FixGetVar("mode", "list");
-	$Page_Action = foxypress_FixGetVar("action", "");
+	$Page_Mode = (filter(foxypress_FixPostVar("foxy_om_mode", "")) != "") ? filter(foxypress_FixPostVar("foxy_om_mode", "")) : filter(foxypress_FixGetVar("mode", "list"));
+	$Page_Action = filter(foxypress_FixGetVar("action", ""));
 	$Page_URL = get_admin_url() . "edit.php";
-	$BlogID = foxypress_FixGetVar("b", "");
+	$BlogID = filter(foxypress_FixGetVar("b", ""));
 	$PageStart = foxypress_GetPaginationStart();
 	if($Page_Action == "sync")
 	{
@@ -170,7 +170,7 @@ function order_management_page_load()
 	Begin_Foxy_Order_Management();
 	if($Page_Mode == "list")
 	{
-		$List_Status = foxypress_FixGetVar("status", "");
+		$List_Status = filter(foxypress_FixGetVar("status", ""));
 		if($List_Status == "") //general view, list all of the statuses
 		{
 			$sql = "SELECT ts.foxy_transaction_status
@@ -220,7 +220,7 @@ function order_management_page_load()
 				if ($pos === false) {
 					$targetpage .= "?";
 				}
-				$pageNumber = foxypress_FixGetVar('fp_pn');
+				$pageNumber = filter(foxypress_FixGetVar('fp_pn'));
 				$start = ($pageNumber != "" && $pageNumber != "0") ? $start = ($pageNumber - 1) * $limit : 0;
 				//get blogs
 				$blogs = $wpdb->get_results($wpdb->prepare("SELECT * FROM $wpdb->blogs WHERE blog_id != '$MainBlogID' LIMIT $start, $limit"));
@@ -302,7 +302,7 @@ function order_management_page_load()
 				}
 			}
 
-			$Transaction_Type = foxypress_FixGetVar("transactiontype", "");
+			$Transaction_Type = filter(foxypress_FixGetVar("transactiontype", ""));
 			$basePage =  $Page_URL . "?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=order-management&status=" . $List_Status . "&mode=list";
 			$TransactionFilter = ($Transaction_Type == "1") ? " and foxy_transaction_is_test='1'" : (($Transaction_Type == "0") ? " and foxy_transaction_is_test='0'" : "");
 			$Status = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_transaction_status WHERE foxy_transaction_status = '$List_Status'");
@@ -324,7 +324,7 @@ function order_management_page_load()
 									 AND foxy_blog_id = " . ((foxypress_IsMultiSite()) ? "'" . $wpdb->blogid . "'" : "foxy_blog_id") . "
 									 $TransactionFilter");
 			$limit = 25;
-			$pageNumber = foxypress_FixGetVar('pagenum');
+			$pageNumber = filter(foxypress_FixGetVar('pagenum'));
 			$start = ($pageNumber != "" && $pageNumber != "0") ? $start = ($pageNumber - 1) * $limit : 0;
 			$Transactions = $wpdb->get_results("SELECT *
 												FROM " . $wpdb->prefix ."foxypress_transaction
@@ -381,7 +381,7 @@ function order_management_page_load()
 	}
 	else if($Page_Mode == "detail")
 	{
-		$TransactionID = foxypress_FixGetVar("transaction", "");
+		$TransactionID = filter(foxypress_FixGetVar("transaction", ""));
 		if($TransactionID == "")
 		{
 			echo("Invalid Transaction ID");
@@ -766,7 +766,7 @@ function order_management_page_load()
 	}
 	else if($Page_Mode == "createslip")
 	{
-		$TransactionID = foxypress_FixGetVar("transaction", "");
+		$TransactionID = filter(foxypress_FixGetVar("transaction", ""));
 		$foxyStoreURL = get_option('foxycart_storeurl');
 		$foxyAPIKey =  get_option('foxycart_apikey');
 		$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
@@ -987,10 +987,10 @@ function foxypress_SendEmailTemplate($templateID, $transactionID)
 function foxypress_PrintPackingSlip($partialSlip, $printPage)
 {
 	global $wpdb;
-	$TransactionID = foxypress_FixGetVar('transaction');
-	$Products = explode(",", foxypress_FixGetVar('products'));
+	$TransactionID = filter(foxypress_FixGetVar('transaction'));
+	$Products = explode(",", filter(foxypress_FixGetVar('products')));
 	if(foxypress_FixGetVar('message')!=""){
-		$CustomMessage = foxypress_FixGetVar('message');
+		$CustomMessage = filter(foxypress_FixGetVar('message'));
 	}else{
 		$CustomMessage = get_option('foxypress_packing_slip_footer_message');
 	}

@@ -11,13 +11,13 @@ add_action('admin_init', 'inventory_option_groups_postback');
 function inventory_option_groups_postback()
 {
 	global $wpdb;
-	$PageName = foxypress_FixGetVar("page");
-	$action = foxypress_FixGetVar("action");
+	$PageName = filter(foxypress_FixGetVar("page"));
+	$action = filter(foxypress_FixGetVar("action"));
 	if($PageName == "inventory-option-groups")
 	{
 		if(isset($_POST['option_group_save']))
 		{
-			$group_name = foxypress_FixPostVar('option_group_name');
+			$group_name = filter(foxypress_FixPostVar('option_group_name'));
 			if($group_name != "")
 			{
 				//insert new option group
@@ -38,7 +38,7 @@ function inventory_option_groups_postback()
 		}
 		else if($action == "deleteoptiongroup")
 		{
-			$option_group_id = foxypress_FixGetVar('optiongroupid', '');
+			$option_group_id = filter(foxypress_FixGetVar('optiongroupid', ''));
 			if($option_group_id != "")
 			{
 				//delete option group
@@ -95,7 +95,7 @@ function foxypress_inventory_option_groups_page_load() {
 					$targetpage .= "?";
 				}	
 				$drRows = $wpdb->get_row("select count(option_group_id) as RowCount from " . $wpdb->prefix . "foxypress_inventory_option_group");
-				$pageNumber = foxypress_FixGetVar('fp_pn');
+				$pageNumber = filter(foxypress_FixGetVar('fp_pn'));
 				$start = ($pageNumber != "" && $pageNumber != "0") ? $start = ($pageNumber - 1) * $limit : 0;	
 				
                 //get option groups

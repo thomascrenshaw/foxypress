@@ -58,17 +58,18 @@ function foxypress_view_reports_list()
 function foxyprses_view_ordersByCode_report()
 {
 	global $wpdb;
-	if(isset($_POST['ddlStartHour'])){$ddlStartHour = $_POST['ddlStartHour'];}else{$ddlStartHour = "";}
-	if(isset($_POST['ddlStartMinute'])){$ddlStartMinute = $_POST['ddlStartMinute'];}else{$ddlStartMinute = "";}
-	if(isset($_POST['ddlStartSuffix'])){$ddlStartSuffix = $_POST['ddlStartSuffix'];}else{$ddlStartSuffix = "";}
-	if(isset($_POST['ddlEndHour'])){$ddlEndHour = $_POST['ddlEndHour'];}else{$ddlEndHour = "";}
-	if(isset($_POST['ddlEndMinute'])){$ddlEndMinute = $_POST['ddlEndMinute'];}else{$ddlEndMinute = "";}
-	if(isset($_POST['ddlEndSuffix'])){$ddlEndSuffix = $_POST['ddlEndSuffix'];}else{$ddlEndSuffix = "";}
 	
-	if(isset($_POST['txtStartDate'])){$txtStartDate = $_POST['txtStartDate'];}else{$txtStartDate = "";}
-	if(isset($_POST['txtEndDate'])){$txtEndDate = $_POST['txtEndDate'];}else{$txtEndDate = "";}
+	if(isset($_POST['ddlStartHour'])){$ddlStartHour = filter($_POST['ddlStartHour']);}else{$ddlStartHour = "";}
+	if(isset($_POST['ddlStartMinute'])){$ddlStartMinute = filter($_POST['ddlStartMinute']);}else{$ddlStartMinute = "";}
+	if(isset($_POST['ddlStartSuffix'])){$ddlStartSuffix = filter($_POST['ddlStartSuffix']);}else{$ddlStartSuffix = "";}
+	if(isset($_POST['ddlEndHour'])){$ddlEndHour = filter($_POST['ddlEndHour']);}else{$ddlEndHour = "";}
+	if(isset($_POST['ddlEndMinute'])){$ddlEndMinute = filter($_POST['ddlEndMinute']);}else{$ddlEndMinute = "";}
+	if(isset($_POST['ddlEndSuffix'])){$ddlEndSuffix = filter($_POST['ddlEndSuffix']);}else{$ddlEndSuffix = "";}
 	
-	if(isset($_POST['txtProductCode'])){$txtProductCode = $_POST['txtProductCode'];}else{$txtProductCode = "";}
+	if(isset($_POST['txtStartDate'])){$txtStartDate = filter($_POST['txtStartDate']);}else{$txtStartDate = "";}
+	if(isset($_POST['txtEndDate'])){$txtEndDate = filter($_POST['txtEndDate']);}else{$txtEndDate = "";}
+	
+	if(isset($_POST['txtProductCode'])){$txtProductCode = filter($_POST['txtProductCode']);}else{$txtProductCode = "";}
 	?>
     <script> 
 		jQuery(function() {
@@ -258,17 +259,17 @@ function foxyprses_view_ordersByCode_report()
 function foxyprses_view_coupon_ordersByCode_report()
 {
 	global $wpdb;
-	if(isset($_POST['ddlStartHour'])){$ddlStartHour = $_POST['ddlStartHour'];}else{$ddlStartHour = "";}
-	if(isset($_POST['ddlStartMinute'])){$ddlStartMinute = $_POST['ddlStartMinute'];}else{$ddlStartMinute = "";}
-	if(isset($_POST['ddlStartSuffix'])){$ddlStartSuffix = $_POST['ddlStartSuffix'];}else{$ddlStartSuffix = "";}
-	if(isset($_POST['ddlEndHour'])){$ddlEndHour = $_POST['ddlEndHour'];}else{$ddlEndHour = "";}
-	if(isset($_POST['ddlEndMinute'])){$ddlEndMinute = $_POST['ddlEndMinute'];}else{$ddlEndMinute = "";}
-	if(isset($_POST['ddlEndSuffix'])){$ddlEndSuffix = $_POST['ddlEndSuffix'];}else{$ddlEndSuffix = "";}
+	if(isset($_POST['ddlStartHour'])){$ddlStartHour = filter($_POST['ddlStartHour']);}else{$ddlStartHour = "";}
+	if(isset($_POST['ddlStartMinute'])){$ddlStartMinute = filter($_POST['ddlStartMinute']);}else{$ddlStartMinute = "";}
+	if(isset($_POST['ddlStartSuffix'])){$ddlStartSuffix = filter($_POST['ddlStartSuffix']);}else{$ddlStartSuffix = "";}
+	if(isset($_POST['ddlEndHour'])){$ddlEndHour = filter($_POST['ddlEndHour']);}else{$ddlEndHour = "";}
+	if(isset($_POST['ddlEndMinute'])){$ddlEndMinute = filter($_POST['ddlEndMinute']);}else{$ddlEndMinute = "";}
+	if(isset($_POST['ddlEndSuffix'])){$ddlEndSuffix = filter($_POST['ddlEndSuffix']);}else{$ddlEndSuffix = "";}
 	
-	if(isset($_POST['txtStartDate'])){$txtStartDate = $_POST['txtStartDate'];}else{$txtStartDate = "";}
-	if(isset($_POST['txtEndDate'])){$txtEndDate = $_POST['txtEndDate'];}else{$txtEndDate = "";}
+	if(isset($_POST['txtStartDate'])){$txtStartDate = filter($_POST['txtStartDate']);}else{$txtStartDate = "";}
+	if(isset($_POST['txtEndDate'])){$txtEndDate = filter($_POST['txtEndDate']);}else{$txtEndDate = "";}
 	
-	if(isset($_POST['txtProductCode'])){$txtProductCode = $_POST['txtProductCode'];}else{$txtProductCode = "";}
+	if(isset($_POST['txtProductCode'])){$txtProductCode = filter($_POST['txtProductCode']);}else{$txtProductCode = "";}
 	?>
     <script> 
 		jQuery(function() {
@@ -631,18 +632,18 @@ function foxypress_filter_orders($StartDate, $EndDate, $ProductCode, $OrdersWith
 function foxypress_view_totals_report()
 {
 	global $wpdb;
-	if(isset($_POST['ddlStartHour'])){$ddlStartHour = $_POST['ddlStartHour'];}else{$ddlStartHour = "";}
-	if(isset($_POST['ddlStartMinute'])){$ddlStartMinute = $_POST['ddlStartMinute'];}else{$ddlStartMinute = "";}
-	if(isset($_POST['ddlStartSuffix'])){$ddlStartSuffix = $_POST['ddlStartSuffix'];}else{$ddlStartSuffix = "";}
-	if(isset($_POST['ddlEndHour'])){$ddlEndHour = $_POST['ddlEndHour'];}else{$ddlEndHour = "";}
-	if(isset($_POST['ddlEndMinute'])){$ddlEndMinute = $_POST['ddlEndMinute'];}else{$ddlEndMinute = "";}
-	if(isset($_POST['ddlEndSuffix'])){$ddlEndSuffix = $_POST['ddlEndSuffix'];}else{$ddlEndSuffix = "";}
+	if(isset($_POST['ddlStartHour'])){$ddlStartHour = filter($_POST['ddlStartHour']);}else{$ddlStartHour = "";}
+	if(isset($_POST['ddlStartMinute'])){$ddlStartMinute = filter($_POST['ddlStartMinute']);}else{$ddlStartMinute = "";}
+	if(isset($_POST['ddlStartSuffix'])){$ddlStartSuffix = filter($_POST['ddlStartSuffix']);}else{$ddlStartSuffix = "";}
+	if(isset($_POST['ddlEndHour'])){$ddlEndHour = filter($_POST['ddlEndHour']);}else{$ddlEndHour = "";}
+	if(isset($_POST['ddlEndMinute'])){$ddlEndMinute = filter($_POST['ddlEndMinute']);}else{$ddlEndMinute = "";}
+	if(isset($_POST['ddlEndSuffix'])){$ddlEndSuffix = filter($_POST['ddlEndSuffix']);}else{$ddlEndSuffix = "";}
 	
-	if(isset($_POST['txtStartDate'])){$txtStartDate = $_POST['txtStartDate'];}else{$txtStartDate = "";}
-	if(isset($_POST['txtEndDate'])){$txtEndDate = $_POST['txtEndDate'];}else{$txtEndDate = "";}
+	if(isset($_POST['txtStartDate'])){$txtStartDate = filter($_POST['txtStartDate']);}else{$txtStartDate = "";}
+	if(isset($_POST['txtEndDate'])){$txtEndDate = filter($_POST['txtEndDate']);}else{$txtEndDate = "";}
 	
-	if(isset($_POST['txtProductCode'])){$txtProductCode = $_POST['txtProductCode'];}else{$txtProductCode = "";}
-	if(isset($_POST['foxy_transaction_type'])){$foxy_transaction_type = $_POST['foxy_transaction_type'];}else{$foxy_transaction_type = "";}
+	if(isset($_POST['txtProductCode'])){$txtProductCode = filter($_POST['txtProductCode']);}else{$txtProductCode = "";}
+	if(isset($_POST['foxy_transaction_type'])){$foxy_transaction_type = filter($_POST['foxy_transaction_type']);}else{$foxy_transaction_type = "";}
 	
 	?>
     <script> 

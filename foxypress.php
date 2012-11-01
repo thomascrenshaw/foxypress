@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.2.5
+Version: 0.4.2.7
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -42,6 +42,9 @@ through the plugin website at any time.
 Thanks and enjoy this plugin!
 
 **************************************************************************/
+$root = dirname(dirname(dirname(dirname(__FILE__))));
+require_once($root.'/wp-config.php');
+require_once($root.'/wp-includes/wp-db.php');
 
 register_activation_hook( __FILE__ , 'foxypress_activate');
 register_uninstall_hook( __FILE__ , 'foxypress_deactivate');
@@ -126,7 +129,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.6");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.7");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -156,6 +159,17 @@ if ( !empty ( $foxypress_url ) ){
 if(get_option("foxycart_show_dashboard_widget") == "1")
 {
 	add_action('wp_dashboard_setup', 'foxypress_DashboardSetup');
+}
+
+function filter($data) {
+    $data = trim(htmlentities(strip_tags($data)));
+ 
+    if (get_magic_quotes_gpc())
+        $data = stripslashes($data);
+ 
+    $data = mysql_real_escape_string($data);
+ 
+    return $data;
 }
 
 function foxypress_ajax_upload() {

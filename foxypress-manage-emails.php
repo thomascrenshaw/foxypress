@@ -5,11 +5,16 @@ for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
+global $wpdb;
+
+$root = dirname(dirname(dirname(dirname(__FILE__))));
+require_once($root.'/wp-config.php');
+require_once($root.'/wp-includes/wp-db.php');
+
 $plugin_dir = basename(dirname(__FILE__));
 load_plugin_textdomain( 'foxypress','wp-content/plugins/'.$plugin_dir, $plugin_dir);
 //add_action('admin_init', 'manage_emails_postback');
 
-global $wpdb;
 //page load
 function foxypress_manage_emails_page_load() 
 {
@@ -19,21 +24,21 @@ function foxypress_manage_emails_page_load()
 	{
 		if(isset($_POST['foxy_em_save']))
 		{
-			$subject=$_POST['subject'];
-			$templatename = $_POST['templatename'];
-			$content=$_POST['content'];
-			$from=$_POST['from'];		
+			$subject= filter($_POST['subject']);
+			$templatename = filter($_POST['templatename']);
+			$content=filter($_POST['content']);
+			$from=filter($_POST['from']);		
 
 			if($templatename!=''&& $subject!=''){
-				if(!is_numeric($_GET[id])){
+				if(!is_numeric(filter($_GET['id']))){
 					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&&action=error',$_REQUEST['page'],'manage-emails');
 					echo 'Invalid Template ID...';
 					echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
 				}				
 	                
-	            $me = $wpdb->get_row("SELECT * from " . $wpdb->prefix ."foxypress_email_templates WHERE email_template_id='".$_GET[id]."'");
+	            $me = $wpdb->get_row("SELECT * from " . $wpdb->prefix ."foxypress_email_templates WHERE email_template_id='" . filter($_GET['id']) . "'");
 				if(!empty($me)){
-					$sql = "UPDATE  ". $wpdb->prefix . "foxypress_email_templates set foxy_email_template_name='".$templatename."', foxy_email_template_subject='".$subject."', foxy_email_template_email_body='".$content."', foxy_email_template_from='" . $from . "' WHERE email_template_id='".$_GET[id]."'";
+					$sql = "UPDATE  ". $wpdb->prefix . "foxypress_email_templates set foxy_email_template_name='".$templatename."', foxy_email_template_subject='".$subject."', foxy_email_template_email_body='".$content."', foxy_email_template_from='" . $from . "' WHERE email_template_id='" . filter($_GET['id']) . "'";
 					$wpdb->query($sql);
 					$sm_error = "<div class='updated' id='message'>" . __('Your email template has been successfully saved', 'foxypress') . "!</div>";
 				}else{
@@ -46,13 +51,18 @@ function foxypress_manage_emails_page_load()
 			}
 			echo $sm_error;
 		}
-		$me = $wpdb->get_row("SELECT * from " . $wpdb->prefix ."foxypress_email_templates WHERE email_template_id='".$_GET[id]."'");
+		$me = $wpdb->get_row("SELECT * from " . $wpdb->prefix ."foxypress_email_templates WHERE email_template_id='" . filter($_GET['id']) . "'");
+		if(!is_numeric(filter($_GET['id']))){
+			$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&&action=error',$_REQUEST['page'],'manage-emails');
+			echo 'Invalid Template ID...';
+			echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+		}	
 	?>
 	        <div class="wrap">
 	    		<h2><?php _e('Manage Emails', 'foxypress'); ?> <a href='<?php echo(admin_url()); ?>edit.php?post_type=foxypress_product&page=manage-emails&mode=new' class="add-new-h2"><?php _e('Add New', 'foxypress'); ?></a></h2>
 	        	<table cellpadding="10" style="float:left; width:650px">
 	        		<tr>
-	        			<td width="180"><?php _e('Template ID', 'foxypress'); ?></td><td><?php _e($_GET['id']); ?></td>
+	        			<td width="180"><?php _e('Template ID', 'foxypress'); ?></td><td><?php _e(filter($_GET['id'])); ?></td>
 	        		</tr>
                     <script type="text/javascript" src="<?php echo(plugins_url())?>/foxypress/js/ckeditor/ckeditor.js"></script>
 	        		<form method="POST" name="statusForm" id="statusForm"> 
@@ -183,10 +193,10 @@ function foxypress_manage_emails_page_load()
 	        <?php
 		}else if(isset($_GET['mode']) && $_GET['mode']=='new'){
 			if(isset($_POST['foxy_em_save'])){
-				$subject=$_POST['subject'];
-				$templatename = $_POST['templatename'];
-				$content=$_POST['content'];
-				$from=$_POST['from'];
+				$subject=filter($_POST['subject']);
+				$templatename = filter($_POST['templatename']);
+				$content=filter($_POST['content']);
+				$from=filter($_POST['from']);
 				if($templatename!='' && $subject!=''){
 					$sql = "INSERT INTO  ". $wpdb->prefix . "foxypress_email_templates VALUES(null,'$templatename','$subject','$content','$from')";
 					$wpdb->query($sql);
@@ -464,9 +474,20 @@ function foxypress_manage_emails_page_load()
 		if ($action === 'updated') { 
 			echo("<div class='updated' id='message'>" . __('Your email template has been successfully saved', 'foxypress') . "!</div>");
 		}else if ($action === 'delete') { 
-			$sql = "delete from  " . $wpdb->prefix . "foxypress_email_templates WHERE email_template_id = '".$_GET['id']."'";
-			$wpdb->query($sql);
-			echo("<div class='updated' id='message'>" . __('Your email template has been successfully deleted', 'foxypress') . "!</div>");
+			global $wpdb;
+	        $data = "SELECT *
+	                FROM " . $wpdb->prefix . "foxypress_email_templates
+	                WHERE email_template_id = " . filter($_GET['id']);
+	
+	        $item = $wpdb->get_results($data);
+	        
+			if(!empty($item)){
+				$sql = "delete from  " . $wpdb->prefix . "foxypress_email_templates WHERE email_template_id = '" . filter($_GET['id']) . "'";
+				$wpdb->query($sql);
+				echo("<div class='updated' id='message'>" . __('Your email template has been successfully deleted', 'foxypress') . "!</div>");
+			}else{
+				echo("<div class='updated' id='message'>" . __('Your email template ID is invalid. Please try again.', 'foxypress') . "!</div>");
+			}				
 		}else if ($action === 'error') { 
 			echo("<div class='updated' id='message'>" . __('Your email template ID is invalid. Please try again.', 'foxypress') . "!</div>");
 		}

@@ -12,11 +12,11 @@ add_action('admin_init', 'status_management_postback');
 function status_management_postback()
 {
 	global $wpdb;	
-	$PageName = foxypress_FixGetVar("page");
+	$PageName = filter(foxypress_FixGetVar("page"));
 	if($PageName == "status-management")
 	{
-		$StatusID = foxypress_FixGetVar("status", "");
-		$Action = foxypress_FixGetVar("action", "");		
+		$StatusID = filter(foxypress_FixGetVar("status", ""));
+		$Action = filter(foxypress_FixGetVar("action", ""));		
 		if(isset($_POST['foxy_sm_new_status_submit']))
 		{
 			$NewDescription = foxypress_FixPostVar("foxy_sm_new_status", "");	
@@ -44,8 +44,8 @@ function status_management_postback()
 function status_management_page_load()
 {
 	global $wpdb;	
-	$StatusID = foxypress_FixGetVar("status", "");
-	$Action = foxypress_FixGetVar("action", "");
+	$StatusID = filter(foxypress_FixGetVar("status", ""));
+	$Action = filter(foxypress_FixGetVar("action", ""));
 	$sm_error = "";
 	?>
     <div class="wrap">

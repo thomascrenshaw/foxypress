@@ -6,6 +6,10 @@ Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.
 **************************************************************************/
 
 session_start();
+$root = dirname(dirname(dirname(dirname(__FILE__))));
+require_once($root.'/wp-config.php');
+require_once($root.'/wp-includes/wp-db.php');
+
 add_action('init', 'foxypress_create_custom_post_type', 1);
 add_action('after_setup_theme','foxypress_setup_post_thumbnails', 999);
 add_action('manage_posts_custom_column', 'manage_custom_columns', 10, 2);

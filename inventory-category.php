@@ -15,10 +15,10 @@ function foxypress_inventory_category_postback()
 	wp_enqueue_script('jquery-ui-core');
 	wp_enqueue_script('jquery-ui-sortable');
 	
-	$PageName = foxypress_FixGetVar("page");
+	$PageName = filter(foxypress_FixGetVar("page"));
 	if($PageName == "inventory-category")
 	{
-		$mode = foxypress_FixGetVar('mode');
+		$mode = filter(foxypress_FixGetVar('mode'));
 		if(isset($_POST['foxypress_new_category_save']))
 		{
 			$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_inventory_categories SET category_name='" . foxypress_FixPostVar('foxypress_new_category') . "'";
@@ -33,15 +33,15 @@ function foxypress_inventory_category_postback()
 			$wpdb->query($sql);
 			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
 		}
-		else if($mode == "delete" &&  foxypress_FixGetVar('category_id') != "") //deleting
+		else if($mode == "delete" &&  filter(foxypress_FixGetVar('category_id')) != "") //deleting
 		{
-			$category_id = foxypress_FixGetVar('category_id');
+			$category_id = filter(foxypress_FixGetVar('category_id'));
 			//before we delete, we need to default items to the general category unless they are already apart of that category
 			$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_inventory_to_category (inventory_id, category_id)
 					SELECT itc.inventory_id, '1'
 					FROM " . $wpdb->prefix . "posts as i
 					INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as itc on i.ID = itc.inventory_id
-							AND itc.category_id = '" . foxypress_FixGetVar('category_id') . "'
+							AND itc.category_id = '" . filter(foxypress_FixGetVar('category_id')) . "'
 					LEFT JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ltc on i.ID = ltc.inventory_id and ltc.category_id = '1'
 					WHERE ltc.itc_id is null
 						AND i.post_type='" . FOXYPRESS_CUSTOM_POST_TYPE . "'";
@@ -66,7 +66,7 @@ function foxypress_inventory_category_postback()
 		}
 		else if(isset($_POST['foxy_order_items_save']))
 		{
-			$categoryID = foxypress_FixGetVar('categoryid');
+			$categoryID = filter(foxypress_FixGetVar('categoryid'));
 			$OrderArray = explode(",", foxypress_FixPostVar('hdn_foxy_items_order'));
 			$counter = 1;
 			foreach ($OrderArray as $itc_id)
@@ -96,9 +96,9 @@ function foxypress_inventory_category_postback()
 			}
 			header("location: " . get_admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=inventory-category");
 		}
-		else if($mode == "delete_image" && foxypress_FixGetVar('category_id') != "")
+		else if($mode == "delete_image" && filter(foxypress_FixGetVar('category_id')) != "")
 		{
-			$category_id = foxypress_FixGetVar('category_id');
+			$category_id = filter(foxypress_FixGetVar('category_id'));
 			$directory = ABSPATH . INVENTORY_IMAGE_LOCAL_DIR;
 			$data = $wpdb->get_row("select category_image from " . $wpdb->prefix . "foxypress_inventory_categories where category_id = '" . mysql_escape_string($category_id) . "'");
 			if (!empty($data))
@@ -114,7 +114,7 @@ function foxypress_inventory_category_postback()
 //page load
 function foxypress_inventory_category_page_load()
 {
-	$page_view = foxypress_FixGetVar('view');
+	$page_view = filter(foxypress_FixGetVar('view'));
 	if($page_view == "sort")
 	{
 		foxypress_inventory_category_sort();
@@ -129,7 +129,7 @@ function foxypress_inventory_category_page_load()
 function foxypress_inventory_category_sort()
 {
 	global $wpdb;
-	$category_id =  foxypress_FixGetVar('categoryid');
+	$category_id =  filter(foxypress_FixGetVar('categoryid'));
 ?>
 	 <script type="text/javascript">
 		jQuery(document).ready(function() {
@@ -239,7 +239,7 @@ function foxypress_inventory_category_view_categories()
 		$targetpage .= "?";
 	}
 	$drRows = $wpdb->get_row("select count(category_id) as RowCount from " . $wpdb->prefix . "foxypress_inventory_categories");
-	$pageNumber = foxypress_FixGetVar('fp_pn');
+	$pageNumber = filter(foxypress_FixGetVar('fp_pn'));
 	$start = ($pageNumber != "" && $pageNumber != "0") ? $start = ($pageNumber - 1) * $limit : 0;
 
     $categories = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories ORDER BY category_id ASC LIMIT $start, $limit");

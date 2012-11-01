@@ -5,6 +5,10 @@ for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
+$root = dirname(dirname(dirname(dirname(__FILE__))));
+require_once($root.'/wp-config.php');
+require_once($root.'/wp-includes/wp-db.php');
+
 add_action('admin_init', 'foxypress_settings_postback');
 
 function foxypress_settings_postback()

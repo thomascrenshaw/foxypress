@@ -83,7 +83,7 @@ class Foxypress_affiliate_banners extends WP_List_Table
         //Build row actions
         $actions = array(
             'view_banner' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&banner_id=%s">' . __('Edit Details', 'foxypress') . '</a>',
-				$_REQUEST['page'],'view_banner',$item->id)
+				filter($_REQUEST['page']),'view_banner',$item->id)
         );
         
         //Return the title contents
@@ -111,7 +111,7 @@ class Foxypress_affiliate_banners extends WP_List_Table
 	function column_management_asset_delete($item)
     {
         return sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&banner_id=%s" onclick="return confirm(\'' . __('Are you sure you want to delete this banner?','foxypress') . '\');">' . __('Delete', 'foxypress') . '</a>',
-			/*$1%s*/ $_REQUEST['page'],'delete_banner',$item->id
+			/*$1%s*/ filter($_REQUEST['page']),'delete_banner',$item->id
 		);
     }
 
@@ -292,7 +292,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
         //Build row actions
         $actions = array(
-            'view_details' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s">' . __('View Details', 'foxypress') . '</a>',$_REQUEST['page'],'view_details',$item->id)
+            'view_details' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s">' . __('View Details', 'foxypress') . '</a>',filter($_REQUEST['page']),'view_details',$item->id)
         );
         
         //Return the title contents
@@ -484,7 +484,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
     function column_pending_affiliates_approve($item)
     {
-        return sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&approve=%s&affiliate_id=%s">' . __('Approve', 'foxypress') . '</a>',$_REQUEST['page'],'pending_affiliates','true',$item->id);
+        return sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&approve=%s&affiliate_id=%s">' . __('Approve', 'foxypress') . '</a>',filter($_REQUEST['page']),'pending_affiliates','true',$item->id);
     }
     
     /** ************************************************************************
@@ -500,7 +500,7 @@ class Foxypress_affiliate_management extends WP_List_Table
 
         //Build row actions
         $actions = array(
-            'pay_affiliate' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&order_id=%s">' . __('Pay Affiliate', 'foxypress') . '</a>',$_REQUEST['page'],'pay_affiliate',$affiliate_id,$item->order_id),
+            'pay_affiliate' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&order_id=%s">' . __('Pay Affiliate', 'foxypress') . '</a>',filter($_REQUEST['page']),'pay_affiliate',$affiliate_id,$item->order_id),
             'view_order' => sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=order-management&transaction=%sb=0&mode=detail">' . __('View Order Detail', 'foxypress') . '</a>',$item->order_id)
         );
 
@@ -954,7 +954,7 @@ class Foxypress_affiliate_management extends WP_List_Table
             $affiliate_id = $this->foxypress_FixGetVar('affiliate_id');
 
             if(!is_numeric($affiliate_id)){
-				$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&action=error',$_REQUEST['page'],'affiliate-management');
+				$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&action=error',filter($_REQUEST['page']),'affiliate-management');
 				echo 'Invalid Affiliate ID...';
 				echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
 			}	
@@ -1137,9 +1137,9 @@ function foxypress_create_affiliate_table() {
 			<!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
             <form id="affiliate-filter" method="get" style="margin-top: -5px;position:relative;">
                 <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
+                <input type="hidden" name="page" value="<?php echo filter($_REQUEST['page']) ?>" />
                 <!-- Now we can render the completed list table -->
-                <?php echo(sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s" class="add-new-h2" style="position:absolute;left:0px;top:5px;">' . __('Add New Banner', 'foxypress') . '</a>',$_REQUEST['page'],'add_banner')); ?>
+                <?php echo(sprintf('<a href="?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s" class="add-new-h2" style="position:absolute;left:0px;top:5px;">' . __('Add New Banner', 'foxypress') . '</a>',filter($_REQUEST['page']),'add_banner')); ?>
 				<?php $fp_banner->display(); ?>
             </form>
 			
@@ -1251,7 +1251,7 @@ function foxypress_create_affiliate_table() {
                             $affiliate_url = plugins_url() . '/foxypress/foxypress-affiliate.php?aff_id=' . $user_id;
                             update_user_option($user_id, 'affiliate_url', $affiliate_url);                         
 
-                            $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&updated=%s&affiliate_id=%s',$_REQUEST['page'],'pending_affiliates','true',$user_id); ?>
+                            $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&updated=%s&affiliate_id=%s',filter($_REQUEST['page']),'pending_affiliates','true',$user_id); ?>
 
                             <div class="updated" id="message">
                                 <p><strong><?php _e('Approving Affiliate...', 'foxypress'); ?></strong></p>
@@ -1349,10 +1349,10 @@ function foxypress_create_affiliate_table() {
             <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
             <form id="affiliate-filter" method="get" style="position:relative;">
                 <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
+                <input type="hidden" name="page" value="<?php echo filter($_REQUEST['page']) ?>" />
                 <ul class="subsubsub">
                     <li class="all"><a class="<?php if ($mode === 'management') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s',$_REQUEST['page'],'management'); ?>"><?php _e('Approved Affiliates', 'foxypress'); ?> <span class="count">(<?php echo $affiliate_counts[0]->total_approved; ?>)</span></a> |</li>
-                    <li class="administrator"><a class="<?php if ($mode === 'pending_affiliates') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s',$_REQUEST['page'],'pending_affiliates'); ?>"><?php _e('Pending Affiliates', 'foxypress'); ?> <span class="count">(<?php echo $affiliate_counts[0]->total_pending; ?>)</span></a></li>
+                    <li class="administrator"><a class="<?php if ($mode === 'pending_affiliates') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s',filter($_REQUEST['page']),'pending_affiliates'); ?>"><?php _e('Pending Affiliates', 'foxypress'); ?> <span class="count">(<?php echo $affiliate_counts[0]->total_pending; ?>)</span></a></li>
                 </ul>
 				<a href="user-new.php" class="add-new-h2" style="position:absolute;left:0px;top:40px;">Add New Affiliate</a>
                 <!-- Now we can render the completed list table -->
@@ -1362,20 +1362,26 @@ function foxypress_create_affiliate_table() {
         </div>			
     <?php } else if ($mode === 'delete_banner') { 
 		global $wpdb;
-		$banner_id = $fp_banner->foxypress_FixGetVar('banner_id');
-		
-		$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_affiliate_assets WHERE ID = '" . $banner_id . "'";
-		$wpdb->query($sql);
-		
-		$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_deleted=%s',$_REQUEST['page'],'true');
-		_e('Deleting Banner...', 'foxypress');
-        echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+		$banner_id = filter($fp_banner->foxypress_FixGetVar('banner_id'));
+		$item = $fp_banner->get_affiliate_banner();
+		if(!empty($item)){
+			$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_affiliate_assets WHERE ID = '" . $banner_id . "'";
+			$wpdb->query($sql);
+			
+			$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_deleted=%s',filter($_REQUEST['page']),'true');
+			_e('Deleting Banner...', 'foxypress');
+	        echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+		}else{
+			$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_deleted=%s',filter($_REQUEST['page']),'false');
+			_e('Invalid Request...', 'foxypress');
+	        echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
+		}		
 	?>
 	<?php } else if ($mode === 'add_banner' || $mode === 'view_banner') { 
 		global $wpdb;
 		$item = $fp_banner->get_affiliate_banner();
-		if(empty($item)){
-			$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&action=error',$_REQUEST['page'],'affiliate-management');
+		if(empty($item) && $mode === 'view_banner'){
+			$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&action=error',filter($_REQUEST['page']),'affiliate-management');
 			echo 'Invalid Affiliate Banner ID...';
 			echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
 		}
@@ -1401,7 +1407,7 @@ function foxypress_create_affiliate_table() {
 		    		$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_assets (foxy_asset_type, foxy_asset_name, foxy_asset_file_name, foxy_asset_file_ext, foxy_asset_landing_url) values ('" . $foxy_asset_type . "', '" . $foxy_asset_name . "', '" . $foxy_asset_file_name . "', '" . $foxy_asset_file_ext . "', '" . $foxy_asset_landing_url . "')";
 					$wpdb->query($sql);	
 					
-					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_added=%s',$_REQUEST['page'],'true');
+					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_added=%s',filter($_REQUEST['page']),'true');
 					_e('Adding Banner...', 'foxypress');
 		            echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
 				}else{
@@ -1409,7 +1415,7 @@ function foxypress_create_affiliate_table() {
 					$sql = "UPDATE " . $wpdb->prefix . "foxypress_affiliate_assets SET foxy_asset_type='" . $foxy_asset_type . "', foxy_asset_name='" . $foxy_asset_name . "', foxy_asset_file_name='" . $foxy_asset_file_name . "', foxy_asset_file_ext='" . $foxy_asset_file_ext . "', foxy_asset_landing_url='" . $foxy_asset_landing_url . "' WHERE id= '" . $foxy_asset_id . "' ";
 					$wpdb->query($sql);
 
-					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_updated=%s',$_REQUEST['page'],'true');
+					$destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&banner_updated=%s',filter($_REQUEST['page']),'true');
 					_e('Updating Banner...', 'foxypress');
 		            echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>';
 				}
@@ -1564,10 +1570,10 @@ function foxypress_create_affiliate_table() {
             <!-- Forms are NOT created automatically, so you need to wrap the table in one to use features like bulk actions -->
             <form id="affiliate-filter" method="get">
                 <!-- For plugins, we also need to ensure that the form posts back to our current page -->
-                <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" />
+                <input type="hidden" name="page" value="<?php echo filter($_REQUEST['page']) ?>" />
                 <ul class="subsubsub">
-                    <li class="all"><a class="<?php if ($mode === 'view_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',$_REQUEST['page'],'view_details',$user_detail->ID); ?>"><?php _e('Open Orders', 'foxypress'); ?> <span class="count">(<?php echo $total_unpaid_orders; ?>)</span></a> |</li>
-                    <li class="administrator"><a class="<?php if ($mode === 'view_past_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',$_REQUEST['page'],'view_past_details',$user_detail->ID); ?>"><?php _e('Paid Orders', 'foxypress'); ?> <span class="count">(<?php echo $order_detail[0]->num_paid_orders; ?>)</span></a></li>
+                    <li class="all"><a class="<?php if ($mode === 'view_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',filter($_REQUEST['page']),'view_details',$user_detail->ID); ?>"><?php _e('Open Orders', 'foxypress'); ?> <span class="count">(<?php echo $total_unpaid_orders; ?>)</span></a> |</li>
+                    <li class="administrator"><a class="<?php if ($mode === 'view_past_details') { ?>current<?php } ?>" href="<?php echo sprintf('?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s',filter($_REQUEST['page']),'view_past_details',$user_detail->ID); ?>"><?php _e('Paid Orders', 'foxypress'); ?> <span class="count">(<?php echo $order_detail[0]->num_paid_orders; ?>)</span></a></li>
                 </ul>
                 <!-- Now we can render the completed list table -->
                 <?php $fp_affiliate->display() ?>
@@ -1636,7 +1642,7 @@ function foxypress_create_affiliate_table() {
                 $sql = "INSERT INTO " . $wpdb->prefix . "foxypress_affiliate_payments (foxy_affiliate_id, foxy_transaction_id, foxy_transaction_order_total, foxy_affiliate_payout, foxy_affiliate_payout_type, foxy_affiliate_commission, foxy_affiliate_commission_type, foxy_affiliate_payment_method, foxy_affiliate_payment_date) values ('$affiliate_id', '$order_id', '$order_total', '$affiliate_payout', '$affiliate_payout_type', '$affiliate_commission', '$affiliate_commission_type', '$payment_method', '$payment_date')";
                 $wpdb->query($sql);
                 
-                $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&updated=true',$_REQUEST['page'],'view_details',$affiliate_id);
+                $destination_url = get_admin_url() . sprintf('edit.php?post_type=' . FOXYPRESS_CUSTOM_POST_TYPE . '&page=%s&mode=%s&affiliate_id=%s&updated=true',filter($_REQUEST['page']),'view_details',$affiliate_id);
                 _e('Submitting Payment...', 'foxypress');
                 echo '<script type="text/javascript">window.location.href = \'' . $destination_url . '\'</script>'; ?>
             </div>

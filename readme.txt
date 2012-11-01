@@ -43,6 +43,31 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.7 =
+* Security Breach Listing: http://www.waraxe.us/advisory-95.html
+* Security Fix: 1 - Addressed file extension issue. Upload cannot occur unless it is a valid extention (.jpg,.jpeg,.gif,.png,.zip)
+* Security Fix: 2 - The table name is now a part of the documenthandler.php instead of being passed by POST variables
+* Security Fix: 3 - Row is queried before assigning variables to the page. ID is checked for numeric as well. User is redirected if invalid.
+* Security Fix: 4 - ID is checked for is_numeric before querying.
+* Security Fix: 5-1: checked for valid ORDER inputs.
+* Security Fix: 5-2: checked for valid banner ID, redirect with warning message if not found.
+* Security Fix: 5-3: checked for valid affiliate ID, redirect with warning message if not found.
+* Security Fix: 6 - Clean and filter all POST submitted data.
+* Security Fix: 7 - ID is checked for is_numeric before querying. GET data is cleaned and filtered.
+* Security Fix: 8 - Clean and filter all GET data.
+* Security Fix: 9 - Clean and filter all POST/GET data.
+* Security Fix: 10 - Clean and filter all POST/GET/REQUEST data.
+* Security Fix: 11 - This is not a problem. We intentionally allow users to redirect to any site they want so that the FoxyPress affiliate ID can be tracked.
+* Security Fix: 12 - Inventory.csv is now deleted after a successful import. 
+* Security Fix: 13 - Clean and filter all GET data. Check for valid banner in place. If banner is not found, delete is not performed and user is redirected.
+* Security Fix: 14 - Clean and filter all POST/GET/REQUEST data.
+* Security Fix: 15 - Clean and filter all POST/GET/REQUEST data.
+* Security Fix: 16 - Clean and filter all POST/GET/REQUEST data.
+* Security Fix: 17 - Clean and filter all POST/GET/REQUEST data.
+* Security Fix: 18 - Clean and filter all POST/GET/REQUEST data.
+* Security Fix: 19 - protected the ajax.php file with a check for if the ABSPATH is defined.
+* Security Fix: 20 - Cleaned up all errors
+
 = 0.4.2.6 =
 * Security Fix: Multiple Security fixes based on findings from Waraxe. Read full post here: http://www.foxy-press.com/blog/2012/10/31/foxypress-0-4-2-6/
 

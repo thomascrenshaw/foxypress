@@ -5,6 +5,10 @@ for use with FoxyCart's e-commerce solution.
 Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
+$root = dirname(dirname(dirname(dirname(__FILE__))));
+require_once($root.'/wp-config.php');
+require_once($root.'/wp-includes/wp-db.php');
+
 add_action('admin_init', 'import_export_postback');
 
 //global vars
@@ -182,8 +186,7 @@ function import_export_postback()
 									}
 								}
 							}	
-						}	
-							
+						}								
 						
 						//handle attributes
 						if(!empty($Product_Attributes))
@@ -234,6 +237,7 @@ function import_export_postback()
 				}
 				fclose($file);
 				$error = "Successfully Uploaded. <a href=\"" . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "\">View Inventory</a>";
+				unlink(WP_PLUGIN_DIR . '/foxypress/Inventory.csv');	
 			}//end if uploaded
 			else 
 			{

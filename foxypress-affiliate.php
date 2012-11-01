@@ -13,7 +13,7 @@ require_once($root.'/wp-includes/wp-db.php');
 $referer 	= $_SERVER['HTTP_REFERER'];
 $user_agent = $_SERVER['HTTP_USER_AGENT'];
 $user_ip	= $_SERVER['REMOTE_ADDR'];
-$affiliate_id = $_GET['aff_id'];
+$affiliate_id = filter($_GET['aff_id']);
 if (isset($_GET['url'])) {
 	$destination_url = $_GET['url'];
 } else {
