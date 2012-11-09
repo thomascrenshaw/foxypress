@@ -43,6 +43,11 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.2.8 =
+* Security Breach Listing: http://secunia.com/advisories/51109/
+* Security Fix: #4 - Addressed POST variables sanitization by calling filter() on all REQUEST/GET/POST data in affiliate-management.php.  
+* Security Fix: #5 - Addressed URL verification for redirect URL in the foxypress-affiliate.php file. The url is being checked with esc_url.
+
 = 0.4.2.7 =
 * Security Breach Listing: http://www.waraxe.us/advisory-95.html
 * Security Fix: 1 - Addressed file extension issue. Upload cannot occur unless it is a valid extention (.jpg,.jpeg,.gif,.png,.zip)
