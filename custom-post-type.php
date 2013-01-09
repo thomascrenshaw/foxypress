@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 session_start();
@@ -20,6 +20,8 @@ add_filter('post_updated_messages', 'foxypress_updated_messages');
 add_action('admin_init', 'foxypress_product_meta_init');
 add_action('before_delete_post', 'foxypress_delete_product');
 add_action( 'admin_head', 'wpt_portfolio_icons' );
+
+define('SCRIPT_DEBUG', true);
 
 function wpt_portfolio_icons() {
     ?>
@@ -40,6 +42,8 @@ function foxypress_create_custom_post_type()
 {
 	wp_enqueue_script('jquery-ui-core');
 	wp_enqueue_script('jquery-ui-sortable');
+	wp_enqueue_script('jquery-ui-datepicker');
+
 	$labels = array(
 		'name' => __('Products', 'foxypress'),
 		'singular_name' => __('Product', 'foxypress'),
@@ -438,7 +442,7 @@ function foxypress_product_images_setup()
 		}
 	}
 	?>
-    <p>Simply add new items through the <a title="Add an Image" class="thickbox" id="add_image" href="media-upload.php?post_id=<?php echo($post->ID); ?>&amp;type=image&amp;TB_iframe=1&amp;width=640&amp;height=536">media upload window</a>. Any images that are in the gallery will be attached to this product. <a href="post.php?post=<?php echo($post->ID);?>&action=edit">Refresh</a> or click update on the right if you aren't seeing the latest images uploaded.</p>
+    <p>Simply add new items through the <a href="#" class="insert-media add_media" data-editor="content" title="Add Media"><span class="wp-media-buttons-icon"></span> media upload window</a>. Any images that are in the gallery will be attached to this product. <a href="post.php?post=<?php echo($post->ID);?>&action=edit">Refresh</a> or click update on the right if you aren't seeing the latest images uploaded.</p>
 
     <?php
 	if($featuredImageSource != "")
@@ -665,10 +669,12 @@ function foxypress_extra_product_details_setup()
 	<div style="clear: both;"></div>
     <script type="text/javascript" langauge="javascript">
 		jQuery(document).ready(function() {
-		  	jQuery("#_salestartdate").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
-			jQuery("#_saleenddate").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
-			jQuery("#_item_start_date").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
-			jQuery("#_item_end_date").datetimepicker({ dateFormat: 'yy-mm-dd', timeFormat: 'hh:mm:ss' });
+		  	jQuery('#_salestartdate').datepicker({dateFormat : 'yy-mm-dd'});
+		  	jQuery('#_saleenddate').datepicker({dateFormat : 'yy-mm-dd'});		  	
+		  	jQuery('#_sub_startdate').datepicker({dateFormat : 'yy-mm-dd'});
+		  	jQuery('#_sub_enddate').datepicker({dateFormat : 'yy-mm-dd'});
+		  	jQuery('#_item_start_date').datepicker({dateFormat : 'yy-mm-dd'});
+		  	jQuery('#_item_end_date').datepicker({dateFormat : 'yy-mm-dd'});
 		});
 	</script>
 <?php
@@ -924,14 +930,60 @@ function foxypress_product_options_setup()
     			tb_show('', 'media-upload.php?type=image&amp;TB_iframe=1&amp;width=640&amp;height=536');
     			return false;
     		});
+    		
+    		wp.media.editor.send.attachment = function( a, b) {
+		       console.log(b); // b has all informations about the attachment
+		       // or whatever you want to do with the data at this point
+		       // original function makes an ajax call to retrieve the image html tag and does a little more
+		    };
+    		
+    		window.original_send_to_editor = window.send_to_editor;
 
     		window.send_to_editor = function(html) {
     			imgurl = jQuery('img',html).attr('src');
+    			console.log(imgurl);	
     			uploadID.val(imgurl); /*assign the value to the input*/
     			console.log('Editor: ' + parentID);
     			jQuery('#' + parentID + ' .option_image_preview').html('<img src="' + imgurl + '">');
     			tb_remove();
 			};
+			
+//			uploadID = jQuery('#foxy_option_image');
+//			parentID = jQuery(uploadID).closest('td').attr('id');
+//    		
+    		// backup of original send function
+//    		original_send = wp.media.editor.send.attachment;
+//    		
+    		// new send function
+//    		wp.media.editor.send.attachment = function( a, b) {
+//    		   console.log(b); // b has all informations about the attachment	
+//    		   imgurl = b.url;
+//    		   uploadID.val(imgurl);
+//    		   console.log(imgurl);
+//    		   console.log(parentID);
+//    		   console.log(uploadID);
+//    		   jQuery('#' + parentID + ' .option_image_preview').html('<img src="' + imgurl + '">');
+//    		   tb_remove();
+    		   // or whatever you want to do with the data at this point
+    		   // original function makes an ajax call to retrieve the image html tag and does a little more
+//    		};
+    		
+    		// wp.media.send.to.editor will automatically trigger window.send_to_editor for backwards compatibility
+    		
+			// backup original window.send_to_editor
+//			window.original_send_to_editor = window.send_to_editor; 
+//			
+			// override window.send_to_editor
+//			window.send_to_editor = function(html) {
+			   // html argument might not be useful in this case
+			   // use the data from var b (attachment) here to make your own ajax call or use data from b and send it back to your defined input fields etc.
+//			   imgurl = jQuery('img',html).attr('src');
+//			   uploadID.val(imgurl); /*assign the value to the input*/
+//			   console.log('Editor: ' + parentID);
+//			   console.log('imgurl: ' + imgurl);
+//			   jQuery('#' + parentID + ' .option_image_preview').html('<img src="' + imgurl + '">');
+//			   tb_remove();
+//			}
 
 			});
 

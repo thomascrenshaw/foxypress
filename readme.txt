@@ -3,7 +3,7 @@ Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/support/
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.0
-Tested up to: 3.4
+Tested up to: 3.5
 Stable tag: 3.0.1
 FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
@@ -42,6 +42,10 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 - MamaDoo Kids - Status Management enhancements
 
 == Changelog ==
+
+= 0.4.2.9 =
+* BugFix: #5 - Addressed URL verification for redirect URL in the foxypress-affiliate.php file. The url is being checked with esc_url.
+* Update: WordPress 3.5 Media Upload fix.
 
 = 0.4.2.8 =
 * Security Breach Listing: http://secunia.com/advisories/51109/

@@ -5,13 +5,13 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.2.8
+Version: 0.4.2.9
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
 
 FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2012 WebMovement, LLC
+Copyright (C) 2008-2013 WebMovement, LLC
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.8");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.9");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -602,8 +602,15 @@ function foxypress_admin_css()
 
 function foxypress_admin_js()
 {
-   echo("<script type=\"text/javascript\" src=\"" . plugins_url() . "/foxypress/js/jquery-ui-1.8.17.custom.min.js\"></script>");
-   echo("<script type=\"text/javascript\" src=\"" . plugins_url() . "/foxypress/js/jquery-ui-timepicker-addon.js\"></script>");
+	$pluginfolder = get_bloginfo('url') . '/' . PLUGINDIR . '/' . dirname(plugin_basename(__FILE__));    
+//	wp_enqueue_script('jquery-ui-core');
+	//wp_enqueue_script('jquery-ui-datepicker');
+	wp_enqueue_script('jquery-ui-datepicker', $pluginfolder . '/jquery.ui.datepicker.min.js', array('jquery', 'jquery-ui-core') );
+	if (jQuery.ui) {
+//		alert("got it");
+	}
+	//echo("<script type=\"text/javascript\" src=\"" . plugins_url() . "/foxypress/js/jquery-ui-1.8.17.custom.min.js\"></script>");
+	//echo("<script type=\"text/javascript\" src=\"" . plugins_url() . "/foxypress/js/jquery-ui-timepicker-addon.js\"></script>");
 }
 
 function foxypress_load_minicart()

@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool 
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 	$root = dirname(dirname(dirname(dirname(__FILE__))));
 	require_once($root.'/wp-config.php');
@@ -224,7 +224,7 @@ function ShowCategoryListing()
             	<td>
                 	<select id="foxy_show_moredetail" name="foxy_show_moredetail">
                     	<option value="0"><?php _e('No', 'foxypress'); ?></option>
-                        <option value="1" selected="selected"><?php _e('Yes', 'foxypress'); ?>Yes</option>
+                        <option value="1" selected="selected"><?php _e('Yes', 'foxypress'); ?></option>
                     </select>
                 </td>
             <tr>
@@ -290,7 +290,7 @@ function SearchResults($searchitems)
 		?>
 		<div class="centertext"><?php _e("There are no items matching your search",'foxypress')  ?></div>
         <div class="centertext"><a href="<?php echo(foxypress_GetCurrentPageURL()); ?>"><?php _e('Full Inventory List', 'foxypress'); ?></a></div>
-    <?
+    <?php
   }
 }
 
@@ -304,7 +304,7 @@ function ShowSearch()
         </form>
     </div><Br>
     <hr /><br />
-    <?
+    <?php
 }
 
 function ShowInventory()
@@ -390,7 +390,7 @@ function ShowInventory()
   	{
 		?>
 		<div class="centertext"><?php _e("There are no inventory items in the database!",'foxypress')  ?></div>
-    <?
+    <?php
   }
 }
 

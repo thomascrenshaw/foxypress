@@ -2,7 +2,7 @@
 /**************************************************************************
 FoxyPress provides a complete shopping cart and inventory management tool
 for use with FoxyCart's e-commerce solution.
-Copyright (C) 2008-2012 WebMovement, LLC - View License Information - FoxyPress.php
+Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.php
 **************************************************************************/
 
 /***************************************************************************************************/
