@@ -141,9 +141,16 @@ function foxypress_GetProductQuantitySold($inventory_id)
 	global $wpdb, $post;
 	$code = get_post_meta($inventory_id,'_code',TRUE);
 	$quantitySold = 0;
-	$foxyStoreURL = get_option('foxycart_storeurl');
+	
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	
 	$foxyAPIKey =  get_option('foxycart_apikey');
-	$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  $foxyAPIKey;
 	$foxyData["api_action"] = "transaction_list";
@@ -446,8 +453,31 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 	$ActualPrice = foxypress_GetActualPrice($_price, $_sale_price, $_sale_start, $_sale_end);
 	$main_inventory_image = foxypress_GetMainInventoryImage($item->ID);
 
-
-	$form  = "<form action=\"https://" . get_option('foxycart_storeurl') . ".foxycart.com/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\" id=\"" . $form_id . "\">"
+	$primaryCategories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id, itc.category_primary
+												FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " as itc inner join " .
+												$wpdb->prefix . "foxypress_inventory_categories" . " as c on itc.category_id = c.category_id
+												WHERE inventory_id='" . $inventory_id . "'");
+	$primary_category = "";
+	foreach($primaryCategories as $pc)
+	{
+		if($pc->category_primary == 1) {
+			$primary_category = $pc->category_name;
+		} 
+	}
+	
+	//use previous category name if a new primary one hasn't been selected yet
+	if($primary_category == "") {
+		$primary_category = stripslashes($item->category_name);
+	}
+	
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$storeURL = get_option('foxycart_storeurl');
+	}else{
+		$storeURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	
+	$form  = "<form action=\"https://" . $storeURL . "/cart\" method=\"POST\" class=\"foxycart\" accept-charset=\"utf-8\" id=\"" . $form_id . "\">"
 			.
 			(
 				($include_quantity_field)
@@ -458,7 +488,7 @@ function foxypress_GetProductFormStart($inventory_id, $form_id = "foxypress_form
 			"<input type=\"hidden\" name=\"name\" value=\"" . stripslashes($item->post_title) . "\" />
 			<input type=\"hidden\" name=\"code\" value=\"" . stripslashes($_code) . "\" />
 			<input type=\"hidden\" name=\"price\" value=\"" . $ActualPrice . "\" />
-			<input type=\"hidden\" name=\"category\" value=\"" . stripslashes($item->category_name) . "\" />
+			<input type=\"hidden\" name=\"category\" value=\"" . $primary_category . "\" />
 			<input type=\"hidden\" name=\"image\" value=\"" . ( ($main_inventory_image != "") ? $main_inventory_image : INVENTORY_IMAGE_DIR . '/' . INVENTORY_DEFAULT_IMAGE ) . "\" />
 			<input type=\"hidden\" name=\"weight\" value=\"" . foxypress_GetActualWeight($_weight, $_weight2) . "\" />
 			<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
@@ -580,6 +610,13 @@ function foxypress_GetTrackingModule()
 
 function foxypress_GetMiniCartWidget($dropdowndisplay, $hideonzero)
 {
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$storeURL = get_option('foxycart_storeurl');
+	}else{
+		$storeURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	
 	if ( $dropdowndisplay == "" )
 	{
 		if ( $hideonzero == "1" )
@@ -589,7 +626,7 @@ function foxypress_GetMiniCartWidget($dropdowndisplay, $hideonzero)
 		?>
 			<span id="fc_quantity">0</span> items.<br />
 			<span id="fc_total_price">0.00</span>
-			<a href="https://<?php echo(get_option('foxycart_storeurl')) ?>.foxycart.com/cart?cart=view" class="foxycart">View Cart</a>
+			<a href="https://<?php echo($storeURL) ?>/cart?cart=view" class="foxycart">View Cart</a>
 		<?php
 		if ( $hideonzero == "1" )
 		{
@@ -613,12 +650,12 @@ function foxypress_GetMiniCartWidget($dropdowndisplay, $hideonzero)
 				<tbody id="cart_content">
 				</tbody>
 			</table>
-			<a href="https://<?php echo(get_option('foxycart_storeurl')) ?>.foxycart.com/cart?checkout" id="fc_checkout_link">Check Out</a>
+			<a href="https://<?php echo(storeURL) ?>/cart?checkout" id="fc_checkout_link">Check Out</a>
 			<div class="fc_clear"></div>
 		</div>
 		<script type="text/javascript" charset="utf-8">
-			var StoreURL = '<?php echo(get_option('foxycart_storeurl')) ?>';
-			var FoxyDomain = StoreURL + ".foxycart.com/";
+			var StoreURL = '<?php echo($storeURL) ?>';
+			var FoxyDomain = StoreURL + "/";
 			var timer = 0;
 			// this function hides the cart in a very nice way
 			function json_cart_fade_out(){
@@ -777,9 +814,15 @@ function foxypress_GetTransactionDetails($transaction)
 {
 	global $wpdb, $post;
 
-	$foxyStoreURL = get_option('foxycart_storeurl');
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	
 	$foxyAPIKey =  get_option('foxycart_apikey');
-	$foxyAPIURL = "https://" . $foxyStoreURL . ".foxycart.com/api";
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  $foxyAPIKey;
 	$foxyData["api_action"] = "transaction_get";

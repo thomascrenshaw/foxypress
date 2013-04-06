@@ -16,6 +16,7 @@ function foxypress_settings_postback()
 	global $wpdb;
 	if(isset($_POST['btnFoxyPressSettingsSaveWizard']))
 	{
+		update_option("foxycart_remote_domain", foxypress_FixPostVar('foxycart_remote_domain_wizard'));
 		update_option("foxycart_storeurl", foxypress_FixPostVar('foxycart_storeurl_wizard'));
 		update_option("foxycart_storeversion", foxypress_FixPostVar('foxycart_storeversion_wizard'));
 		update_option("foxycart_include_jquery", foxypress_FixPostVar('foxycart_include_jquery_wizard'));
@@ -26,6 +27,7 @@ function foxypress_settings_postback()
 	}
 	else if(isset($_POST['btnFoxyPressSettingsSave']))
 	{
+		update_option("foxycart_remote_domain", foxypress_FixPostVar('foxycart_remote_domain'));
 		update_option("foxycart_storeurl", foxypress_FixPostVar('foxycart_storeurl'));
 		update_option("foxycart_apikey", foxypress_FixPostVar('foxycart_apikey'));
 		update_option("foxycart_storeversion", foxypress_FixPostVar('foxycart_storeversion'));
@@ -116,8 +118,11 @@ function foxypress_settings_page_load()
                     <td align="left">
                         <input type="text" name="foxycart_storeurl" id="foxycart_storeurl" value="<?php echo get_option('foxycart_storeurl'); ?>" size="50" />
                         <br />
-                        <?php _e('*A store url is required in order to use Foxypress.', 'foxypress'); ?> <br />
-                        <?php _e('ex. if your store url is foxypress.foxycart.com, enter just \'foxypress\'', 'foxypress'); ?><i>.</i>
+                        <?php _e('* A store url is required in order to use Foxypress.', 'foxypress'); ?>
+                        <?php _e('ex. if your store url is foxypress.foxycart.com, enter only \'foxypress\'', 'foxypress'); ?>.<br />
+                        OR <br />
+                        <input type="checkbox" name="foxycart_remote_domain" value="1" <?php echo(((get_option('foxycart_remote_domain') == "1") ? "checked=\"checked\"" : "")) ?> /> * Check this box if you are using a remote store domain.
+                        <?php _e("* Something like 'cart.yourdomain.com'. This will be your remote store domain.", 'foxypress'); ?> <br />
                     </td>
                 </tr>
                 <tr valign="top">
@@ -152,6 +157,7 @@ function foxypress_settings_page_load()
                     <td align="left">
                          <?php $version = get_option('foxycart_storeversion'); ?>
                         <select name="foxycart_storeversion" width="300" style="width: 300px">
+                        	<option value="1.1" <?php echo( ($version == "1.1") ? "selected=\"selected\"" : "" ); ?>>1.1</option>
 							<option value="1.0" <?php echo( ($version == "1.0") ? "selected=\"selected\"" : "" ); ?>>1.0</option>
 							<option value="0.7.2" <?php echo( ($version == "0.7.2") ? "selected=\"selected\"" : "" ); ?>>0.7.2</option>
 							<option value="0.7.1" <?php echo( ($version == "0.7.1") ? "selected=\"selected\"" : "" ); ?>>0.7.1</option>
@@ -481,19 +487,24 @@ function foxypress_settings_page_load()
             <li id="step-one" class="active"><?php _e('Step 1', 'foxypress'); ?></li>
             <li id="step-two"><?php _e('Step 2', 'foxypress'); ?></li>
             <li id="step-three"><?php _e('Step 3', 'foxypress'); ?></li>
-        </ul>
-
+        </ul>        
+                        
         <span class="wizard_clear"></span>
         <div class="wizard_tab_content step-one">
             <img src="<?php echo(plugins_url())?>/foxypress/img/logo.png" />
-            <?php _e('<p>Thanks for installing FoxyPress! Lets get a few things taken care of quickly to get you on your way to selling!</p>', 'foxypress'); ?>
+            <?php _e('<p>Thanks for installing FoxyPress! Let\'s get a few things taken care of quickly to get you on your way to selling!</p>', 'foxypress'); ?>
             <?php _e('<p>What is your FoxyCart Store Domain?</p>', 'foxypress'); ?>
             <input type="text" name="foxycart_storeurl_wizard" id="foxycart_storeurl_wizard" /><br />
-            <?php _e('<i>ex. if your store url is foxypress.foxycart.com, enter just \'foxypress\'.</i>', 'foxypress'); ?>
+            <?php _e('ex. if your store url is foxypress.foxycart.com, enter only \'foxypress\'', 'foxypress'); ?>.<br />
+			OR <br />
+			<input type="checkbox" name="foxycart_remote_domain_wizard" value="1" <?php echo(((get_option('foxycart_remote_domain_wizard') == "1") ? "checked=\"checked\"" : "")) ?> /> * Check this box if you are using a remote store domain.
+			<br />
+			<?php _e("* Something like 'cart.yourdomain.com'. This will be your remote store domain.", 'foxypress'); ?> <br />
             <?php _e('<p>What version is your FoxyCart store?</p>', 'foxypress'); ?>
             <select name="foxycart_storeversion_wizard" width="300" style="width: 300px">
+				<option value="1.1" selected>1.1</option>
 				<option value="1.0">1.0</option>
-				<option value="0.7.2" selected>0.7.2</option>
+				<option value="0.7.2">0.7.2</option>
                 <option value="0.7.1">0.7.1</option>
                 <option value="0.7.0">0.7.0</option>
             </select>

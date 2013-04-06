@@ -236,6 +236,7 @@ function foxypress_product_meta_init()
 	//show meta boxes
 	add_meta_box('product_details_meta', 'Required Product Details', 'foxypress_product_details_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
 	add_meta_box('product_categories_meta', 'Product Categories', 'foxypress_product_categories_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
+	add_meta_box('product_categories_primary_meta', 'Primary Category', 'foxypress_product_categories_primary_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
 	add_meta_box('extra_product_details_meta', 'Extra Product Details', 'foxypress_extra_product_details_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'low');
 	add_meta_box('product_deal_meta', 'Daily Deal', 'foxypress_product_deal_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'low');
 	add_meta_box('product_images_meta', 'Product Images', 'foxypress_product_images_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'normal', 'high');
@@ -243,6 +244,58 @@ function foxypress_product_meta_init()
 	add_meta_box('product_options_meta', 'Product Options', 'foxypress_product_options_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'normal', 'high');
 	add_meta_box('product_attributes_meta', 'Product Attributes', 'foxypress_product_attributes_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'normal', 'high');
 	add_action('save_post','foxypress_product_meta_save');
+}
+
+function foxypress_product_categories_primary_setup()
+{
+	global $post, $wpdb;
+	//check for current primary categories	
+	$primaryCategories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id, itc.category_primary
+												FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " as itc inner join " .
+												$wpdb->prefix . "foxypress_inventory_categories" . " as c on itc.category_id = c.category_id
+												WHERE inventory_id='" . $post->ID . "'");
+	echo("<select name=\"_primary_category\" id=\"_primary_category\">");
+	foreach($primaryCategories as $pc)
+	{
+		if($pc->category_primary == 1) {
+			echo("<option value=\"" . $pc->category_id . "\" / selected=\"selected\"> " . stripslashes($pc->category_name) . " </option>");
+		} else {
+			echo("<option value=\"" . $pc->category_id . "\" /> " . stripslashes($pc->category_name) . " </option>");
+		}
+	}
+	echo("</select>");
+	
+	?>
+	<script type="text/javascript" language="javascript">
+		jQuery(document).ready(function() {
+		jQuery('#product_categories_meta .inside input').click(function(){
+			   	var current_selected = jQuery('#product_categories_primary_meta .inside #_primary_category option:selected').val();
+			   	var html_replace = "<select name='_primary_category' id='_primary_category'>";
+		       	jQuery('#product_categories_meta .inside input:checkbox').each(function(index) {
+		           	if(jQuery(this).prop('checked')) {
+		           		var $label = jQuery(this).next('label');
+		           		if(jQuery(this).val() == current_selected) {
+		           			html_replace += "<option value='" + jQuery(this).val() + "' selected='selected'> " + $label.text() + " </option>";
+		           		} else {
+		           			html_replace += "<option value='" + jQuery(this).val() + "'> " + $label.text() + " </option>";
+		           		}
+		           	}
+		       	});
+		       	
+		       	html_replace += "</select>";
+		       	jQuery('#product_categories_primary_meta .inside #_primary_category').html(html_replace);
+		       	
+		       	// check length
+		       	var options = jQuery('#product_categories_primary_meta .inside #_primary_category option').length;
+		       	if(options < 1) {
+			  		jQuery('#product_categories_primary_meta').hide();
+			  	} else {
+			  		jQuery('#product_categories_primary_meta').show();
+			  	}
+			});
+		});
+	</script>
+	<?php
 }
 
 function foxypress_product_categories_setup()
@@ -880,6 +933,15 @@ function foxypress_product_meta_save($post_id)
 				$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " WHERE inventory_id = '" . mysql_escape_string($post_id) . "' and category_id='" . $cat . "'";
 				$wpdb->query($sql);
 			}
+		}
+
+		//update primary category
+		$primaryCategories = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " WHERE inventory_id = '" . mysql_escape_string($post_id) ."'");
+		foreach($primaryCategories as $pc)
+		{
+			$update_value = ($pc->category_id == $_POST['_primary_category'] ? 1 : 0);
+			$sql = "UPDATE " . $wpdb->prefix . "foxypress_inventory_to_category" . " SET category_primary = " . $update_value . " WHERE category_id = " . mysql_escape_string($pc->category_id)  . " AND inventory_id = " . $pc->inventory_id ."";
+			$wpdb->query($sql);	
 		}
 
 		//save item email

@@ -3,7 +3,7 @@ Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/support/
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.0
-Tested up to: 3.5
+Tested up to: 3.5.1
 Stable tag: 3.0.1
 FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
@@ -27,21 +27,27 @@ The FoxyPress Team bases their features on their customers' needs, so if you don
 
 FoxyPress is developed and implemented soley by WebMovement, LLC. Additional FoxyPress fixes and features will be added based on forum user requests. If you require custom functionality, please contact us directly at admin@foxy-press.com and we can build what you need.
 
---Site credits--
-- WebMovement, LLC - Plugin Development and conception
-- Scott Hollencamp - Order Management inspiration
-- Quesinberry - donation
-- Uploadify - Multi-image support
-- Green Egg Media - Multi Datafeed inspiration
-- JasonHunterDesign - Affiliate Management inspiration/donation
-- Consolibyte API - Utique Shop
-- Trinity Hockey Co - Affiliate Management Upgrades
-- Adam Morrissey (Delgado Protocol) - Affiliate Tier addition - affiliates can gain referral bonuses
-- WeThePrinters - User Portal addition - Order History
-- Adam Morrissey (Delgado Protocol) - User Portal addition - Affiliate Stats
-- MamaDoo Kids - Status Management enhancements
+= Site credits =
+* WebMovement, LLC - Plugin Development and conception
+* Scott Hollencamp - Order Management inspiration
+* Quesinberry - donation
+* Uploadify - Multi-image support
+* Green Egg Media - Multi Datafeed inspiration
+* JasonHunterDesign - Affiliate Management inspiration/donation
+* Consolibyte API - Utique Shop
+* Trinity Hockey Co - Affiliate Management Upgrades
+* Adam Morrissey (Delgado Protocol) - Affiliate Tier addition - affiliates can gain referral bonuses
+* WeThePrinters - User Portal addition - Order History
+* Adam Morrissey (Delgado Protocol) - User Portal addition - Affiliate Stats
+* MamaDoo Kids - Status Management enhancements
 
 == Changelog ==
+
+= 0.4.3.0 =
+* Update: Custom FoxyCart subdomain support.
+* Update: FoxyCart v1.1 support
+* Update: Primary Category Support - see release notes for explanation 
+* Release notes : http://www.foxy-press.com/blog/2013/04/06/foxypress-0-4-3-0/
 
 = 0.4.2.9 =
 * BugFix: #5 - Addressed URL verification for redirect URL in the foxypress-affiliate.php file. The url is being checked with esc_url.

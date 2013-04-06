@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.2.9
+Version: 0.4.3.0
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -129,7 +129,7 @@ define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.2.9");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.0");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -1130,6 +1130,25 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 					  : "";
 	$CanAddToCart = foxypress_CanAddToCart($item->ID, $_quantity);
 	$ItemOptions = foxypress_BuildOptionList($item->ID, "foxypress_form", $_quantity_max);
+	
+	$primaryCategories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id, itc.category_primary
+												FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " as itc inner join " .
+												$wpdb->prefix . "foxypress_inventory_categories" . " as c on itc.category_id = c.category_id
+												WHERE inventory_id='" . $item->ID . "'");
+	$primary_category = "";
+	foreach($primaryCategories as $pc)
+	{
+		if($pc->category_primary == 1) {
+			$primary_category = $pc->category_name;
+		} 
+	}
+	
+	//use previous category name if a new primary one hasn't been selected yet
+	if($primary_category == "") {
+		$primary_category = stripslashes($item->category_name);
+	}
+	
+	
 	//check to see if we need to link to a detail page
 	if($showMoreDetail)
 	{
@@ -1220,7 +1239,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 								"<input type=\"hidden\" name=\"name\" value=\"" . stripslashes($item->post_title) . "\" />
 								<input type=\"hidden\" name=\"code\" value=\"" . stripslashes($_code) . "\" />
 								<input type=\"hidden\" name=\"price\" value=\"" . $ActualPrice . "\" />
-								<input type=\"hidden\" name=\"category\" value=\"" . stripslashes($item->category_name) . "\" />
+								<input type=\"hidden\" name=\"category\" value=\"" . $primary_category . "\" />
 								<input type=\"hidden\" name=\"image\" value=\"" . ( ($ItemImage != "") ? $ItemImage : INVENTORY_IMAGE_DIR . '/' . INVENTORY_DEFAULT_IMAGE ) . "\" />
 								<input type=\"hidden\" name=\"weight\" value=\"" . foxypress_GetActualWeight($_weight, $_weight2) . "\" />
 								<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
@@ -1439,6 +1458,23 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	$CanAddToCart = foxypress_CanAddToCart($item->ID, $_quantity);
 	$ItemOptions = foxypress_BuildOptionList($item->ID, "foxypress_form", $_quantity_max);
 
+	$primaryCategories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id, itc.category_primary
+												FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " as itc inner join " .
+												$wpdb->prefix . "foxypress_inventory_categories" . " as c on itc.category_id = c.category_id
+												WHERE inventory_id='" . $item->ID . "'");
+	$primary_category = "";
+	foreach($primaryCategories as $pc)
+	{
+		if($pc->category_primary == 1) {
+			$primary_category = $pc->category_name;
+		} 
+	}
+	
+	//use previous category name if a new primary one hasn't been selected yet
+	if($primary_category == "") {
+		$primary_category = stripslashes($item->category_name);
+	}
+	
 	$ItemImages = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
 	$ItemThumbs="";
 	if(!empty($ItemImages) && count($ItemImages) > 1)
@@ -1521,7 +1557,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 						"<input type=\"hidden\" name=\"name\" value=\"" . stripslashes($item->post_title) . "\" />
 						<input type=\"hidden\" name=\"code\" value=\"" . stripslashes($_code) . "\" />
 						<input type=\"hidden\" name=\"price\" value=\"" . $ActualPrice . "\" />
-						<input type=\"hidden\" name=\"category\" value=\"" . stripslashes($item->category_name) . "\" />
+						<input type=\"hidden\" name=\"category\" value=\"" . $primary_category . "\" />
 						<input type=\"hidden\" name=\"image\" value=\"" . ( ($ItemImage != "") ? $ItemImage : INVENTORY_IMAGE_DIR . '/' . INVENTORY_DEFAULT_IMAGE ) . "\" />
 						<input type=\"hidden\" name=\"weight\" value=\"" . foxypress_GetActualWeight($_weight, $_weight2) . "\" />
 						<input type=\"hidden\" name=\"inventory_id\" value=\"" . $item->ID . "\" />
@@ -2606,8 +2642,29 @@ function foxypress_GetFoxyPressIncludes()
 	$version = get_option('foxycart_storeversion');
 	$includejq = get_option('foxycart_include_jquery');
 	$enablemuliship = get_option('foxycart_enable_multiship');
+	$remoteDomain = get_option('foxycart_remote_domain');
 	$scripts = "";
-	if($version == "1.0")
+	
+	/*
+	<script src="//cdn.foxycart.com/adamwoloszyn/foxycart.colorbox.js?ver=2" type="text/javascript" charset="utf-8"></script>
+	<script src="//cdn.foxycart.com/store.adamwoloszyn.com/foxycart.colorbox.js?ver=2" type="text/javascript" charset="utf-8"></script>
+	*/
+	
+	if($version == "1.1")
+	{
+		$scripts = "<!-- BEGIN FOXYCART FILES -->"
+							.
+							(
+								($includejq)
+									? "<script type=\"text/javascript\" src=\"//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js\"></script>"
+									: ""
+							)
+							.
+							"<script src=\"//cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js?ver=2\" type=\"text/javascript\" charset=\"utf-8\"></script>
+							<link rel=\"stylesheet\" href=\"//cdn.foxycart.com/static/scripts/colorbox/1.3.23/style1_fc/colorbox.css?ver=1\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
+					<!-- END FOXYCART FILES -->";
+	}
+	else if($version == "1.0")
 	{
 		$scripts = "<!-- BEGIN FOXYCART FILES -->"
 							.
@@ -2617,7 +2674,7 @@ function foxypress_GetFoxyPressIncludes()
 									: ""
 							)
 							.
-							"<script src=\"//cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js\" type=\"text/javascript\" charset=\"utf-8\"></script>
+							"<script src=\"//cdn.foxycart.com/" . get_option('foxycart_storeurl') . "/foxycart.colorbox.js?ver=2\" type=\"text/javascript\" charset=\"utf-8\"></script>
 							<link rel=\"stylesheet\" href=\"//cdn.foxycart.com/static/scripts/colorbox/1.3.19/style1_fc/colorbox.css?ver=1\" type=\"text/css\" media=\"screen\" charset=\"utf-8\" />
 					<!-- END FOXYCART FILES -->";
 	}
@@ -2627,7 +2684,7 @@ function foxypress_GetFoxyPressIncludes()
 					.
 					(
 						($includejq)
-							? "<script type=\"text/javascript\" src=\"//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js\"></script>"
+							? "<script type=\"text/javascript\" src=\"//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js\"></script>"
 							: ""
 					)
 					.
@@ -2864,7 +2921,15 @@ function foxypress_RegisterUser($UserID)
 {
 	$userdata = get_user_by('id', $UserID);
 	//sync with foxycart
-	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
+	
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
 	$foxyData["api_action"] = "customer_save";
@@ -2886,7 +2951,14 @@ function foxypress_UpdateUser($UserID)
 {
 	$foxycartCustomerID = get_user_meta($user_id, 'foxycart_customer_id', true);
 	//sync with foxycart
-	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
 	$foxyData["api_action"] = "customer_save";
@@ -2914,7 +2986,13 @@ function foxypress_CheckForFoxyCartUser($customer_email)
 {
 	global $current_user;
 	get_currentuserinfo();
-	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
 	$foxyData["api_action"] = "customer_get";
@@ -2940,7 +3018,13 @@ function foxypress_CreateFoxyCartUser($customer_email, $customer_pass, $customer
 {
 	global $current_user;
 	get_currentuserinfo();
-	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
 	$foxyData["api_action"] = "customer_save";
@@ -2972,7 +3056,13 @@ function foxypress_PasswordReset($user, $new_pass)
 	if(empty($new_pass)) { $new_pass = $_POST['pass1']; }
 	$hashed = wp_hash_password($new_pass);
 	$foxycartCustomerID = get_user_meta($user->ID, 'foxycart_customer_id', true);
-	$foxyAPIURL = "https://" . get_option('foxycart_storeurl') . ".foxycart.com/api";
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
 	$foxyData = array();
 	$foxyData["api_token"] =  get_option('foxycart_apikey');
 	$foxyData["api_action"] = "customer_save";
@@ -3213,6 +3303,7 @@ function foxypress_Uninstall()
 	$keep_products = get_option("foxypress_uninstall_keep_products");
 	//delete custom settings
 	$keys = array(
+        'foxycart_remote_domain',
         'foxycart_storeurl',
         'foxycart_apikey',
         'foxycart_storeversion',
@@ -3548,6 +3639,10 @@ function foxypress_Installation_HandleTableAlterations()
 	//update blog id
 	$sql = "UPDATE " . $wpdb->prefix . "foxypress_transaction SET foxy_blog_id = (select min(blog_id) from " . $wpdb->prefix . "blogs) where foxy_blog_id = '0' or foxy_blog_id is null;";
 	$wpdb->query($sql);
+	
+	//update primary category functionality
+	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_to_category ADD category_primary INT(11) NULL AFTER sort_order;";
+	$wpdb->query($sql);
 
 	///////////////////////////////////////////////////////////////////////////
 	//Upgrading Affiliate Functionality
@@ -3800,7 +3895,8 @@ function foxypress_Installation_CreateInventoryToCategoryTable()
 				itc_id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				inventory_id INT(11) NOT NULL,
 				category_id INT(11) NOT NULL,
-				sort_order INT(11) NOT NULL DEFAULT '99'
+				sort_order INT(11) NOT NULL DEFAULT '99',
+				category_primary INT(11) NOT NULL
 		   ) ";
 	$wpdb->query($sql);
 }
@@ -4161,6 +4257,14 @@ class FoxyPress_MiniCart extends WP_Widget {
 	//Display widget on frontend
 	function widget( $args, $instance ) {
 		extract( $args );
+		
+		$remoteDomain = get_option('foxycart_remote_domain');
+		if($remoteDomain){
+			$foxyStoreURL = get_option('foxycart_storeurl');
+		}else{
+			$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+		}
+		
 		$title = apply_filters('widget_title', $instance['title'] );
 		$hideonzero = apply_filters('widget_title', $instance['hideonzero'] );
 		$dropdowndisplay = apply_filters('widget_title', $instance['dropdowndisplay'] );
@@ -4178,7 +4282,7 @@ class FoxyPress_MiniCart extends WP_Widget {
 			?>
 				<span id="fc_quantity">0</span> items<br />
 				<span id="fc_total_price">0.00</span>
-				<a href="https://<?php echo(get_option('foxycart_storeurl')) ?>.foxycart.com/cart?cart=view" class="foxycart">View Cart</a>
+				<a href="https://<?php echo($foxyStoreURL) ?>/cart?cart=view" class="foxycart">View Cart</a>
 			<?php
 			if ( $hideonzero == "1" )
 			{
@@ -4202,12 +4306,12 @@ class FoxyPress_MiniCart extends WP_Widget {
 					<tbody id="cart_content">
 					</tbody>
 				</table>
-				<a href="https://<?php echo(get_option('foxycart_storeurl')) ?>.foxycart.com/cart?checkout" id="fc_checkout_link">Check Out</a>
+				<a href="https://<?php echo($foxyStoreURL) ?>/cart?checkout" id="fc_checkout_link">Check Out</a>
 				<div class="fc_clear"></div>
 			</div>
 			<script type="text/javascript" charset="utf-8">
-				var StoreURL = '<?php echo(get_option('foxycart_storeurl')) ?>';
-				var FoxyDomain = StoreURL + ".foxycart.com/";
+				var StoreURL = '<?php echo($foxyStoreURL) ?>';
+				var FoxyDomain = StoreURL + "/";
 				var timer = 0;
 				// this function hides the cart in a very nice way
 				function json_cart_fade_out(){
