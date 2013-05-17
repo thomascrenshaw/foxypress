@@ -2945,7 +2945,7 @@ function foxypress_ImportFoxypressScripts()
 				?>
 			    jQuery('#easyzoom').attr('href', newImage);
 			    jQuery('#easyzoom').easyZoom({
-			    	parent: '.foxypress_item_image_detail'
+			    	parent: '.foxypress_zoom_image'
 			    });
 				<?php endif; ?>
 			}
