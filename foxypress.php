@@ -1242,7 +1242,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 				}
 			}
 		}
-		$ImageOutput = "<div class=\"foxypress_item_image" . $CssSuffix . "\">" . $ImageOutput . $ItemThumbs . "</div>";
+		$ImageOutput = "<div class=\"foxypress_zoom_image foxypress_item_image" . $CssSuffix . "\">" . $ImageOutput . $ItemThumbs . "</div>";
 		if(isset($_SESSION['affiliate_id'])){$affiliate_id=$_SESSION['affiliate_id'];}else{$affiliate_id="";}
 		$CssSuffix="";
 		//show item
@@ -1577,7 +1577,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 			}
 		}
 	}
-	$ImageOutput = "<div class=\"foxypress_item_image_detail\">" . $ImageOutput . $ItemThumbs . "</div>";
+	$ImageOutput = "<div class=\"foxypress_zoom_image  foxypress_item_image_detail\">" . $ImageOutput . $ItemThumbs . "</div>";
 	//show item
 	if(isset($_SESSION['affiliate_id'])){$affiliate_id=$_SESSION['affiliate_id'];}else{$affiliate_id="";}
 	$CssSuffix="";
@@ -2775,7 +2775,7 @@ function foxypress_GetFoxyPressIncludes()
 		
 		jQuery(function(){
 			jQuery('#easyzoom').easyZoom({
-				parent: '.foxypress_item_image_detail'
+				parent: '.foxypress_zoom_image'
 			});
 		});
 		
