@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.0
+Version: 0.4.3.1
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -128,8 +128,9 @@ define('INVENTORY_DOWNLOADABLE_LOCAL_DIR', "wp-content/inventory_downloadables/"
 define('INVENTORY_DEFAULT_IMAGE', "default-product-image.jpg");
 define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
+define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.0");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.1");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -683,11 +684,12 @@ function foxypress_add_tinymce_plugin($plugin_array) {
 // determine absolute url path of editor_plugin.js
 function foxypress_GetEditorPluginURL($type) {
     //check if defined WordPress Plugins URL
+    $url = plugins_url();
 	if (defined('WP_PLUGINS_URL'))  {
 		return WP_PLUGINS_URL."/". $type ."/editor_plugin.js";
 	}else{
-	//if not assumme it is default location.
-		return "../../../wp-content/plugins/". $type ."/editor_plugin.js";
+		//if not assumme it is default location.
+		return $url . "/". $type ."/editor_plugin.js";
 	}
 }
 
@@ -1207,21 +1209,38 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 			$MainImageOutput = "";
 			if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
 			{
-				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" /></a>";
+				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
 			}
 			else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
 			{
-				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" /></a>";
+				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+			}
+			else if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM)
+			{
+				$MainImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
 			}
 			else
 			{
 				$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
 			}
-			$ImageOutput = ($ItemImage != "") //if we have an image show it, else show default
-							? ($ItemThumbs == "") //if we have no thumbs, make the main image clickable, else just <img>
-								? $MainImageOutput
-								: "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />"
-							: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
+			
+			if ($ItemImage == "") {
+				// If there is no item image, use the default
+				$ImageOutput = "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" id=\"foxypress_main_item_image\" />";
+			}
+			else if ($ItemThumbs == "") {
+				// If there are no thumbnails, main image needs to be clickable
+				$ImageOutput = $MainImageOutput;
+			}
+			else {
+				if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM) {
+					// If Easy Image Zoom is in use, add easyzoom link container
+					$ImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+				} else {
+					// Otherwise display main image without link
+					$ImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
+				}
+			}
 		}
 		$ImageOutput = "<div class=\"foxypress_item_image" . $CssSuffix . "\">" . $ImageOutput . $ItemThumbs . "</div>";
 		if(isset($_SESSION['affiliate_id'])){$affiliate_id=$_SESSION['affiliate_id'];}else{$affiliate_id="";}
@@ -1525,21 +1544,38 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 		$MainImageOutput = "";
 		if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
 		{
-			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" /></a>";
+			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
 		}
 		else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
 		{
-			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" /></a>";
+			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+		}
+		else if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM)
+		{
+			$MainImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
 		}
 		else
 		{
 			$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
 		}
-		$ImageOutput = ($ItemImage != "") //if we have an image show it, else show default
-						? ($ItemThumbs == "") //if we have no thumbs, make the main image clickable, else just <img>
-							? $MainImageOutput
-							: "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\"/>"
-						: "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" />";
+		
+		if ($ItemImage == "") {
+			// If there is no item image, use the default
+			$ImageOutput = "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" id=\"foxypress_main_item_image\" />";
+		}
+		else if ($ItemThumbs == "") {
+			// If there are no thumbnails, main image needs to be clickable
+			$ImageOutput = $MainImageOutput;
+		}
+		else {
+			if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM) {
+				// If Easy Image Zoom is in use, add easyzoom link container
+				$ImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+			} else {
+				// Otherwise display main image without link
+				$ImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
+			}
+		}
 	}
 	$ImageOutput = "<div class=\"foxypress_item_image_detail\">" . $ImageOutput . $ItemThumbs . "</div>";
 	//show item
@@ -2731,6 +2767,21 @@ function foxypress_GetFoxyPressIncludes()
 					 <script type=\"text/javascript\" src=\"" . plugins_url() ."/foxypress/js/lightbox.js\"></script>
 					 <link rel=\"stylesheet\" href=\"". plugins_url() ."/foxypress/css/lightbox.css\" type=\"text/css\" media=\"screen\" />";*/
 	}
+	
+	/* load Easy Image Zoom javascript libraries if it's enabled */
+	if (get_option('foxypress_image_mode') == FOXYPRESS_USE_EASYIMAGEZOOM) {
+		$scripts .= "<script src=\"" . plugins_url() . "/foxypress/js/easyzoom.min.js\" type=\"text/javascript\" charset=\"utf-8\"></script>" . "<link rel=\"stylesheet\" href=\"". plugins_url() ."/foxypress/css/easyzoom.css\" type=\"text/css\" media=\"screen\" />";
+		$scripts .= "<script type=\"text/javascript\">
+		
+		jQuery(function(){
+			jQuery('#easyzoom').easyZoom({
+				parent: '.foxypress_item_image_detail'
+			});
+		});
+		
+		</script>";
+	}
+	
 	return $scripts;
 }
 
@@ -2794,7 +2845,7 @@ function foxypress_ImportFoxypressScripts()
 					var error = false;
 
 					jQuery('#foxypress-errors').html('');
-					jQuery('.foxycart select').each(function() {
+					jQuery(this).find('select').each(function() {
 						if (jQuery(this).val() == '') {
 							error = true;
 							var selectName = jQuery(this).attr('name');
@@ -2886,7 +2937,17 @@ function foxypress_ImportFoxypressScripts()
 
 			function ToggleItemImage(newImage)
 			{
-				jQuery('#foxypress_main_item_image').attr('src', newImage)
+				jQuery('#foxypress_main_item_image').attr('src', newImage);
+				
+				<?php 
+					// Only perform easyzoom Javascript functions if it's selected
+					if (get_option('foxypress_image_mode') == FOXYPRESS_USE_EASYIMAGEZOOM): 
+				?>
+			    jQuery('#easyzoom').attr('href', newImage);
+			    jQuery('#easyzoom').easyZoom({
+			    	parent: '.foxypress_item_image_detail'
+			    });
+				<?php endif; ?>
 			}
 
 		</script>

@@ -3,7 +3,7 @@ Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/support/
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.0
-Tested up to: 3.5.1
+Tested up to: 3.6 Beta 3
 Stable tag: 3.0.1
 FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
@@ -40,9 +40,17 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 * WeThePrinters - User Portal addition - Order History
 * Adam Morrissey (Delgado Protocol) - User Portal addition - Affiliate Stats
 * MamaDoo Kids - Status Management enhancements
+* Easy Image Zoom - http://cssglobe.com/jquery-plugin-easy-image-zoom/
 
 == Changelog ==
 
+= 0.4.3.1 =
+* Feature: Added an open source Zoom tool for product images. See release notes for details.
+* Update: We fixed a couple of places we had "wp-content" hard coded. This was hindering certain security plugins from working.
+* Bugfix: Validation for adding items with options where many products exist on a single page was not functioning. Single product view was fine.
+* Bugfix: Ajax file for status management had some concatenation issues regarding line breaks. 
+* Release notes : http://www.foxy-press.com/blog/2013/05/16/foxypress-0-4-3-1/
+ 
 = 0.4.3.0 =
 * Update: Custom FoxyCart subdomain support.
 * Update: FoxyCart v1.1 support

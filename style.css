@@ -117,8 +117,8 @@ form.foxycart{}
 .foxypress_item_quantity{width:20px;}
 
 /** PRODUCT DETAIL **/
-.foxy_item_wrapper_detail{float:right;width:450px;}
-
+.foxy_item_wrapper_detail{float:right;width:400px;margin-left:50px;margin-bottom:20px;}
+.foxypress_detail{max-width: 925px;min-width: 405px;margin:0 auto;}
 form.foxycart{}
 
 .foxypress_item_name_detail{font-weight:bold;/*color:#E4AE0A;*/}
@@ -133,7 +133,12 @@ form.foxycart{}
 	.foxypress_item_submit_wrapper_detail .foxypress_item_submit:hover{/*background:#E4AE0A;*/}
 
 .foxypress_item_image_detail{float:left;}
-	.foxypress_item_image_detail img{width:425px;}
+
+/* If using the eazyzoom display method, you will also need to change
+   the #easy_zoom {left: } setting in foxypress/css/easyzoom.css 
+   if you change this main item width: */
+#foxypress_main_item_image{width:425px;}
+
 	
 	ul.foxypress_item_image_thumbs_detail{list-style-type:none;margin:0;}
 		ul.foxypress_item_image_thumbs_detail li{float:left;margin-top:5px;}

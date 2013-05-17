@@ -197,7 +197,7 @@
 									$d += 1;
 								}
 
-								$product_listing = "<table class='product_listing' width='600'><tbody><tr><td height='20' valign='middle' align='center' bgcolor='#cccccc'>Item</td><td height='20' valign='middle' align='center' bgcolor='#cccccc'>Quantity</td><td height='20' valign='middle' align='center' bgcolor='#cccccc'>Price</td></tr>";
+								$product_listing = "<table class='product_listing' width='600'>\r\n<tbody>\r\n<tr>\r\n<td height='20' valign='middle' align='center' bgcolor='#cccccc'>Item</td>\r\n<td height='20' valign='middle' align='center' bgcolor='#cccccc'>Quantity</td>\r\n<td height='20' valign='middle' align='center' bgcolor='#cccccc'>Price</td>\r\n</tr>\r\n";
 								$total_product_price = 0;
 								foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
 								{
@@ -255,18 +255,18 @@
 										$ProductImage = "<img src=\"" . foxypress_GetMainInventoryImage($Inventory_ID) . "\" style=\"width: 100px; \" width=\"100\"/>";					
 									}
 									$total_product_price = (double)$td->product_price * $td->product_quantity;
-									$product_listing .="<tr><td valign='top' align='left'><table><tbody><tr>" .
-														"<td valign='top' align='left' width='120'>" . $ProductImage . "</td>" .
+									$product_listing .="<tr>\r\n<td valign='top' align='left'>\r\n<table>\r\n<tbody>\r\n<tr>\r\n" .
+														"<td valign='top' align='left' width='120'>" . $ProductImage . "</td>\r\n" .
 														"<td valign='top' align='left'>Product: " . $td->product_name . "<br />" .
 														(($ProductCode != "") ? "Code: " . $ProductCode . "<br />" : "") .
 														"Weight: " . $td->product_weight . "<br />" .
 														$options .
-														"</td></tr></tbody></table></td>" .
-														"<td valign='top' align='center'>" . $td->product_quantity . "</td>" .
-														"<td valign='top' align='center'>" . foxypress_FormatCurrency($total_product_price) . "</td></tr>";
+														"</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</td>\r\n" .
+														"<td valign='top' align='center'>" . $td->product_quantity . "</td>\r\n" .
+														"<td valign='top' align='center'>" . foxypress_FormatCurrency($total_product_price) . "</td>\r\n</tr>\r\n";
 									$all_products_price =  $all_products_price + $total_product_price;				
 								}
-								$product_listing .= "</tbody></table>";
+								$product_listing .= "</tbody>\r\n</table>\r\n";
 							  
 								//replace fields
 								$EmailSubject = str_replace("{{order_id}}", $tRow->foxy_transaction_id, $EmailSubject);

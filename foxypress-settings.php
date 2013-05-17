@@ -215,6 +215,7 @@ function foxypress_settings_page_load()
                         <select name="foxypress_image_mode" id="foxypress_image_mode">
                             <option value="" <?php if($image_mode == "") { echo("selected=\"selected\""); } ?>><?php _e('Neither', 'foxypress'); ?></option>
                             <option value="<?php echo(FOXYPRESS_USE_COLORBOX); ?>" <?php if($image_mode == FOXYPRESS_USE_COLORBOX) { echo("selected=\"selected\""); } ?>><?php _e('Use Colorbox', 'foxypress'); ?></option>
+                            <option value="<?php echo(FOXYPRESS_USE_EASYIMAGEZOOM); ?>" <?php if($image_mode == FOXYPRESS_USE_EASYIMAGEZOOM) { echo("selected=\"selected\""); } ?>><?php _e('Use Easy Image Zoom', 'foxypress'); ?></option>
                         </select><br />
                          <?php _e('*If you choose neither, Foxypress will swap the main image with the thumbnail clicked.', 'foxypress'); ?>
                     </td>
@@ -521,6 +522,7 @@ function foxypress_settings_page_load()
             <?php _e('<p>By default, FoxyPress comes loaded with the ability to choose different ways to display your photos.  Which will you choose?</p>', 'foxypress'); ?>
             <select name="foxypress_image_mode_wizard" id="foxypress_image_mode_wizard" style="width: 300px">
             	<option value="<?php echo(FOXYPRESS_USE_COLORBOX); ?>"><?php _e('Use Colorbox', 'foxypress'); ?></option>
+            	<option value="<?php echo(FOXYPRESS_USE_EASYIMAGEZOOM); ?>"><?php _e('Use Easy Image Zoom', 'foxypress'); ?></option>
                 <option value=""><?php _e('Neither', 'foxypress'); ?></option>
             </select>
 			<img id="step-one-nav" class="wizard_nav prev" src="<?php echo(plugins_url())?>/foxypress/img/prev.png" />
