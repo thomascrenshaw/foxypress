@@ -84,7 +84,6 @@ form.foxycart{}
 	.foxypress_item_submit_wrapper_single .foxypress_item_submit:hover{/*background:#E4AE0A;*/}
 
 .foxypress_item_image_single{}
-	.foxypress_item_image_single img{width:425px;}
 
 	ul.foxypress_item_image_thumbs_single{list-style-type:none;margin:0;}
 		ul.foxypress_item_image_thumbs_single li{float:left;margin-top:5px;}
