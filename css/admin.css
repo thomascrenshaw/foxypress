@@ -45,6 +45,28 @@ div.foxy_item_pagination span.disabled {
 	width:150px;
 }.PhotoWrapper:hover{border:solid #222 1px;}
 
+.remove-image {
+    background-color: #FFFFFF;
+    border: 1px solid transparent;
+    border-radius: 5px 5px 5px 5px;
+    box-shadow: 1px 1px 2px #000000;
+    display: none;
+    height: 17px;
+    padding: 4px;
+    position: absolute;
+    right: -4px;
+    text-align: center;
+    top: -4px;
+    width: 17px;
+}
+.PhotoWrapper:hover .remove-image {
+	display: block;
+}
+.remove-image:hover {
+	border: 1px solid #666;
+	cursor: pointer;
+}
+
 .Hide { display:none; }
 .noDecoration { text-decoration: none; }
 .RemoveItem {
@@ -122,7 +144,6 @@ table.product_options{margin-bottom:10px;}
 	margin-bottom:10px;
 	font-weight:bold;
 }
-
 
 .wizard_clear{
 	clear: both;
