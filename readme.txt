@@ -44,6 +44,12 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.3.2 =
+* Feature: New/Fixed Product Media uploader. This allows better attachment of images to your products with the latest WordPress media uploader alteration.
+* Bugfix: Too much recursion Javascript error on category pages that had certain javascript code.
+* Bugfix: Zoom tool on category shortcode pages needed some fixing.
+* Release notes : http://www.foxy-press.com/blog/2013/06/14/foxypress-0-4-3-2/
+
 = 0.4.3.1 =
 * Feature: Added an open source Zoom tool for product images. See release notes for details.
 * Update: We fixed a couple of places we had "wp-content" hard coded. This was hindering certain security plugins from working.
