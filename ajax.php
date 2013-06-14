@@ -111,27 +111,60 @@
 			echo(GetErrorJSON());	
 		}
 	}
-	else if($mode == "save-image-order")
+	else if($mode == "update-images")
 	{
+		$result = array();
+		
 		$session_id = foxypress_FixGetVar('sid');
 		if($session_id == session_id())
 		{
+			$product_id = intval(foxypress_FixGetVar('product-id'));
 			$imageorder = foxypress_FixGetVar('order');
 			$images = explode(",", $imageorder);
-			$x = 1;
-			foreach($images as $image)
-			{
-				$imageExploded = explode("-", $image);
-				$imageid = $imageExploded[1];
-				$query = "UPDATE " . $wpdb->prefix . "posts SET menu_order='" . $x . "' WHERE ID='" . mysql_escape_string($imageid) . "'";		
-				$wpdb->query($query);
-				$x++;
+			
+			// Remove all product images associated with this product
+			$query = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_images WHERE inventory_id='" . $wpdb->escape($product_id) . "'";		
+			$result['delete'] = $wpdb->query($query);
+			
+			if ($result['delete'] === false) {
+				// Delete query had some problems...
+				$result['failed_query'] = $query;
+			} else {
+				// Delete was successful
+				
+				// Loop through images, adding each to the foxypress_inventory_images table
+				$numImages = count($images);
+				for ($i = 0; $i < $numImages; $i++) {
+					// Get image ID
+					$imageExploded = explode("-", $images[$i]);
+					$imageid = intval($imageExploded[count($imageExploded) - 1]);
+					
+					// Insert into database
+					$result['insert-' . $i] = $wpdb->insert( 
+						$wpdb->prefix . "foxypress_inventory_images", 
+						array( 
+							'inventory_id' => $product_id, 
+							'attached_image_id' => $imageid,
+							'image_order' => $i
+						), 
+						array( 
+							'%d', 
+							'%d',
+							'%d'
+						) 
+					);
+					
+					// Return some extra data in the result array if the insert was unsuccessful
+					if ($result['insert-' . $i] === false) {
+						$result['insert-' . $i . '-error'] = "inventoryId: $product_id; attached_image_id: $imageid; image_order: $i";
+					}
+				}
 			}
-			echo("{\"ajax_status\":\"ok\"}");	
-		}
-		else
-		{
-			echo(GetErrorJSON());	
+			
+			// Return result as a JSON object
+			echo json_encode($result);
+		} else {
+			echo(GetErrorJSON());
 		}
 	}
 	else if($mode == "transaction_submit")

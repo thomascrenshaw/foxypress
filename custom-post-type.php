@@ -169,18 +169,48 @@ function manage_custom_columns($column_name, $id)
 			}
 			break;
 		case 'productimage':
-			$featuredImageID = (has_post_thumbnail($id) ? get_post_thumbnail_id($id) : 0);
-			$imageNumber = 0;
+			
 			$src = "";
-			$attachments = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $id, 'order' => 'ASC','orderby' => 'menu_order'));
-			foreach ($attachments as $attachment)
-			{
-				$thumbnailSRC = wp_get_attachment_image_src($attachment->ID, "thumbnail");
-				if ($featuredImageID == $attachment->ID || ($featuredImageID == 0 && $imageNumber == 0)) $src = $thumbnailSRC[0];
-				$imageNumber++;
+			
+			if (has_post_thumbnail($id)) {
+				// Get featured image if it exists
+				$featuredImage = wp_get_attachment_image_src(get_post_thumbnail_id($id), "thumbnail");
+				$src = $featuredImage[0];
+			} else {
+				// Use first valid image
+				$inventory_images = $wpdb->get_results( 
+					"
+					SELECT attached_image_id, image_id
+					FROM " . $wpdb->prefix . "foxypress_inventory_images
+					WHERE inventory_id = " . $id . " 
+					ORDER BY image_order ASC
+					"
+				);
+				
+				foreach ( $inventory_images as $image ) 
+				{
+					if ($image != null) {
+						
+						// Check to see if image has been deleted
+						if (get_post($image->attached_image_id) == null) {
+							// Delete image attachment
+							foxypress_RemoveInventoryImage($image->image_id);
+						} else {
+							$featuredImage = wp_get_attachment_image_src($image->attached_image_id, "full");
+							$src = $featuredImage[0];
+							break; // Exit foreach loop
+						}
+					}
+				}
+				
+				// Use default product image if no attached image was found
+				if ($src == "") {
+					$src = plugins_url( 'img/' . INVENTORY_DEFAULT_IMAGE , __FILE__ );
+				}
 			}
-			if (!$src) $src = INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE;
+			
 			echo '<a href="post.php?post=' . $id . '&amp;action=edit"><img src="' . $src . '" style="max-height:32px; max-width:40px;" /></a>';
+			
 			break;
 		default:
 	}
@@ -472,7 +502,144 @@ function foxypress_product_digital_download_setup()
 function foxypress_product_images_setup()
 {
 	global $post, $wpdb;
-	//check for featured image
+	
+	// Check for featured image
+	if (has_post_thumbnail($post->ID)) {
+		$featuredImage = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), "thumbnail");
+		$src = $featuredImage[0];
+		?>
+		<div class='subhead'><?php _e('Featured Product Image', 'foxypress'); ?></div>
+		<div class='PhotoWrapper'><img src="<?php echo $src; ?>" style="max-width:150px;"></div>
+		<?php
+	}
+	
+	// Check for current images
+	$current_images = "";
+	$images = $wpdb->get_results( 
+		"
+		SELECT attached_image_id, image_id
+		FROM " . $wpdb->prefix . "foxypress_inventory_images
+		WHERE inventory_id = " . $post->ID . " 
+		ORDER BY image_order ASC
+		"
+	);
+	
+	foreach ( $images as $image ) 
+	{
+		// Check to see if image has been deleted
+		if (get_post($image->attached_image_id) == null) {
+			// Delete image attachment
+			foxypress_RemoveInventoryImage($image->image_id);
+		} else {
+			$current_images .= "<li id='product-image-" . $image->attached_image_id . "' class='CreatePhoto'><div class='PhotoWrapper'><img src='" . wp_get_attachment_thumb_url($image->attached_image_id) . "' style='max-width:150px;' /><div id='remove-image-" . $image->attached_image_id . "' class='remove-image'><img src='" . plugins_url( 'img/x.png' , __FILE__ ) . "' /></div></div></li>";
+		}
+	}
+	?>
+	<div class="subhead"><?php _e('Current Product Images', 'foxypress'); ?></div>
+	<a class="fp-open-media button" href="#" target="wp-preview" id="post-preview">Add Product Images</a>
+	<div id="inventory_images"><ul><?php echo($current_images) ?></ul></div>
+	<div style="clear:both;"></div>
+	<script>
+		jQuery(document).ready(function($){
+		    // Prepare the variable that holds our custom media manager.
+		    var fp_media_frame;
+		    
+		    // Bind to our click event in order to open up the new media experience.
+		    $(document.body).on('click.fpOpenMediaManager', '.fp-open-media', function(e){
+		        // Prevent the default action from occuring.
+		        e.preventDefault();
+		
+		        // If the frame already exists, re-open it.
+		        if ( fp_media_frame ) {
+		            fp_media_frame.open();
+		            return;
+		        }
+		
+		        // Create media frame with options
+		        //   *For additional options see wp-includes/js/media-views.js
+		        fp_media_frame = wp.media.frames.fp_media_frame = wp.media({
+		            
+		            className: 'media-frame fp-media-frame', // Custom frame class name
+		            frame: 'select', // Frame type. Either 'select' or 'post'
+		            multiple: true,
+		            title: 'Choose Additional Product Image(s)',
+		            // Limit view to library
+		            library: {
+		                type: 'image'
+		            },
+		            button: {
+		                text:  'Select Image(s)'
+		            }
+		        });
+		
+		        // On form submit event handler
+		        fp_media_frame.on('select', function(){
+		            // Grab our attachment selection and construct a JSON representation of the model.
+		            var media_attachments = fp_media_frame.state().get('selection').toJSON();
+					
+					// Update Product Images with selected images
+					for (var i = 0; i < media_attachments.length; i++) {
+						addToProductImages(media_attachments[i]);
+					}
+					
+					productImagesSortable(); // Re-enable sortable 
+					saveImageOrder(); // Saves image order
+		        });
+		
+		        // Now that everything has been set, let's open up the frame.
+		        fp_media_frame.open();
+		    });
+		    
+		    function addToProductImages(media_attachment) {
+		    	
+		    	// Check to make sure the image doesn't already exist in the image array
+		    	if ($('#product-image-' + media_attachment.id).length > 0) {
+		    		// Image already exists - do not add again
+		    	} else {
+		    		$('#inventory_images > ul').append("<li id='product-image-" + media_attachment.id + "' class='CreatePhoto'><div class='PhotoWrapper'><img src='" + media_attachment.sizes.thumbnail.url + "' style='max-width:150px;' /><div id='remove-image-" + media_attachment.id + "' class='remove-image'><img src='<?php echo  plugins_url( 'img/x.png' , __FILE__ ); ?>' /></div></div></li>");
+		    	}
+		    }
+		    
+		    function productImagesSortable() {
+		    	jQuery( "#inventory_images > *" ).sortable(
+		    		{
+		    			revert: true,
+		    			update: function(event, ui) { saveImageOrder(); }
+		    		}
+		    	);
+		    }
+		    
+		    // Execute on first load
+		    productImagesSortable();
+			
+			var image_ajax_request;
+			
+			function saveImageOrder()
+			{
+				var ImageOrder = jQuery( "#inventory_images > *" ).sortable("toArray");
+	
+				var url = "<?php echo(plugins_url()) . "/foxypress/ajax.php?m=update-images&sid=" . session_id() . "&product-id=" . $post->ID . "&order=" ?>" + ImageOrder;
+	
+				image_ajax_request = jQuery.ajax({
+					url : url,
+					type : "GET",
+					datatype : "json",
+					cache : "false"
+				});
+			}
+			
+			$(document).on("click", ".remove-image", function(){ 
+				// Remove list item from DOM
+				$(this).parent().parent().remove();
+				// Save new image order
+				saveImageOrder();
+			});
+		});
+	</script>
+	
+	<?php
+	/*
+	// Check for featured image
 	$featuredImageID = (has_post_thumbnail($post->ID) ? get_post_thumbnail_id($post->ID) : 0);
 	$featuredImageSource = "";
 	//get images
@@ -536,7 +703,7 @@ function foxypress_product_images_setup()
 			}
 		</script>
 	<?php
-	}
+	}*/
 }
 
 function foxypress_product_details_setup()

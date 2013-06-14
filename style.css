@@ -136,7 +136,7 @@ form.foxycart{}
 /* If using the eazyzoom display method, you will also need to change
    the #easy_zoom {left: } setting in foxypress/css/easyzoom.css 
    if you change this main item width: */
-#foxypress_main_item_image{width:425px;}
+.foxypress_main_item_image{width:425px;}
 
 	
 	ul.foxypress_item_image_thumbs_detail{list-style-type:none;margin:0;}

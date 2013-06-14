@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.1
+Version: 0.4.3.2
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.1");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.2");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -598,7 +598,7 @@ function foxypress_FlushRewrites()
 function foxypress_admin_css()
 {
 	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() .  "/foxypress/css/smoothness/jquery-ui-1.8.17.custom.css\">");
-	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css\">");
+	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css?ver=8\">");
 }
 
 function foxypress_admin_js()
@@ -999,26 +999,39 @@ function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=
 function foxypress_GetMainInventoryImage($inventory_id)
 {
 	global $wpdb, $post;
-
-	$featuredImageID = (has_post_thumbnail($inventory_id)) ? get_post_thumbnail_id($inventory_id) : 0;
-
-	if($featuredImageID != 0)
-	{
-		$featuredSrc = wp_get_attachment_image_src($featuredImageID, "full");
-		return $featuredSrc[0];
-	}
-	else
-	{
-		$current_images = $wpdb->get_results("SELECT * FROM  " . $wpdb->prefix . "posts WHERE  post_parent = " . $inventory_id . " AND post_type='attachment' ORDER BY menu_order ASC LIMIT 0,1");
-		//$current_images = get_posts(array('numberposts' => 1, 'post_type' => 'attachment', 'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order'));
-		if(!empty($current_images))
+	
+	if (has_post_thumbnail($inventory_id)) {
+		// Get featured image if it exists
+		$featuredImage = wp_get_attachment_image_src(get_post_thumbnail_id($inventory_id), "full");
+		return $featuredImage[0];
+	} else {
+		// Use first valid image
+		$inventory_images = $wpdb->get_results( 
+			"
+			SELECT attached_image_id, image_id
+			FROM " . $wpdb->prefix . "foxypress_inventory_images
+			WHERE inventory_id = " . $inventory_id . " 
+			ORDER BY image_order ASC
+			"
+		);
+		
+		foreach ( $inventory_images as $image ) 
 		{
-			foreach ($current_images as $img)
-			{
-				$src = wp_get_attachment_image_src($img->ID, "full");
-				return $src[0];
+			if ($image != null) {
+				
+				// Check to see if image has been deleted
+				if (get_post($image->attached_image_id) == null) {
+					// Delete image attachment
+					foxypress_RemoveInventoryImage($image->image_id);
+				} else {
+					$featuredImage = wp_get_attachment_image_src($image->attached_image_id, "full");
+					return $featuredImage[0];
+				}
 			}
 		}
+		
+		// No valid image found - return the FoxyPress default product image
+		return plugins_url( 'img/' . INVENTORY_DEFAULT_IMAGE , __FILE__ );
 	}
 	return "";
 }
@@ -1038,16 +1051,102 @@ function foxypress_GetFirstInventoryImage($inventory_id)
 	return "";
 }
 
-function foxypress_GetFeaturedInventoryImage($inventory_id)
+/**
+ * Gets the Featured Image URL for the given post ID. If none
+ *   exists, returns an empty string.
+ * 
+ * @param $inventory_id  Post ID to get Featured Image
+ * @param $size          Size of image. If not provided, returns full
+ * 						   size. Options: thumbnail, medium, large or full
+ */
+function foxypress_GetFeaturedInventoryImage($inventory_id, $size = "full")
 {
 	global $wpdb, $post;
 	$featuredImageID = (has_post_thumbnail($inventory_id)) ? get_post_thumbnail_id($inventory_id) : 0;
 	if($featuredImageID != 0)
 	{
-		$featuredSrc = wp_get_attachment_image_src($featuredImageID, "full");
+		$featuredSrc = wp_get_attachment_image_src($featuredImageID, $size);
 		return $featuredSrc[0];
 	}
 	return "";
+}
+
+/**
+ * Returns an unordered list of thumbnails for the requested product post ID
+ * 
+ * @param $post_id    Post ID of product
+ * @param $title      Title of product
+ * @param $css_class  CSS class to attach to ul element
+ * @param $image_mode Image mode
+ */
+function foxypress_GetImageThumbs($post_id, $title, $css_class, $image_mode) {
+	global $wpdb;
+	
+	// Set up string used to hold all thumbnails
+	$ItemThumbs = "";
+	
+	// Display featured image as first thumb if it exists
+	$FeaturedImageThumb = foxypress_GetFeaturedInventoryImage($post_id, "thumbnail");
+	if ($FeaturedImageThumb != "") {
+		$FeaturedImageFull = foxypress_GetFeaturedInventoryImage($post_id, "full");
+		
+		if($image_mode == FOXYPRESS_USE_COLORBOX) {
+			$ItemThumbs .= "<li><a href=\"" . $FeaturedImageFull . "\" rel=\"colorbox\"><img src=\"" . $FeaturedImageThumb . "\" /></a></li>";
+		} else if($image_mode == FOXYPRESS_USE_LIGHTBOX) {
+			$ItemThumbs .= "<li><a href=\"" . $FeaturedImageFull . "\" rel=\"lightbox[foxypress" . $post_id. "]\" title=\"" . stripslashes($title) . "\"><img src=\"" . $FeaturedImageThumb . "\" /></a></li>";
+		} else {
+			$ToggleID = "toggle-image-" . foxypress_GenerateRandomString(8);
+			$ItemThumbs .= "<li><a id=\"$ToggleID\" href=\"javascript:ToggleItemImage('#$ToggleID', '" . $FeaturedImageFull . "');\" ><img src=\"" . $FeaturedImageThumb . "\" /></a></li>";
+		}
+	}
+	
+	// Get remaining inventory images attached to this product
+	$inventory_images = $wpdb->get_results( 
+		"
+		SELECT attached_image_id, image_id
+		FROM " . $wpdb->prefix . "foxypress_inventory_images
+		WHERE inventory_id = " . $post_id . " 
+		ORDER BY image_order ASC
+		"
+	);
+	
+	foreach ( $inventory_images as $image ) 
+	{
+		// Check to see if image has been deleted
+		if (get_post($image->attached_image_id) == null) {
+			// Delete image attachment
+			foxypress_RemoveInventoryImage($image->image_id);
+		} else {
+			$ImageFullAttributes = wp_get_attachment_image_src($image->attached_image_id, "full");
+			$ImageFullURL = $ImageFullAttributes[0];
+			$ImageThumbURL = wp_get_attachment_thumb_url($image->attached_image_id);
+			
+			if($image_mode == FOXYPRESS_USE_COLORBOX) {
+				$ItemThumbs .= "<li><a href=\"" . $ImageFullURL . "\" rel=\"colorbox\"><img src=\"" . $ImageThumbURL . "\" /></a></li>";
+			} else if($image_mode == FOXYPRESS_USE_LIGHTBOX) {
+				$ItemThumbs .= "<li><a href=\"" . $ImageFullURL . "\" rel=\"lightbox[foxypress" . $post_id. "]\" title=\"" . stripslashes($title) . "\"><img src=\"" . $FeaturedImageThumb . "\" /></a></li>";
+			} else {
+				$ToggleID = "toggle-image-" . foxypress_GenerateRandomString(8);
+				$ItemThumbs .= "<li><a id=\"$ToggleID\" href=\"javascript:ToggleItemImage('#$ToggleID', '" . $ImageFullURL . "');\" ><img src=\"" . $ImageThumbURL . "\" /></a></li>";
+			}
+		}
+	}
+	
+	// Determine if the ItemThumbs object is empty
+	if (strlen($ItemThumbs) > 0) {
+		// Otherwise return the thumbnails unordered list
+		return "<ul class=\"$css_class\">$ItemThumbs</ul>";
+	} else {
+		// Return a blank string if the object is empty
+		return "";
+	}
+}
+
+function foxypress_RemoveInventoryImage($inventory_image_id) {
+	global $wpdb;
+	
+	$query = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_images WHERE image_id='" . $wpdb->escape($inventory_image_id) . "'";
+	return $wpdb->query($query);
 }
 
 function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, $ShowAddToCart = true, $ShowMainImage = true, $ShowQuantityField = false, $CssSuffix = '', $IsPartOfListing = false)
@@ -1150,7 +1249,6 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 		$primary_category = stripslashes($item->category_name);
 	}
 	
-	
 	//check to see if we need to link to a detail page
 	if($showMoreDetail)
 	{
@@ -1159,74 +1257,32 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 
 	if($ShowAddToCart)
 	{
-		$FormID = "foxypress_form_" . foxypress_GenerateRandomString(8);
-		$ItemImages = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
-		if(!empty($ItemImages) && count($ItemImages) > 1)
-		{
-			$ItemThumbs = "<ul class=\"foxypress_item_image_thumbs" . $CssSuffix . "\">";
-			//check to see if we have a featured image, if we do, use that as the first thumb
-			$FeaturedImage = foxypress_GetFeaturedInventoryImage($item->ID);
-			if($FeaturedImage != "")
-			{
-				if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
-				{
-					$ItemThumbs .= "<li><a href=\"" . $FeaturedImage . "\" rel=\"colorbox\"><img src=\"" . $FeaturedImage . "\" /></a></li>";
-				}
-				else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
-				{
-					$ItemThumbs .= "<li><a href=\"" . $FeaturedImage . "\" rel=\"lightbox[foxypress" . $item->ID. "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $FeaturedImage . "\" /></a></li>";
-				}
-				else
-				{
-					$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $FeaturedImage . "');\" ><img src=\"" . $FeaturedImage . "\" /></a></li>";
-				}
-			}
-			//loop through all the images
-			foreach($ItemImages as $ii)
-			{
-				$temp_src = wp_get_attachment_image_src($ii->ID, "full");
-				//make sure were not repeating the featured image
-				if($FeaturedImage != $temp_src[0])
-				{
-					if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
-					{
-						$ItemThumbs .= "<li><a href=\"" . $temp_src[0] . "\" rel=\"colorbox\"><img src=\"" . $temp_src[0] . "\" /></a></li>";
-					}
-					else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
-					{
-						$ItemThumbs .= "<li><a href=\"" . $temp_src[0] . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($ii->post_title) . "\"><img src=\"" . $temp_src[0] . "\" /></a></li>";
-					}
-					else
-					{
-						$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $temp_src[0] . "');\" ><img src=\"" . $temp_src[0] . "\" /></a></li>";
-					}
-				}
-			}
-			$ItemThumbs .= "</ul>";
-		}
+		// Get image thumbnails
+		$ItemThumbs = foxypress_GetImageThumbs($item->ID, $item->post_title, "foxypress_item_image_thumbs", $Foxypress_Image_Mode); 
+		
 		if($ShowMainImage)
 		{
 			$MainImageOutput = "";
 			if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
 			{
-				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 			}
 			else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
 			{
-				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+				$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 			}
 			else if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM)
 			{
-				$MainImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+				$MainImageOutput = "<a href=\"" . $ItemImage . "\" class=\"easyzoom\" /><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 			}
 			else
 			{
-				$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
+				$MainImageOutput = "<img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" />";
 			}
 			
 			if ($ItemImage == "") {
 				// If there is no item image, use the default
-				$ImageOutput = "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" id=\"foxypress_main_item_image\" />";
+				$ImageOutput = "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" class=\"foxypress_main_item_image\" />";
 			}
 			else if ($ItemThumbs == "") {
 				// If there are no thumbnails, main image needs to be clickable
@@ -1235,10 +1291,10 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 			else {
 				if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM) {
 					// If Easy Image Zoom is in use, add easyzoom link container
-					$ImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+					$ImageOutput = "<a href=\"" . $ItemImage . "\" class=\"easyzoom\" /><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 				} else {
 					// Otherwise display main image without link
-					$ImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
+					$ImageOutput = "<img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" />";
 				}
 			}
 		}
@@ -1494,74 +1550,32 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 		$primary_category = stripslashes($item->category_name);
 	}
 	
-	$ItemImages = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
-	$ItemThumbs="";
-	if(!empty($ItemImages) && count($ItemImages) > 1)
-	{
-		$ItemThumbs = "<ul class=\"foxypress_item_image_thumbs_detail\">";
-		//check to see if we have a featured image, if we do, use that as the first thumb
-		$FeaturedImage = foxypress_GetFeaturedInventoryImage($item->ID);
-		if($FeaturedImage != "")
-		{
-			if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
-			{
-				$ItemThumbs .= "<li><a href=\"" . $FeaturedImage . "\" rel=\"colorbox\"><img src=\"" . $FeaturedImage . "\" /></a></li>";
-			}
-			else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
-			{
-				$ItemThumbs .= "<li><a href=\"" . $FeaturedImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $FeaturedImage . "\" /></a></li>";
-			}
-			else
-			{
-				$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $FeaturedImage . "');\" ><img src=\"" . $FeaturedImage . "\" /></a></li>";
-			}
-		}
-		//loop through all the images
-		foreach($ItemImages as $ii)
-		{
-			$temp_src = wp_get_attachment_image_src($ii->ID, "full");
-			//make sure were not repeating the featured image
-			if($FeaturedImage != $temp_src[0])
-			{
-				if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
-				{
-					$ItemThumbs .= "<li><a href=\"" . $temp_src[0] . "\" rel=\"colorbox\"><img src=\"" . $temp_src[0] . "\" /></a></li>";
-				}
-				else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
-				{
-					$ItemThumbs .= "<li><a href=\"" . $temp_src[0] . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($ii->post_title) . "\"><img src=\"" . $temp_src[0] . "\" /></a></li>";
-				}
-				else
-				{
-					$ItemThumbs .= "<li><a href=\"javascript:ToggleItemImage('" . $temp_src[0] . "');\" ><img src=\"" . $temp_src[0] . "\" /></a></li>";
-				}
-			}
-		}
-		$ItemThumbs .= "</ul>";
-	}
+	// Get image thumbnails
+	$ItemThumbs = foxypress_GetImageThumbs($item->ID, $item->post_title, "foxypress_item_image_thumbs_detail", $Foxypress_Image_Mode);
+	
 	if($showMainImage)
 	{
 		$MainImageOutput = "";
 		if($Foxypress_Image_Mode == FOXYPRESS_USE_COLORBOX)
 		{
-			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"colorbox\"><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 		}
 		else if($Foxypress_Image_Mode == FOXYPRESS_USE_LIGHTBOX)
 		{
-			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+			$MainImageOutput = "<a href=\"" . $ItemImage . "\" rel=\"lightbox[foxypress" . $item->ID . "]\" title=\"" . stripslashes($item->post_title) . "\"><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 		}
 		else if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM)
 		{
-			$MainImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+			$MainImageOutput = "<a href=\"" . $ItemImage . "\" class=\"easyzoom\" /><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 		}
 		else
 		{
-			$MainImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
+			$MainImageOutput = "<img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" />";
 		}
 		
 		if ($ItemImage == "") {
 			// If there is no item image, use the default
-			$ImageOutput = "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" id=\"foxypress_main_item_image\" />";
+			$ImageOutput = "<img src=\"" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "\" class=\"foxypress_main_item_image\" />";
 		}
 		else if ($ItemThumbs == "") {
 			// If there are no thumbnails, main image needs to be clickable
@@ -1570,10 +1584,10 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 		else {
 			if($Foxypress_Image_Mode == FOXYPRESS_USE_EASYIMAGEZOOM) {
 				// If Easy Image Zoom is in use, add easyzoom link container
-				$ImageOutput = "<a href=\"" . $ItemImage . "\" id=\"easyzoom\" /><img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" /></a>";
+				$ImageOutput = "<a href=\"" . $ItemImage . "\" class=\"easyzoom\" /><img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" /></a>";
 			} else {
 				// Otherwise display main image without link
-				$ImageOutput = "<img src=\"" . $ItemImage . "\" id=\"foxypress_main_item_image\" />";
+				$ImageOutput = "<img src=\"" . $ItemImage . "\" class=\"foxypress_main_item_image\" />";
 			}
 		}
 	}
@@ -2774,9 +2788,14 @@ function foxypress_GetFoxyPressIncludes()
 		$scripts .= "<script type=\"text/javascript\">
 		
 		jQuery(function(){
-			jQuery('#easyzoom').easyZoom({
-				parent: '.foxypress_zoom_image'
-			});
+			
+			// Only enable EasyImageZoom if there is one zoom element
+			if (jQuery('.easyzoom').length == 1) {
+				console.log('one easyzoom element found');
+				jQuery('.easyzoom').easyZoom({
+					parent: '.foxypress_zoom_image'
+				});
+			}
 		});
 		
 		</script>";
@@ -2834,14 +2853,13 @@ function foxypress_ImportFoxypressScripts()
 				jQuery('#foxypress_find_tracking_return').html(res);
 
 			}
-
+			
 			jQuery(document).ready(function() {
 				jQuery("a[rel='colorbox']").colorbox();
 
 				jQuery('#foxypress-errors').hide();
 				var curProdID = jQuery('[name=inventory_id]').val();
 				jQuery('#foxypress_' + curProdID).submit(function(event) {
-					event.preventDefault();
 					var error = false;
 
 					jQuery('#foxypress-errors').html('');
@@ -2853,16 +2871,17 @@ function foxypress_ImportFoxypressScripts()
 							jQuery('#foxypress-errors').append('Please select a ' + selectName + ' option.<br />')
 						}
 					});
-
+					
 					if (error == false) {
-						jQuery('.foxycart').submit();
+						// Let form submit on its own	
+						return true;					
 					} else {
+						// Prevent form from being submitted and show errors
+						event.preventDefault();
 						jQuery('#foxypress-errors').show();
+						return false;
 					}
-
-					return false;
 				});
-
 			});
 
 			function foxypress_modify_max(formid, data, selectedvalue, defaultmax)
@@ -2903,7 +2922,7 @@ function foxypress_ImportFoxypressScripts()
 				var img = jQuery(select_id).find('option:selected').attr('rel');
 				if (img != "")
 				{
-					jQuery('div.productimage').html('<img src="' + img + '" id="foxypress_main_item_image" class="foxypress_main_item_image" />');
+					jQuery('div.productimage').html('<img src="' + img + '" class="foxypress_main_item_image" />');
 				}
 			}
 
@@ -2935,18 +2954,21 @@ function foxypress_ImportFoxypressScripts()
 				}
 			}*/
 
-			function ToggleItemImage(newImage)
+			function ToggleItemImage(clickedElement, newImage)
 			{
-				jQuery('#foxypress_main_item_image').attr('src', newImage);
+				jQuery(clickedElement).parents().eq(2).find('.foxypress_main_item_image').attr('src', newImage);
 				
 				<?php 
 					// Only perform easyzoom Javascript functions if it's selected
 					if (get_option('foxypress_image_mode') == FOXYPRESS_USE_EASYIMAGEZOOM): 
 				?>
-			    jQuery('#easyzoom').attr('href', newImage);
-			    jQuery('#easyzoom').easyZoom({
-			    	parent: '.foxypress_zoom_image'
-			    });
+				// Only enable easyzoom if there is just one element
+				if (jQuery('.easyzoom').length == 1) {
+			    	jQuery('.easyzoom').attr('href', newImage);
+				    jQuery('.easyzoom').easyZoom({
+				    	parent: '.foxypress_zoom_image'
+				    });
+			    }
 				<?php endif; ?>
 			}
 
@@ -3477,7 +3499,8 @@ function foxypress_Install($apikey, $encryptionkey)
 		foxypress_Installation_CreateInventoryDownloadablesTable();
 		foxypress_Installation_CreateDownloadTransactionTable();
 		foxypress_Installation_CreateDownloadableDownloadTable();
-
+		foxypress_Installation_CreateInventoryImagesTable();
+		
 		foxypress_Installation_CreateAffiliatePaymentsTable();
 		foxypress_Installation_CreateAffiliateTrackingTable();
 		foxypress_Installation_CreateAffiliateReferralsTable();
@@ -3561,6 +3584,11 @@ function foxypress_Install($apikey, $encryptionkey)
 		if(!in_array($wpdb->prefix . "foxypress_inventory_downloadables", $tables))
 		{
 			foxypress_Installation_CreateInventoryDownloadablesTable();
+		}
+		//inventory images
+		if(!in_array($wpdb->prefix . "foxypress_inventory_images", $tables))
+		{
+			foxypress_Installation_CreateInventoryImagesTable();
 		}
 		//download transaction
 		if(!in_array($wpdb->prefix . "foxypress_downloadable_transaction", $tables))
@@ -4079,6 +4107,49 @@ function foxypress_Installation_CreateEmailTemplatesTable()
 	$wpdb->query($sql);
 }
 
+function foxypress_Installation_CreateInventoryImagesTable()
+{
+	global $wpdb;
+	//create inventory images table
+	$sql = "CREATE TABLE IF NOT EXISTS " . $wpdb->prefix . "foxypress_inventory_images (
+				image_id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				inventory_id bigint(20) unsigned NOT NULL,
+				attached_image_id bigint(20) unsigned NOT NULL,
+				image_order int(11) NOT NULL
+			)";
+	$wpdb->query($sql);
+	
+	// Pull in all attached images when creating this table for the first time
+	$attachment_posts = $wpdb->get_results( 
+		"
+		SELECT ID, post_parent, menu_order
+		FROM " . $wpdb->prefix . "posts
+		WHERE post_type = 'attachment' 
+		"
+	);
+	
+	// Loop through all attachment posts and create an entry for each in the 
+	//   new wp_foxypress_inventory_images table
+	foreach ( $attachment_posts as $attachment_post ) 
+	{
+		if ($attachment_post->post_parent > 0) {
+			$wpdb->insert( 
+				$wpdb->prefix . "foxypress_inventory_images", 
+				array( 
+					'inventory_id' => $attachment_post->post_parent, 
+					'attached_image_id' => $attachment_post->ID,
+					'image_order' => $attachment_post->menu_order
+				), 
+				array( 
+					'%d', 
+					'%d',
+					'%d'
+				) 
+			);
+		}
+	}
+}
+
 function foxypress_Installation_CreateSettings($encryption_key, $api_key)
 {
 	global $wpdb;
@@ -4142,7 +4213,6 @@ function foxypress_Installation_CreateInventoryImagesDirectory()
 		copy($defaultImage, ABSPATH . INVENTORY_IMAGE_LOCAL_DIR . INVENTORY_DEFAULT_IMAGE);
 	}
 }
-
 
 function foxypress_Installation_UpdateCurrentVersion()
 {
