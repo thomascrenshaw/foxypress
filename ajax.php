@@ -135,28 +135,32 @@
 				// Loop through images, adding each to the foxypress_inventory_images table
 				$numImages = count($images);
 				for ($i = 0; $i < $numImages; $i++) {
-					// Get image ID
-					$imageExploded = explode("-", $images[$i]);
-					$imageid = intval($imageExploded[count($imageExploded) - 1]);
+					// Make sure this isn't an empty string
+					if (strlen($images[$i]) > 0) {
 					
-					// Insert into database
-					$result['insert-' . $i] = $wpdb->insert( 
-						$wpdb->prefix . "foxypress_inventory_images", 
-						array( 
-							'inventory_id' => $product_id, 
-							'attached_image_id' => $imageid,
-							'image_order' => $i
-						), 
-						array( 
-							'%d', 
-							'%d',
-							'%d'
-						) 
-					);
-					
-					// Return some extra data in the result array if the insert was unsuccessful
-					if ($result['insert-' . $i] === false) {
-						$result['insert-' . $i . '-error'] = "inventoryId: $product_id; attached_image_id: $imageid; image_order: $i";
+						// Get image ID
+						$imageExploded = explode("-", $images[$i]);
+						$imageid = intval($imageExploded[count($imageExploded) - 1]);
+						
+						// Insert into database
+						$result['insert-' . $i] = $wpdb->insert( 
+							$wpdb->prefix . "foxypress_inventory_images", 
+							array( 
+								'inventory_id' => $product_id, 
+								'attached_image_id' => $imageid,
+								'image_order' => $i
+							), 
+							array( 
+								'%d', 
+								'%d',
+								'%d'
+							) 
+						);
+						
+						// Return some extra data in the result array if the insert was unsuccessful
+						if ($result['insert-' . $i] === false) {
+							$result['insert-' . $i . '-error'] = "inventoryId: $product_id; attached_image_id: $imageid; image_order: $i";
+						}
 					}
 				}
 			}

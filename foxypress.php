@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.2
+Version: 0.4.3.3
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.2");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.3");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -1078,10 +1078,13 @@ function foxypress_GetFeaturedInventoryImage($inventory_id, $size = "full")
  * @param $title      Title of product
  * @param $css_class  CSS class to attach to ul element
  * @param $image_mode Image mode
+ * @param $min_thumbs Minimum number of thumbnails required in order to display
  */
-function foxypress_GetImageThumbs($post_id, $title, $css_class, $image_mode) {
+function foxypress_GetImageThumbs($post_id, $title, $css_class, $image_mode, $min_thumbs = 0) {
 	global $wpdb;
 	
+	// Track how many thumbnails have been added
+	$numThumbs = 0;
 	// Set up string used to hold all thumbnails
 	$ItemThumbs = "";
 	
@@ -1098,6 +1101,8 @@ function foxypress_GetImageThumbs($post_id, $title, $css_class, $image_mode) {
 			$ToggleID = "toggle-image-" . foxypress_GenerateRandomString(8);
 			$ItemThumbs .= "<li><a id=\"$ToggleID\" href=\"javascript:ToggleItemImage('#$ToggleID', '" . $FeaturedImageFull . "');\" ><img src=\"" . $FeaturedImageThumb . "\" /></a></li>";
 		}
+		
+		$numThumbs++;
 	}
 	
 	// Get remaining inventory images attached to this product
@@ -1129,15 +1134,17 @@ function foxypress_GetImageThumbs($post_id, $title, $css_class, $image_mode) {
 				$ToggleID = "toggle-image-" . foxypress_GenerateRandomString(8);
 				$ItemThumbs .= "<li><a id=\"$ToggleID\" href=\"javascript:ToggleItemImage('#$ToggleID', '" . $ImageFullURL . "');\" ><img src=\"" . $ImageThumbURL . "\" /></a></li>";
 			}
+			
+			$numThumbs++;
 		}
 	}
 	
-	// Determine if the ItemThumbs object is empty
-	if (strlen($ItemThumbs) > 0) {
-		// Otherwise return the thumbnails unordered list
+	// Determine if the number of thumbnails matches the minimum requested, and that it's not empty
+	if ($numThumbs >= $min_thumbs && strlen($ItemThumbs) > 0) {
+		// Return the thumbnails unordered list
 		return "<ul class=\"$css_class\">$ItemThumbs</ul>";
 	} else {
-		// Return a blank string if the object is empty
+		// Otherwise return a blank string
 		return "";
 	}
 }
@@ -1258,7 +1265,7 @@ function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, 
 	if($ShowAddToCart)
 	{
 		// Get image thumbnails
-		$ItemThumbs = foxypress_GetImageThumbs($item->ID, $item->post_title, "foxypress_item_image_thumbs", $Foxypress_Image_Mode); 
+		$ItemThumbs = foxypress_GetImageThumbs($item->ID, $item->post_title, "foxypress_item_image_thumbs", $Foxypress_Image_Mode, 2); 
 		
 		if($ShowMainImage)
 		{
@@ -1551,7 +1558,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 	}
 	
 	// Get image thumbnails
-	$ItemThumbs = foxypress_GetImageThumbs($item->ID, $item->post_title, "foxypress_item_image_thumbs_detail", $Foxypress_Image_Mode);
+	$ItemThumbs = foxypress_GetImageThumbs($item->ID, $item->post_title, "foxypress_item_image_thumbs_detail", $Foxypress_Image_Mode, 2);
 	
 	if($showMainImage)
 	{
@@ -1994,11 +2001,11 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 				}
 				if ($image_js == true)
 				{
-					$JsToAdd = "foxypress_change_option_image(this);";
+					$JsToAdd = "foxypress_change_option_image(this, '" . stripslashes($groupName) . "');";
 				}
 				$MasterList .= "<div class=\"foxypress_item_options\">" .
 									 stripslashes($groupName) . ":
-									<select name=\"" . stripslashes($groupName) . "\" onchange=\"" . $JsToAdd . "\"><option rel='" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "' value=''>--Select--</option>"
+									<select id=\"" . str_replace(" ", "_", stripslashes($groupName)) . "\" name=\"" . stripslashes($groupName) . "\" onchange=\"" . $JsToAdd . "\"><option rel='" . INVENTORY_IMAGE_DIR . "/" . INVENTORY_DEFAULT_IMAGE . "' value=''>--Select--</option>"
 										. $listItems .
 									"</select>" .
 									$SetDefaultJS .
@@ -2917,7 +2924,7 @@ function foxypress_ImportFoxypressScripts()
 				}
 			}
 
-			function foxypress_change_option_image(select_id)
+			function foxypress_change_option_image(select_id, group_name)
 			{
 				var img = jQuery(select_id).find('option:selected').attr('rel');
 				if (img != "")
@@ -3062,6 +3069,30 @@ function foxypress_UpdateUser($UserID)
 	if($foxycart_customer_id)
 	{
 		add_user_meta($UserID, 'foxycart_customer_id', $foxycart_customer_id, true);
+	}
+}
+
+function foxypress_CheckValidAPIKey()
+{
+	$remoteDomain = get_option('foxycart_remote_domain');
+	if($remoteDomain){
+		$foxyStoreURL = get_option('foxycart_storeurl');
+	}else{
+		$foxyStoreURL = get_option('foxycart_storeurl') . ".foxycart.com";
+	}
+	$foxyAPIURL = "https://" . $foxyStoreURL . "/api";
+	$foxyData = array();
+	$foxyData["api_token"] =  get_option('foxycart_apikey');
+	$foxyData["api_action"] = "category_list";
+	$SearchResults = foxypress_curlPostRequest($foxyAPIURL, $foxyData);
+	$foxyXMLResponse = simplexml_load_string($SearchResults, NULL, LIBXML_NOCDATA);
+	if ($foxyXMLResponse->result == "SUCCESS")
+	{
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

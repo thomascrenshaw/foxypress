@@ -46,7 +46,7 @@ div.foxy_item_pagination span.disabled {
 }.PhotoWrapper:hover{border:solid #222 1px;}
 
 .remove-image {
-    background-color: #FFFFFF;
+    background-color: #F6F6F6;
     border: 1px solid transparent;
     border-radius: 5px 5px 5px 5px;
     box-shadow: 1px 1px 2px #000000;
@@ -222,11 +222,10 @@ table.product_options{margin-bottom:10px;}
 	border-style: solid;
 	border-width: 1px;
 	clear: both;
-	margin: 0;
+	margin: 20px 0;
 	width: 99%;
 	background-color: #F9F9F9;
 	border-color: #DFDFDF;
-	margin-bottom:20px;
 }
 .settings_head
 {

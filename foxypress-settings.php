@@ -14,6 +14,8 @@ add_action('admin_init', 'foxypress_settings_postback');
 function foxypress_settings_postback()
 {
 	global $wpdb;
+	$additional_params = "";
+	
 	if(isset($_POST['btnFoxyPressSettingsSaveWizard']))
 	{
 		update_option("foxycart_remote_domain", foxypress_FixPostVar('foxycart_remote_domain_wizard'));
@@ -23,7 +25,7 @@ function foxypress_settings_postback()
 		update_option("foxypress_image_mode", foxypress_FixPostVar('foxypress_image_mode_wizard'));
 
 		update_option("foxypress_skip_settings_wizard", "1");
-		header("location: " . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=foxypress-settings");
+		header("location: " . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=foxypress-settings" . $additional_params);
 	}
 	else if(isset($_POST['btnFoxyPressSettingsSave']))
 	{
@@ -39,7 +41,19 @@ function foxypress_settings_postback()
         update_option("foxypress_user_portal", foxypress_FixPostVar('foxypress_user_portal'));
 		update_option("foxycart_hmac", foxypress_FixPostVar('foxycart_hmac'));
 		update_option("foxycart_enable_multiship", foxypress_FixPostVar('foxycart_enable_multiship'));
-		update_option("foxycart_enable_sso", foxypress_FixPostVar('foxycart_enable_sso'));
+		
+		// Make sure API key is set properly before enabling SSO
+		if (foxypress_FixPostVar('foxycart_enable_sso') == 1) {
+			if (foxypress_CheckValidAPIKey()) {
+				// API key checks out properly
+				update_option("foxycart_enable_sso", foxypress_FixPostVar('foxycart_enable_sso'));
+			} else {
+				// API key does not check out
+				update_option("foxycart_enable_sso", "");
+				$additional_params .= "&error=" . urlencode("SSO cannot be enabled, as your FoxyCart account has the incorrect API key configured. Please copy the FoxyPress API Key (specified in Main Settings below) and paste it into the FoxyCart Advanced Settings page.");
+			}
+		}
+		
 		update_option("foxycart_show_dashboard_widget", foxypress_FixPostVar('foxycart_show_dashboard_widget'));
 		update_option("foxypress_max_downloads", foxypress_FixPostVar('foxypress_max_downloads'));
 		update_option("foxypress_qty_alert", foxypress_FixPostVar('foxypress_qty_alert'));
@@ -56,8 +70,7 @@ function foxypress_settings_postback()
 		update_option("foxypress_affiliate_approval_email_subject", foxypress_FixPostVar('foxypress_affiliate_approval_email_subject'));
 		$foxypress_affiliate_approval_email_body=str_replace("rn", "", stripslashes(foxypress_FixPostVar('foxypress_affiliate_approval_email_body')));
 		update_option("foxypress_affiliate_approval_email_body", $foxypress_affiliate_approval_email_body);
-
-
+		
 		if(function_exists('is_multisite') && is_multisite())
 		{
 			$OriginalBlog = $wpdb->blogid;
@@ -80,7 +93,7 @@ function foxypress_settings_postback()
 			}
 		}
 
-		header("location: " . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=foxypress-settings");
+		header("location: " . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "&page=foxypress-settings" . $additional_params);
 	}
 }
 
@@ -107,6 +120,14 @@ function foxypress_settings_page_load()
             <a class="button bold" href="http://affiliate.foxycart.com/idevaffiliate.php?id=182" target="_blank"><?php _e('Need a FoxyCart account?', 'foxypress'); ?></a>
         </div>
     </div>
+    <?php	
+    	// Get admin message if it's sent via GET
+    	if (isset($_GET['error'])) :
+    ?>
+    <div class="error">
+    	<p><?php _e( urldecode($_GET['error']), 'foxypress' ); ?></p>
+		</div>
+    <?php endif; ?>
     <div id="" class="settings_widefat">
         <div class="settings_head settings">
             <?php _e('Main Settings', 'foxypress'); ?>

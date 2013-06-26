@@ -44,6 +44,13 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.3.3 =
+* Bugfix: Image thumbnails will only be displayed via category short code when there are two or more images attached to a product
+* Feature: SSO now checks for a custom action, foxypress_sso_endpoint, before proceeding with the default SSO operation. This allows admins to implement their own SSO functionality
+* Feature: FoxyPress now checks to make sure the FoxyCart API Key is correct before enabling SSO
+* Bugfix:Fixed an issue with the new product image manager where a blank image would be left after removing all attached images
+* Bugfix: Fixed the remove attached image button background color
+
 = 0.4.3.2 =
 * Feature: New/Fixed Product Media uploader. This allows better attachment of images to your products with the latest WordPress media uploader alteration.
 * Bugfix: Too much recursion Javascript error on category pages that had certain javascript code.
