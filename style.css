@@ -1,0 +1,212 @@
+/** DEFAULT WIDGET STYLING **/
+#fc_cart{
+    background-color:#333333;
+    color: #FFFFFF;
+    position:absolute; /* don't edit this line */
+    top:0px; /* don't edit this line */
+    opacity:0; /* don't edit this line */
+    top:-500px; /* don't edit this line */
+	left:0px;
+    padding: 5px;
+    width: 15em;
+ 
+}
+#fc_cart h2{
+    color: #DF1E26;
+}
+.fc_clear{
+    clear: both;
+}
+#fc_cart img{
+    float:left;
+    margin: 5px;
+}
+#fc_cart table{
+    border-bottom: 1px solid #FFFFFF;
+    border-top: 1px solid #FFFFFF;
+    width: 100%;
+    font-size: 80%;
+    margin-bottom: 5px;
+}
+#fc_edit_link{
+    float:left;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    padding: 3px;
+    margin: 2px;
+    font-size: 80%;
+}
+#fc_checkout_link{
+    float:right;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+    padding: 3px;
+    margin: 2px;
+    font-size: 80%;
+}
+
+
+/** WIDGET STYLING **/
+#fc_cart{ 
+}
+#fc_cart h2{
+}
+.fc_clear{
+    clear: both;
+}
+#fc_cart img{
+}
+#fc_cart table{
+}
+#fc_edit_link{
+}
+#fc_checkout_link{
+}
+
+/* These css classes can be copied into your themes css style sheet and reworked as necessary */
+
+/** FOXYPRESS STYLING **/
+/** SINGLE ITEM **/
+.foxy_item_wrapper_single{float:right;width:260px;}
+
+form.foxycart{}
+
+.foxypress_item_name_single{font-weight:bold;}
+.foxypress_item_price_single{font-style:italic;}
+.foxypress_item_description_single{}
+.foxypress_item_options_detail{}
+.foxypress_item_quantity_single{width:20px;}
+.foxypress_item_options{}
+	div.foxypress_item_options select{}
+
+.foxypress_item_submit_wrapper_single{margin-top:10px;}
+	.foxypress_item_submit_wrapper_single .foxypress_item_submit{/*background:#FFFFFF;border:none;*/}
+	.foxypress_item_submit_wrapper_single .foxypress_item_submit:hover{/*background:#E4AE0A;*/}
+
+.foxypress_item_image_single{}
+
+	ul.foxypress_item_image_thumbs_single{list-style-type:none;margin:0;}
+		ul.foxypress_item_image_thumbs_single li{float:left;margin-top:5px;}
+		ul.foxypress_item_image_thumbs_single img{width:115px;margin-right:5px;}
+
+/** CATEGORY TEMPLATE **/
+.foxypress_item_row{}
+
+/* 3 column approach 
+.foxy_item_wrapper{float:left;width:300px;margin-right:15px;}*/
+
+/* 2 column approach */
+.foxy_item_wrapper{float:left;width:305px;margin-right:35px;}
+
+.foxypress_item_image{}
+	/* 3 column approach 
+	.foxypress_item_image img{width:300px;}*/
+
+	/* 2 column approach */
+	.foxypress_item_image img{width:300px;}
+
+.foxypress_item_content_wrapper{}
+	.foxypress_item_name{font-weight:bold;/*color:#E4AE0A;*/}
+	.foxypress_item_price{font-style:italic;/*font-weight:bold;*/}
+	.foxypress_item_description{/*font-style:italic;*/}
+	.foxypress_item_readmore {/*margin-top:10px;*/}
+		.foxypress_item_readmore a{/*color:red;*/}
+
+.foxypress_item_row_clear{clear:both;/*padding-bottom:20px;*/}
+.foxypress_item_quantity{width:20px;}
+
+/** PRODUCT DETAIL **/
+.foxy_item_wrapper_detail{float:right;width:400px;margin-left:50px;margin-bottom:20px;}
+.foxypress_detail{max-width: 925px;min-width: 405px;margin:0 auto;}
+form.foxycart{}
+
+.foxypress_item_name_detail{font-weight:bold;/*color:#E4AE0A;*/}
+.foxypress_item_price_detail{font-style:italic;/*font-weight:bold;*/}
+.foxypress_item_description_detail{/*font-style:italic;*/}
+.foxypress_item_options_detail{}
+.foxypress_item_options{}
+	div.foxypress_item_options select{}
+
+.foxypress_item_submit_wrapper_detail{margin-top:10px;}
+	.foxypress_item_submit_wrapper_detail .foxypress_item_submit{/*background:#FFFFFF;border:none;*/}
+	.foxypress_item_submit_wrapper_detail .foxypress_item_submit:hover{/*background:#E4AE0A;*/}
+
+.foxypress_item_image_detail{float:left;}
+
+/* If using the eazyzoom display method, you will also need to change
+   the #easy_zoom {left: } setting in foxypress/css/easyzoom.css 
+   if you change this main item width: */
+.foxypress_main_item_image{width:425px;}
+
+	
+	ul.foxypress_item_image_thumbs_detail{list-style-type:none;margin:0;}
+		ul.foxypress_item_image_thumbs_detail li{float:left;margin-top:5px;}
+		ul.foxypress_item_image_thumbs_detail img{width:125px;margin-right:5px;}
+
+.foxypress_item_quantity_detail{width:20px;}
+
+
+.foxypress_item_submit_wrapper_detail .shipto_select{margin-bottom:10px;}
+
+/** CATEGORY NO DETAIL **/
+.foxypress_item_row {clear:both;margin-bottom:40px;border-bottom:solid 1px #c4c4c4;}
+
+.foxypress_item_submit_wrapper_nodetail{margin-top:10px;}
+
+	ul.foxypress_item_image_thumbs_nodetail{list-style-type:none;margin:0;}
+		ul.foxypress_item_image_thumbs_nodetail li{float:left;margin-top:5px;}
+	ul.foxypress_item_image_thumbs_nodetail img{width:125px;margin-right:5px;}
+
+.foxypress_item_quantity_nodetail{width:20px;}
+
+/** CATEGORY NO DETAIL NEW **/
+	.foxypress_item_row{width:700px;}
+
+	.foxypress_item_content_wrapper_nodetail{float:right;width:250px;}
+
+	.foxypress_item_readmore_nodetail{display:none;}
+
+	.foxypress_item_image_nodetail{float:left;width:430px;}
+
+		.foxypress_item_image_nodetail img{width:430px;}
+
+	ul.foxypress_item_image_thumbs_nodetail{list-style-type:none;margin:0;}
+		ul.foxypress_item_image_thumbs_nodetail li{float:left;margin-top:5px;}
+			ul.foxypress_item_image_thumbs_nodetail img{width:125px;margin-right:5px;}
+
+	.foxypress_item_row_clear{clear:both;/*padding-bottom:20px;*/}
+
+
+/* pagination */
+div.foxy_item_pagination 
+{
+	padding: 3px;
+	margin: 3px;
+}		
+div.foxy_item_pagination a 
+{
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #AAAADD;	
+	text-decoration: none; /* no underline */
+}
+div.foxy_item_pagination a:hover, div.foxy_item_pagination a:active 
+{
+	border: 1px solid #000099;
+	color: #000;
+}
+div.foxy_item_pagination span.current 
+{
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #666666;	
+	font-weight: bold;
+	color: #666666;
+}
+div.foxy_item_pagination span.disabled 
+{
+	padding: 2px 5px 2px 5px;
+	margin: 2px;
+	border: 1px solid #EEE;
+	color: #ccc;
+}
