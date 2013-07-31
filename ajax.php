@@ -51,46 +51,17 @@
 			echo(GetErrorJSON());
 		}
 	}
-	else if($mode == "deletedownloadable")
+	else if($mode == "add_downloadable")
 	{
-		//we don't want to delete any downloads in case people still are downloading them.
-		$session_id = foxypress_FixGetVar('sid');
-		$downloadable_id = foxypress_FixGetVar('downloadableid');
-		$inventory_id = foxypress_FixGetVar('inventoryid');		
-		if($session_id == session_id())
-		{
-			if ($downloadable_id != "" && $inventory_id != "") 
-			{
-				$query = "UPDATE ". $wpdb->prefix  . "foxypress_inventory_downloadables SET status = '0' WHERE downloadable_id='" . mysql_escape_string($downloadable_id) . "'";		
-				$wpdb->query($query);			
-			}
-			echo("{\"ajax_status\":\"ok\"}");
-		}
-		else
-		{
-			echo(GetErrorJSON());	
-		}
+		echo json_encode(AddDigitalDownload());
 	}
-	else if($mode == "savemaxdownloads")
+	else if($mode == "remove_downloadable")
 	{
-		$session_id = foxypress_FixGetVar('sid');
-		$downloadable_id = foxypress_FixGetVar('downloadableid');
-		$inventory_id = foxypress_FixGetVar('inventoryid');		
-		$maxdownloads = foxypress_FixGetVar('maxdownloads');
-		if($session_id == session_id())
-		{
-			if ($downloadable_id != "" && $inventory_id != "") 
-			{			
-				$query = "UPDATE " . $wpdb->prefix  . "foxypress_inventory_downloadables SET maxdownloads='" . $maxdownloads. "' WHERE downloadable_id='" . mysql_escape_string($downloadable_id) . "'";		
-				$wpdb->query($query);		
-				
-			}
-			echo("{\"ajax_status\":\"ok\"}");	
-		}
-		else
-		{
-			echo(GetErrorJSON());	
-		}
+		echo json_encode(RemoveDigitalDownload());
+	}
+	else if($mode == "update_downloadable")
+	{
+		echo json_encode(UpdateDigitalDownload());
 	}
 	else if($mode == "resetdownloadcount")
 	{
@@ -378,6 +349,220 @@
 	function GetErrorJSON()
 	{
 		return "{\"ajax_status\":\"error\"}";
+	}
+	
+	/**
+	 * Adds given attachment ID as a digital download for the 
+	 * specified product
+	 * 
+	 * @since 0.4.3.4
+	 * 
+	 * @return array Response object as an array
+	 */
+	function AddDigitalDownload() {
+		// Create result array for the AJAX response object
+		$result = array();
+		
+		$session_id = foxypress_FixGetVar('sid');
+		// Verify session ID matches
+		if($session_id != session_id())
+		{
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Session id does not match";	
+			return $result;
+		}
+		
+		$post_id = foxypress_FixGetVar('pid');
+		// Verify Post ID is an int
+		if (!is_numeric($post_id)) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Invalid post id";	
+			return $result;
+		}
+		// Verify Post ID refers to a foxypress product
+		if (get_post_type($post_id) != "foxypress_product") {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Post id does not refer to a foxypress product";	
+			return $result;
+		}
+		
+		$attachment_id = foxypress_FixGetVar('aid');	
+		// Verify Attachment ID is an int
+		if (!is_numeric($attachment_id)) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Invalid attachment id";	
+			return $result;
+		}
+		// Verify Post ID refers to a foxypress product
+		if (get_post_type($attachment_id) != "attachment") {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Attachment id does not refer to an attachment";	
+			return $result;
+		}
+		
+		$attachment_url = wp_get_attachment_url($attachment_id);
+		// Check allowed file types
+		$attachment_extension = foxypress_ParseFileExtension($attachment_url);
+		$allowedFileTypes = array('jpg','jpeg','gif','png','zip');
+		if (!in_array($attachment_extension,$allowedFileTypes)) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Attachment type '$attachment_extension' not allowed. Digital downloads file types limited to " . implode(", ", $allowedFileTypes);
+			return $result;
+		}
+		
+		// Generate new filename
+		$target_path = ABSPATH . INVENTORY_DOWNLOADABLE_LOCAL_DIR;
+		$attachment_prefix = get_the_title($attachment_id);
+		$attachment_prefix = str_replace(" ", "_", $attachment_prefix);
+		$attachment_prefix .= "_";
+		$attachment_new_filename = foxypress_GenerateNewFileName($attachment_extension, $post_id, $target_path, $attachment_prefix);
+		$attachment_new_url = $target_path . $attachment_new_filename;
+		
+		// Copy attachment to new location
+		$copy_result = copy($attachment_url, $attachment_new_url);
+		if (!$copy_result) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Unable to copy attachment to download location";	
+			return $result;
+		}
+		
+		$max_downloads = 5;
+		global $wpdb;
+		$insert_result = $wpdb->insert( 
+			$wpdb->prefix . "foxypress_inventory_downloadables", 
+			array( 
+				'inventory_id' => $post_id, 
+				'filename' => mysql_escape_string($attachment_new_filename),
+				'maxdownloads' => $max_downloads,
+				'status' => 1
+			), 
+			array( 
+				'%d',
+				'%s',
+				'%d',
+				'%d'
+			) 
+		);
+		$downloadable_id = $wpdb->insert_id;
+		
+		// Check to make sure insert didn't return false
+		if (!$insert_result) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Unable to add attachment to digital download database table";	
+			return $result;
+		}
+		
+		$result['ajax_status'] = "ok";
+		$result['filename'] = $attachment_new_filename;
+		$result['maxdownloads'] = $max_downloads;
+		$result['downloadable_id'] = $downloadable_id;
+		return $result;
+	}
+	
+	/**
+	 * Removes digital download from the specified product 
+	 * 
+	 * @since 0.4.3.4
+	 * 
+	 * @return array Response object as an array
+	 */
+	function RemoveDigitalDownload() {
+		// Create result array for the AJAX response object
+		$result = array();
+		
+		$session_id = foxypress_FixGetVar('sid');
+		// Verify session ID matches
+		if($session_id != session_id())
+		{
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Session id does not match";	
+			return $result;
+		}
+		
+		$downloadable_id = foxypress_FixGetVar('did');
+		// Verify download ID is an int
+		if (!is_numeric($downloadable_id)) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Invalid download id";	
+			return $result;
+		}
+		
+		global $wpdb;
+		$rows_updated = $wpdb->update( 
+			$wpdb->prefix . 'foxypress_inventory_downloadables', 
+			array( 'status' => 0 ), 
+			array( 'downloadable_id' => $downloadable_id ), 
+			array( '%d' ), 
+			array( '%d' ) 
+		);
+		
+		// Make sure that there were some rows updated
+		if ($rows_updated == false) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Unable to remove downloadable";	
+			return $result;
+		}
+		
+		$result['ajax_status'] = "ok";
+		$result['rows_updated'] = $rows_updated;
+		return $result;
+	}
+	
+	/**
+	 * Updates max downloads for the specified product 
+	 * 
+	 * @since 0.4.3.4
+	 * 
+	 * @return array Response object as an array
+	 */
+	function UpdateDigitalDownload() {
+		// Create result array for the AJAX response object
+		$result = array();
+		
+		$session_id = foxypress_FixGetVar('sid');
+		// Verify session ID matches
+		if($session_id != session_id())
+		{
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Session id does not match";	
+			return $result;
+		}
+		
+		$downloadable_id = foxypress_FixGetVar('did');
+		// Verify download ID is an int
+		if (!is_numeric($downloadable_id)) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Invalid download id";	
+			return $result;
+		}
+		
+		$max_downloads = foxypress_FixGetVar('maxdl');
+		// Verify download ID is an int
+		if (!is_numeric($max_downloads)) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Max downloads must be numeric";	
+			return $result;
+		}
+		
+		global $wpdb;
+		$rows_updated = $wpdb->update( 
+			$wpdb->prefix . 'foxypress_inventory_downloadables', 
+			array( 'maxdownloads' => $max_downloads ), 
+			array( 'downloadable_id' => $downloadable_id ), 
+			array( '%d' ), 
+			array( '%d' ) 
+		);
+		
+		// Make sure that there were some rows updated
+		if ($rows_updated == false) {
+			$result['ajax_status'] = "error";
+			$result['error_text'] = "Unable to update downloadable";	
+			return $result;
+		}
+		
+		$result['ajax_status'] = "ok";
+		$result['rows_updated'] = $rows_updated;
+		return $result;
 	}
 	
 	exit;

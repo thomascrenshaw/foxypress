@@ -267,6 +267,7 @@ function foxypress_product_meta_init()
 	add_meta_box('product_details_meta', 'Required Product Details', 'foxypress_product_details_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
 	add_meta_box('product_categories_meta', 'Product Categories', 'foxypress_product_categories_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
 	add_meta_box('product_categories_primary_meta', 'Primary Category', 'foxypress_product_categories_primary_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'high');
+	add_meta_box('product_related_items_meta', 'Related Items', 'foxypress_related_items_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'low');
 	add_meta_box('extra_product_details_meta', 'Extra Product Details', 'foxypress_extra_product_details_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'low');
 	add_meta_box('product_deal_meta', 'Daily Deal', 'foxypress_product_deal_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'side', 'low');
 	add_meta_box('product_images_meta', 'Product Images', 'foxypress_product_images_setup', FOXYPRESS_CUSTOM_POST_TYPE, 'normal', 'high');
@@ -384,22 +385,163 @@ function foxypress_product_categories_setup()
 function foxypress_product_digital_download_setup()
 {
 	global $post, $wpdb;
-
-	$ajax_nonce = wp_create_nonce("foxy-download");
-	$fp_current_downloadables = "";
-	$fp_has_downloadable = false;
 	$fp_ajax_url = plugins_url() . "/foxypress/ajax.php";
-	$inventory_id = $post->ID;
-	//get current image
-	$inventory_downloadables = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_downloadables WHERE inventory_id = '" . $inventory_id . "' AND status = '1'");
-	if(!empty($inventory_downloadables))
-	{
-		foreach($inventory_downloadables as $d)
-		{
-			$fp_current_downloadables .= "<a href=\"" . get_bloginfo("url") . "/wp-content/inventory_downloadables/" . $d->filename . "\" target=\"_blank\">" . $d->filename . "</a> &nbsp; <img src=\"" . plugins_url() . "/foxypress/img/delimg.png\" alt=\"\" onclick=\"DeleteDownloadable('" . $fp_ajax_url. "', '" . session_id() . "', '" . $inventory_id . "', '" . $d->downloadable_id . "');\" class=\"RemoveItem\" align=\"bottom\"/> Max Downloads: <input type=\"text\" name=\"inv_downloadable_update_max_downloads\" id=\"inv_downloadable_update_max_downloads\" value=\"" . $d->maxdownloads . "\" style=\"width:40px;\" /> <input type=\"button\" name=\"inv_downloadable_update_max_downloads_button\" id=\"inv_downloadable_update_max_downloads_button\" value=\"Update\" onclick=\"SaveMaxDownloads('" . $fp_ajax_url . "', '" . session_id() . "', '" . $inventory_id . "', '" . $d->downloadable_id . "');\" /><img src=\"" . plugins_url() . "/foxypress/img/ajax-loader.gif\" id=\"inv_downloadable_loading\" name=\"inv_downloadable_loading\" style=\"display:none;\" />";
-		}
-		$fp_has_downloadable = true;
-	}
+	$inventory_downloadables = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_downloadables WHERE inventory_id = '" . $post->ID . "' AND status = '1'");
+?>
+<ul class="download-list">
+<?php
+	foreach($inventory_downloadables as $d) :
+?>
+	<li class="download-id-<?php echo $d->downloadable_id; ?>"><strong><?php echo $d->filename; ?></strong></li>
+	<li class="download-id-<?php echo $d->downloadable_id; ?>">
+		<ul class="indent">
+			<li>Max downloads: <input type="text" name="inv_downloadable_update_max_downloads" class="inv_downloadable_update_max_downloads" value="<?php echo $d->maxdownloads; ?>" style="width:40px;" /><a class="button download-update" href="#" data-id="<?php echo $d->downloadable_id; ?>">Update</a></li>
+			<li><span class="submitbox"><a class="submitdelete download-delete" href="#" data-id="<?php echo $d->downloadable_id; ?>">Remove Download</a></span></li>
+		</ul>
+	</li>
+<?php
+	endforeach;
+?>
+</ul>
+<a class="fp-attach-download button" href="#" target="wp-preview">Add Digital Download</a>
+<span class="download-message"><span class="spinner" style="float: left;"></span><span class="text"></span></span>
+<div style="clear:both;"></div>
+<script>
+	jQuery(document).ready(function($){
+    // Prepare the variable that holds our custom media manager.
+    var fp_download_frame;
+    
+    // Bind to our click event in order to open up the new media experience.
+    $(document.body).on('click.fpAttachDownload', '.fp-attach-download', function(e){
+        // Prevent the default action from occuring.
+        e.preventDefault();
+				
+        // If the frame already exists, re-open it.
+        if ( fp_download_frame ) {
+            fp_download_frame.open();
+            return;
+        }
+				
+        // Create media frame with options
+        //   *For additional options see wp-includes/js/media-views.js
+        fp_download_frame = wp.media.frames.fp_download_frame = wp.media({
+            
+            className: 'media-frame fp-download-frame', // Custom frame class name
+            frame: 'select', // Frame type. Either 'select' or 'post'
+            multiple: false,
+            title: 'Select File for Digital Download',
+            button: {
+                text:  'Select File'
+            }
+        });
+				
+        // On form submit event handler
+        fp_download_frame.on('select', function(){
+          // Grab our attachment selection and construct a JSON representation of the model.
+          var file_attachments = fp_download_frame.state().get('selection').toJSON();
+					
+					// Update Product Images with selected images
+					for (var i = 0; i < file_attachments.length; i++) {
+						addToDigitalDownloads(file_attachments[i]);
+					}
+        });
+				
+        // Now that everything has been set, let's open up the frame.
+        fp_download_frame.open();
+    });
+		
+		var download_ajax_request;
+		
+    function addToDigitalDownloads(file_attachment) {
+    	
+    	$(".download-message .spinner").show();
+    	$(".fp-attach-download").hide();
+    	
+			var ajaxUrl = "<?php echo $fp_ajax_url; ?>";
+			var mode = "add_downloadable";
+			var session_id = "<?php echo session_id(); ?>";
+			var attachment_id = file_attachment.id;
+			var post_id = "<?php echo $post->ID; ?>";
+			
+    	var url = ajaxUrl + "?m=" + mode + "&sid=" + session_id + "&aid=" + attachment_id + "&pid=" + post_id;
+    	
+			download_ajax_request = jQuery.ajax({
+				url : url,
+				type : "GET",
+				datatype : "json",
+				cache : "false",
+				success : function(data, textStatus, jqXHR) {
+					if (data.ajax_status == "ok") {
+						addDigitalDownload(data.filename, data.maxdownloads, data.downloadable_id);
+						$(".download-message .text").text("");
+					} else {
+						$(".download-message .text").text(data.error_text);
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					$(".download-message .text").text(errorThrown);
+				},
+				complete : function(jqXHR, textStatus) {
+					$(".download-message .spinner").hide();
+					$(".fp-attach-download").show();
+				}
+			});
+    }
+    
+    function addDigitalDownload(filename, maxdownloads, downloadable_id) {
+    	$(".download-list").append('<li class="download-id-' + downloadable_id + '"><strong>' + filename + '</strong></li><li class="download-id-' + downloadable_id + '"><ul class="indent"><li>Max downloads: <input type="text" name="inv_downloadable_update_max_downloads" class="inv_downloadable_update_max_downloads" value="' + maxdownloads + '" style="width:40px;" /><a class="button download-update" href="#" data-id="' + downloadable_id + '">Update</a></li><li><span class="submitbox"><a class="submitdelete download-delete" href="#" data-id="' + downloadable_id + '">Remove Download</a></span></li></ul></li>');
+    }
+    
+    // Click listener for digital downloads update
+    $(document.body).on('click', '.download-update', function(e){
+        // Prevent the default action from occuring.
+        e.preventDefault();
+    		
+    		var ajaxUrl = "<?php echo $fp_ajax_url; ?>";
+    		var mode = "update_downloadable";
+    		var session_id = "<?php echo session_id(); ?>";
+    		var downloadable_id = $(this).attr('data-id');
+    		var max_downloads = $('.download-id-' + $(this).attr('data-id') + ' .inv_downloadable_update_max_downloads').val();
+    		
+    		var url = ajaxUrl + "?m=" + mode + "&sid=" + session_id + "&did=" + downloadable_id + "&maxdl=" + max_downloads;
+    		
+    		var delete_downloadable_ajax_request = jQuery.ajax({
+    			url : url,
+    			type : "GET",
+    			datatype : "json",
+    			cache : "false"
+    		});
+    });
+    
+    // Click listener for digital downloads remote
+    $(document.body).on('click', '.download-delete', function(e){
+      // Prevent the default action from occuring.
+      e.preventDefault();
+  		
+  		var ajaxUrl = "<?php echo $fp_ajax_url; ?>";
+  		var mode = "remove_downloadable";
+  		var session_id = "<?php echo session_id(); ?>";
+  		var downloadable_id = $(this).attr('data-id');
+  		
+  		var url = ajaxUrl + "?m=" + mode + "&sid=" + session_id + "&did=" + downloadable_id;
+  		
+  		var delete_downloadable_ajax_request = jQuery.ajax({
+  			url : url,
+  			type : "GET",
+  			datatype : "json",
+  			cache : "false"
+  		});
+  		
+  		// Remove entry from the list of digital downloads
+  		$('.download-id-' + $(this).attr('data-id')).remove();
+    });
+    
+	});
+</script>
+
+<?php
+	
+	/*
 ?>
 	<div id="inventory_downloadable_upload" <?php echo(($fp_has_downloadable) ? " style=\"display:none;\"" : "") ?>>
     	<p><?php _e('Making your product into a digital download is simple, just fill out the form below.  Once you\'ve filled out the information below and provided a downloadable, your product will be marked as a downloadable product and will send your users an email with their download link.', 'foxypress'); ?></p>
@@ -497,6 +639,7 @@ function foxypress_product_digital_download_setup()
 		}
 	</script>
 <?php
+*/
 }
 
 function foxypress_product_images_setup()
@@ -636,74 +779,7 @@ function foxypress_product_images_setup()
 			});
 		});
 	</script>
-	
 	<?php
-	/*
-	// Check for featured image
-	$featuredImageID = (has_post_thumbnail($post->ID) ? get_post_thumbnail_id($post->ID) : 0);
-	$featuredImageSource = "";
-	//get images
-	$images = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $post->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
-	$current_images = "";
-	foreach ($images as $img)
-	{
-		$image_source = wp_get_attachment_image_src($img->ID, "thumbnail");
-		if($featuredImageID == $img->ID)
-		{
-			$featuredImageSource =  $image_source[0];
-		}
-		else
-		{
-			$current_images .= "<li id=\"inventory_images-" . $img->ID . "\" class=\"CreatePhoto\">
-									 <div class=\"PhotoWrapper\">
-										<img src=\"" . $image_source[0] . "\" / style=\"max-width:150px;\">
-									</div>
-								 </li>";
-		}
-	}
-	?>
-    <p>Simply add new items through the <a href="#" class="insert-media add_media" data-editor="content" title="Add Media"><span class="wp-media-buttons-icon"></span> media upload window</a>. Any images that are in the gallery will be attached to this product. <a href="post.php?post=<?php echo($post->ID);?>&action=edit">Refresh</a> or click update on the right if you aren't seeing the latest images uploaded.</p>
-
-    <?php
-	if($featuredImageSource != "")
-	{
-    	echo("<div class='subhead'>Featured Product Image</div>
-			  <div class='PhotoWrapper'><img src=\"" . $featuredImageSource . "\" style=\"max-width:150px;\"></div>");
-    }
-	if(!empty($images) && count($images) > 0)
-	{
-	?>
-	<div class="subhead"><?php _e('Current Product Images', 'foxypress'); ?></div>
-	<div id="inventory_images"><ul><?php echo($current_images) ?></ul></div>
-	<div style="clear:both;"></div>
-    <script type="text/javascript" language="javascript">
-			jQuery(document).ready(function() {
-				 jQuery( "#inventory_images > *" ).sortable(
-					{
-						revert: true,
-						update: function(event, ui) { SaveImageOrder(); }
-					}
-				);
-			});
-
-			function SaveImageOrder()
-			{
-				var ImageOrder = jQuery( "#inventory_images > *" ).sortable("toArray");
-
-				var url = "<?php echo(plugins_url()) . "/foxypress/ajax.php?m=save-image-order&sid=" . session_id() . "&order=" ?>" + ImageOrder;
-
-				jQuery.ajax(
-							{
-								url : url,
-								type : "GET",
-								datatype : "json",
-								cache : "false"
-							}
-						);
-			}
-		</script>
-	<?php
-	}*/
 }
 
 function foxypress_product_details_setup()
@@ -745,6 +821,42 @@ function foxypress_product_details_setup()
 	</div>
     <div style="clear:both"></div>
     <input type="hidden" name="products_meta_noncename" value="<?php echo(wp_create_nonce(__FILE__)); ?>" />
+<?php
+}
+
+function foxypress_related_items_setup()
+{
+	global $post;
+	$products_selected = foxypress_GetRelatedItems($post->ID);
+	$products = get_posts( array( 'post_type' => FOXYPRESS_CUSTOM_POST_TYPE, 'numberposts' => 1000 ) );
+?>
+	<div id="add-page" class="postbox ">
+		<div id="posttype-page" class="posttypediv">
+			<div id="tabs-panel-posttype-page-most-recent" class="tabs-panel tabs-panel-active">
+				<ul id="pagechecklist-most-recent" class="categorychecklist form-no-clear">
+				<?php
+					foreach( $products as $product ) : 
+						$checked = "";
+						// Determine if this product is related
+						if ($products_selected === false) {
+							// There are no related products
+						} else {
+							if(in_array($product->ID, $products_selected)) {
+								$checked = " checked";
+							} 
+						}
+				?>
+						<li>
+							<label class="menu-item-title">
+								<input type="checkbox" name="_relatedProducts[]" value="<?php echo($product->ID); ?>"<?php echo $checked ?> /> <?php echo($product->post_title); ?>
+							</label>
+						</li>
+					<?php 
+					endforeach; ?>
+				</ul>
+			</div><!-- /.tabs-panel -->
+		</div>
+	</div>
 <?php
 }
 
@@ -1119,6 +1231,19 @@ function foxypress_product_meta_save($post_id)
 		foxypress_save_meta_data($post_id, '_item_deal_active',$_POST['_item_deal_active']);
 		foxypress_save_meta_data($post_id, '_item_deal_code_type',$_POST['_item_deal_code_type']);
 		foxypress_save_meta_data($post_id, '_item_deal_static_code',$_POST['_item_deal_static_code']);
+		
+		//save related products
+		$products_selected['_relatedProducts'] = $_POST['_relatedProducts'];
+		foreach ($products_selected as $key => $value) { 
+			if( $post->post_type == 'revision' ) return;
+			$value = implode(',', (array)$value); 
+			if(get_post_meta($post_id, $key, FALSE)) {
+			    update_post_meta($post_id, $key, $value);
+			} else { 
+			    add_post_meta($post_id, $key, $value);
+			}
+			if(!$value) delete_post_meta($post_id, $key);
+		}
 	}
 	return $post_id;
 }

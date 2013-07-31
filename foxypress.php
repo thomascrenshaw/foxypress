@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.3
+Version: 0.4.3.4
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.3");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.4");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -693,11 +693,11 @@ function foxypress_GetEditorPluginURL($type) {
 	}
 }
 
-function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
+function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "", $plaintext = false)
 {
 	$from = $mail_from;
-	$subject = $mail_subject;
 	if(get_option("foxypress_smtp_host")!='' && get_option("foxypress_email_username")!='' && get_option("foxypress_email_password")!=''){
+		
 		if($from == "")
 		{
 			$from = get_option("foxypress_email_username");
@@ -709,7 +709,7 @@ function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
 
 		$headers = array ('From' => $from,
 			   'To' => $to,
-			   'Subject' => $subject,
+			   'Subject' => $mail_subject,
 				'MIME-Version' => '1.0',
 				'Content-type' => 'text/html;charset=iso-8859-1');
 		//check if they are using a port or not for secure mail
@@ -727,8 +727,10 @@ function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
 			     'username' => $username,
 			     'password' => $password));
 		}
+		
 		//send email to customer
 		$mail = $smtp->send($to, $headers, $mail_body);
+		
 		if (PEAR::isError($mail)) {
 		  $emailSent=$mail->getMessage();
 		} else {
@@ -737,17 +739,16 @@ function foxypress_Mail($mail_to, $mail_subject, $mail_body, $mail_from = "")
 	}else{
 		if($from == "")
 		{
-			$from = get_settings("admin_email ");
-		}
-		if($from == "")
-		{
 			$from = get_option('admin_email');
 		}
-		//send email to customer
-		$headers = "MIME-Version: 1.0" . "\r\n";
-		$headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
-		$headers .= 'From: ' . get_option('blogname') . ' <' . $from . '>' . "\r\n";
-		mail($mail_to,$subject,$mail_body,$headers);
+		
+		// If plaintext is false (default), submit email as HTML
+		if ($plaintext === false) {
+			$headers[] = "Content-type:text/html;charset=iso-8859-1";
+		}
+		$headers[] = 'From: ' . get_option('blogname') . ' <' . $from . '>';
+		
+		$mail_result = wp_mail($mail_to,$mail_subject,$mail_body,$headers);
 	}
 }
 
@@ -915,6 +916,44 @@ function foxypress_GetMinMaxFormFields($DownloadableID, $min, $max, $qty)
 	}
 	return  $MinField .
 			$MaxField;
+}
+
+/**
+ * Shortcode function to display a list of items. Does not
+ * currently support pagination
+ * 
+ * @since 0.4.3.3
+ * 
+ * @param array $items An integer array of product IDs to output in list
+ * @param int $ItemsPerRow Number of items to display on each row
+ * @param bool $showMoreDetail 
+ * @param bool $ShowMainImage
+ * @param bool $ShowAddToCart
+ * @param bool $ShowQuantityField
+ */
+function foxypress_handle_shortcode_list($items, $ItemsPerRow=2, $showMoreDetail, $ShowMainImage=true, $ShowAddToCart=false, $ShowQuantityField=false)
+{
+	$output = "";
+	
+	if (!empty($items)) {
+		
+		for ($i = 0; $i < count($items); $i++) {
+			// Determine if this is the start of a row
+			if ($i % $ItemsPerRow == 0) {
+				$output .= "<div class=\"foxypress_item_row\">";
+			}
+			
+			// Print item
+			$output .= foxypress_handle_shortcode_item($items[$i], $showMoreDetail, $ShowAddToCart, $ShowMainImage, $ShowQuantityField, $CssSuffix, true);
+			
+			// Determine if this is the end of a row or the last item
+			if (($i + 1) % $ItemsPerRow == 0 || $i + 1 == count($items)) {
+				$output .= "<div class=\"foxypress_item_row_clear\">&nbsp;</div></div>";
+			}
+		}
+	}
+	
+	return $output;
 }
 
 function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=2, $showMoreDetail, $ShowMainImage=true, $ShowAddToCart=false, $ShowQuantityField=false)
@@ -2186,6 +2225,11 @@ function foxypress_shortcode( $atts, $content = null) {
 	{
 		$returnHTML = foxypress_handle_shortcode_listing(trim($atts['categoryid']), trim($atts['items']), trim($atts['cols']), $showMoreDetail, $showMainImage, $showAddToCart, $showQuantity);
 	}
+	else if($mode == 'related')
+	{
+		$related_items = foxypress_GetRelatedItems(trim($atts['productid']));
+		$returnHTML = foxypress_handle_shortcode_list($related_items, trim($atts['cols']), $showMoreDetail, $showMainImage, $showAddToCart, $showQuantity);
+	}
 	else if($mode == 'detail')
 	{
 		$returnHTML = foxypress_handle_shortcode_detail($showMainImage, $showQuantity);
@@ -3293,6 +3337,37 @@ function foxypress_option_exists($option_name)
 	return true;
 }
 
+/**
+ * Logs an event to the foxypress_event_log table.
+ *
+ * @since 0.4.3.4
+ * 
+ * @param string $event_data String to log to event table
+ * @return bool Returns false if insert was unsuccessful, true if insert was a success
+ */
+function foxypress_LogEvent($event_data) {
+	global $wpdb;
+	
+	$result = $wpdb->insert( 
+		$wpdb->prefix . "foxypress_event_log", 
+		array( 
+			'data' => $event_data
+		), 
+		array( 
+			'%s'
+		) 
+	);
+	
+	
+	if ($result === false) {
+		// Insert failed
+		return false;
+	} else {
+		// Insert successful
+		return true;
+	}
+}
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /************************************ Foxypress Installation ***************************************/
@@ -3538,7 +3613,8 @@ function foxypress_Install($apikey, $encryptionkey)
 		foxypress_Installation_CreateAffiliateAssetsTable();
 
 		foxypress_Installation_CreateEmailTemplatesTable();
-
+		
+		foxypress_Installation_CreateEventLogTable();
 		foxypress_Installation_CreateSettings($encryptionkey, $apikey);
 		foxypress_Installation_CreateInventoryDownloadablesDirectory();
 		foxypress_Installation_CreateInventoryImagesDirectory();
@@ -3656,6 +3732,11 @@ function foxypress_Install($apikey, $encryptionkey)
 		if(!in_array($wpdb->prefix . "foxypress_email_templates", $tables))
 		{
 			foxypress_Installation_CreateEmailTemplatesTable();
+		}
+		//event logging
+		if(!in_array($wpdb->prefix . "foxypress_event_log", $tables))
+		{
+			foxypress_Installation_CreateEventLogTable();
 		}
 
 		//handle alterations
@@ -4134,6 +4215,18 @@ function foxypress_Installation_CreateEmailTemplatesTable()
 				foxy_email_template_subject TEXT NULL,
 				foxy_email_template_email_body TEXT NULL,
 				foxy_email_template_from varchar(100) NULL
+			) ";
+	$wpdb->query($sql);
+}
+
+function foxypress_Installation_CreateEventLogTable()
+{
+	global $wpdb;
+	//create email templates table
+	$sql = "CREATE TABLE " . $wpdb->prefix . "foxypress_event_log (
+  			event_id bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+				data varchar(255) NOT NULL,
+				timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 			) ";
 	$wpdb->query($sql);
 }

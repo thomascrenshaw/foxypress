@@ -12,6 +12,11 @@ var FoxyPressDialog = {
 		tinyMCEPopup.editor.execCommand('mceInsertRawHTML', false, embedCode);
 		tinyMCEPopup.close();	
 	},
+	InsertRelatedItems : function(item_id) {
+		var embedCode = "[foxypress productid='" + item_id + "' addtocart='1' cols='1' showmoredetail='1' mode='related']FoxyPress[/foxypress]";
+		tinyMCEPopup.editor.execCommand('mceInsertRawHTML', false, embedCode);
+		tinyMCEPopup.close();		
+	},
 	/*InsertInventoryDetail : function(item_id) {
 		var embedCode = "[foxypress mode='detail']FoxyPress[/foxypress]";
 		tinyMCEPopup.editor.execCommand('mceInsertRawHTML', false, embedCode);

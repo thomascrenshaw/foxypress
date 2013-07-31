@@ -66,7 +66,7 @@ Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <title><?php _e('FoxyPress Plugin', 'foxypress'); ?></title>
 <script type="text/javascript" src="../../../wp-includes/js/tinymce/tiny_mce_popup.js"></script>
-<script type="text/javascript" src="js/dialog.js"></script>
+<script type="text/javascript" src="js/dialog.js?ver=2"></script>
 <script type="text/javascript" language="javascript">
 	function InsertItem(item_id)
 	{
@@ -75,6 +75,10 @@ Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.
 	function InsertCategory()
 	{
 		FoxyPressDialog.InsertCategoryListing(document.getElementById('foxy_category_listing').value, document.getElementById('foxy_show_addtocart').value, document.getElementById('foxy_paging_items').value, document.getElementById('foxy_paging_itemsperrow').value, document.getElementById('foxy_show_moredetail').value);
+	}
+	function RelatedItems(item_id)
+	{
+		FoxyPressDialog.InsertRelatedItems(item_id);
 	}
 </script>
 <style type="text/css">
@@ -85,7 +89,7 @@ Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.
 		font-family: "Lucida Grande", Verdana, sans-serif;
 		font-size: 10pt;
 		line-height: 20px;
-		background-image:url(../img/gradient.jpg);
+		background-image:url(img/gradient.jpg);
 		background-repeat:repeat-x;
 		background-color:#dfdfdf;
 	}
@@ -349,6 +353,7 @@ function ShowInventory()
                     <th class="manage-column inventory-heading" scope="col"><?php _e('Code','foxypress') ?></th>
                     <th class="manage-column inventory-heading" scope="col"><?php _e('Name','foxypress') ?></th>
                     <th class="manage-column inventory-heading" scope="col"><?php _e('Price','foxypress') ?></th>
+                    <th class="manage-column inventory-heading" scope="col"><?php _e('Related Items','foxypress') ?></th>
                 <?php
                 $class = '';
                 foreach ( $items as $item ) {
@@ -372,6 +377,7 @@ function ShowInventory()
                         <td><label for="inventory_code" class="inventory-label"><?php echo get_post_meta($item->ID, "_code", true); ?></label></td>
                         <td><label for="inventory_name"><?php echo stripslashes($item->post_title); ?></label></td>
                         <td><label for="inventory_price"><?php echo foxypress_FormatCurrency($price); ?></label></td>
+                        <td><input type="button" name="related" value="Insert Related Items" onclick="RelatedItems('<?php echo(stripslashes($item->ID)); ?>');" /></td>
                    </tr>
                 <?php }  ?>
         </table>

@@ -31,6 +31,8 @@ div.foxy_item_pagination span.disabled {
 	color: #ccc;
 }
 
+/** PRODUCT ADMIN PAGE **/
+
 .CreatePhoto {
 	float:left;
 	width:170px;
@@ -46,18 +48,18 @@ div.foxy_item_pagination span.disabled {
 }.PhotoWrapper:hover{border:solid #222 1px;}
 
 .remove-image {
-    background-color: #F6F6F6;
-    border: 1px solid transparent;
-    border-radius: 5px 5px 5px 5px;
-    box-shadow: 1px 1px 2px #000000;
-    display: none;
-    height: 17px;
-    padding: 4px;
-    position: absolute;
-    right: -4px;
-    text-align: center;
-    top: -4px;
-    width: 17px;
+	background-color: #F6F6F6;
+	border: 1px solid transparent;
+	border-radius: 5px 5px 5px 5px;
+	box-shadow: 1px 1px 2px #000000;
+	display: none;
+	height: 17px;
+	padding: 4px;
+	position: absolute;
+	right: -4px;
+	text-align: center;
+	top: -4px;
+	width: 17px;
 }
 .PhotoWrapper:hover .remove-image {
 	display: block;
@@ -143,6 +145,18 @@ table.product_options{margin-bottom:10px;}
 	padding-top: 10px;	
 	margin-bottom:10px;
 	font-weight:bold;
+}
+
+.download-message {
+	padding-left: 10px;
+}
+
+.download-list ul {
+	margin-bottom: 20px;
+}
+
+.indent {
+	margin-left: 20px;
 }
 
 .wizard_clear{

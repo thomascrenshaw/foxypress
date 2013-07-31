@@ -102,6 +102,7 @@ Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.
 			//restore blog
 			if($switched_blog) { restore_current_blog(); }
 			_e('Invalid Download ID');
+			_e("Download ID: " . mysql_escape_string($downloadable_id));
 			exit;
 		}	
 	}
@@ -110,6 +111,8 @@ Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.
 		//restore blog
 		if($switched_blog) { restore_current_blog(); }
 		_e('Invalid Download ID');
+		_e("Download ID: " . $jibberish_downloadable_id);
+		_e("Download ID: " . $downloadable_id);
 		exit;
 	}
 ?>

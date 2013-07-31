@@ -567,6 +567,19 @@ function foxypress_GetCategories()
 	return null;
 }
 
+function foxypress_GetCategoryByID($category_id)
+{
+	global $wpdb;
+	$item = $wpdb->get_row("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories WHERE category_id='" . $category_id . "'");
+							
+	if(!empty($item)){
+		$category = array();
+		$category['id'] = $item->category_id;
+		$category['name'] = $item->category_name;
+		$category['image'] = INVENTORY_IMAGE_DIR . "/" . $item->category_image;
+	}
+	return $category;
+}
 
 function foxypress_GetCategoryCount($category_id)
 {
@@ -592,6 +605,31 @@ function foxypress_GetCategoryCount($category_id)
 		return $item->ItemCount;
 	}
 	return "0";
+}
+
+/**
+ * Get all related items for a post
+ *
+ * @since 0.4.3.4
+ * 
+ * @param int $post_id Product post ID
+ * @return bool|array Returns an array of related items, or false if no related items are available
+ */
+function foxypress_GetRelatedItems($post_id) 
+{
+	$related_item_string = get_post_meta($post_id, '_relatedProducts', true);
+	
+	if ($related_item_string === "") 
+	{
+		// No related items stored in post meta
+		return false;
+	} 
+	else 
+	{
+		// At least one related item. Split into array
+		$related_items = split(",", $related_item_string);
+		return $related_items;
+	}
 }
 
 function foxypress_GetTrackingModule()
