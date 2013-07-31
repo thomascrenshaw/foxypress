@@ -50,6 +50,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 * Feature: Multiple digital downloads can be attached to a single product
 * Bugfix: Digital download email no longer blocked when sent from Rackspace Cloud
 * Bugfix: XML feeds that are re-fed will not adjust quantity or re-send digital download email if they have already been processed by FoxyPress
+* Release Notes: http://www.foxy-press.com/blog/2013/07/31/foxypress-0-4-3-4/
 
 = 0.4.3.3 =
 * Bugfix: Image thumbnails will only be displayed via category short code when there are two or more images attached to a product
