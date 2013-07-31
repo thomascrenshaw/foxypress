@@ -44,6 +44,13 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.3.4 =
+* Feature: Related Items can be assigned to each product and displayed via the related items shortcode (see FoxyPress dialog button in WYSIWYG editor) or the foxypress_GetRelatedItems PHP helper function
+* Feature: Attaching digital downloads to a product is now done with the Wordpress 3.5 Media Manager instead of Uploadify
+* Feature: Multiple digital downloads can be attached to a single product
+* Bugfix: Digital download email no longer blocked when sent from Rackspace Cloud
+* Bugfix: XML feeds that are re-fed will not adjust quantity or re-send digital download email if they have already been processed by FoxyPress
+
 = 0.4.3.3 =
 * Bugfix: Image thumbnails will only be displayed via category short code when there are two or more images attached to a product
 * Feature: SSO now checks for a custom action, foxypress_sso_endpoint, before proceeding with the default SSO operation. This allows admins to implement their own SSO functionality
