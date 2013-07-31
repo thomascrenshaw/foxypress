@@ -9,7 +9,7 @@ FoxyPress is a FREE shopping cart and product management tool that integrates wi
 
 == Description ==
 
-FoxyPress is a FREE shopping cart and product management tool that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. Take an in-depth look at some of our major features below, aimed to help alleviate the stress of building your site, so you can focus on making your products shine.
+FoxyPress is a FREE shopping cart and product management plugin that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. Take an in-depth look at some of our major features below, aimed to help alleviate the stress of building your site, so you can focus on making your products shine.
 
 The FoxyPress Team bases their features on their customers' needs, so if you don't see a tool you need, they will build it for you. For more information or to submit a request, visit <a href="http://www.foxy-press.com" target="_blank">Foxy-Press.com</a>.
 
