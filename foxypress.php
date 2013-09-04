@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.4
+Version: 0.4.3.5
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.4");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.5");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -598,7 +598,7 @@ function foxypress_FlushRewrites()
 function foxypress_admin_css()
 {
 	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() .  "/foxypress/css/smoothness/jquery-ui-1.8.17.custom.css\">");
-	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css?ver=8\">");
+	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css?ver=9\">");
 }
 
 function foxypress_admin_js()
