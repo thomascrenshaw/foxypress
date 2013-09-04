@@ -1,0 +1,234 @@
+^^order_begin^^
+=====================================================
+YOUR {{ store_name|raw }} RECEIPT
+=====================================================
+
+Thank you for ordering from {{ store_name|raw }}.
+
+If you would like to update your payment card for future transactions, please use this link and enter your updated billing information: {{ store_domain }}/cart?cart=updateinfo.
+
+=====================================================
+
+{% block email_text_order_details %}
+{# BEGIN EMAIL TWIG TEMPLATE #}
+{% if not is_updateinfo %}
+{% if has_downloadables %}
+	{{ lang.email_text_downloadable_products|raw }}
+	{{ text_downloadable_links|raw }}
+{% endif %}
+{{ lang.email_text_order_summary|raw }}
+	{{ lang.email_order_number|raw }}: {{ order_id }}
+	{{ lang.checkout_date|raw }}: {{ checkout_date }}
+{% if purchase_order != '' %}
+	{{ lang.checkout_purchase_order|raw }}: {{ purchase_order }}
+{% endif %}
+{% if payment_type == 'plastic' %}
+	{{ lang.checkout_card_number|raw }}: {{ cc_number_masked }} ({{ cc_type }})
+{% endif %}
+	{{ lang.email_order_total|raw }}: {{ order_total }}
+{% if has_live_rate_shippable_products and not has_multiship %}
+	{{ lang.email_shipping|raw }}: {{ shipping_service_description }}
+{% endif %}
+{% for custom_field in custom_fields %}
+	{{ custom_field.name }}: {{ custom_field.value }}
+{% endfor %}
+{% endif %}
+
+{{ lang.email_text_purchasing_information|raw }}
+{{ lang.email_email|raw }}: {{ email }}
+{{ lang.email_billing_address|raw }}:
+	{{ first_name }} {{ last_name }}
+{% if company != '' %}
+	{{ company }}
+{% endif %}
+	{{ address1 }}
+{% if address2 != '' %}
+	{{ address2 }}
+{% endif %}
+	{{ city }}, {{ region_code }} {{ postal_code }}
+	{{ country_name }}
+{% if geoip != '' %}
+	{{ geoip }}
+{% endif %}
+{% if phone != '' %}
+	{{ phone }}
+{% endif %}
+{% for multiship in multiship_data %}
+
+{{ lang.email_ship_to|raw }}: {{ multiship.address_name }}
+	{{ multiship.first_name }} {{ multiship.last_name }}
+{% if multiship.company != '' %}
+	{{ multiship.company }}
+{% endif %}
+	{{ multiship.address1 }}
+{% if multiship.address2 != '' %}
+	{{ multiship.address2 }}
+{% endif %}
+	{{ multiship.city }}, {{ multiship.region_code }} {{ multiship.postal_code }}
+	{{ multiship.country_name }}
+{% if multiship.phone != '' %}
+	{{ multiship.phone }}
+{% endif %}
+
+{% for custom_field in multiship.custom_fields %}
+	{{ custom_field.name }}: {{ custom_field.value }}
+{% endfor %}
+	{{ lang.email_subtotal|raw }}: {{ multiship.sub_total }}
+{% if has_live_rate_shippable_products %}
+	{{ multiship.shipping_service_description }}: {{ multiship.shipping_total }}
+{% else %}
+{% if has_shippable_products %}
+	{{ shipping_and_handling_label|raw }}: {{ multiship.shipping_total }}
+{% endif %}
+{% endif %}
+	{{ lang.email_tax|raw }}: {{ multiship.tax_total }}
+	{{ lang.email_group_total|raw }}: {{ multiship.total }}
+{% endfor %}
+{% if use_alternate_shipping_address and has_shippable_products %}
+{{ lang.email_shipping_address|raw }}:
+{% if use_alternate_shipping_address %}
+	{{ shipping_first_name }} {{ shipping_last_name }}
+{% if shipping_company != '' %}
+	{{ shipping_company }}
+{% endif %}
+	{{ shipping_address1 }}
+{% if shipping_address2 != '' %}
+	{{ shipping_address2 }}
+{% endif %}
+	{{ shipping_city }}, {{ shipping_region_code }} {{ shipping_postal_code }}
+	{{ shipping_country_name }}
+{% if shipping_phone != '' %}
+	{{ shipping_phone }}
+{% endif %}
+{% else %}
+	{{ first_name }} {{ last_name }}
+{% if company != '' %}
+	{{ company }}
+{% endif %}
+	{{ address1 }}
+{% if address2 != '' %}
+	{{ address2 }}
+{% endif %}
+	{{ city }}, {{ region_code }} {{ postal_code }}
+	{{ country_name }}
+{% if phone != '' %}
+	{{ phone }}
+{% endif %}
+{% endif %}
+{% endif %}
+{% if subscriptions|length > 0 and not is_subscription_cancel %}
+
+{{ lang.email_text_manage_subscriptions|raw }}
+{{ lang.email_text_subscription_instructions|raw }}
+{% for subscription in subscriptions %}
+{{ subscription.description }}
+{{ subscription.text_links|raw }}
+{% endfor %}
+{% endif %}
+{# END EMAIL TWIG TEMPLATE #}
+{% endblock %}
+
+{% if not is_updateinfo %}
+{% block email_text_cart %}
+{# BEGIN CART TWIG TEMPLATE #}
+
+----- {{ lang.email_text_cart }} -----
+
+{% for item in items %}
+{% if item.multiship > 0 %}
+-- {{ lang.cart_shipto|raw }}: {{ item.shipto }} --
+
+{% endif %}
+{{ item.name }}
+{% for option in item.options %}
+	{{ option.name }}: {{ option.value }}
+{% endfor %}
+{% if item.code != '' %}
+	{{ lang.cart_code|raw }}: {{ item.code }}
+{% endif %}
+{% if item.category_code != 'DEFAULT' %}
+	{{ lang.cart_category|raw }}: {{ item.category_code }}
+{% endif %}
+{% if item.weight != 0 %}
+	{{ lang.cart_weight|raw }}: {{ item.weight }} {{ weight_uom }}
+{% endif %}
+{% if item.subscription_frequency != '' %}
+	{{ lang.cart_subscription_details|raw }}
+		{{ lang.cart_frequency|raw }}: {{ item.subscription_frequency }}
+		{{ lang.cart_start_date|raw }}: {{ item.subscription_start_date }}
+		{{ lang.cart_next_date|raw }}: {{ item.subscription_next_transaction_date }}
+{% if item.subscription_end_date != "0000-00-00" %}
+		{{ lang.cart_end_date|raw }}: {{ item.subscription_end_date }}
+{% endif %}
+{% endif %}
+	{{ lang.cart_quantity}}: {{ item.quantity|raw }}
+	{{ lang.cart_price|raw }}: {{ item.price_total }}{% if item.quantity > 1 %} ({{ item.price_each }} {{ lang.cart_each|raw }}){% endif %}
+
+
+{% endfor %}
+
+{{ lang.cart_subtotal|raw }}: {{ cart_sub_total }}
+{% if has_future_products %}
+{{ lang.cart_future_subscriptions|raw }}: {{ future_total_price }}
+{% endif %}
+{% for coupon in coupons %}
+{{ coupon.name }}: {{ coupon.amount }}
+{% endfor %}
+{{ shipping_and_handling_label|raw }}: {{ cart_total_shipping }}
+{% if has_future_products and show_future_shipping_and_handling %}
+{{ lang.cart_future_subscriptions|raw }} {{ shipping_and_handling_label|raw }}: {{ future_shipping_and_handling }}
+{% endif %}
+{% if has_taxes %}
+{% for tax in taxes %}
+{% if tax.show_tax %}
+{{ tax.description|raw }}: {{ tax.amount }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{{ lang.cart_order_total|raw }}: {{ order_total }}
+{# END CART TWIG TEMPLATE #}
+{% endblock %}
+{% endif %}
+
+
+^^order_end^^
+
+
+
+
+^^updateinfo_begin^^
+=====================================================
+YOUR {{ store_name|raw }}
+BILLING INFORMATION HAS BEEN UPDATED
+=====================================================
+Your billing information has been updated as displayed below.
+
+{{ block('email_text_order_details') }}
+
+^^updateinfo_end^^
+
+^^subscription_cancel_begin^^
+=====================================================
+{{ store_name|raw }}
+SUBSCRIPTION CANCELLATION CONFIRMATION
+=====================================================
+
+This email is confirmation that the subscription listed below will be canceled and not billed further.
+
+{{ block('email_text_order_details') }}
+{{ block('email_text_cart') }}
+
+^^subscription_cancel_end^^
+
+^^subscription_modification_begin^^
+=====================================================
+{{ store_name|raw }}
+SUBSCRIPTION MODIFICATION CONFIRMATION
+=====================================================
+
+This email is confirmation that the subscription listed below has been modified.
+
+{{ block('email_text_order_details') }}
+{{ block('email_text_cart') }}
+
+^^subscription_modification_end^^
