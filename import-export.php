@@ -11,20 +11,15 @@ require_once($root.'/wp-includes/wp-db.php');
 
 add_action('admin_init', 'import_export_postback');
 
-//global vars
-global $Categories;
-global $CategoriesFlipped;
-global $OptionGroups;
-global $OptionGroupsFlipped;
-
 function import_export_postback()
 {
+	global $foxyExported;
+	$foxyExported = false;
 	global $foxyImportData;
 	$foxyImportData = false;
 	global $foxyImported;
 	$foxyImported = false;
-	global $wpdb, $post, $error;
-	global $Categories, $CategoriesFlipped, $OptionGroups, $OptionGroupsFlipped;
+	
 	$PageName = foxypress_FixGetVar("page");
 	if($PageName == "import-export")
 	{
@@ -36,202 +31,28 @@ function import_export_postback()
 		elseif(isset($_POST['verify_import'])) 
 		{
 			// Admin has verified import data and wants to proceed with import.
-			$foxyImported = import_export_Import();
+			$foxyImported = foxypress_process_import(false);
 		}
 		else if(isset($_POST['export_submit'])) //start export
 		{	
-			$list = array();
-			$data = "";
-			$row = array();
-			$row[] = 'Item Code';
-			$row[] = 'Item Name';
-			$row[] = 'Item Description';
-			$row[] = 'Item Category';
-			$row[] = 'Item Price';
-			$row[] = 'Item Sale Price';
-			$row[] = 'Item Sale Start Date';
-			$row[] = 'Item Sale End Date';
-			$row[] = 'Item Weight';
-			$row[] = 'Item Quantity';
-			$row[] = 'Item Quantity Min';
-			$row[] = 'Item Quantity Max';
-			$row[] = 'Item Options';
-			$row[] = 'Item Attributes';	
-			$row[] = 'Item Discount Quantity Amount';	
-			$row[] = 'Item Discount Quantity Percentage';	
-			$row[] = 'Item Discount Price Amount';	
-			$row[] = 'Item Discount Price Percentage';	
-			$row[] = 'Subscription Frequency';	
-			$row[] = 'Subscription Start Date';	
-			$row[] = 'Subscription End Date';	
-			$row[] = 'Item Start Date';	
-			$row[] = 'Item End Date';	
-			$row[] = 'Item Active';				
-			$row[] = 'Item Images';
-						
-			//$data .= join(',', $row)."\r\n";		
-			$list[] = $row;
-			foxypress_GetImportExportCategories();
-			foxypress_GetImportExportOptionGroups();	
-			$cats = "";
-			$opts = "";
-			$attrs = "";
-			$Items = $wpdb->get_results("select * from " . $wpdb->prefix . "posts where post_type='" . FOXYPRESS_CUSTOM_POST_TYPE . "' and post_status='publish' order by ID");
-			if(!empty($Items))
-			{
-				foreach($Items as $item)
-				{
-					//get categories
-					$cats = "";				
-					$InventoryCategories = $wpdb->get_results("select * from " . $wpdb->prefix . "foxypress_inventory_to_category where inventory_id='" . $item->ID. "'");
-					if(!empty($InventoryCategories))
-					{
-						foreach($InventoryCategories as $ic)
-						{
-							$cats .= ($cats == "") ? $Categories[$ic->category_id] : "|" . $Categories[$ic->category_id];
-						}
-					}		
-					//get options
-					$opts = "";
-					$InventoryOptions = $wpdb->get_results("select * from " . $wpdb->prefix . "foxypress_inventory_options where inventory_id='" . $item->ID. "'");
-					if(!empty($InventoryOptions))
-					{
-						foreach($InventoryOptions as $io)
-						{
-							//GroupName|Text|Value|Price|Weight|code|Quantity|Active|Order
-							$opt = $OptionGroups[$io->option_group_id] . "|" 
-									. stripslashes($io->option_text) . "|" 
-									. stripslashes($io->option_value) . "|" 
-									. $io->option_extra_price . "|" 
-									. $io->option_extra_weight . "|" 
-									. $io->option_code . "|" 
-									. $io->option_quantity . "|" 
-									. $io->option_active . "|" 
-									. $io->option_order;
-							$opts .= ($opts == "") ? $opt : "~~" . $opt ;
-						}
-					}	
-					//get attributes
-					$attrs = "";
-					$InventoryAttributes = $wpdb->get_results("select * from " . $wpdb->prefix . "foxypress_inventory_attributes where inventory_id='" . $item->ID. "'");
-					if(!empty($InventoryAttributes))
-					{
-						foreach($InventoryAttributes as $ia)
-						{
-							//text|value
-							$attr = $ia->attribute_text . "|" . $ia->attribute_value;
-							$attrs .= ($attrs == "") ? $attr : "~~" . $attr;
-						}
-					}			
-					
-					//get images
-					$images = "";
-					//get images
-					$imageList = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
-					if(!empty($imageList))
-					{
-						foreach ($imageList as $img) 
-						{
-							$image_source = wp_get_attachment_image_src($img->ID, "full");
-							$images .= ($images == "") ? $image_source[0] : "|" . $image_source[0];							
-						}
-					}
-					
-					
-					//write row					
-					$row = array(); //clear previous items
-					$row[] = get_post_meta($item->ID, "_code", true);
-					$row[] = $item->post_title;
-					$row[] = $item->post_content;
-					$row[] = $cats;
-					$row[] = get_post_meta($item->ID, "_price", true);
-					$row[] = get_post_meta($item->ID, "_saleprice", true);
-					$row[] = get_post_meta($item->ID, "_salestartdate", true);
-					$row[] = get_post_meta($item->ID, "_saleenddate", true);
-					$row[] = get_post_meta($item->ID,'_weight', true);
-					$row[] = get_post_meta($item->ID,'_quantity', true);
-					$row[] = get_post_meta($item->ID,'_quantity_min', true);
-					$row[] = get_post_meta($item->ID,'_quantity_max', true);
-					$row[] = $opts;
-					$row[] = $attrs;
-					$row[] = get_post_meta($item->ID,'_discount_quantity_amount',TRUE);
-					$row[] = get_post_meta($item->ID,'_discount_quantity_percentage',TRUE);
-					$row[] = get_post_meta($item->ID,'_discount_price_amount',TRUE);
-					$row[] = get_post_meta($item->ID,'_discount_price_percentage',TRUE);
-					$row[] = get_post_meta($item->ID,'_sub_frequency',TRUE);
-					$row[] = get_post_meta($item->ID,'_sub_startdate',TRUE);
-					$row[] = get_post_meta($item->ID,'_sub_enddate',TRUE);
-					$row[] = get_post_meta($item->ID,'_item_start_date',TRUE);
-					$row[] = get_post_meta($item->ID,'_item_end_date',TRUE);
-					$row[] = get_post_meta($item->ID,'_item_active',TRUE);		
-					$row[] = $images;								
-					//$data .= join(',', $row)."\r\n";	
-					$list[] = $row;
-				}
-			}
-			if (file_exists(WP_PLUGIN_DIR . "/foxypress/Export.csv")) 
-			{
-				unlink(WP_PLUGIN_DIR . "/foxypress/Export.csv");
-			}
-			$f = fopen(WP_PLUGIN_DIR . "/foxypress/Export.csv", "x+");
-			//fwrite($f,$data);		
-			foreach ($list as $line)
-			{
-				fputcsv($f, $line );
-				fseek($f, -1, SEEK_CUR);
-				fwrite($f, "\r\n"); 
-			}
-			fclose($f);
-			$error = "<a href=\"" . plugins_url() . "/foxypress/Export.csv\" target=\"_blank\">Download Export</a> <small><i>(Right Click, Save As)</i></small>";
+			$foxyExported = import_export_Export();
 		}//end if export
 	}//end if were posting to this page
-}
-
-function foxypress_GetImportExportOptionGroups()
-{
-	global $OptionGroups;
-	global $OptionGroupsFlipped;
-	global $wpdb;	
-	$OptionGroups = array();
-	
-	$OptionGroupData = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_option_group");
-	if(!empty($OptionGroupData))
-	{
-		foreach($OptionGroupData as $ogd)
-		{
-			$OptionGroups[$ogd->option_group_id] = stripslashes($ogd->option_group_name);	
-		}
-	}	
-	$OptionGroupsFlipped = array_flip($OptionGroups);
-}
-
-function foxypress_GetImportExportCategories()
-{
-	global $Categories;
-	global $CategoriesFlipped;
-	global $wpdb;	
-	$Categories = array();	
-	$CategoryData = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories");
-	if(!empty($CategoryData))
-	{
-		foreach($CategoryData as $cat)
-		{
-			$Categories[$cat->category_id] = stripslashes($cat->category_name);	
-		}
-	}
-	$CategoriesFlipped = array_flip($Categories);	
 }
 
 function import_export_page_load()
 {
 	global $error;
+	global $foxyExported;
 	global $foxyImportData;
 	global $foxyImported;
 	?>
 	<div class="wrap">
-		<div id="" class="settings_widefat">
+		<?php screen_icon('foxypress'); ?>
+		<h2><?php _e('Import/Export','foxypress'); ?></h2>
+		<div class="settings_widefat">
 			<div class="settings_head settings">
-        <?php _e('Import Inventory','foxypress'); ?>
+        <?php _e('Import','foxypress'); ?>
     	</div>
     	<?php 
     		if ($foxyImportData):
@@ -239,7 +60,7 @@ function import_export_page_load()
 					if ($foxyImportData['error']):
 						// Error on import preview
 			?>
-			<div>
+			<div class="fp-import-export-container">
 			  <p><?php _e('Error when uploading file and generating import preview:','foxypress'); ?></p>
 			  <p><?php echo $foxyImportData['message']; ?></p>
 			  <form method="POST" enctype="multipart/form-data" id="frmImport" name="frmImport">
@@ -251,82 +72,118 @@ function import_export_page_load()
 					else:
 						// No import errors on import upload. Display import preview.
 			?>
-			<div class="import-preview">
+			<div class="import-preview fp-import-export-container">
 			  <p><?php _e('FoxyPress import file uploaded. Please verify data to be imported below before clicking Import.', 'foxypress'); ?></p>
 			  <p>
 				  <form method="POST" enctype="multipart/form-data" id="frmImport" name="frmImport">
 				  	<input type="submit" name="verify_import" id="verify_import" value="<?php _e('Import', 'foxypress'); ?>" /> 
 				  </form>
 			  </p>
-				<table>
-					<thead>
-						<tr>
-							<td>Name</td>
-							<td class="description">Description</td>
-							<td>Code</td>
-							<td>Price</td>
-							<td>Sale Price</td>
-							<td>Sale Start Date</td>
-							<td>Sale End Date</td>
-							<td>Weight</td>
-							<td>Quantity</td>
-							<td>Quantity Min</td>
-							<td>Quantity Max</td>
-							<td>Discount Qty Amount</td>
-							<td>Discount Qty Percent</td>
-							<td>Discount Price Amount</td>
-							<td>Discount Price Percent</td>
-							<td>Subscription Frequency</td>
-							<td>Subscription Start</td>
-							<td>Subscription End</td>
-							<td>Item Start</td>
-							<td>Item End</td>
-							<td>Item Active</td>
-							<td>Categories</td>
-							<td>Options</td>
-							<td>Images</td>
-						</tr>
-					</thead>
-					<tbody>
-						<?php
-						foreach ($foxyImportData['data'] as $product) :
-							$image_thumbnails = "";
-							$image_urls = explode("|", $product['_images']);
-							foreach ($image_urls as $image_url) {
-								$image_thumbnails .= "<img src='$image_url' style='width:50px; height: 50px' alt='' />";
-							}
-						?>
-						<tr>
-							<td><?php echo $product['_name']; ?></td>
-							<td class="description"><?php echo $product['_description']; ?></td>
-							<td><?php echo $product['_code']; ?></td>
-							<td><?php echo $product['_price']; ?></td>
-							<td><?php echo $product['_saleprice']; ?></td>
-							<td><?php echo $product['_salestartdate']; ?></td>
-							<td><?php echo $product['_saleenddate']; ?></td>
-							<td><?php echo $product['_weight']; ?></td>
-							<td><?php echo $product['_quantity']; ?></td>
-							<td><?php echo $product['_quantity_min']; ?></td>
-							<td><?php echo $product['_quantity_max']; ?></td>
-							<td><?php echo $product['_discount_quantity_amount']; ?></td>
-							<td><?php echo $product['_discount_quantity_percentage']; ?></td>
-							<td><?php echo $product['_discount_price_amount']; ?></td>
-							<td><?php echo $product['_discount_price_percentage']; ?></td>
-							<td><?php echo $product['_sub_frequency']; ?></td>
-							<td><?php echo $product['_sub_startdate']; ?></td>
-							<td><?php echo $product['_sub_enddate']; ?></td>
-							<td><?php echo $product['_item_start_date']; ?></td>
-							<td><?php echo $product['_item_end_date']; ?></td>
-							<td><?php echo $product['_item_active']; ?></td>
-							<td><?php echo $product['_categories']; ?></td>
-							<td><?php echo $product['_options']; ?></td>
-							<td><?php echo $image_thumbnails; ?></td>
-						</tr>
-						<?php
-						endforeach;
-						?>
-					</tbody>
-				</table>
+			  <h3>Categories</h3>
+			  <div class="category-table-wrapper">
+				  <table>
+						<thead>
+							<tr>
+								<td>Category ID</td>
+								<td>Category Name</td>
+								<td>Category Parent ID</td>
+								<td>Existing Category or New?</td>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							foreach ($foxyImportData['categories'] as $category) :
+								$existing_text = "";
+								if ($category['category_insert']) {
+									$existing_text = "New";
+								} else {
+									$existing_text = "Existing";
+								}
+							?>
+							<tr>
+								<td><?php echo $category['category_import_id']; ?></td>
+								<td><?php echo $category['category_name']; ?></td>
+								<td><?php echo $category['category_parent_id']; ?></td>
+								<td><?php echo $existing_text; ?></td>
+							</tr>
+							<?php
+							endforeach;
+							?>
+						</tbody>
+					</table>
+				</div>
+				<h3>Products</h3>
+				<div class="product-table-wrapper">
+					<table>
+						<thead>
+							<tr>
+								<td>Name</td>
+								<td class="description">Description</td>
+								<td>Code</td>
+								<td>Price</td>
+								<td>Sale Price</td>
+								<td>Sale Start Date</td>
+								<td>Sale End Date</td>
+								<td>Weight</td>
+								<td>Quantity</td>
+								<td>Quantity Min</td>
+								<td>Quantity Max</td>
+								<td>Discount Qty Amount</td>
+								<td>Discount Qty Percent</td>
+								<td>Discount Price Amount</td>
+								<td>Discount Price Percent</td>
+								<td>Subscription Frequency</td>
+								<td>Subscription Start</td>
+								<td>Subscription End</td>
+								<td>Item Start</td>
+								<td>Item End</td>
+								<td>Item Active</td>
+								<td>Categories</td>
+								<td>Options</td>
+								<td>Images</td>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							foreach ($foxyImportData['products'] as $product) :
+								$image_thumbnails = "";
+								$image_urls = explode("|", $product['_images']);
+								foreach ($image_urls as $image_url) {
+									$image_thumbnails .= "<img src='$image_url' style='width:50px; height: 50px' alt='' />";
+								}
+							?>
+							<tr>
+								<td><?php echo $product['_name']; ?></td>
+								<td class="description"><?php echo $product['_description']; ?></td>
+								<td><?php echo $product['_code']; ?></td>
+								<td><?php echo $product['_price']; ?></td>
+								<td><?php echo $product['_saleprice']; ?></td>
+								<td><?php echo $product['_salestartdate']; ?></td>
+								<td><?php echo $product['_saleenddate']; ?></td>
+								<td><?php echo $product['_weight']; ?></td>
+								<td><?php echo $product['_quantity']; ?></td>
+								<td><?php echo $product['_quantity_min']; ?></td>
+								<td><?php echo $product['_quantity_max']; ?></td>
+								<td><?php echo $product['_discount_quantity_amount']; ?></td>
+								<td><?php echo $product['_discount_quantity_percentage']; ?></td>
+								<td><?php echo $product['_discount_price_amount']; ?></td>
+								<td><?php echo $product['_discount_price_percentage']; ?></td>
+								<td><?php echo $product['_sub_frequency']; ?></td>
+								<td><?php echo $product['_sub_startdate']; ?></td>
+								<td><?php echo $product['_sub_enddate']; ?></td>
+								<td><?php echo $product['_item_start_date']; ?></td>
+								<td><?php echo $product['_item_end_date']; ?></td>
+								<td><?php echo $product['_item_active']; ?></td>
+								<td><?php echo $product['_categories']; ?></td>
+								<td><?php echo $product['_options']; ?></td>
+								<td><?php echo $image_thumbnails; ?></td>
+							</tr>
+							<?php
+							endforeach;
+							?>
+						</tbody>
+					</table>
+				</div>
 				<p><?php _e('If import above is incorrect, please fix import file and reupload below:', 'foxypress'); ?></p>
 				<form method="POST" enctype="multipart/form-data" id="frmImport" name="frmImport">
 					<input type="file" name="file_import" id="file_import" /> 
@@ -340,172 +197,166 @@ function import_export_page_load()
     			if ($foxyImported['error']):
     				// Error on import data
     	?>
-    	<div>
+    	<div class="fp-import-export-container">
     	  <p><?php _e('Error when processing import:','foxypress'); ?></p>
     	  <p><?php echo $foxyImported['message']; ?></p>
     	  <form method="POST" enctype="multipart/form-data" id="frmImport" name="frmImport">
-    	  	<input type="file" name="file_import" id="file_import" /> 
-    	  	<input type="submit" name="file_submit" id="file_submit" value="<?php _e('Import Preview', 'foxypress'); ?>" /> 
+    	  	<input type="file" name="file_import" id="file_import" />
+    	  	<input type="submit" name="file_submit" id="file_submit" value="<?php _e('Import Preview', 'foxypress'); ?>" />
     	  </form>
     	</div>
     	<?php
     			else:
     				// No import errors on process import file
     	?>
-    	<div>
-    	  <p><?php echo $foxyImported['message']; ?></p>	
+    	<div class="fp-import-export-container">
+    	  <p><?php echo $foxyImported['message']; ?></p>
     	</div>
     	<?php 
     			endif;
     		else: 
     			// Import file not uploaded. Display import upload form. 
     	?>
-    	<div>
+    	<div class="fp-import-export-container">
     	  <p><?php _e('We recommend reading the import instructions before selecting a file to upload.  When you are ready, simply browse to the file and click import.', 'foxypress'); ?></p>
     		<form method="POST" enctype="multipart/form-data" id="frmImport" name="frmImport">
-    			<input type="file" name="file_import" id="file_import" /> 
-    			<input type="submit" name="file_submit" id="file_submit" value="<?php _e('Import Preview', 'foxypress'); ?>" /> 
-    	  </form>			
+    			<input type="file" name="file_import" id="file_import" />
+    			<input type="submit" name="file_submit" id="file_submit" value="<?php _e('Import Preview', 'foxypress'); ?>" />
+    	  </form>
     	</div>
     	<?php endif; ?>
 		</div>
-        <br />
-		<div id="" class="settings_widefat">
+		<div class="settings_widefat">
 			<div class="settings_head advanced">
-	            <?php _e('Export Inventory','foxypress'); ?>
+	            <?php _e('Export','foxypress'); ?>
 	        </div>
-	        <div>
-	        	<p><?php _e('Click the button below to export an excel document of your inventory', 'foxypress'); ?>.</p>
+	        <div class="fp-import-export-container">
+	        	<p><?php _e('Click the button below to generate a CSV export of your FoxyPress categories and products', 'foxypress'); ?>.</p>
 				<form method="POST" id="frmExport" name="frmExport">
-	            	<input type="submit" name="export_submit" id="export_submit" value="<?php _e('Export', 'foxypress'); ?>" /> 
+	            	<input type="submit" name="export_submit" id="export_submit" value="<?php _e('Export', 'foxypress'); ?>" />
 	                <?php
-						if( $error != "" && isset($_POST['export_submit']) )
+						if( isset($foxyExported['message']) )
 						{
-							echo($error);
+							echo $foxyExported['message'];
 						}
 					?>
 	            </form>
 	        </div>
 		</div>
-		<br />
-		<div id="" class="settings_widefat">
+		<div class="settings_widefat">
 			<div class="settings_head custom">
-	            <?php _e('Import Notes - read before importing','foxypress'); ?>
-	        </div>		
-			<table>
-				<tr>
-					<td valign="top" width="325px;">
-						<ul>
-							<li><b><?php _e('Column Order', 'foxypress'); ?></b>
-								<ul style="list-style-type:disc;margin-left:40px;">
-				                    <li><?php _e('Item Code', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Name', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Description', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Category', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Price', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Sale Price', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Sale Start Date', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Sale End Date', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Weight', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Quantity', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Quantity Min', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Quantity Max', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Options', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Attributes', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Discount Quantity Amount', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Discount Quantity Percentage', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Discount Price Amount', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Discount Price Percentage', 'foxypress'); ?></li>
-				                    <li><?php _e('Subscription Frequency', 'foxypress'); ?></li>
-				                    <li><?php _e('Subscription Start Date', 'foxypress'); ?></li>
-				                    <li><?php _e('Subscription End Date', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Start Date', 'foxypress'); ?></li>
-				                    <li><?php _e('Item End Date', 'foxypress'); ?></li>
-				                    <li><?php _e('Item Active', 'foxypress'); ?></li>
-								</ul>
-							</li>
-						</ul>
-					</td>
-					<td valign="top">
-						<ul>
-							<li><b><?php _e('Formatting Notes', 'foxypress'); ?></b>
-								<ul style="list-style-type:disc;margin-left:40px;">
-									<li><?php _e('Categories must match exactly with categories that you have created in foxypress. If there are multiple categories for an item you can split them up by using "|" (without quotes)', 'foxypress'); ?>. 
-										<br /><?php _e("<b>Example:</b> General|Shirts|Fun Items", "foxypress"); ?>
-									</li>
-									<li><?php _e('Price does not need to have a currency symbol', 'foxypress'); ?></li>
-									<li><?php _e('Options will be in this format: Option Group Name|Option Name|Option Value|Option Extra Price|Option Extra Weight|Option Code|Option Quantity|Active|Sort Order', 'foxypress'); ?>
-										<ul style="list-style-type:disc;margin-left:40px;">
-											<li><?php _e('Active can be either 1(true) or 0(false)', 'foxypress'); ?></li>
-											<li><?php _e('Option Group Name must match exactly with option groups that you have created in foxypress', 'foxypress'); ?>.</li>
-											<li><?php _e('Multiple options can be imported by using "~~" (without quotes) between sets', 'foxypress'); ?>.
-												<br /><?php _e("<b>Example:</b> Color|Red|red|0.00|0|mycode|100|1|5~~Color|Blue|blue|0.00|0|mycode|100|1|6", "foxypress"); ?>
-											</li>
-                                        </ul>
-									</li>
-								</ul>
-							</li>
-							<li><?php _e('Attributes will be in this format: Attribute Name|Attribute Value', 'foxypress'); ?>
-								<ul style="list-style-type:disc;margin-left:40px;">
-									<li><?php _e('Multiple attributes can be imported by using "~~" (without quotes) between sets', 'foxypress'); ?>.
-										<br /><?php _e("<b>Example:</b> MyAttributeName|MyValue~~AnotheName|AnotherValue", 'foxypress'); ?>
-									</li>
-								</ul>
-							</li>
-						</ul>
-					</td>
-				</tr>
-			</table>		
+				<?php _e('Import Notes - read before importing','foxypress'); ?>
+			</div>
+			<div class="fp-import-export-container fp-import-notes">
+				<p>If creating an import file for ease of data entry, it’s often a good idea to build out a couple sample categories/products in FoxyPress, then generate a FoxyPress export from this page to see the correct import file format.</p>
+				<p>A valid FoxyPress import file is a CSV that contains three sections:</p>
+				<ul>
+					<li>Version</li>
+					<li>Categories</li>
+					<li>Products</li>
+				</ul>
+
+				<h3>Version</h3>
+				<p>The version is used by FoxyPress to ensure import compatibility. Old FoxyPress exports cannot be imported unless updated to match the current version syntax.</p>
+				<p>The FoxyPress import file must contain the version as the first line of the CSV.</p>
+				<pre>%%%VERSION,2</pre>
+				<p>The current import version is 2.</p>
+
+				<h3>Categories</h3>
+				<p>The following three columns are used by FoxyPress categories:</p>
+				<ul>
+					<li>Category ID</li>
+					<li>Category Name</li>
+					<li>Category Parent ID</li>
+				</ul>
+				<pre>%%%CATEGORIES
+"Category ID","Category Name","Category Parent"
+72,Shirts,0
+73,Accessories,0
+78,Socks,73</pre>
+				<p>Category ID and Category Parent ID will not be directly imported into the database. A new product category ID will be generated for each category that is added to the FoxyPress install.</p>
+				<p>If an import category name matches an existing category name, a duplicate will not be generated. Instead all products that point to the import category will be assigned to the existing category.</p>
+
+				<h3>Products</h3>
+				<p>The following three columns are used by FoxyPress categories:</p>
+				<ul>
+					<li>Item Code</li>
+					<li>Item Name</li>
+					<li>Item Description</li>
+					<li>Item Category</li>
+					<li>Item Price</li>
+					<li>Item Sale Price</li>
+					<li>Item Sale Start Date</li>
+					<li>Item Sale End Date</li>
+					<li>Item Weight</li>
+					<li>Item Quantity</li>
+					<li>Item Quantity Min</li>
+					<li>Item Quantity Max</li>
+					<li>Item Options</li>
+					<li>Item Attributes</li>
+					<li>Item Discount Quantity Amount</li>
+					<li>Item Discount Quantity Percentage</li>
+					<li>Item Discount Price Amount</li>
+					<li>Item Discount Price Percentage</li>
+					<li>Subscription Frequency</li>
+					<li>Subscription Start Date</li>
+					<li>Subscription End Date</li>
+					<li>Item Start Date</li>
+					<li>Item End Date</li>
+					<li>Item Active</li>
+					<li>Item Images</li>
+				</ul>
+				<pre>%%%PRODUCTS
+"Item Code","Item Name","Item Description","Item Category","Item Price","Item Sale Price","Item Sale Start Date","Item Sale End Date","Item Weight","Item Quantity","Item Quantity Min","Item Quantity Max","Item Options","Item Attributes","Item Discount Quantity Amount","Item Discount Quantity Percentage","Item Discount Price Amount","Item Discount Price Percentage","Subscription Frequency","Subscription Start Date","Subscription End Date","Item Start Date","Item End Date","Item Active","Item Images"
+CHAIR1,"Corner Chair","Diam dictumst dis.",1,429.00,279.00,,,,,,,,,,,,,,,,,,1,http://www.example.com/wp-content/uploads/2013/10/fp_6zzhwvjy5j_802.jpg|http://www.example.com/wp-content/uploads/2013/10/fp_xntb8yf8y3_802.jpg
+TWL1,Towels,"Sit augue vut cursus elementum cursus a mus?",1,25.99,21.99,,,,,,,,,,,,,,,,,,1,http://www.example.com/wp-content/uploads/2013/10/fp_ff357tgk_805.jpg|http://www.example.com/wp-content/uploads/2013/10/fp_du9plx40xi_805.jpg</pre>
+				<h4>Item Price</h4>
+				<p>Price does not require a currency symbol.</p>
+				<h4>Item Category</h4>
+				<p>Categories are specified by the category ID from the above <code>%%%CATEGORIES</code> section. Multiple categories can be specified by the vertical pipe character: <code>|</code></p>
+				<p>Example:</p>
+				<pre>1|73|78</pre>
+				<h4>Item Options</h4>
+				<p>Options are saved in the following format: <code>Option Group Name|Option Name|Option Value|Option Extra Price|Option Extra Weight|Option Code|Option Quantity|Active|Sort Order</code></p>
+				<ul>
+					<li><code>Active</code> can be either 1(true) or 0(false)</li>
+					<li><code>Option Group Name</code> must match exactly with option groups that you have created in FoxyPress</li>
+					<li>Multiple options can be imported by using <code>~~</code> (two tildes) between sets.</li>
+				</ul>
+				<p>Example:</p>
+				<pre>Color|Red|red|0.00|0|mycode|100|1|5~~Color|Blue|blue|0.00|0|mycode|100|1|6</pre>
+				<h4>Item Attributes</h4>
+				<p>Attributes are saved in the following format: <code>Attribute Name|Attribute Value</code></p>
+				<p>Multiple attributes can be imported by using <code>~~</code> (two tildes) between sets.</p>
+				<p>Example:</p>
+				<pre>MyAttributeName|MyValue~~AnotheName|AnotherValue</pre>
+			</div>
 		</div>
-    </div>
+	</div>
 	<?php
-}
-
-//Helper Functions
-function foxypress_GetOptionGroupID($OptionGroupName)
-{
-	global $OptionGroups;
-	global $OptionGroupsFlipped;
-
-	if(in_array($OptionGroupName, $OptionGroups))
-	{
-		return $OptionGroupsFlipped[$OptionGroupName];
-	}
-	return "0";
-}
-
-function foxypress_GetCategoryID($CategoryName)
-{
-	global $Categories;
-	global $CategoriesFlipped;
-
-	if(in_array($CategoryName, $Categories))
-	{
-		return $CategoriesFlipped[$CategoryName];
-	}
-	return "0";
 }
 
 /**
  * Stores POSTed import file and runs import preview on it
  * 
  * @since 0.4.3.5
- *
+ * 
  * @return array Response object as an array
  */
 function import_export_ImportPreview() {
 	$response = array();
 	
+	// Upload the import file to the server
 	$uploaded = false;
 	//delete current copy of Inventory.csv (if one exists)
-	if (file_exists(WP_PLUGIN_DIR . '/foxypress/Inventory.csv')) 
+	if (file_exists(WP_PLUGIN_DIR . '/foxypress/Import.csv')) 
 	{
-		unlink(WP_PLUGIN_DIR . '/foxypress/Inventory.csv');		
+		unlink(WP_PLUGIN_DIR . '/foxypress/Import.csv');		
 	}
 	//upload && rename file to Inventory.csv
 	if ($_FILES['file_import']['name'] != "")
 	{
-		if (move_uploaded_file($_FILES['file_import']['tmp_name'], WP_PLUGIN_DIR . '/foxypress/Inventory.csv'))
+		if (move_uploaded_file($_FILES['file_import']['tmp_name'], WP_PLUGIN_DIR . '/foxypress/Import.csv'))
 		{
 			$uploaded = true;
 		}
@@ -519,344 +370,29 @@ function import_export_ImportPreview() {
 		$response['message'] = 'Invalid Data';
 		return $response;
 	}
-	
-	$response['data'] = array();
-	$rowCount = 0;
-	
-	foxypress_GetImportExportCategories();
-	foxypress_GetImportExportOptionGroups();					
-	$file = fopen(WP_PLUGIN_DIR . '/foxypress/Inventory.csv', 'r');
-	while(! feof($file))
-	{
-		$rowCount++;
-		
-		$inventory_id = "";
-		$row = fgetcsv($file);			
-		//defaults
-		$Product_Code = "";
-		$Product_Name = "";
-		$Product_Description = "";
-		$Product_Categories = "";
-		$Product_Price = "";
-		$Product_SalePrice = "";
-		$Product_SaleStartDate = "";
-		$Product_SaleEndDate = "";
-		$Product_Weight = "";
-		$Product_Quantity = "";
-		$Product_QuantityMin = "";
-		$Product_QuantityMax = "";
-		$Product_Options = "";
-		$Product_Attributes = "";					
-		$Product_DiscountQuantityAmount = "";
-		$Product_DiscountQuantityPercentage = "";
-		$Product_DiscountPriceAmount = "";
-		$Product_PricePercentage = "";
-		$Product_SubFrequency = "";
-		$Product_SubStartDate = "";
-		$Product_SubEndDate = "";
-		$Product_StartDate = "";
-		$Product_EndDate = "";
-		$Product_Active = "";				
-		$Product_Images = "";	
-		$Product_Data_Set = false;
-		$Product_Has_Cats = false;		
-		
-		if($row[0] == "Item Code" || $row[0] == "") { $Product_Data_Set = false; } //we are reading our row with titles, so skip to the next row
-		else
-		{
-			$Product_Code = mysql_escape_string($row[0]);
-			$Product_Name = mysql_escape_string($row[1]);
-			$Product_Description = $row[2];
-			$Product_Categories = $row[3];
-			$Product_Price = mysql_escape_string(str_replace('$','',$row[4]));
-			$Product_SalePrice =  mysql_escape_string(str_replace('$','',$row[5]));
-			$Product_SaleStartDate = mysql_escape_string($row[6]);
-			$Product_SaleEndDate = mysql_escape_string($row[7]);
-			$Product_Weight = mysql_escape_string($row[8]);
-			$Product_Quantity = mysql_escape_string($row[9]);
-			$Product_QuantityMin = mysql_escape_string($row[10]);
-			$Product_QuantityMax = mysql_escape_string($row[11]);
-			$Product_Options = $row[12];
-			$Product_Attributes = $row[13];				
-			$Product_DiscountQuantityAmount = mysql_escape_string($row[14]);
-			$Product_DiscountQuantityPercentage = mysql_escape_string($row[15]);
-			$Product_DiscountPriceAmount = mysql_escape_string($row[16]);
-			$Product_PricePercentage = mysql_escape_string($row[17]);
-			$Product_SubFrequency = mysql_escape_string($row[18]);
-			$Product_SubStartDate = mysql_escape_string($row[19]);
-			$Product_SubEndDate = mysql_escape_string($row[20]);
-			$Product_StartDate = mysql_escape_string($row[21]);
-			$Product_EndDate = mysql_escape_string($row[22]);
-			$Product_Active = mysql_escape_string($row[23]);						
-			$Product_Images = mysql_escape_string($row[24]);						
-			$Product_Data_Set = true;
-		}
-		
-		if($Product_Data_Set)
-		{
-			$response['data'][$rowCount] = array();
-			$response['data'][$rowCount]['_name'] = $Product_Name;
-			$response['data'][$rowCount]['_description'] = $Product_Description;
-			$response['data'][$rowCount]['_code'] = $Product_Code;
-			$response['data'][$rowCount]['_price'] = $Product_Price;
-			$response['data'][$rowCount]['_saleprice'] = $Product_SalePrice;
-			$response['data'][$rowCount]['_salestartdate'] = $Product_SaleStartDate;
-			$response['data'][$rowCount]['_saleenddate'] = $Product_SaleEndDate;
-			$response['data'][$rowCount]['_weight'] = $Product_Weight;
-			$response['data'][$rowCount]['_quantity'] = $Product_Quantity;
-			$response['data'][$rowCount]['_quantity_min'] = $Product_QuantityMin;
-			$response['data'][$rowCount]['_quantity_max'] = $Product_QuantityMax;
-			$response['data'][$rowCount]['_discount_quantity_amount'] = $Product_DiscountQuantityAmount;
-			$response['data'][$rowCount]['_discount_quantity_percentage'] = $Product_DiscountQuantityPercentage;
-			$response['data'][$rowCount]['_discount_price_amount'] = $Product_DiscountPriceAmount;
-			$response['data'][$rowCount]['_discount_price_percentage'] = $Product_PricePercentage;
-			$response['data'][$rowCount]['_sub_frequency'] = $Product_SubFrequency;
-			$response['data'][$rowCount]['_sub_startdate'] = $Product_SubStartDate;
-			$response['data'][$rowCount]['_sub_enddate'] = $Product_SubEndDate;
-			$response['data'][$rowCount]['_item_start_date'] = $Product_StartDate;
-			$response['data'][$rowCount]['_item_end_date'] = $Product_EndDate;
-			$response['data'][$rowCount]['_item_active'] = $Product_Active;
-			$response['data'][$rowCount]['_categories'] = $Product_Categories;
-			
-			//make sure we have some global option groups set up
-			if(count($OptionGroups) > 0)
-			{
-				//handle options
-				if(!empty($Product_Options))
-				{
-					$response['data'][$rowCount]['_options'] = $Product_Options;
-				}	
-			}								
-			
-			//handle attributes
-			if(!empty($Product_Attributes))
-			{
-				$response['data'][$rowCount]['_attributes'] = $Product_Attributes;
-				$AttributesExploded = explode("~~", $Product_Attributes);
-			}	
-			
-			//handle images			
-			if(!empty($Product_Images))
-			{
-				$response['data'][$rowCount]['_images'] = $Product_Images;
-			}
-		} //end if Product_Data_Set
-	}
-	
-	fclose($file);
-	
-	$response['error'] = false;
-	$response['message'] = "Successfully Uploaded.";
-	return $response;
+
+	return foxypress_process_import();
 }
 
 /**
- * Request to import stored import file
+ * Request to export foxypress category and product information
  * 
- * @since 0.4.3.5
+ * @since 0.4.3.6
  * 
  * @return array Response object as an array
  */
-function import_export_Import() {
-	global $wpdb;
-	global $Categories, $CategoriesFlipped, $OptionGroups, $OptionGroupsFlipped;
+function import_export_Export() {
 	
-	foxypress_GetImportExportCategories();
-	foxypress_GetImportExportOptionGroups();					
-	$file = fopen(WP_PLUGIN_DIR . '/foxypress/Inventory.csv', 'r');
-	while(! feof($file))
-	{
-		$inventory_id = "";
-		$row = fgetcsv($file);			
-		//defaults
-		$Product_Code = "";
-		$Product_Name = "";
-		$Product_Description = "";
-		$Product_Categories = "";
-		$Product_Price = "";
-		$Product_SalePrice = "";
-		$Product_SaleStartDate = "";
-		$Product_SaleEndDate = "";
-		$Product_Weight = "";
-		$Product_Quantity = "";
-		$Product_QuantityMin = "";
-		$Product_QuantityMax = "";
-		$Product_Options = "";
-		$Product_Attributes = "";					
-		$Product_DiscountQuantityAmount = "";
-		$Product_DiscountQuantityPercentage = "";
-		$Product_DiscountPriceAmount = "";
-		$Product_PricePercentage = "";
-		$Product_SubFrequency = "";
-		$Product_SubStartDate = "";
-		$Product_SubEndDate = "";
-		$Product_StartDate = "";
-		$Product_EndDate = "";
-		$Product_Active = "";				
-		$Product_Images = "";	
-		$Product_Data_Set = false;
-		$Product_Has_Cats = false;		
-		
-		if($row[0] == "Item Code" || $row[0] == "") { $Product_Data_Set = false; } //we are reading our row with titles, so skip to the next row
-		else
-		{
-			
-			$Product_Code = mysql_escape_string($row[0]);
-			$Product_Name = mysql_escape_string($row[1]);
-			$Product_Description = $row[2];
-			$Product_Categories = $row[3];
-			$Product_Price = mysql_escape_string(str_replace('$','',$row[4]));
-			$Product_SalePrice =  mysql_escape_string(str_replace('$','',$row[5]));
-			$Product_SaleStartDate = mysql_escape_string($row[6]);
-			$Product_SaleEndDate = mysql_escape_string($row[7]);
-			$Product_Weight = mysql_escape_string($row[8]);
-			$Product_Quantity = mysql_escape_string($row[9]);
-			$Product_QuantityMin = mysql_escape_string($row[10]);
-			$Product_QuantityMax = mysql_escape_string($row[11]);
-			$Product_Options = $row[12];
-			$Product_Attributes = $row[13];				
-			$Product_DiscountQuantityAmount = mysql_escape_string($row[14]);
-			$Product_DiscountQuantityPercentage = mysql_escape_string($row[15]);
-			$Product_DiscountPriceAmount = mysql_escape_string($row[16]);
-			$Product_PricePercentage = mysql_escape_string($row[17]);
-			$Product_SubFrequency = mysql_escape_string($row[18]);
-			$Product_SubStartDate = mysql_escape_string($row[19]);
-			$Product_SubEndDate = mysql_escape_string($row[20]);
-			$Product_StartDate = mysql_escape_string($row[21]);
-			$Product_EndDate = mysql_escape_string($row[22]);
-			$Product_Active = mysql_escape_string($row[23]);						
-			$Product_Images = mysql_escape_string($row[24]);						
-			$Product_Data_Set = true;
-		}
-		
-		if($Product_Data_Set)
-		{
-			$my_post = array(
-				 'post_title' => $Product_Name,
-				 'post_content' => $Product_Description,
-				 'post_status' => 'publish',
-				 'post_author' => 1,
-				 'post_type' => FOXYPRESS_CUSTOM_POST_TYPE
-				 
-			  );
-		  	$inventory_id = wp_insert_post( $my_post );
-			foxypress_save_meta_data($inventory_id, '_code', $Product_Code);
-			foxypress_save_meta_data($inventory_id, '_price', $Product_Price);
-			foxypress_save_meta_data($inventory_id, '_saleprice', $Product_SalePrice);
-			foxypress_save_meta_data($inventory_id, '_salestartdate', $Product_SaleStartDate);
-			foxypress_save_meta_data($inventory_id, '_saleenddate', $Product_SaleEndDate);
-			foxypress_save_meta_data($inventory_id, '_weight', $Product_Weight);
-			foxypress_save_meta_data($inventory_id, '_quantity', $Product_Quantity);
-			foxypress_save_meta_data($inventory_id, '_quantity_min', $Product_QuantityMin);
-			foxypress_save_meta_data($inventory_id, '_quantity_max', $Product_QuantityMax);						
-			foxypress_save_meta_data($inventory_id, '_discount_quantity_amount', $Product_DiscountQuantityAmount);
-			foxypress_save_meta_data($inventory_id, '_discount_quantity_percentage', $Product_DiscountQuantityPercentage);
-			foxypress_save_meta_data($inventory_id, '_discount_price_amount', $Product_DiscountPriceAmount);
-			foxypress_save_meta_data($inventory_id, '_discount_price_percentage', $Product_PricePercentage);
-			foxypress_save_meta_data($inventory_id, '_sub_frequency', $Product_SubFrequency);
-			foxypress_save_meta_data($inventory_id, '_sub_startdate', $Product_SubStartDate);
-			foxypress_save_meta_data($inventory_id, '_sub_enddate', $Product_SubEndDate);
-			foxypress_save_meta_data($inventory_id, '_item_start_date', $Product_StartDate);
-			foxypress_save_meta_data($inventory_id, '_item_end_date', $Product_EndDate);
-			foxypress_save_meta_data($inventory_id, '_item_active', $Product_Active);	
-			//handle categories
-			if(!empty($Product_Categories))
-			{
-				$CategoriesExploded = explode("|", $Product_Categories);
-				if(count($CategoriesExploded) > 0)
-				{
-					foreach($CategoriesExploded as $Cat)
-					{
-						$CategoryID = foxypress_GetCategoryID($Cat);
-						if($CategoryID != "0")
-						{
-							$Product_Has_Cats = true;
-							$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_to_category (inventory_id, category_id) values ('$inventory_id', '" . $CategoryID . "')");
-						}
-					}
-				}
-			}
-			
-			//if we don't have any valid categories, insert with the default category (General)
-			if(!$Product_Has_Cats)
-			{
-				$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_to_category (inventory_id, category_id) values ('$inventory_id', '1')");
-			}
-			
-			//make sure we have some global option groups set up
-			if(count($OptionGroups) > 0)
-			{
-				//handle options
-				if(!empty($Product_Options))
-				{
-					$OptionsExploded = explode("~~", $Product_Options);
-					if(count($OptionsExploded) > 0)
-					{
-						foreach($OptionsExploded as $Option)
-						{
-							$OptionExploded = explode("|", $Option);
-							if(count($OptionExploded) == 9)
-							{
-								//get option group id
-								$OptionGroupID = foxypress_GetOptionGroupID($OptionExploded[0]);					
-								$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active, option_order) values ('$inventory_id', '" . $OptionGroupID . "', '" . mysql_escape_string($OptionExploded[1]) . "', '" . mysql_escape_string($OptionExploded[2]) . "' , '" . mysql_escape_string(str_replace('$','',$OptionExploded[3])) . "', '" . mysql_escape_string($OptionExploded[4]) . "', '" . mysql_escape_string($OptionExploded[5]) . "', '" . mysql_escape_string($OptionExploded[6]) . "', '" . mysql_escape_string($OptionExploded[7]) . "', '" . mysql_escape_string($OptionExploded[8]) . "')");
-							}					
-						}
-					}
-				}	
-			}								
-			
-			//handle attributes
-			if(!empty($Product_Attributes))
-			{
-				$AttributesExploded = explode("~~", $Product_Attributes);
-				if(count($AttributesExploded) > 0)
-				{
-					foreach($AttributesExploded as $Attribute)
-					{
-						$AttributeExploded = explode("|", $Attribute);
-						if(count($AttributeExploded) == 2)
-						{
-							$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_attributes (inventory_id, attribute_text, attribute_value) values ('$inventory_id', '" . mysql_escape_string($AttributeExploded[0]) . "', '" . mysql_escape_string($AttributeExploded[1]) . "')");
-						}					
-					}
-				}
-			}	
-			
-			//handle images			
-			if(!empty($Product_Images))
-			{
-				$ImagesExploded = explode("|", $Product_Images);
-				if(count($ImagesExploded) > 0)
-				{
-					$directory = dirname(__FILE__) . "/img/";
-					$ImageOrder = 0;
-					foreach($ImagesExploded as $ProductImageURL)
-					{
-						$ImageOrder++;
-						$path_parts = pathinfo($ProductImageURL);
-						//generate random file name
-						$temp_extension = $path_parts['extension'];									
-						$temp_file_name = foxypress_GenerateNewFileName($temp_extension, $inventory_id, $directory, "fp_");									
-						$temp_destination = $directory . $temp_file_name;
-						//try to get file
-						$img = file_get_contents($ProductImageURL);			
-						if($img)
-						{
-							file_put_contents($temp_destination, $img);
-							foxypress_ConvertImage($temp_destination, $inventory_id, $ImageOrder);
-							foxypress_DeleteItem($temp_destination);
-						}	
-					}
-				}
-			}
-			
-		} //end if Product_Data_Set
+	$response = array();
+	
+	if ( foxypress_generate_export() ) {
+		$response['error'] = false;
+		$response['message'] = "<a href=\"" . plugins_url() . "/foxypress/Export.csv\" target=\"_blank\">Download Export</a> <small><i>(Right Click, Save As)</i></small>";
+	} else {
+		$response['error'] = true;
+		$response['message'] = "<small><i>Unable to generate FoxyPress export</i></small>";
 	}
-	fclose($file);
-	$response['error'] = false;
-	$response['message'] = "Import successful. <a href=\"" . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "\">View Inventory</a>";
-	unlink(WP_PLUGIN_DIR . '/foxypress/Inventory.csv');
+	
 	return $response;
 }
 ?>

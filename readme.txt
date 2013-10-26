@@ -3,7 +3,7 @@ Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/support/
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.0
-Tested up to: 3.6 Beta 3
+Tested up to: 3.7
 Stable tag: 3.0.1
 FoxyPress is a FREE shopping cart and product management plugin that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
@@ -44,6 +44,17 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.3.6 =
+* Feature: Manage Categories page now supports hierarchy via subcategories. When listing products via the category shortcode, products within subcategories will be listed as well.
+* Update: Import/Export now will import and export category data, including category hierarchy. Categories that already exist will not be overwritten or duplicated. Products will automatically be assigned to the new or existing categories as appropriate.
+* Update: CSS optimizations on the Import/Export page.
+* Bugfix: Product options will now be properly displayed in the Packing Slip when multiple items with options are purchased. Previously only the first product would have options displayed.
+* Bugfix: If product option is sold past available quantity due to simultaneous purchases, option will be displayed as sold out instead of perpetually available.
+* Bugfix: Inventory import is now compatible with the new product image management. Previously image imports would not be attached to the posts since the 0.4.3.2 FoxyPress update.
+
+= 0.4.3.5 =
+* Feature: Import Preview allows you to view products to be imported before they're added to the product list
+
 = 0.4.3.4 =
 * Feature: Related Items can be assigned to each product and displayed via the related items shortcode (see FoxyPress dialog button in WYSIWYG editor) or the foxypress_GetRelatedItems PHP helper function
 * Feature: Attaching digital downloads to a product is now done with the Wordpress 3.5 Media Manager instead of Uploadify
@@ -56,7 +67,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 * Bugfix: Image thumbnails will only be displayed via category short code when there are two or more images attached to a product
 * Feature: SSO now checks for a custom action, foxypress_sso_endpoint, before proceeding with the default SSO operation. This allows admins to implement their own SSO functionality
 * Feature: FoxyPress now checks to make sure the FoxyCart API Key is correct before enabling SSO
-* Bugfix:Fixed an issue with the new product image manager where a blank image would be left after removing all attached images
+* Bugfix: Fixed an issue with the new product image manager where a blank image would be left after removing all attached images
 * Bugfix: Fixed the remove attached image button background color
 
 = 0.4.3.2 =

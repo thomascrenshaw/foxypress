@@ -183,10 +183,27 @@ function foxypress_GetProductsByCategory($category_id, $items_per_page = 999999,
 {
 	global $wpdb;
 	$start = ($page_number != "" && $page_number != "0") ? ($page_number - 1) * $items_per_page : 0;
-	$drRows = $wpdb->get_row("SELECT count(i.ID) as RowCount
+	
+	$cat_list = $category_id;
+	$child_cats = foxypress_get_product_categories($category_id);
+	foreach ($child_cats as $child_cat)
+	{
+		$cat_list .= "," . $child_cat->category_id;
+	}
+	
+//	$matching_products = $wpdb->get_col( $wpdb->prepare( 
+//		"
+//		SELECT DISTINCT itc.inventory_id
+//		FROM        " . $wpdb->prefix . "foxypress_inventory_to_category itc
+//		WHERE       itc.category_id IN %s 
+//		",
+//		$cat_list
+//	) ); 
+	
+	$drRows = $wpdb->get_row("SELECT DISTINCT count(i.ID) as RowCount
 								FROM " . $wpdb->prefix . "posts as i
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic ON i.ID=ic.inventory_id and
-																								ic.category_id = '" .  $category_id . "'
+																								ic.category_id IN (" .  $cat_list . ")
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
@@ -198,11 +215,12 @@ function foxypress_GetProductsByCategory($category_id, $items_per_page = 999999,
 									AND pm_active.meta_value = '1'
 									AND (coalesce(pm_start_date.meta_value, now()) <= now() AND coalesce(pm_end_date.meta_value, now()) >= now())
 								ORDER BY ic.sort_order, i.ID DESC");
+	
 	$total_pages = ceil($drRows->RowCount/$items_per_page);
-	$items = $wpdb->get_results("SELECT i.ID
+	$items = $wpdb->get_results("SELECT DISTINCT i.ID
 								FROM " . $wpdb->prefix . "posts as i
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic ON i.ID=ic.inventory_id and
-																								ic.category_id = '" .  $category_id . "'
+																								ic.category_id IN (" .  $cat_list . ")
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_start_date on i.ID = pm_start_date.post_ID
@@ -567,6 +585,45 @@ function foxypress_GetCategories()
 	return null;
 }
 
+/**
+ * Returns a sorted array of root-level product categories
+ *
+ * @since 0.4.3.6
+ * 
+ * @return array Array of root-level product categories
+ */
+function foxypress_GetRootCategories()
+{
+	global $wpdb;
+	$categories = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories WHERE category_parent_id = 0");
+	
+	if (count($categories) == 0) {
+		return;
+	} 
+	
+	// Sort the categories in alphabetical order
+	usort($categories, "foxypress_compare_categories");
+	
+	return $categories;
+}
+
+/**
+ * Returns a sorted array of child categories of the given $parent_category
+ *
+ * @since 0.4.3.6
+ * 
+ * @param int $parent_category ID of parent category to retrieve children
+ * @return array Array of root-level product categories
+ */
+function foxypress_GetCategoryChildren( $parent_category = -1 ) {
+	// Make sure we have a number
+	if ( ! is_numeric( $parent_category ) || $parent_category == -1 ) {
+		return;
+	} else {
+		return foxypress_get_product_categories( $parent_category );
+	}
+}
+
 function foxypress_GetCategoryByID($category_id)
 {
 	global $wpdb;
@@ -630,6 +687,28 @@ function foxypress_GetRelatedItems($post_id)
 		$related_items = split(",", $related_item_string);
 		return $related_items;
 	}
+}
+
+/**
+ * Retrieve selected categories for a given product ID
+ *
+ * @since 0.4.3.6
+ * 
+ * @param int $product_id Product ID to retrieve selected categories
+ */
+function foxypress_GetCategoriesFor( $product_id )
+{
+	global $wpdb;
+	$post_ids = $wpdb->get_col( $wpdb->prepare( 
+		"
+		SELECT      category_id
+		FROM        " . $wpdb->prefix . "foxypress_inventory_to_category
+		WHERE       inventory_id = %d
+		",
+		$product_id
+	) ); 
+	
+	return $post_ids;
 }
 
 function foxypress_GetTrackingModule()

@@ -332,54 +332,21 @@ function foxypress_product_categories_primary_setup()
 function foxypress_product_categories_setup()
 {
 	global $post, $wpdb;
-	$CurrentCategoriesArray = array();
-	//check for current categories
-	$inventory_categories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id
-												FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " as itc inner join " .
-												$wpdb->prefix . "foxypress_inventory_categories" . " as c on itc.category_id = c.category_id
-												WHERE inventory_id='" . $post->ID . "'");
-	if(!empty($inventory_categories))
-	{
-		foreach($inventory_categories as $inventory_cat)
-		{
-			$CurrentCategoriesArray[] = $inventory_cat->category_id;
+	
+	$all_categories = foxypress_get_product_categories();
+	$product_categories = foxypress_GetCategoriesFor( $post->ID );
+	
+	foreach ($all_categories as $category) :
+		
+		// Determine if category is already selected or not
+		$checked = "";
+		if (in_array($category->category_id, $product_categories)) {
+			$checked = 'checked="checked"';
 		}
-	}
-
-	// Grab all the categories and list them
-	$cats = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories" );
-	$i=0;
-	foreach( $cats as $cat )
-	{
-		$checked="";
-		if(in_array($cat->category_id, $CurrentCategoriesArray))
-		{
-			$checked = "checked=\"checked\"";
-		}
-		//if($i==0){$checked = "checked=\"checked\"";} //find a way to auto check default only on new setup
-		echo("<input type=\"checkbox\" name=\"foxy_categories[]\" value=\"" . $cat->category_id . "\" " . $checked. " /> " . stripslashes($cat->category_name) . "<br/>");
-		$i+=1;
-	}
 ?>
-	<script type="text/javascript" language="javascript">
-    	jQuery(document).ready(function() {
-			jQuery('#post').submit(function() {
-				var fields = jQuery("input[name='foxy_categories[]']").serializeArray();
-				if(fields.length == 0)
-				{
-					alert(__('Please choose at least one category', 'foxypress'));
-					jQuery("img[id='ajax-loading']").hide();
-					return false;
-				}
-				else
-				{
-					jQuery("img[id='ajax-loading']").show();
-				}
-				return true;
-			});
-		});
-    </script>
+<input type="checkbox" name="foxy_categories[]" value="<?php echo $category->category_id; ?>" <?php echo $checked; ?> /> <?php echo stripslashes($category->category_name); ?><br/>
 <?php
+	endforeach;
 }
 
 function foxypress_product_digital_download_setup()
@@ -1189,6 +1156,8 @@ function foxypress_product_meta_save($post_id)
 
 		//categories
 		$cats = $_POST['foxy_categories'];
+		
+		//set categories as defined
 		$AllCategories = $wpdb->get_results( "SELECT category_id FROM " . $wpdb->prefix . "foxypress_inventory_categories" );
 		$CategoryArray = array();
 		foreach($AllCategories as $ac)
@@ -1212,6 +1181,13 @@ function foxypress_product_meta_save($post_id)
 				$sql = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " WHERE inventory_id = '" . mysql_escape_string($post_id) . "' and category_id='" . $cat . "'";
 				$wpdb->query($sql);
 			}
+		}
+		
+		//set Default as category if there were no categories selected
+		if (count($cats) == 0) 
+		{
+			$sql = "INSERT INTO " . $wpdb->prefix . "foxypress_inventory_to_category" . " (inventory_id, category_id) values ('" . mysql_escape_string($post_id) . "', '1')";
+			$wpdb->query($sql);
 		}
 
 		//update primary category

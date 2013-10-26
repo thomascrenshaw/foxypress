@@ -455,7 +455,7 @@ span.avatar-loader {
 .ui-timepicker-div td { font-size: 90%; }
 .ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
 
-.import-preview {
+.import-preview .product-table-wrapper {
 	overflow-x: scroll;
 }
 .import-preview thead {
@@ -468,4 +468,25 @@ span.avatar-loader {
 }
 .import-preview td.description {
 	min-width: 300px;
+}
+.fp-import-export-container {
+	padding: 5px 10px 10px;
+}
+.fp-import-notes ul {
+	list-style: disc inside none;
+	margin: 0 0 0 20px;
+}
+.fp-import-notes li {
+	margin-bottom: 0;
+}
+.fp-import-notes pre {
+	background: #F0F0F0;
+	border: 1px solid #dedede;
+	border-radius: 3px;
+	padding: 11px;
+	overflow: auto;
+}
+
+#icon-foxypress {
+	background-image: url(../img/icon_foxypress_32.png);
 }

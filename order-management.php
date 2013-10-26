@@ -1024,6 +1024,10 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 
 		foreach($foxyXMLResponse->transaction->transaction_details->transaction_detail as $td)
 		{
+			// Clear options string before proceeding to next transaction
+			$temp_inventory_option_name = "";
+			$temp_inventory_option_value = "";
+			
 			if($partialSlip)
 			{
 				foreach($td->transaction_detail_options->transaction_detail_option as $opt)
@@ -1042,9 +1046,6 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 				{
 					$temp_exploded_option_names = explode("|", $temp_inventory_option_name);
 					$temp_exploded_option_values = explode("|", $temp_inventory_option_value);
-
-					$temp_inventory_option_name = "";
-					$temp_inventory_option_value = "";
 
 					$options="";
 					for($i = 0; $i < sizeof($temp_exploded_option_names)-1; $i++){
@@ -1077,9 +1078,6 @@ function foxypress_PrintPackingSlip($partialSlip, $printPage)
 				}
 				$temp_exploded_option_names = explode("|", $temp_inventory_option_name);
 				$temp_exploded_option_values = explode("|", $temp_inventory_option_value);
-
-				$temp_inventory_option_name = "";
-				$temp_inventory_option_value = "";
 
 				$options="";
 				for($i = 0; $i < sizeof($temp_exploded_option_names)-1; $i++){

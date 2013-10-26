@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.5
+Version: 0.4.3.6
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.5");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.6");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -598,7 +598,7 @@ function foxypress_FlushRewrites()
 function foxypress_admin_css()
 {
 	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() .  "/foxypress/css/smoothness/jquery-ui-1.8.17.custom.css\">");
-	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css?ver=9\">");
+	echo("<link rel=\"stylesheet\" href=\"" . plugins_url() . "/foxypress/css/admin.css?ver=20131025\">");
 }
 
 function foxypress_admin_js()
@@ -965,10 +965,19 @@ function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=
 	if (strrpos($targetpage, "?") === false) {
 		$targetpage .= "?";
 	}
+	
+	// Get list of this category and child categories
+	$cat_list = $CategoryID;
+	$child_cats = foxypress_get_product_categories($CategoryID);
+	foreach ($child_cats as $child_cat)
+	{
+		$cat_list .= "," . $child_cat->category_id;
+	}
+	
 	$drRows = $wpdb->get_row("SELECT count(i.ID) as RowCount
 								FROM " . $wpdb->prefix . "posts as i
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic on i.ID=ic.inventory_id
-																						and ic.category_id = '" .  $CategoryID . "'
+																						and ic.category_id IN (" .  $cat_list . ")
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
@@ -983,11 +992,12 @@ function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=
 								");
 	$pageNumber = foxypress_FixGetVar('fp_pn');
 	$start = ($pageNumber != "" && $pageNumber != "0") ? ($pageNumber - 1) * $Limit : 0;
+	
 	//get all items within this category. format the result set somehow
 	$items = $wpdb->get_results("SELECT i.*
 								FROM " . $wpdb->prefix . "posts as i
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_to_category as ic ON i.ID=ic.inventory_id
-																								and ic.category_id = '" .  $CategoryID . "'
+																								and ic.category_id IN (" .  $cat_list . ") 
 								INNER JOIN " . $wpdb->prefix . "foxypress_inventory_categories as c ON ic.category_id = c.category_id
 								LEFT JOIN " . $wpdb->prefix . "postmeta as pm_active on i.ID = pm_active.post_ID
 																						and pm_active.meta_key = '_item_active'
@@ -1001,6 +1011,7 @@ function foxypress_handle_shortcode_listing($CategoryID, $Limit=5, $ItemsPerRow=
 									AND (coalesce(pm_start_date.meta_value, now()) <= now() AND coalesce(pm_end_date.meta_value, now()) >= now())
 								ORDER BY ic.sort_order, i.ID DESC
 								LIMIT $start, $Limit");
+	
 	if(!empty($items))
 	{
 		$counter = 0;
@@ -1925,7 +1936,7 @@ function foxypress_BuildOptionList($inventory_id, $formid, $defaultMaxQty)
 					{
 						$groupName = $option->option_group_name;
 					}
-					if($option->option_active == "1" && $option->option_quantity != "0")
+					if($option->option_active == "1" && $option->option_quantity > 0)
 					{
 						$extraattribute = "";
 						$extraattributefriendly = "";
@@ -2211,6 +2222,8 @@ function foxypress_shortcode( $atts, $content = null) {
 	global $foxypress_url;
 	$mode = trim($atts['mode']);
 	$mode = ($mode == "") ? "single" : $mode;
+	$limit = trim($atts['items']);
+	$limit = (empty($limit)) ? 5 : $limit;
 	$showMainImage = (strtolower(trim($atts['show_main_image'])) == "false") ? false : true;
 	$showAddToCart = (trim($atts['addtocart']) == "1") ? true : false;
 	$showQuantity = (trim($atts['show_qty']) == "1") ? true : false;
@@ -2223,7 +2236,7 @@ function foxypress_shortcode( $atts, $content = null) {
 	}
 	else if(trim($atts['categoryid']) != '' && $mode == 'list')
 	{
-		$returnHTML = foxypress_handle_shortcode_listing(trim($atts['categoryid']), trim($atts['items']), trim($atts['cols']), $showMoreDetail, $showMainImage, $showAddToCart, $showQuantity);
+		$returnHTML = foxypress_handle_shortcode_listing(trim($atts['categoryid']), $limit, trim($atts['cols']), $showMoreDetail, $showMainImage, $showAddToCart, $showQuantity);
 	}
 	else if($mode == 'related')
 	{
@@ -3368,6 +3381,709 @@ function foxypress_LogEvent($event_data) {
 	}
 }
 
+/**
+ * Returns a sorted and tiered array of product categories. Can return only
+ * children of a supplied category if specified.
+ *
+ * @since 0.4.3.6
+ * 
+ * @param int $parent_category If specified, will only return children of this
+ *                             category (optional)
+ * @return array Array of tiered categories
+ */
+function foxypress_get_product_categories( $parent_category = -1 ) {
+	if ($parent_category === -1) {
+		// Retrieve all categories
+		$categories = array();
+		foxypress_get_product_categories_array($categories);
+		return $categories;
+	} else {
+		// Retrieve only categories that are children of the specified $parent_category
+		$categories = array();
+		foxypress_get_product_categories_array($categories, $parent_category);
+		return $categories;
+	}
+}
+
+/**
+ * Returns a sorted and tiered array of all product categories excepting children
+ * of the specified category
+ *
+ * @since 0.4.3.6
+ * 
+ * @param int $not_children_of_cat_id Does not return children from this
+ *                                    category given its category ID
+ * @return array Array of tiered categories
+ */
+function foxypress_get_product_categories_not( $not_children_of_cat_id = 0 ) {
+	// Retrieve all categories except children of the $not_cat_id
+	$categories = array();
+	foxypress_get_product_categories_array($categories);
+	$not_categories = array();
+	foxypress_get_product_categories_array($not_categories, $not_children_of_cat_id);
+	
+	// Remove all not categories from $all_categories
+	for ($i = 0; $i < count($categories); $i++) {
+		for ($j = 0; $j < count($not_categories); $j++) {
+			if ($categories[$i]->category_id === $not_categories[$j]->category_id) {
+				unset($categories[$i]);
+				break;
+			}
+		} 
+	}
+	
+	return $categories;
+}
+
+/**
+ * Recursive function that retrieves product categories, sorts them in 
+ * alphebetical order and arranges child categories as tiered subcategories.
+ *
+ * @since 0.4.3.6
+ * 
+ * @param array &$category_array Array to insert category objects into
+ * @param int    $parent_id      Category ID to start at
+ * @param int    $tier           Tier of initial category
+ */
+function foxypress_get_product_categories_array( &$category_array, $parent_id = 0, $tier = 0 ) {
+	// Get all child categories of $parent_id
+	global $wpdb;
+	$categories = $wpdb->get_results("SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories WHERE category_parent_id = " . $parent_id);
+	
+	if (count($categories) == 0) {
+		return;
+	}
+	
+	// Sort the child categories in alphabetical order
+	usort($categories, "foxypress_compare_categories");
+	
+	// Loop through all child categories and get further children
+	foreach ( $categories as $category ) {
+		$category->category_name = str_repeat("&mdash; ", $tier) . $category->category_name;
+		$category_array[] = $category;
+		
+		foxypress_get_product_categories_array( $category_array, $category->category_id, $tier + 1 );
+	}
+}
+
+/**
+ * Category comparison function, used by foxypress_get_product_categories_array()
+ *
+ * @since 0.4.3.6
+ * 
+ * @param object $a Object A
+ * @param object $b Object B
+ */
+function foxypress_compare_categories($a, $b) {
+	if ($a->category_name == $b->category_name) {
+		return 0;
+	}
+	return ($a->category_name < $b->category_name) ? -1 : 1;
+}
+
+/**
+ * Generates the FoxyPress export file as a CSV. Default location is at 
+ * /wp-content/plugins/foxypress/Export.csv
+ *
+ * @since 0.4.3.6
+ * 
+ * @param String $filename Optional filename for the export file
+ * @param String $location Optional location relative to the foxypress plugin folder
+ *
+ * @return bool True if export was successful, false if not
+ */
+function foxypress_generate_export( $filename = "Export.csv", $location = "/foxypress/" ) {
+	$list = array();
+	
+	// CSV Step 1: Store the CSV version number. Used for import
+	//   compatibility of updated CSV export files 
+	$list[] = ['%%%VERSION', 2];
+	
+	// CSV Step 2: Store category information
+	$list[] = ['%%%CATEGORIES'];
+	$list[] = ["Category ID","Category Name","Category Parent"];
+	
+	global $wpdb;
+	$categories = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories" );
+	foreach ( $categories as $category ) {
+		if ( $category->category_id == 1 ) {
+			// Do not export Default row
+		} else {
+			$row = array();
+			$row[] = $category->category_id;
+			$row[] = $category->category_name;
+			$row[] = $category->category_parent_id;
+			$list[] = $row;
+		}
+	}
+	
+	$list[] = ['%%%PRODUCTS'];
+	
+	$row = array();
+	$row[] = 'Item Code';
+	$row[] = 'Item Name';
+	$row[] = 'Item Description';
+	$row[] = 'Item Category';
+	$row[] = 'Item Price';
+	$row[] = 'Item Sale Price';
+	$row[] = 'Item Sale Start Date';
+	$row[] = 'Item Sale End Date';
+	$row[] = 'Item Weight';
+	$row[] = 'Item Quantity';
+	$row[] = 'Item Quantity Min';
+	$row[] = 'Item Quantity Max';
+	$row[] = 'Item Options';
+	$row[] = 'Item Attributes';	
+	$row[] = 'Item Discount Quantity Amount';	
+	$row[] = 'Item Discount Quantity Percentage';	
+	$row[] = 'Item Discount Price Amount';	
+	$row[] = 'Item Discount Price Percentage';	
+	$row[] = 'Subscription Frequency';	
+	$row[] = 'Subscription Start Date';	
+	$row[] = 'Subscription End Date';	
+	$row[] = 'Item Start Date';	
+	$row[] = 'Item End Date';	
+	$row[] = 'Item Active';				
+	$row[] = 'Item Images';
+	$list[] = $row;
+	
+	$cats = "";
+	$opts = "";
+	$attrs = "";
+	$Items = $wpdb->get_results("select * from " . $wpdb->prefix . "posts where post_type='" . FOXYPRESS_CUSTOM_POST_TYPE . "' and post_status='publish' order by ID");
+	if(!empty($Items))
+	{
+		foreach($Items as $item)
+		{
+			//get categories
+			$cats = "";
+			$InventoryCategories = $wpdb->get_results("select * from " . $wpdb->prefix . "foxypress_inventory_to_category where inventory_id='" . $item->ID. "'");
+			if(!empty($InventoryCategories))
+			{
+				foreach($InventoryCategories as $ic)
+				{
+					$cats .= ($cats == "") ? $ic->category_id : "|" . $ic->category_id;
+				}
+			}		
+			//get options
+			$opts = "";
+			$InventoryOptions = $wpdb->get_results("select * from " . $wpdb->prefix . "foxypress_inventory_options where inventory_id='" . $item->ID. "'");
+			if(!empty($InventoryOptions))
+			{
+				foreach($InventoryOptions as $io)
+				{
+					//GroupName|Text|Value|Price|Weight|code|Quantity|Active|Order
+					$opt = foxypress_get_option_group_name($io->option_group_id) . "|" 
+							. stripslashes($io->option_text) . "|" 
+							. stripslashes($io->option_value) . "|" 
+							. $io->option_extra_price . "|" 
+							. $io->option_extra_weight . "|" 
+							. $io->option_code . "|" 
+							. $io->option_quantity . "|" 
+							. $io->option_active . "|" 
+							. $io->option_order;
+					$opts .= ($opts == "") ? $opt : "~~" . $opt ;
+				}
+			}	
+			//get attributes
+			$attrs = "";
+			$InventoryAttributes = $wpdb->get_results("select * from " . $wpdb->prefix . "foxypress_inventory_attributes where inventory_id='" . $item->ID. "'");
+			if(!empty($InventoryAttributes))
+			{
+				foreach($InventoryAttributes as $ia)
+				{
+					//text|value
+					$attr = $ia->attribute_text . "|" . $ia->attribute_value;
+					$attrs .= ($attrs == "") ? $attr : "~~" . $attr;
+				}
+			}			
+			
+			//get images
+			$images = "";
+			//get images
+			$imageList = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $item->ID, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
+			if(!empty($imageList))
+			{
+				foreach ($imageList as $img) 
+				{
+					$image_source = wp_get_attachment_image_src($img->ID, "full");
+					$images .= ($images == "") ? $image_source[0] : "|" . $image_source[0];							
+				}
+			}
+			
+			//write row					
+			$row = array(); //clear previous items
+			$row[] = get_post_meta($item->ID, "_code", true);
+			$row[] = $item->post_title;
+			$row[] = $item->post_content;
+			$row[] = $cats;
+			$row[] = get_post_meta($item->ID, "_price", true);
+			$row[] = get_post_meta($item->ID, "_saleprice", true);
+			$row[] = get_post_meta($item->ID, "_salestartdate", true);
+			$row[] = get_post_meta($item->ID, "_saleenddate", true);
+			$row[] = get_post_meta($item->ID,'_weight', true);
+			$row[] = get_post_meta($item->ID,'_quantity', true);
+			$row[] = get_post_meta($item->ID,'_quantity_min', true);
+			$row[] = get_post_meta($item->ID,'_quantity_max', true);
+			$row[] = $opts;
+			$row[] = $attrs;
+			$row[] = get_post_meta($item->ID,'_discount_quantity_amount',TRUE);
+			$row[] = get_post_meta($item->ID,'_discount_quantity_percentage',TRUE);
+			$row[] = get_post_meta($item->ID,'_discount_price_amount',TRUE);
+			$row[] = get_post_meta($item->ID,'_discount_price_percentage',TRUE);
+			$row[] = get_post_meta($item->ID,'_sub_frequency',TRUE);
+			$row[] = get_post_meta($item->ID,'_sub_startdate',TRUE);
+			$row[] = get_post_meta($item->ID,'_sub_enddate',TRUE);
+			$row[] = get_post_meta($item->ID,'_item_start_date',TRUE);
+			$row[] = get_post_meta($item->ID,'_item_end_date',TRUE);
+			$row[] = get_post_meta($item->ID,'_item_active',TRUE);		
+			$row[] = $images;
+			$list[] = $row;
+		}
+	}
+	if (file_exists(WP_PLUGIN_DIR . $location . $filename)) 
+	{
+		unlink(WP_PLUGIN_DIR . $location . $filename);
+	}
+	$f = fopen(WP_PLUGIN_DIR . $location . $filename, "x+");
+	
+	foreach ($list as $line)
+	{
+		fputcsv($f, $line );
+		fseek($f, -1, SEEK_CUR);
+		fwrite($f, "\r\n"); 
+	}
+	fclose($f);
+	
+	return true;
+}
+
+/**
+ * Processes a FoxyPress CSV import file. Default location is at 
+ * /wp-content/plugins/foxypress/Import.csv
+ *
+ * @since 0.4.3.6
+ * 
+ * @param bool   $preview  Optional If true, will only generate a preview. If false, will add 
+ *                                  the import data to the database
+ * @param String $filename Optional filename for the export file
+ * @param String $location Optional location relative to the foxypress plugin folder
+ *
+ * @return array Response object as array
+ */
+function foxypress_process_import( $preview = true, $filename = "Import.csv", $location = "/foxypress/" ) {
+	
+	if ( ! $preview ) {
+		// Increase time before PHP times out. Required when fetching images.
+		set_time_limit(360);
+	}
+
+	$response = array();
+	$file = fopen( WP_PLUGIN_DIR . $location . $filename, 'r' );
+
+	// Determine Import.csv version
+	$version = -1;
+	$row_version = fgetcsv( $file );
+	if ( $row_version[0] == "%%%VERSION" ){
+		$version = $row_version[1];
+	} else {
+		$version = 1;
+	}
+
+	// If import is not the new enough for the parser, return an error
+	if ( $version < 2 ) {
+		$response[error] = true;
+		$response[message] = "Unable to import old FoxyPress export. Please update the import file to version 2.";
+		return $response;
+	}
+
+	global $wpdb;
+	$response[categories] = array();
+	$response[products] = array();
+	$current_row = 1;
+	$import_mode = "";
+	$categories = array();
+	$new_cat_ids = array();
+	$empty_rows = 0;
+	$new_cat_count = 0;
+	$new_prod_count = 0;
+
+	while( ! feof( $file ) ) {
+		$current_row++;
+		$row = fgetcsv( $file );
+
+		// Ignore empty rows
+		if ( empty($row[0]) ) {
+			continue;
+		}
+
+		// Check to see if this is a mode set/change row
+		if ( substr( $row[0], 0, 3) == "%%%" ) {
+			// Set new mode
+			$import_mode = substr( $row[0], 3 );
+			// Continue to next row
+			continue;
+		}
+
+		switch ( $import_mode ) {
+			case "CATEGORIES":
+				// Parse category rows here
+
+				// Ignore the title row
+				if ( $row[0] == "Category ID" ) {
+					break;
+				}
+
+				// Validate category data
+				if ( ! is_numeric( $row[0] ) ) {
+					$response[error] = true;
+					$response[message] = "Import parse error on line " . $current_row . "; Category ID must be numeric.";
+					return $response;
+				}
+				if ( empty( $row[1] ) ) {
+					$response[error] = true;
+					$response[message] = "Import parse error for category " . $row[0] . "; Category name cannot be empty.";
+					return $response;
+				}
+				if ( ! is_numeric( $row[2] ) ) {
+					$response[error] = true;
+					$response[message] = "Import parse error for category " . $row[0] . "; Category parent ID must be numeric.";
+					return $response;
+				}
+
+				$cat_import_id = $row[0];
+				$cat_import_name = $row[1];
+				$cat_import_parent_id = $row[2];
+
+				// Determine if matching category name already exists in this FoxyPress install
+				$cat_new_id = foxypress_get_category_by_name( $cat_import_name );
+
+				// Propogate response object for preview
+				if ( $preview ) {
+					$cat_insert_required = false;
+					if ( is_null( $cat_new_id ) ) {
+						$cat_insert_required = true;
+					}
+
+					$response[categories][] = array(
+						"category_import_id" => $cat_import_id,
+						"category_name" => $cat_import_name,
+						"category_parent_id" => $cat_import_parent_id,
+						"category_insert" => $cat_insert_required
+					);
+
+				// If this is not a preview, continue executing import of categories "for real"
+				} else {
+					// Insert category, retrieve new category ID
+					if ( is_null( $cat_new_id ) ) {
+						$cat_new_id = foxypress_insert_category( $cat_import_name );
+						$new_cat_count++;
+					}
+
+					// Add category to categories array, to be further processed after all categories
+					//   have been added to the FoxyPress install
+					$new_cat_ids[$cat_import_id] = $cat_new_id;
+					$new_categories[] = array(
+						"cat_import_id" => $cat_import_id,
+						"cat_import_name" => $cat_import_name,
+						"cat_import_parent_id" => $cat_import_parent_id,
+						"cat_new_id" => $cat_new_id
+					);
+				}
+				break;
+
+			case "PRODUCTS":
+				// Parse product rows here
+
+				// Ignore the title row
+				if ( $row[0] == "Item Code" ) {
+					break;
+				}
+
+				$name = mysql_escape_string($row[1]);
+				$description = $row[2];
+				$code = mysql_escape_string($row[0]);
+				$price = mysql_escape_string(str_replace('$','',$row[4]));
+				$saleprice = mysql_escape_string(str_replace('$','',$row[5]));
+				$salestartdate = mysql_escape_string($row[6]);
+				$saleenddate = mysql_escape_string($row[7]);
+				$weight = mysql_escape_string($row[8]);
+				$quantity = mysql_escape_string($row[9]);
+				$quantity_min = mysql_escape_string($row[10]);
+				$quantity_max = mysql_escape_string($row[11]);
+				$discount_quantity_amount = mysql_escape_string($row[14]);
+				$discount_quantity_percentage = mysql_escape_string($row[15]);
+				$discount_price_amount = mysql_escape_string($row[16]);
+				$discount_price_percentage = mysql_escape_string($row[17]);
+				$sub_frequency = mysql_escape_string($row[18]);
+				$sub_startdate = mysql_escape_string($row[19]);
+				$sub_enddate = mysql_escape_string($row[20]);
+				$item_start_date = mysql_escape_string($row[21]);
+				$item_end_date = mysql_escape_string($row[22]);
+				$item_active = mysql_escape_string($row[23]);
+				$categories = $row[3];
+				$options = $row[12];
+				$attributes = $row[13];
+				$images = mysql_escape_string($row[24]);
+
+				// Generate preview if requested
+				if ( $preview ) {
+					$response['products'][] = array(
+						"_name" => $name,
+						"_description" => $description,
+						"_code" => $code,
+						"_price" => $price,
+						"_saleprice" => $saleprice,
+						"_salestartdate" => $salestartdate,
+						"_saleenddate" => $saleenddate,
+						"_weight" => $weight,
+						"_quantity" => $quantity,
+						"_quantity_min" => $quantity_min,
+						"_quantity_max" => $quantity_max,
+						"_discount_quantity_amount" => $discount_quantity_amount,
+						"_discount_quantity_percentage" => $discount_quantity_percentage,
+						"_sub_frequency" => $sub_frequency,
+						"_sub_startdate" => $sub_startdate,
+						"_sub_enddate" => $sub_enddate,
+						"_item_start_date" => $item_start_date,
+						"_item_end_date" => $item_end_date,
+						"_item_active" => $item_active,
+						"_categories" => $categories,
+						"_options" => $options,
+						"_attributes" => $attributes,
+						"_images" => $images
+					);
+
+				// If this is not a preview, continue executing import of products "for real"
+				} else {
+					$my_post = array(
+						'post_title' => $name,
+						'post_content' => $description,
+						'post_status' => 'publish',
+						'post_author' => 1,
+						'post_type' => FOXYPRESS_CUSTOM_POST_TYPE
+			  	);
+		  		$inventory_id = wp_insert_post( $my_post );
+					foxypress_save_meta_data($inventory_id, '_code', $code);
+					foxypress_save_meta_data($inventory_id, '_price', $price);
+					foxypress_save_meta_data($inventory_id, '_saleprice', $saleprice);
+					foxypress_save_meta_data($inventory_id, '_salestartdate', $salestartdate);
+					foxypress_save_meta_data($inventory_id, '_saleenddate', $saleenddate);
+					foxypress_save_meta_data($inventory_id, '_weight', $weight);
+					foxypress_save_meta_data($inventory_id, '_quantity', $quantity);
+					foxypress_save_meta_data($inventory_id, '_quantity_min', $quantity_min);
+					foxypress_save_meta_data($inventory_id, '_quantity_max', $quantity_max);						
+					foxypress_save_meta_data($inventory_id, '_discount_quantity_amount', $discount_quantity_amount);
+					foxypress_save_meta_data($inventory_id, '_discount_quantity_percentage', $discount_quantity_percentage);
+					foxypress_save_meta_data($inventory_id, '_discount_price_amount', $discount_price_amount);
+					foxypress_save_meta_data($inventory_id, '_discount_price_percentage', $discount_price_percentage);
+					foxypress_save_meta_data($inventory_id, '_sub_frequency', $sub_frequency);
+					foxypress_save_meta_data($inventory_id, '_sub_startdate', $sub_startdate);
+					foxypress_save_meta_data($inventory_id, '_sub_enddate', $sub_enddate);
+					foxypress_save_meta_data($inventory_id, '_item_start_date', $item_start_date);
+					foxypress_save_meta_data($inventory_id, '_item_end_date', $item_end_date);
+					foxypress_save_meta_data($inventory_id, '_item_active', $item_active);
+
+					// Configure product categories
+					$category_array = explode("|", $categories);
+					foreach ( $category_array as $category ) {
+						if ( $category == 1 ) {
+							// Maintain value for default category
+							foxypress_insert_inventory_category_assoc( $inventory_id, 1 );
+						} else {
+							// Set category association to the existing or new category ID
+							foxypress_insert_inventory_category_assoc( $inventory_id, $new_cat_ids[$category] );
+						}
+					}
+
+					// Configure product options
+					$options_array = explode( "~~", $options );
+					foreach ( $options_array as $option ) {
+						$option_array = explode("|", $option);
+						if( count( $option_array ) == 9 ) {
+							//get option group id
+							$OptionGroupID = foxypress_get_option_group_id( $option_array[0] );					
+							$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_options (inventory_id, option_group_id, option_text, option_value, option_extra_price, option_extra_weight, option_code, option_quantity, option_active, option_order) values ('$inventory_id', '" . $OptionGroupID . "', '" . mysql_escape_string($option_array[1]) . "', '" . mysql_escape_string($option_array[2]) . "' , '" . mysql_escape_string(str_replace('$','',$option_array[3])) . "', '" . mysql_escape_string($option_array[4]) . "', '" . mysql_escape_string($option_array[5]) . "', '" . mysql_escape_string($option_array[6]) . "', '" . mysql_escape_string($option_array[7]) . "', '" . mysql_escape_string($option_array[8]) . "')");
+						}	
+					}			
+			
+					// Configure product attributes
+					$attributes_array = explode( "~~", $attributes );
+					foreach ( $attributes_array as $attribute ) {
+						$attribute_array = explode("|", $attribute);
+						if( count($attribute_array) == 2 )
+						{
+							$wpdb->query("insert into " . $wpdb->prefix . "foxypress_inventory_attributes (inventory_id, attribute_text, attribute_value) values ('$inventory_id', '" . mysql_escape_string($attribute_array[0]) . "', '" . mysql_escape_string($attribute_array[1]) . "')");
+						}		
+					}
+					
+					// Configure product images
+					$images_array = explode("|", $images);
+					$directory = ABSPATH . INVENTORY_IMAGE_LOCAL_DIR;
+					$ImageOrder = 0;
+					foreach ( $images_array as $image ) {
+						$ImageOrder++;
+						$path_parts = pathinfo($image);
+						//generate random file name
+						$temp_extension = $path_parts['extension'];									
+						$temp_file_name = foxypress_GenerateNewFileName($temp_extension, $inventory_id, $directory, "fp_");									
+						$temp_destination = $directory . $temp_file_name;
+						//try to get file
+						$img = file_get_contents($image);			
+						if($img)
+						{
+							file_put_contents($temp_destination, $img);
+							foxypress_ConvertImage($temp_destination, $inventory_id, $ImageOrder);
+						}
+					}
+
+					$new_prod_count++;
+				}
+
+				break;
+		}
+
+		// Once all the categories and products have been processed, calculate the correct parent IDs for
+		//   categories with parents specified
+		foreach ( $new_categories as $category ) {
+			if ( $category[cat_import_parent_id] != 0 ) {
+				foxypress_update_category_parent_id( $category[cat_new_id], $new_cat_ids[$category[cat_import_parent_id]] );
+			}
+		}
+	}
+
+	fclose($file);
+	$response[error] = false;
+	$response[message] = "Import successful. $new_prod_count products and $new_cat_count categories added. <a href=\"" . admin_url() . "edit.php?post_type=" . FOXYPRESS_CUSTOM_POST_TYPE . "\">View Inventory</a>";
+	unlink(WP_PLUGIN_DIR . '/foxypress/Inventory.csv');
+	return $response;
+}
+
+/**
+ * Returns category ID of the category with the name supplied. If the category name does not
+ *   exist in FoxyPress, null will be returned.
+ *
+ * @since 0.4.3.6
+ * 
+ * @param String  $category_name  Category name to search for
+ *
+ * @return int/null ID of category with matching name, null if match does not exist
+ */
+function foxypress_get_category_by_name( $category_name ) {
+	global $wpdb;
+	return $wpdb->get_var( "SELECT category_id from " . $wpdb->prefix  . "foxypress_inventory_categories WHERE LOWER( category_name ) = '" . strtolower( $category_name ) . "'" );
+}
+
+/**
+ * Inserts a new category into the foxypress categories table
+ *
+ * @since 0.4.3.6
+ * 
+ * @param String  $category_name       Category name to add
+ * @param int     $category_parent_id  ID of category parent. 0 for no parent (default).
+ * @param String  $category_image      Image to attach to category. Blank by default.
+ *
+ * @return int/boolean ID of inserted row, or false if row could not be inserted
+ */
+function foxypress_insert_category( $category_name, $category_parent_id = 0, $category_image = "" ) {
+	global $wpdb;
+	$wpdb->insert( 
+		$wpdb->prefix . 'foxypress_inventory_categories', 
+		array( 
+			'category_name' => $category_name, 
+			'category_parent_id' => $category_parent_id,
+			'category_image' => $category_image
+		), 
+		array( 
+			'%s',
+			'%d',
+			'%s'
+		)
+	);
+	return $wpdb->insert_id;
+}
+
+/**
+ * Updates category parent ID
+ *
+ * @since 0.4.3.6
+ * 
+ * @param int  $category_id         Category to update
+ * @param int  $category_parent_id  ID of category parent. 0 for no parent (default).
+ */
+function foxypress_update_category_parent_id( $category_id, $category_parent_id = 0 ) {
+	global $wpdb;
+	return $wpdb->update( 
+		// table
+		$wpdb->prefix . "foxypress_inventory_categories", 
+		// data
+		array( 'category_parent_id' => $category_parent_id ), 
+		// where
+		array( 'category_id' => $category_id ),
+		// data_format
+		array( '%d' ), 
+		// where_format
+		array( '%d' )
+	);
+}
+
+/**
+ * Inserts a new inventory->category association
+ *
+ * @since 0.4.3.6
+ * 
+ * @param int  $inventory_id  Inventory ID of item to associate with category
+ * @param int  $category_id   Category ID
+ *
+ * @return int/boolean ID of inserted row, or false if row could not be inserted
+ */
+function foxypress_insert_inventory_category_assoc( $inventory_id, $category_id ) {
+
+	global $wpdb;
+	$wpdb->insert( 
+		$wpdb->prefix . 'foxypress_inventory_to_category', 
+		array( 
+			'inventory_id' => $inventory_id, 
+			'category_id' => $category_id
+		), 
+		array( 
+			'%d',
+			'%d'
+		)
+	);
+	return $wpdb->insert_id;
+}
+
+/**
+ * Returns option ID of given the name supplied. If the option name does not
+ *   exist in FoxyPress, null will be returned.
+ *
+ * @since 0.4.3.6
+ * 
+ * @param String  $option_name  Option name to search for
+ *
+ * @return int/null ID of option with matching name, null if match does not exist
+ */
+function foxypress_get_option_group_id( $option_name ) {
+	global $wpdb;
+	return $wpdb->get_var( "SELECT option_group_id from " . $wpdb->prefix  . "foxypress_inventory_option_group WHERE LOWER( option_group_name ) = '" . strtolower( $option_name ) . "'" );
+}
+
+/**
+ * Returns option group name from given ID. If the option name does not
+ *   exist in FoxyPress, null will be returned.
+ *
+ * @since 0.4.3.6
+ * 
+ * @param int  $option_id  Option name to search for
+ *
+ * @return String/null ID of option with matching name, null if match does not exist
+ */
+function foxypress_get_option_group_name( $option_id ) {
+	global $wpdb;
+	return $wpdb->get_var( "SELECT option_group_name from " . $wpdb->prefix  . "foxypress_inventory_option_group WHERE LOWER( option_group_id ) = '" . $option_id . "'" );
+}
+
 /***************************************************************************************************/
 /***************************************************************************************************/
 /************************************ Foxypress Installation ***************************************/
@@ -3830,6 +4546,9 @@ function foxypress_Installation_HandleTableAlterations()
 	///////////////////////////////////////////////////////////////////////////
 	//add category image
 	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_categories ADD category_image VARCHAR(100) NULL AFTER category_name;";
+	$wpdb->query($sql);
+	//add category parent_id
+	$sql = "ALTER TABLE " . $wpdb->prefix . "foxypress_inventory_categories ADD category_parent_id INT(11) NOT NULL DEFAULT '0' AFTER category_image;";
 	$wpdb->query($sql);
 
 
@@ -4484,6 +5203,21 @@ function foxypress_ConvertImage($file_to_move, $post_id, $menu_order)
 		require_once(ABSPATH . 'wp-admin/includes/image.php');
   		$attachment_data = wp_generate_attachment_metadata($attachment_id, $new_file_path);
   		wp_update_attachment_metadata($attachment_id, $attachment_data);
+		
+		// Attach image to post via wp_foxypress_inventory_images table
+		$wpdb->insert( 
+			$wpdb->prefix . "foxypress_inventory_images", 
+			array( 
+				'inventory_id' => $post_id, 
+				'attached_image_id' => $attachment_id,
+				'image_order' => $menu_order
+			), 
+			array( 
+				'%d', 
+				'%d',
+				'%d'
+			) 
+		);
 	}
 	//delete original image
 	foxypress_DeleteItem($file_to_move);
