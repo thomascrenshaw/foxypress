@@ -1,0 +1,22 @@
+.foxypress_zoom_image {
+	position: relative;
+}
+
+#easy_zoom{
+	background:#fff;
+	border:5px solid #eee;
+	   -moz-box-shadow:0 0 10px #555;
+	-webkit-box-shadow:0 0 10px #555;
+	        box-shadow:0 0 10px #555;
+	color:#333;
+	height:400px;
+	left: 440px; /* <- If foxypress_main_item_image width is changed, also change this */
+	overflow:hidden;
+	position: absolute;
+	top: 0;
+	width:600px;
+	
+	/* vertical and horizontal alignment used for preloader text */
+	line-height:400px;
+	text-align:center;
+}
