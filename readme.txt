@@ -44,6 +44,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.3.7 =
+* Bugfix: Fixed array syntax in foxypress.php that was preventing FoxyPress from activating on servers running a version of PHP older than 5.4
+
 = 0.4.3.6 =
 * Feature: Manage Categories page now supports hierarchy via subcategories. When listing products via the category shortcode, products within subcategories will be listed as well.
 * Update: Import/Export now will import and export category data, including category hierarchy. Categories that already exist will not be overwritten or duplicated. Products will automatically be assigned to the new or existing categories as appropriate.

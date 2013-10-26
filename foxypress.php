@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.6
+Version: 0.4.3.7
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.6");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.7");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -3497,11 +3497,11 @@ function foxypress_generate_export( $filename = "Export.csv", $location = "/foxy
 	
 	// CSV Step 1: Store the CSV version number. Used for import
 	//   compatibility of updated CSV export files 
-	$list[] = ['%%%VERSION', 2];
+	$list[] = array('%%%VERSION', 2);
 	
 	// CSV Step 2: Store category information
-	$list[] = ['%%%CATEGORIES'];
-	$list[] = ["Category ID","Category Name","Category Parent"];
+	$list[] = array('%%%CATEGORIES');
+	$list[] = array("Category ID","Category Name","Category Parent");
 	
 	global $wpdb;
 	$categories = $wpdb->get_results( "SELECT * FROM " . $wpdb->prefix . "foxypress_inventory_categories" );
@@ -3517,7 +3517,7 @@ function foxypress_generate_export( $filename = "Export.csv", $location = "/foxy
 		}
 	}
 	
-	$list[] = ['%%%PRODUCTS'];
+	$list[] = array('%%%PRODUCTS');
 	
 	$row = array();
 	$row[] = 'Item Code';
