@@ -1387,7 +1387,7 @@ function foxypress_product_options_setup()
             <td>
                 <div id="inventory-help">
                     <a href="#"><img src="<?php echo(plugins_url())?>/foxypress/img/help-icon.png" height="15px" />
-                    <span><?php _e('Use this field if you have a unique product code and would like to keep track of inventory at the option specific level.', 'foxypress'); ?></span></a>
+                    <span><?php _e('Use this field if you have a unique product code and would like to keep track of inventory at the option specific level. Quantity will be reduced by one for each option sold. When quantity reaches 0, option will be listed as sold out. Leave blank to disable quantity tracking for this option.', 'foxypress'); ?></span></a>
                 </div>
             </td>
         </tr>

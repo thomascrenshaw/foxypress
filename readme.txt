@@ -44,6 +44,9 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.3.8 =
+* Bugfix: Product option quantity fix in 0.4.3.6 intruduced another bug where option quantity could no longer be untracked. The option quantity field can now be left blank to prevent quantity tracking for that option. Product options quantity tooltip has been updated accordingly.
+
 = 0.4.3.7 =
 * Bugfix: Fixed array syntax in foxypress.php that was preventing FoxyPress from activating on servers running a version of PHP older than 5.4
 
