@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.8
+Version: 0.4.3.10
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.8");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.10");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -1749,7 +1749,7 @@ function foxypress_handle_shortcode_detail($showMainImage, $showQuantityField, $
 								"<div class=\"foxypress_item_submit_wrapper_detail\">
 									<input type=\"submit\" value=\"Add To Cart\" class=\"foxypress_item_submit_detail\" />
 								</div>"
-							:  "<div class=\"foxypress_item_submit_wrapper_detail\">
+							:  "<div class=\"foxypress_item_submit_wrapper_detail out-of-stock\">
 							    	<span>" . $OutOfStockMessage . "</span>
 							    </div>"
 						 )
@@ -4083,6 +4083,49 @@ function foxypress_get_option_group_id( $option_name ) {
 function foxypress_get_option_group_name( $option_id ) {
 	global $wpdb;
 	return $wpdb->get_var( "SELECT option_group_name from " . $wpdb->prefix  . "foxypress_inventory_option_group WHERE LOWER( option_group_id ) = '" . $option_id . "'" );
+}
+
+/**
+ * Returns primary category of given product
+ *
+ * @since 0.4.3.9
+ * 
+ * @param int  $inventory_id  Inventory ID of product to find primary category
+ *
+ * @return String Name of inventory item primary category, or the first category if there is no primary cat set
+ */
+function foxypress_get_primary_category( $inventory_id ) {
+	global $wpdb;
+	$primaryCategories = $wpdb->get_results("SELECT c.category_name, c.category_id, itc.itc_id, itc.category_primary
+												FROM " . $wpdb->prefix . "foxypress_inventory_to_category" . " as itc inner join " .
+												$wpdb->prefix . "foxypress_inventory_categories" . " as c on itc.category_id = c.category_id
+												WHERE inventory_id='" . $inventory_id . "'");
+	$primary_category = "";
+	foreach($primaryCategories as $pc)
+	{
+		if($pc->category_primary == 1) {
+			$primary_category = $pc->category_name;
+		} 
+	}
+
+	if ( $primary_category === "" ) {
+		$category_names = $wpdb->get_col( $wpdb->prepare( 
+			"
+			SELECT      ic.category_name
+			FROM        " . $wpdb->prefix . "foxypress_inventory_to_category as itc
+			JOIN        " . $wpdb->prefix . "foxypress_inventory_categories as ic
+			ON          itc.category_id = ic.category_id
+			WHERE       itc.inventory_id = %d
+			",
+			$inventory_id
+		) );
+
+		if ( sizeof( $category_names ) > 0 ) {
+			$primary_category = $category_names[0];
+		}
+	}
+
+	return $primary_category;
 }
 
 /***************************************************************************************************/

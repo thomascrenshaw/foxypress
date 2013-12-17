@@ -44,6 +44,17 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
+= 0.4.3.10 =
+* Updated: Product feed now supports custom attributes via the foxypress_product_feed_additional_attributes filter
+* Updated: Products now have a "Product Feed Options" option group in the "Extra Product Details" meta box that allows a product color to be specified. This color appears in the product feed as <g:color>{set color}</g:color>
+* Updated: Product feed now properly retrieves the main inventory image
+* Bugfix: FoxyPress menu icon updated for Wordpress version 3.8
+* Updated: Added an out-of-stock css class to the submit wrapper of an item that has a quantity of 0 to allow for more selective styling
+
+= 0.4.3.9 =
+* Updated: Products may now have option codes and quantities set for one unique option group. For example, if a single product has options for both Size and Color option groups, one of those groups may now have codes set and quantities tracked. Previously option codes and quantities could not be set for products with options from multiple option groups.
+* Updated: Added a foxypress_get_primary_category method to retrieve the primary category for a given product ID.
+
 = 0.4.3.8 =
 * Bugfix: Product option quantity fix in 0.4.3.6 intruduced another bug where option quantity could no longer be untracked. The option quantity field can now be left blank to prevent quantity tracking for that option. Product options quantity tooltip has been updated accordingly.
 

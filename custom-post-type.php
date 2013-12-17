@@ -19,24 +19,8 @@ add_filter( 'request', 'foxypress_product_sortable_columns_orderby' );
 add_filter('post_updated_messages', 'foxypress_updated_messages');
 add_action('admin_init', 'foxypress_product_meta_init');
 add_action('before_delete_post', 'foxypress_delete_product');
-add_action( 'admin_head', 'wpt_portfolio_icons' );
 
 define('SCRIPT_DEBUG', true);
-
-function wpt_portfolio_icons() {
-    ?>
-    <style type="text/css" media="screen">
-        #menu-posts-foxypress_product .wp-menu-image {
-            background: url(<?php echo(plugins_url()) ?>/foxypress/img/icon_foxypress.png) no-repeat 6px 6px !important;
-        }
-	    #menu-posts-foxypress_product:hover .wp-menu-image, #menu-posts-portfolio.wp-has-current-submenu .wp-menu-image {
-	            background-position:6px -16px !important;
-				background: url(<?php echo(plugins_url()) ?>/foxypress/img/icon_foxypress_white.png) no-repeat 6px 6px !important;
-	        }
-	    #icon-edit.icon32-posts-foxypress_product {background: url(<?php echo(plugins_url()) ?>/foxypress/img/icon_foxypress_32.png) no-repeat;}
-	    .option_image_preview img{max-width: 150px;}
-    </style>
-<?php }
 
 function foxypress_create_custom_post_type()
 {
@@ -57,8 +41,7 @@ function foxypress_create_custom_post_type()
 		'not_found' =>  __('No Products Found', 'foxypress'),
 		'not_found_in_trash' => __('No Products Found in Trash', 'foxypress'),
 		'search_items' => __('Search Products', 'foxypress'),
-		'parent_item_colon' => '',
-		'menu_icon' => plugins_url() . '/img/icon_foxypress.png'
+		'parent_item_colon' => ''
 	);
 	$post_type_support = array('title','editor','thumbnail','excerpt', 'comments');
 	$custom_post_slug = "products";
@@ -74,7 +57,8 @@ function foxypress_create_custom_post_type()
 		'capability_type' => 'page',
 		'hierarchical' => false,
 		'supports' => $post_type_support,
-		'rewrite' => array("slug" => $custom_post_slug)
+		'rewrite' => array("slug" => $custom_post_slug),
+		'menu_icon' => plugins_url('/img/icon_foxypress.png', __FILE__)
 	));
 }
 
@@ -848,6 +832,8 @@ function foxypress_extra_product_details_setup()
 
 	$_item_email_active = get_post_meta($post->ID, '_item_email_active', TRUE);
 	$_item_email_template = get_post_meta($post->ID, '_item_email_template', TRUE);
+
+	$_item_color = get_post_meta($post->ID, '_item_color', TRUE);
 ?>
 	<h4>
 		<?php 
@@ -966,6 +952,13 @@ function foxypress_extra_product_details_setup()
         <div style="clear: both;"></div>
 	</div>
 	<div style="clear: both;"></div>
+    <h4><?php _e('Product Feed Options', 'foxypress'); ?></h4>
+    <div class="foxypress_field_control">
+		<label for="_item_color"><?php _e('Color', 'foxypress'); ?></label>
+		<input type="text" name="_item_color" id="_item_color" value="<?php echo $_item_color; ?>" />
+        <div style="clear: both;"></div>
+    </div>
+	<div style="clear: both;"></div>
     <script type="text/javascript" langauge="javascript">
 		jQuery(document).ready(function() {
 		  	jQuery('#_salestartdate').datepicker({dateFormat : 'yy-mm-dd'});
@@ -1051,8 +1044,14 @@ function foxypress_product_meta_save($post_id)
 	{
 		//save option data
 			$rowsToProcess = foxypress_FixPostVar('hdn_foxy_options_count');
+
 			if($rowsToProcess > 0)
 			{
+				// This array is used to track if there is an option code associated
+				//   with each unique option group, as a single product cannot have 
+				//   more than one option group with codes
+				$option_groups_codes = array();
+
 				for($i=1; $i<=$rowsToProcess; $i++)
 				{
 					$optionID = foxypress_FixPostVar('hdn_foxy_option_id_' . $i);
@@ -1076,18 +1075,24 @@ function foxypress_product_meta_save($post_id)
 									  ,option_image = '" . $optionImage . "'
 									 ,option_active = '" . $optionActive. "'
 								  where option_id='" . $optionID . "'");
+
+					// If this option has a code set, add it to the array of unique
+					//   option groups with codes set
+					if (!empty($optionCode)) {
+						$option_groups_codes[$optiongroupid] = true;
+					}
 				}
 
-				//NOTE: currently unique product option codes only work per 1 group per item, so if they try entering in unique codes for mulitple
-				//option groups we need ot wipe them out.
-				$BadData = $wpdb->get_row("select count(distinct option_group_id) as GroupCount from " . $wpdb->prefix . "foxypress_inventory_options". " where inventory_id='" . $inventory_id . "'");
-				if(!empty($BadData) && $BadData->GroupCount > 1)
-				{
-					//wipe out the codes and quantities
+				// This line used for debugging to database
+				//foxypress_LogEvent("Saving options. Option groups with codes: " . count($option_groups_codes));
+
+				// If there is more than one option group with product codes assigned, clear
+				//   all this product's option group codes and quantities
+				if (count($option_groups_codes) > 1) {
 					$wpdb->query("update " . $wpdb->prefix . "foxypress_inventory_options" . "
-								  set option_quantity = NULL
-									,option_code = NULL
-								  where inventory_id = '" . $inventory_id . "'");
+						  set option_quantity = NULL
+							,option_code = NULL
+						  where inventory_id = '" . $inventory_id . "'");
 				}
 			}
 			//update sort order
@@ -1153,6 +1158,8 @@ function foxypress_product_meta_save($post_id)
 		foxypress_save_meta_data($post_id, '_item_start_date',$_POST['_item_start_date']);
 		foxypress_save_meta_data($post_id, '_item_end_date',$_POST['_item_end_date']);
 		foxypress_save_meta_data($post_id, '_item_active',$_POST['_item_active']);
+
+		foxypress_save_meta_data($post_id, '_item_color',$_POST['_item_color']);
 
 		//categories
 		$cats = $_POST['foxy_categories'];
