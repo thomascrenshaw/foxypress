@@ -690,7 +690,17 @@ function foxypress_product_images_setup()
 		    	if ($('#product-image-' + media_attachment.id).length > 0) {
 		    		// Image already exists - do not add again
 		    	} else {
-		    		$('#inventory_images > ul').append("<li id='product-image-" + media_attachment.id + "' class='CreatePhoto'><div class='PhotoWrapper'><img src='" + media_attachment.sizes.thumbnail.url + "' style='max-width:150px;' /><div id='remove-image-" + media_attachment.id + "' class='remove-image'><img src='<?php echo  plugins_url( 'img/x.png' , __FILE__ ); ?>' /></div></div></li>");
+		    		
+		    		var thumbnail_url;
+		    		if (media_attachment.sizes.thumbnail !== undefined) {
+		    			// Image thumbnail exists
+		    			thumbnail_url = media_attachment.sizes.thumbnail.url;
+		    		} else {
+		    			// No thumbnail - use full image URL
+		    			thumbnail_url = media_attachment.url;
+		    		}
+
+		    		$('#inventory_images > ul').append("<li id='product-image-" + media_attachment.id + "' class='CreatePhoto'><div class='PhotoWrapper'><img src='" + thumbnail_url + "' style='max-width:150px;' /><div id='remove-image-" + media_attachment.id + "' class='remove-image'><img src='<?php echo  plugins_url( 'img/x.png' , __FILE__ ); ?>' /></div></div></li>");
 		    	}
 		    }
 		    

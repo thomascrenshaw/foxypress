@@ -2,8 +2,8 @@
 Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/support/
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
-Requires at least: 3.0
-Tested up to: 3.7
+Requires at least: 3.5
+Tested up to: 3.8
 Stable tag: 3.0.1
 FoxyPress is a FREE shopping cart and product management plugin that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
@@ -43,6 +43,12 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 * Easy Image Zoom - http://cssglobe.com/jquery-plugin-easy-image-zoom/
 
 == Changelog ==
+
+= 0.4.4.0 =
+* Updated: foxypress_GetProduct now returns the correct images per the latest FoxyPress image adding/sorting instead of the old Wordpress images-attached-to-posts method. Legacy image displaying and sorting can be applied via foxypress_GetProduct($inventory_id, true);
+* Bugfix: Categories now working properly on clean FoxyPress installations. The parent category feature previously prevented categories from working on new FoxyPress installs.
+* Bugfix: Images that Wordpress don't generate thumbnails for (such as when the image is smaller than thumbnail dimensions or thumbnail resizing is disabled) can now be added as product images.
+* Updated: Product images css now updated to be cleaner and enable easier sorting with images of different aspect ratios.
 
 = 0.4.3.10 =
 * Updated: Product feed now supports custom attributes via the foxypress_product_feed_additional_attributes filter

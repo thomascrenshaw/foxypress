@@ -5,7 +5,7 @@ Plugin Name: FoxyPress
 Plugin URI: http://www.foxy-press.com/
 Description: FoxyPress provides a complete shopping cart and inventory management tool for use with FoxyCart's e-commerce solution. Easily manage inventory, view and track orders, generate reports and much more.
 Author: WebMovement, LLC
-Version: 0.4.3.10
+Version: 0.4.4.0
 Author URI: http://www.webmovementllc.com/
 
 **************************************************************************
@@ -130,7 +130,7 @@ define('FOXYPRESS_USE_COLORBOX', '1');
 define('FOXYPRESS_USE_LIGHTBOX', '2');
 define('FOXYPRESS_USE_EASYIMAGEZOOM', '3');
 define('FOXYPRESS_CUSTOM_POST_TYPE', 'foxypress_product');
-define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.3.10");
+define('WP_FOXYPRESS_CURRENT_VERSION', "0.4.4.0");
 define('FOXYPRESS_PATH', dirname(__FILE__));
 define('FOXYPRESS_USER_PORTAL','user');
 if ( !empty ( $foxypress_url ) ){
@@ -1156,14 +1156,7 @@ function foxypress_GetImageThumbs($post_id, $title, $css_class, $image_mode, $mi
 	}
 	
 	// Get remaining inventory images attached to this product
-	$inventory_images = $wpdb->get_results( 
-		"
-		SELECT attached_image_id, image_id
-		FROM " . $wpdb->prefix . "foxypress_inventory_images
-		WHERE inventory_id = " . $post_id . " 
-		ORDER BY image_order ASC
-		"
-	);
+	$inventory_images = foxypress_GetInventoryImages($post_id);
 	
 	foreach ( $inventory_images as $image ) 
 	{
@@ -1204,6 +1197,29 @@ function foxypress_RemoveInventoryImage($inventory_image_id) {
 	
 	$query = "DELETE FROM " . $wpdb->prefix . "foxypress_inventory_images WHERE image_id='" . $wpdb->escape($inventory_image_id) . "'";
 	return $wpdb->query($query);
+}
+
+/**
+ * Inserts a new inventory->category association
+ *
+ * @since 0.4.4.0
+ *
+ * @param int $post_id ID of post to retrieve images for
+ *
+ * @return Inventory images as a PHP object
+ */
+function foxypress_GetInventoryImages($post_id) {
+	global $wpdb;
+	$inventory_images = $wpdb->get_results( 
+		"
+		SELECT attached_image_id, image_id
+		FROM " . $wpdb->prefix . "foxypress_inventory_images
+		WHERE inventory_id = " . $post_id . " 
+		ORDER BY image_order ASC
+		"
+	);
+
+	return $inventory_images;
 }
 
 function foxypress_handle_shortcode_item($InventoryID, $showMoreDetail = false, $ShowAddToCart = true, $ShowMainImage = true, $ShowQuantityField = false, $CssSuffix = '', $IsPartOfListing = false)
@@ -4726,6 +4742,7 @@ function foxypress_Installation_CreateInventoryCategoryTable()
 				category_id INT(11) NOT NULL AUTO_INCREMENT,
 				category_name VARCHAR(30) NOT NULL,
 				category_image VARCHAR(100) NULL,
+				category_parent_id INT(11) NOT NULL DEFAULT '0',
 				PRIMARY KEY (category_id)
 			)";
 	$wpdb->query($sql);

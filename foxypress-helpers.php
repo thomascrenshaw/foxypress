@@ -11,7 +11,7 @@ Copyright (C) 2008-2013 WebMovement, LLC - View License Information - FoxyPress.
 /***************************************************************************************************/
 /***************************************************************************************************/
 
-function foxypress_GetProduct($inventory_id)
+function foxypress_GetProduct($inventory_id, $legacy_images = false)
 {
 	global $wpdb, $post;
 	$item = $wpdb->get_row("select i.*
@@ -83,12 +83,25 @@ function foxypress_GetProduct($inventory_id)
 
 		//images
 		$images = array();
-		$current_images = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
-		foreach ($current_images as $img)
-		{
-			$src = wp_get_attachment_image_src($img->ID, 'full');
-			$images[] = array("id" => $img->ID, "name" => $src[0], "order" => $img->menu_order);
+		if ($legacy_images) {
+			// Old method of retrieving inventory images by the post they're attached to
+			$current_images = get_posts(array('numberposts' => -1, 'post_type' => 'attachment','post_status' => null,'post_parent' => $inventory_id, 'order' => 'ASC','orderby' => 'menu_order', 'post_mime_type' => 'image'));
+			foreach ($current_images as $img)
+			{
+				$src = wp_get_attachment_image_src($img->ID, 'full');
+				$images[] = array("id" => $img->ID, "name" => $src[0], "order" => $img->menu_order);
+			}
+		} else {
+			// Updated image retrieving
+			$inventory_images = foxypress_GetInventoryImages($inventory_id);
+			$count = 0;
+			foreach ($inventory_images as $image) {
+				$src = wp_get_attachment_image_src($image->attached_image_id, 'full');
+				$images[] = array("id" => $image->attached_image_id, "name" => $src[0], "order" => $count);
+				$count++;
+			}
 		}
+
 		$product['images'] = $images;
 
 		//options
