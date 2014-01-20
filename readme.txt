@@ -44,7 +44,7 @@ FoxyPress is developed and implemented soley by WebMovement, LLC. Additional Fox
 
 == Changelog ==
 
-= 0.4.4.0 =
+= 0.4.4 =
 * Updated: foxypress_GetProduct now returns the correct images per the latest FoxyPress image adding/sorting instead of the old Wordpress images-attached-to-posts method. Legacy image displaying and sorting can be applied via foxypress_GetProduct($inventory_id, true);
 * Bugfix: Categories now working properly on clean FoxyPress installations. The parent category feature previously prevented categories from working on new FoxyPress installs.
 * Bugfix: Images that Wordpress don't generate thumbnails for (such as when the image is smaller than thumbnail dimensions or thumbnail resizing is disabled) can now be added as product images.
