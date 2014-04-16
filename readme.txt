@@ -3,7 +3,7 @@ Contributors: webmovementllc
 Donate link: http://www.foxy-press.com/support/
 Tags: foxycart, shopping cart, inventory, management, ecommerce, selling, subscription
 Requires at least: 3.5
-Tested up to: 3.8
+Tested up to: 3.9
 Stable tag: 3.0.1
 FoxyPress is a FREE shopping cart and product management plugin that integrates with FoxyCart's e-commerce solution to help you get your store up and running quickly and efficiently. 
 
